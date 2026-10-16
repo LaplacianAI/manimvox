@@ -58,7 +58,7 @@ Afterwards:
 
 ## 5 Finals
 
-Run `manimvox render epNN` for each episode, never more than two at once: renders are CPU-bound. Rendering needs the narration voice. If it asks to download a model or to go online, that needs the user's go-ahead; with none, stop and report. If the chosen voice cannot be used and the user cannot be asked, follow [manimvox-voice](../manimvox-voice/SKILL.md): use only a local voice that `manimvox voices` shows ready, name it in the report, otherwise stop. A render is done only when it prints `audio check: ok`. A silent line is a failure frames cannot show: reword it and render again.
+Run `manimvox render epNN` for each episode, never more than two at once: renders are CPU-bound. Rendering needs the narration voice. A model download needs the user's go-ahead (pass `--yes` or `-y` only after they have said yes to it), and so does an online voice. If the user cannot be asked, a needed download counts as the voice being unusable: use [manimvox-voice](../manimvox-voice/SKILL.md)'s local fallback (a local voice `manimvox voices` shows ready, named in the report), else stop and report. A render is done only when it prints `audio check: ok`. A silent line is a failure frames cannot show: reword it and render again.
 
 If you can view video or images, look at 4 to 6 moments of each `out/epNN_*.mp4`. Otherwise the sheets and `manimvox check layout epNN` (which reads the last draft, not the final) are the check, and the report says the finals' frames were not viewed.
 

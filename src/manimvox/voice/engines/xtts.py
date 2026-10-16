@@ -9,7 +9,7 @@ from pathlib import Path
 
 import soundfile as sf
 
-from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError, clone_reference
+from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError, clone_reference, install_hint
 from ..download import engine_dir, file_digest, scoped_env
 
 MODEL = "tts_models/multilingual/multi-dataset/xtts_v2"
@@ -62,7 +62,7 @@ class XTTSEngine(VoiceEngine):
 
     def status(self) -> EngineStatus:
         if not _installed():
-            return EngineStatus(False, 'not installed: uv tool install "manimvox[xtts]"')
+            return EngineStatus(False, f"not installed: {install_hint('xtts')}")
         if not model_present():
             return EngineStatus(True, "model downloads on first use (asks first); voice is clone=<speaker.wav>")
         return EngineStatus(True, "model ready; voice is clone=<speaker.wav>")

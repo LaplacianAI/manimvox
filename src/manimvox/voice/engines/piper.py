@@ -8,7 +8,7 @@ import wave
 from collections.abc import Callable
 from pathlib import Path
 
-from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError
+from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError, install_hint
 from ..download import RemoteFile, engine_dir, ensure_files, fetch, file_digest, verified
 
 REV = "c10ece1aade47bb51c153c893d14e5bf8e5b7117"  # rhasspy/piper-voices, 2026-09-17
@@ -73,7 +73,7 @@ class PiperEngine(VoiceEngine):
 
     def status(self) -> EngineStatus:
         if not _installed():
-            return EngineStatus(False, 'not installed: uv tool install "manimvox[piper]"')
+            return EngineStatus(False, f"not installed: {install_hint('piper')}")
         have = len(list(voice_dir().glob("*.onnx"))) if voice_dir().exists() else 0
         return EngineStatus(True, f"{have} voice(s) downloaded in {voice_dir()}; others download on first use")
 

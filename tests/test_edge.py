@@ -40,7 +40,7 @@ def test_rate_arg(speed, arg):
 
 def test_not_installed(monkeypatch):
     monkeypatch.setitem(sys.modules, "edge_tts", None)
-    with pytest.raises(EngineNotInstalled, match=r"manimvox\[edge\]"):
+    with pytest.raises(EngineNotInstalled, match=r"manimvox\[kokoro,edge\]"):
         ed.EdgeEngine().prepare("en-US-AriaNeural", lambda p: True, None)
 
 

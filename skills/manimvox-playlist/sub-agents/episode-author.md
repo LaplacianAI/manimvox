@@ -5,7 +5,7 @@ One author per episode. The brief is the author's only context; fill every brack
 ```text
 Write episode [NN] of the "[series]" playlist, in the project folder [series dir].
 
-Read first, in this order:
+Read first, in this order (the skill files are in the manimvox skills folder: run `python -c "import manimvox; print(manimvox.skills_path())"`, or ask the orchestrator for the path):
 1. manimvox-core's SKILL.md, then its references/author-guide.md   the rules, the kit API, the lessons
 2. [series dir]/SERIES.md    the viewer, the ladder, your beats, the running example
 3. [series dir]/FACTS.md     the only claims you may make

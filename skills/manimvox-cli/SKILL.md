@@ -89,11 +89,11 @@ These skills reach a coding agent through `manimvox skills`. Run it only with th
 | `manimvox skills update` | installs again, in the mode (link or copy) each folder already uses |
 | `manimvox skills remove` | deletes only the manimvox skills, never another entry |
 
-Flags: `--agent ID` (repeatable) picks agents; `--global` works on every project, `--project` (the default) on this one; `--copy` copies instead of linking; `-y` / `--yes` answers yes.
+Flags by subcommand: `install` takes `--agent ID` (repeatable), `--global` or `--project`, `--copy`, `--native`, `-y` / `--yes`; `check` takes `--global` or `--project`; `update` takes `--global` or `--project` and `-y` / `--yes` (nothing to ask, so it changes nothing); `remove` takes `--global` or `--project` and `-y` / `--yes`. `--global` works on every project, `--project` (the default) on this one.
 
-- `install`, `update` and `remove` touch only the ten manimvox skills. Anything else at one of those names is skipped with a message ("exists and is not a manimvox skill; left untouched") and the command exits `1`.
-- `check`, `update` and `remove` look in every known agent folder for the scope, not only the detected agents. `check` exits `1` and says so when nothing is installed.
-- With no terminal, `install` needs `--yes` (add `--agent ID` to choose agents; without it every detected agent gets the skills) and `remove` needs `--yes`; otherwise they exit `2`. On a terminal, `--yes` skips the questions.
+- `install`, `update` and `remove` touch only the ten manimvox skills. Anything else at one of those names is left untouched with a message ("exists and is not a manimvox skill; left untouched") and the command exits `1`, on the `npx` path too: it checks before handing off and does not run `npx` if anything would be overwritten.
+- `check`, `update` and `remove` look in every known agent folder for the scope, not only the detected agents. `check` and `update` exit `1` and say so when nothing is installed.
+- With no terminal, `install` needs `--yes` on every path, native included (add `--agent ID` to choose agents; without it every detected agent gets the skills, or the shared `.agents/skills` folder when none is detected) and `remove` needs `--yes`; otherwise they exit `2`. An `npx` found in the current folder is ignored; the built-in installer runs instead. On a terminal, `--yes` skips the questions.
 - After upgrading manimvox, run `manimvox skills update`.
 
 ## Speed

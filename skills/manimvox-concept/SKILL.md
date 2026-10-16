@@ -41,7 +41,7 @@ Pick two or three reputable references: a textbook, the original paper, the stan
 
 ## 2 Facts
 
-Write `FACTS.md` before any narration, adding the URLs from step 1: every spoken or on-screen claim is a line with a source. One claim per line, with its source (a URL, or a book with chapter and page) and a label. Everything from these references is `[EXTERNAL]`, and so is labelled on screen where it appears. Rules and labels are in [facts](../manimvox-creative/references/facts.md). An example you invent for the picture, such as sample numbers, is marked on screen as an example and kept as the running example. A claim with no source line is dropped, or shown as open.
+Write `FACTS.md` before any narration, adding the URLs from step 1: every spoken or on-screen claim is a line with a source. One claim per line, with its source (a URL, or a book with chapter and page) and a label. The concept video's references are its sources: label what comes from them `[SOURCE]` with the citation. Use `[EXTERNAL]` only for an aside from outside those references, and only those are labelled on screen. Rules and labels are in [facts](../manimvox-creative/references/facts.md). An example you invent for the picture, such as sample numbers, is marked on screen as an example and kept as the running example. A claim with no source line is dropped, or shown as open.
 
 ## 3 Theme
 
@@ -69,7 +69,7 @@ Then loop: `manimvox draft ep01 --every 5`, read every contact sheet in `sheets/
 
 ## 6 Final
 
-Run `manimvox render ep01`. This needs the narration voice. If it asks to download a model or to go online, that needs the user's go-ahead; with none, stop and report. Pass `--yes` (or `-y`) only after the user has said yes to that download. If the chosen voice cannot be used and the user cannot be asked, follow [manimvox-voice](../manimvox-voice/SKILL.md): use only a local voice that `manimvox voices` shows ready, name it in the report, otherwise stop. The render is done only when it prints `audio check: ok`. If a line is silent, reword it and render again.
+Run `manimvox render ep01`. This needs the narration voice. A model download needs the user's go-ahead (pass `--yes` or `-y` only after they have said yes to it), and so does an online voice. If the user cannot be asked, a needed download counts as the voice being unusable: use [manimvox-voice](../manimvox-voice/SKILL.md)'s local fallback (a local voice `manimvox voices` shows ready, named in the report), else stop and report. The render is done only when it prints `audio check: ok`. If a line is silent, reword it and render again.
 
 If you can view video or images, look at 4 to 6 moments of `out/ep01_<name>.mp4`, one from each stage of the story. Otherwise the draft's sheets and `manimvox check layout ep01` (which reads the last draft, not the final) are the check, and the report says the final's frames were not viewed.
 

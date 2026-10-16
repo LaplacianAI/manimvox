@@ -17,7 +17,7 @@ A contact sheet is a 3 by 3 grid of frames. Code that runs is not a video that r
 
 Draft timing is estimated at 2.6 words a second; the final uses the real audio length. Never hard-code a wait to match speech; use `say`, `steps` or `narrate`.
 
-Write only your own `episodes/epNN_*.py`. Do not edit the kit, `series.json` or other episodes. If the kit has a bug, work around it in your file and report it.
+Write your episode file `episodes/epNN_*.py` and register it in `series.json`. When you are an episode author briefed by an orchestrator, do not edit the kit, `series.json` or other episodes; report what they need. If the kit has a bug, work around it in your file and report it.
 
 ## 1 · Kit cheat sheet (`from manimvox.kit import *`)
 

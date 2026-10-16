@@ -41,7 +41,7 @@ State these; do not ask about them:
 
 - 16:9 at 1080p, 30 frames a second.
 - English, the only narration language in this version.
-- The voice `kokoro:af_heart`, which runs locally. A different, online or cloned voice is the user's choice: see [manimvox-voice](../manimvox-voice/SKILL.md).
+- The voice `kokoro:af_heart`, which runs locally. A different, online or cloned voice is the user's choice, except the voice skill's local fallback when the user cannot be asked: see [manimvox-voice](../manimvox-voice/SKILL.md).
 
 ## 5 Domain skills
 

@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError
+from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError, install_hint
 from ..download import RemoteFile, cache_root, ensure_files, fetch, verified
 
 __all__ = ["MODELS", "MODEL_BASE", "KokoroEngine", "cache_root", "ensure_models", "model_dir"]
@@ -49,7 +49,7 @@ class KokoroEngine(VoiceEngine):
         try:
             import kokoro_onnx  # noqa: F401
         except ImportError:
-            return EngineStatus(False, 'not installed: uv tool install "manimvox[kokoro]"')
+            return EngineStatus(False, f"not installed: {install_hint('kokoro')}")
         if not self._models_ready():
             return EngineStatus(False, f"model files not downloaded ({model_dir()}); a render will offer to")
         return EngineStatus(True, f"models in {model_dir()}")

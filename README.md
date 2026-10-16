@@ -48,7 +48,12 @@ manimvox doctor
 
 `manimvox doctor` checks the system libraries, fonts and voice engines, and names the command that fixes anything missing. The first run can take a few minutes while Pango builds its font cache.
 
-Add more voices with extras, for example `manimvox[kokoro,piper]`:
+Add more voices by reinstalling with the extras you want, keeping `kokoro`:
+
+```bash
+uv tool install --force "manimvox[kokoro,piper] @ git+https://github.com/LaplacianAI/manimvox"
+```
+
 
 | Extra | Adds |
 |---|---|
@@ -119,7 +124,7 @@ manimvox ships ten agent skills, so your coding agent can plan, write, render an
 
 ```bash
 npx skills add LaplacianAI/manimvox                      # detects your agents and lets you pick
-npx skills add LaplacianAI/manimvox --all -g             # every agent, for all projects
+npx skills add LaplacianAI/manimvox -g -y                # your detected agents, for all projects, no prompts
 npx skills add LaplacianAI/manimvox -a claude-code -a codex -y
 ```
 
@@ -133,7 +138,7 @@ manimvox skills update
 manimvox skills remove
 ```
 
-Other flags: `--project` (the default) installs in the current project, `--copy` copies the skills instead of linking them, and `--native` skips npx even when it is present. Without a terminal, pass `--yes`. Only the ten manimvox skills are ever touched.
+Other flags: `--project` (the default) installs in the current project, `--copy` copies the skills instead of linking them, and `--native` skips npx even when it is present. Without a terminal, `install` and `remove` need `--yes` (with `--agent ID` to choose agents), npx or not. An `npx` in the current folder is ignored. Only the ten manimvox skills are ever touched.
 
 `npx skills add LaplacianAI/manimvox` fetches from GitHub, so it installs whatever is on the default branch. `manimvox skills install` installs the skills that match your installed manimvox version.
 
