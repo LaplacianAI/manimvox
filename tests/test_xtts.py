@@ -95,3 +95,24 @@ def test_voice_key_changes_with_recording(stub_tts, tmp_path, monkeypatch):
     k1 = e.voice_key("clone=me.wav")
     sf.write(str(rec), np.ones(24000, dtype=np.int16), 24000, format="WAV", subtype="PCM_16")
     assert e.voice_key("clone=me.wav") != k1 and k1.startswith("clone=")
+
+
+def test_status_not_installed_when_spec_absent(monkeypatch):
+    monkeypatch.setattr(xt.importlib.util, "find_spec", lambda name: None)
+    st = xt.XTTSEngine().status()
+    assert not st.ready and "manimvox[xtts]" in st.detail
+
+
+def test_status_treats_broken_spec_as_not_installed(monkeypatch):
+    def boom(name):
+        raise ValueError("TTS.__spec__ is None")
+    monkeypatch.setattr(xt.importlib.util, "find_spec", boom)
+    assert not xt.XTTSEngine().status().ready
+
+
+def test_status_never_imports_tts_api(monkeypatch, tmp_path):
+    monkeypatch.setenv("MANIMVOX_CACHE", str(tmp_path / "cache"))
+    monkeypatch.delitem(sys.modules, "TTS.api", raising=False)
+    monkeypatch.setattr(xt.importlib.util, "find_spec", lambda name: object())
+    assert xt.XTTSEngine().status().ready
+    assert "TTS.api" not in sys.modules

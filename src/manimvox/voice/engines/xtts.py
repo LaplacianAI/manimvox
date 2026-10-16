@@ -4,6 +4,7 @@ The model's licence (Coqui Public Model License) allows non-commercial use only.
 from __future__ import annotations
 
 import contextlib
+import importlib.util
 import os
 from collections.abc import Iterator
 from pathlib import Path
@@ -34,6 +35,14 @@ def tos_agreed() -> Iterator[None]:
             os.environ["COQUI_TOS_AGREED"] = old
 
 
+def _installed() -> bool:
+    """Detect coqui-tts without importing it (that would pull in torch)."""
+    try:
+        return importlib.util.find_spec("TTS") is not None
+    except (ImportError, ValueError):
+        return False
+
+
 def _api():
     try:
         from TTS.api import TTS
@@ -53,9 +62,7 @@ class XTTSEngine(VoiceEngine):
         self._tts = None
 
     def status(self) -> EngineStatus:
-        try:
-            _api()
-        except EngineNotInstalled:
+        if not _installed():
             return EngineStatus(False, 'not installed: uv tool install "manimvox[xtts]"')
         if not accepted_marker().exists():
             return EngineStatus(True, "model downloads on first use (asks first); voice is clone=<speaker.wav>")
