@@ -1,0 +1,42 @@
+[build-system]
+requires = ["hatchling>=1.27"]  # 1.27+ reads the SPDX `license = "MIT"` string
+build-backend = "hatchling.build"
+
+[project]
+name = "manimvox"
+dynamic = ["version"]
+description = "Narrated, animated explainer videos with Manim and pluggable voices, driven by agent skills."
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+dependencies = [
+  "manim>=0.19,<0.23",
+  "numpy>=1.26",
+  "soundfile>=0.12",
+  "av>=12",
+  "pillow>=10",
+]
+
+[project.optional-dependencies]
+kokoro = ["kokoro-onnx>=0.4,<0.7"]
+dev = ["pytest>=8", "ruff>=0.6"]
+
+[project.scripts]
+manimvox = "manimvox.cli:main"
+
+[tool.hatch.version]
+path = "src/manimvox/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/manimvox"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "slow: renders video with Manim (seconds to a minute)",
+  "kokoro: needs the kokoro extra and its model files on disk",
+]
+addopts = "-m 'not kokoro'"
+
+[tool.ruff]
+line-length = 120
