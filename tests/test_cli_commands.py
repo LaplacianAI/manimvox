@@ -186,3 +186,14 @@ def test_render_without_key_stops_before_manim(project, capsys, monkeypatch):
     assert main(["render", "ep01", "--voice", "openai:alloy"]) == 1
     assert "OPENAI_API_KEY" in capsys.readouterr().err
     assert not (project / "out" / "ep01_hello.mp4").exists()
+
+
+def test_voices_table_runs_offline_for_every_engine(project, capsys, monkeypatch):
+    from manimvox.voice import http
+
+    monkeypatch.setattr(http, "_urlopen", lambda *a, **k: pytest.fail("network used"))
+    assert main(["voices"]) == 0
+    out = capsys.readouterr().out
+    for name in ["edge", "elevenlabs", "f5", "kokoro", "openai", "piper", "say", "xtts"]:
+        assert name in out
+    assert out.count("non-commercial use only") >= 3  # say, xtts, f5

@@ -120,3 +120,20 @@ def test_clone_reference_relative_to_root(tmp_path):
 def test_clone_reference_errors(tmp_path, bad, msg):
     with pytest.raises(VoiceError, match=msg):
         clone_reference(bad, tmp_path)
+
+
+ALL = ["edge", "elevenlabs", "f5", "fake", "kokoro", "openai", "piper", "say", "xtts"]
+
+
+def test_every_spec_engine_is_registered():
+    from manimvox.voice import engine_names
+    assert engine_names() == ALL
+
+
+@pytest.mark.parametrize("name", ALL)
+def test_every_engine_states_licence_extra_and_default(name):
+    e = get_engine(name)
+    assert e.name == name and e.licence and e.default_voice
+    assert e.extra in (None, "kokoro", "piper", "edge", "cloud", "xtts", "f5")
+    st = e.status()  # never raises, never touches the network
+    assert isinstance(st.ready, bool) and st.detail
