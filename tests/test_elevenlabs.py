@@ -71,3 +71,47 @@ def test_other_refusals_scrub_the_key_from_the_detail(server, tmp_path):
     with pytest.raises(VoiceError, match="ElevenLabs refused the request") as e:
         el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).synth("Hi.", "abc", 1.0, tmp_path / "a.wav")
     assert "el-SECRET" not in str(e.value)
+
+
+def test_non_json_voice_list_is_a_voice_error(server):
+    server(b"<html>try again</html>")
+    with pytest.raises(VoiceError, match="unreadable voice list"):
+        el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).describe_voices()
+
+
+@pytest.mark.parametrize("body", [
+    b'["Rachel"]',                                              # not an object
+    b'{"voices": "Rachel"}',                                    # voices is not a list
+    b'{"voices": [{"name": "Rachel"}]}',                        # a row without voice_id
+    b'{"voices": [{"voice_id": "", "name": "Rachel"}]}',        # an empty voice_id
+    b'{"voices": [], "has_more": true, "next_page_token": 5}',  # a token that is not a string
+])
+def test_unreadable_voice_pages_are_voice_errors(server, body):
+    server(body)
+    with pytest.raises(VoiceError, match="unreadable voice list"):
+        el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).describe_voices()
+
+
+def test_null_name_sorts_with_the_rest(server):
+    page = {"voices": [{"voice_id": "v2", "name": "Adam"}, {"voice_id": "v1", "name": None}]}
+    server(json.dumps(page).encode())
+    rows = el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).describe_voices()
+    assert rows == [("v1", ""), ("v2", "Adam")]
+
+
+def test_repeated_page_token_stops_after_two_requests(server):
+    page = {"voices": [{"voice_id": "v1", "name": "Rachel"}], "has_more": True, "next_page_token": "t2"}
+    body = json.dumps(page).encode()
+    s = server(body, body)
+    with pytest.raises(VoiceError, match="kept paging"):
+        el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).describe_voices()
+    assert len(s.requests) == 2
+
+
+def test_endless_fresh_tokens_stop_at_the_page_cap(server):
+    replies = [json.dumps({"voices": [], "has_more": True, "next_page_token": f"t{i}"}).encode()
+               for i in range(100)]
+    s = server(*replies)
+    with pytest.raises(VoiceError, match="kept paging"):
+        el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).describe_voices()
+    assert len(s.requests) == 100

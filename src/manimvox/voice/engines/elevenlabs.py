@@ -18,11 +18,34 @@ VOICES_URL = "https://api.elevenlabs.io/v2/voices"
 DEFAULT_MODEL = "eleven_multilingual_v2"
 SPEED_RANGE = (0.7, 1.2)
 KEY_VAR = "ELEVENLABS_API_KEY"
+MAX_VOICE_PAGES = 100
+UNREADABLE_VOICE_LIST = "ElevenLabs returned an unreadable voice list"
+ENDLESS_VOICE_LIST = "ElevenLabs kept paging the voice list; try again later"
 
 
 def split_voice(voice: str) -> tuple[str, str]:
     model, sep, vid = voice.rpartition("/")
     return (model if sep else DEFAULT_MODEL), vid
+
+
+def _read_voice_page(body: bytes) -> tuple[list[tuple[str, str]], str | None, bool]:
+    """One page of GET /v2/voices -> (rows, next_page_token, has_more). Anything off-shape is a VoiceError."""
+    try:
+        page = json.loads(body)
+    except ValueError:  # JSONDecodeError and UnicodeDecodeError both
+        raise VoiceError(UNREADABLE_VOICE_LIST) from None
+    if not isinstance(page, dict) or not isinstance(page.get("voices"), list):
+        raise VoiceError(UNREADABLE_VOICE_LIST)
+    rows: list[tuple[str, str]] = []
+    for v in page["voices"]:
+        if not isinstance(v, dict) or not isinstance(v.get("voice_id"), str) or not v["voice_id"]:
+            raise VoiceError(UNREADABLE_VOICE_LIST)
+        name = v.get("name")
+        rows.append((v["voice_id"], name if isinstance(name, str) else ""))
+    token = page.get("next_page_token")
+    if token is not None and not isinstance(token, str):
+        raise VoiceError(UNREADABLE_VOICE_LIST)
+    return rows, token, bool(page.get("has_more"))
 
 
 class ElevenLabsEngine(VoiceEngine):
@@ -60,14 +83,21 @@ class ElevenLabsEngine(VoiceEngine):
 
     def describe_voices(self) -> list[tuple[str, str]]:
         if self._list is None:
-            rows, token = [], None
-            while True:
+            rows: list[tuple[str, str]] = []
+            token: str | None = None
+            seen: set[str] = set()
+            for _ in range(MAX_VOICE_PAGES):
                 q = {"page_size": "100"} | ({"next_page_token": token} if token else {})
-                page = json.loads(self._call("GET", f"{VOICES_URL}?{urllib.parse.urlencode(q)}"))
-                rows += [(v["voice_id"], v.get("name", "")) for v in page.get("voices", [])]
-                token = page.get("next_page_token")
-                if not page.get("has_more") or not token:
+                url = f"{VOICES_URL}?{urllib.parse.urlencode(q)}"
+                page_rows, token, has_more = _read_voice_page(self._call("GET", url))
+                rows += page_rows
+                if not has_more or not token:
                     break
+                if token in seen:
+                    raise VoiceError(ENDLESS_VOICE_LIST)
+                seen.add(token)
+            else:
+                raise VoiceError(ENDLESS_VOICE_LIST)
             self._list = sorted(rows, key=lambda r: r[1].lower())
         return self._list
 
