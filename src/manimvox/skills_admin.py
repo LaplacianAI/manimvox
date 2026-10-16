@@ -120,7 +120,7 @@ def remove(target_dirs: list[Path]) -> list[Path]:
 
 
 def npx_command(agent_ids, scope_global: bool, copy: bool, yes: bool, src: Path) -> list[str]:
-    cmd = ["npx", "--yes", "skills", "add", str(src), "--skill", "*"]
+    cmd = ["npx", "--yes", SKILLS_CLI, "add", str(src), "--skill", "*"]
     for a in agent_ids or []:
         cmd += ["-a", a]
     if scope_global:
@@ -130,6 +130,9 @@ def npx_command(agent_ids, scope_global: bool, copy: bool, yes: bool, src: Path)
     if yes:
         cmd.append("-y")
     return cmd
+
+
+SKILLS_CLI = "skills@1.7.2"  # bump deliberately: npx runs this package
 
 
 def has_npx() -> bool:

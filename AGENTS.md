@@ -45,6 +45,7 @@ Tests that render with Manim are marked `slow`; tests needing real engines are o
 - Where a capability may be missing, a skill gives the plain fallback: helpers one after another; no way to ask means state the choice and continue; no image viewing means `manimvox check layout`.
 - Consent rules live in the skills: ask before installing, downloading a model, fetching from the web or using an online voice; with no way to ask, the answer is no.
 - Every version in the manifests equals `manimvox.__version__`.
+- `npx` installs run the pinned `SKILLS_CLI` in `skills_admin.py`; bump it deliberately.
 - Use Conventional Commits. Run the tests and ruff before committing.
 
 ## Skills

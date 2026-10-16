@@ -107,7 +107,7 @@ def test_remove_spares_foreign_skills(home, proj):
 
 def test_npx_command(tmp_path):
     cmd = sa.npx_command(["claude-code", "codex"], True, True, True, tmp_path)
-    assert cmd[:4] == ["npx", "--yes", "skills", "add"] and str(tmp_path) in cmd
+    assert cmd[:4] == ["npx", "--yes", sa.SKILLS_CLI, "add"] and str(tmp_path) in cmd
     for flag in ("-g", "--copy", "-y", "--skill"):
         assert flag in cmd
     assert cmd.count("-a") == 2
@@ -121,7 +121,7 @@ def test_cli_install_hands_off_to_npx(home, proj, monkeypatch, no_tty):
     monkeypatch.setattr(sa.subprocess, "run",
                         lambda cmd, **kw: seen.update(cmd=cmd, env=kw.get("env")) or subprocess.CompletedProcess(cmd, 0))
     assert main(["skills", "install", "--yes"]) == 0
-    assert seen["cmd"][:4] == ["npx", "--yes", "skills", "add"] and "-y" in seen["cmd"]
+    assert seen["cmd"][:4] == ["npx", "--yes", sa.SKILLS_CLI, "add"] and "-y" in seen["cmd"]
     assert seen["env"]["DISABLE_TELEMETRY"] == "1"
     assert seen["cmd"].count("-a") == 4  # claude-code, codex, cursor, universal
 
@@ -154,3 +154,24 @@ def test_cli_update_keeps_links(home, proj, no_npx, no_tty):
     (t / "manimvox-pr").unlink()
     assert main(["skills", "check"]) == 1
     assert main(["skills", "update"]) == 0 and (t / "manimvox-pr").is_symlink()
+
+
+@pytest.fixture
+def with_npx(monkeypatch):
+    calls = []
+    monkeypatch.setattr(sa.shutil, "which", lambda name: "/usr/bin/npx" if name == "npx" else None)
+    monkeypatch.setattr(sa.subprocess, "run",
+                        lambda cmd, **kw: calls.append(cmd) or subprocess.CompletedProcess(cmd, 0))
+    return calls
+
+
+def test_npx_without_terminal_needs_yes(home, proj, with_npx, no_tty, capsys):
+    assert main(["skills", "install"]) == 2
+    assert main(["skills", "install", "--agent", "codex"]) == 2
+    assert with_npx == [] and "--yes" in capsys.readouterr().err
+
+
+def test_npx_with_terminal_lets_npx_ask(home, proj, with_npx, monkeypatch):
+    monkeypatch.setattr(sa, "is_tty", lambda: True)
+    assert main(["skills", "install"]) == 0
+    assert "-y" not in with_npx[0] and "-a" not in with_npx[0]

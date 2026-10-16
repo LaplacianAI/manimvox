@@ -250,13 +250,14 @@ def _skills_install(args, home) -> int:
     found = sa.detect_agents(home)
     scope_global = getattr(args, "global_", False)
     if sa.has_npx() and not args.native:
-        if args.agent:
-            ids = list(args.agent)
-        elif args.yes or not sa.is_tty():
-            ids = [a.id for a in found]
-        else:
-            ids = None
-        return sa.run_npx(sa.npx_command(ids, scope_global, args.copy, args.yes or not sa.is_tty(), skills_path()))
+        if not args.yes and not sa.is_tty():
+            print(
+                "manimvox: no terminal to ask: pass --yes (with --agent ID to choose agents)",
+                file=sys.stderr,
+            )
+            return 2
+        ids = list(args.agent) if args.agent else ([a.id for a in found] if args.yes else None)
+        return sa.run_npx(sa.npx_command(ids, scope_global, args.copy, args.yes, skills_path()))
     agents = _pick_agents(args, found)
     if agents is None:
         return 2
