@@ -1,0 +1,9 @@
+{
+  "series": "Hello, Explained",
+  "tagline": "A two-line test episode",
+  "voice": "fake:tone",
+  "speed": 1.0,
+  "pron": [],
+  "theme": {"accent": "#8A83FF", "named": {"agent": "#3987E5"}, "source": "test fixture"},
+  "episodes": [{"n": 1, "stem": "ep01_hello", "cls": "Ep01", "title": "Hello"}]
+}
