@@ -1,0 +1,15 @@
+{
+  "name": "manimvox",
+  "owner": {
+    "name": "LaplacianAI"
+  },
+  "description": "Narrated, animated explainer videos with Manim and pluggable voices, driven by agent skills.",
+  "plugins": [
+    {
+      "name": "manimvox",
+      "source": ".",
+      "description": "Narrated, animated explainer videos with Manim and pluggable voices, driven by agent skills.",
+      "version": "0.1.0"
+    }
+  ]
+}

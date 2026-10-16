@@ -1,0 +1,20 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "manimvox",
+  "version": "0.1.0",
+  "description": "Narrated, animated explainer videos with Manim and pluggable voices, driven by agent skills.",
+  "author": {
+    "name": "LaplacianAI"
+  },
+  "homepage": "https://github.com/LaplacianAI/manimvox",
+  "repository": "https://github.com/LaplacianAI/manimvox",
+  "license": "MIT",
+  "keywords": [
+    "manim",
+    "video",
+    "explainer",
+    "tts",
+    "animation",
+    "skills"
+  ]
+}
