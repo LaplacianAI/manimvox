@@ -47,6 +47,16 @@ def test_checksum_mismatch_deletes_file(fake_models):
     assert not any(kk.model_dir().glob("*.onnx"))
 
 
+def test_network_failure_is_a_voice_error_and_leaves_no_part_file(fake_models):
+    def dropped_fetch(url, dest):
+        dest.write_bytes(b"partial")
+        raise OSError("network down")
+
+    with pytest.raises(VoiceError, match="could not download"):
+        kk.ensure_models(lambda p: True, dropped_fetch)
+    assert not list(kk.model_dir().glob("*.part"))
+
+
 def test_prompt_states_size_and_place(fake_models):
     _, _, fetch = fake_models
     seen = []

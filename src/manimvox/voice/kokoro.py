@@ -74,7 +74,12 @@ def ensure_models(confirm: Callable[[str], bool], fetch: Callable[[str, Path], N
         sha, _ = MODELS[n]
         tmp = d / f"{n}.part"
         try:
-            fetch(f"{MODEL_BASE}/{n}", tmp)
+            try:
+                fetch(f"{MODEL_BASE}/{n}", tmp)
+            except OSError as e:  # urllib's URLError and socket timeouts are OSErrors
+                raise VoiceError(
+                    f"could not download {n} from {MODEL_BASE}: {e}; check the connection and try again"
+                ) from e
             if _sha256(tmp) != sha:
                 raise VoiceError(f"checksum mismatch for {n}; the download was discarded, try again")
             os.replace(tmp, d / n)
