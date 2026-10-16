@@ -11,7 +11,7 @@ from pathlib import Path
 import av
 
 from .checks.audio import read_cues
-from .kit.theme import Theme
+from .kit.theme import DEFAULTS, Theme
 from .project import Project, ProjectError
 
 
@@ -37,6 +37,20 @@ def _rendered(project: Project) -> list[tuple]:
     if not items:
         raise ProjectError("no rendered episodes in out/: run `manimvox render <episode>` first")
     return items
+
+
+_HEX = re.compile(r"#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})")
+
+
+def _colour(th: Theme, role: str) -> str:
+    """A theme colour that is safe inside <style>: a plain hex value, else the kit's default for the role."""
+    v = th[role].strip()
+    return v if _HEX.fullmatch(v) else DEFAULTS[role]
+
+
+def _css_string(s: str) -> str:
+    """Contents of a double-quoted CSS string: no quotes, backslashes, control characters or markup."""
+    return "".join(c for c in str(s) if c.isprintable() and c not in '\\"<>&')
 
 
 def _script_json(obj) -> str:
@@ -65,8 +79,8 @@ def build_index(project: Project) -> tuple[Path, int, float]:
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{esc(project.series)}</title><meta name="color-scheme" content="dark">
 <style>
-:root{{--bg:{th["bg"]};--panel:{th["panel"]};--line:{th["line"]};--ink:{th["ink"]};--muted:{th["muted"]};--accent:{th["accent"]}}}
-*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "{esc(th.font)}",system-ui,sans-serif}}
+:root{{--bg:{_colour(th, "bg")};--panel:{_colour(th, "panel")};--line:{_colour(th, "line")};--ink:{_colour(th, "ink")};--muted:{_colour(th, "muted")};--accent:{_colour(th, "accent")}}}
+*{{box-sizing:border-box}}body{{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 "{_css_string(th.font)}",system-ui,sans-serif}}
 header{{padding:20px 24px 8px}}h1{{margin:0;font-size:22px;color:var(--accent)}}header p{{margin:4px 0 0;color:var(--muted)}}
 main{{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:20px;padding:12px 24px 32px}}
 video{{width:100%;aspect-ratio:16/9;background:#000;border:1px solid var(--line);border-radius:10px}}
@@ -112,21 +126,31 @@ def transcode_720(src: Path, dst: Path) -> None:
         aout = out.add_stream("aac", rate=ain.rate, layout=ain.layout.name) if ain else None
         if aout:
             aout.bit_rate = 96_000
-        streams = [s for s in (vin, ain) if s is not None]
-        for packet in inp.demux(*streams):
+        resampler = (av.AudioResampler(format="fltp", layout=ain.layout.name, rate=ain.rate, frame_size=1024)
+                     if ain else None)
+        vcount = 0
+
+        def mux_audio(frames):
+            for fr in frames:
+                for p in aout.encode(fr):
+                    out.mux(p)
+
+        for packet in inp.demux(*[s for s in (vin, ain) if s is not None]):
             for frame in packet.decode():
                 if packet.stream.type == "video":
                     f = frame.reformat(width=w, height=h, format="yuv420p")
-                    f.pts = None
+                    f.pts = vcount  # count frames: the source's time_base and pts gaps never reach the encoder
+                    f.time_base = vout.codec_context.time_base
+                    vcount += 1
                     for p in vout.encode(f):
                         out.mux(p)
                 else:
                     frame.pts = None
-                    for p in aout.encode(frame):
-                        out.mux(p)
+                    mux_audio(resampler.resample(frame))
         for p in vout.encode():
             out.mux(p)
         if aout:
+            mux_audio(resampler.resample(None))
             for p in aout.encode():
                 out.mux(p)
 

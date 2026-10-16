@@ -8,28 +8,29 @@ import numpy as np
 import pytest
 
 from manimvox.cli import main
+from manimvox.kit.theme import DEFAULTS
 from manimvox.playlist import duration, transcode_720
 
 FIXTURE = Path(__file__).parent / "fixtures" / "hello"
 SRT = "1\n00:00:00,000 --> 00:00:01,000\nHello </script> & <b>\n"
 
 
-def _mp4(path, seconds=2.0, size=(320, 180)):
-    """A real H.264/AAC MP4 like the ones manimvox renders."""
+def _mp4(path, seconds=2.0, size=(320, 180), fps=30, rate=48000, layout="stereo"):
+    """An H.264/AAC MP4 shaped like Manim output: 30 fps, stereo 48 kHz fltp audio."""
     c = av.open(str(path), "w")
-    vs = c.add_stream("libx264", rate=10)
+    vs = c.add_stream("libx264", rate=fps)
     vs.width, vs.height, vs.pix_fmt = size[0], size[1], "yuv420p"
-    a = c.add_stream("aac", rate=24000, layout="mono")
-    for i in range(int(seconds * 10)):
+    a = c.add_stream("aac", rate=rate, layout=layout)
+    for i in range(int(seconds * fps)):
         img = np.full((size[1], size[0], 3), 20 * (i % 10), dtype=np.uint8)
         for p in vs.encode(av.VideoFrame.from_ndarray(img, format="rgb24")):
             c.mux(p)
     for p in vs.encode():
         c.mux(p)
-    t = np.arange(int(seconds * 24000)) / 24000
-    fr = av.AudioFrame.from_ndarray((0.3 * np.sin(2 * np.pi * 220 * t)).astype(np.float32).reshape(1, -1),
-                                    format="flt", layout="mono")
-    fr.sample_rate = 24000
+    t = np.arange(int(seconds * rate)) / rate
+    tone = (0.3 * np.sin(2 * np.pi * 220 * t)).astype(np.float32)
+    fr = av.AudioFrame.from_ndarray(np.stack([tone, tone]), format="fltp", layout=layout)
+    fr.sample_rate = rate
     for p in a.encode(fr):
         c.mux(p)
     for p in a.encode():
@@ -84,8 +85,8 @@ def test_transcode_720(tmp_path):
     transcode_720(src, tmp_path / "b.mp4")
     with av.open(str(tmp_path / "b.mp4")) as c:
         assert c.streams.video[0].height == 720 and c.streams.video[0].width == 1280
-        assert c.streams.audio
-    assert duration(tmp_path / "b.mp4") == pytest.approx(2.0, abs=0.3)
+        assert c.streams.audio and c.streams.audio[0].rate == 48000
+    assert duration(tmp_path / "b.mp4") == pytest.approx(duration(src), abs=0.3)
 
 
 def test_package_builds_two_folders_and_zips(project, capsys):
@@ -99,6 +100,21 @@ def test_package_builds_two_folders_and_zips(project, capsys):
     readme = (share / "Hello-Explained" / "README.txt").read_text(encoding="utf-8")
     assert "Hello, Explained" in readme and "0:02" in readme
     assert "Hello-Explained.zip" in capsys.readouterr().out
+    small = share / "Hello-Explained-720p" / "ep01_hello.mp4"
+    with av.open(str(small)) as c:
+        assert c.streams.video[0].height == 720 and c.streams.audio
+    assert duration(small) == pytest.approx(duration(project / "out" / "ep01_hello.mp4"), abs=0.3)
+
+
+def test_index_sanitises_theme_values(project):
+    d = json.loads((project / "series.json").read_text(encoding="utf-8"))
+    d["theme"].update(accent="red}</style><script>alert(1)</script>", font='Evil"</style><script>x</script>')
+    (project / "series.json").write_text(json.dumps(d), encoding="utf-8")
+    main(["index"])
+    page = (project / "out" / "index.html").read_text(encoding="utf-8")
+    assert page.count("</style>") == 1 and page.count("</script>") == 1
+    assert "alert" not in page.split("</style>")[0]
+    assert f"--accent:{DEFAULTS['accent']}" in page
 
 
 def test_series_json_level_and_blurb_are_optional(tmp_path):
