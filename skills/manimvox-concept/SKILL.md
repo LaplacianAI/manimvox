@@ -1,0 +1,83 @@
+---
+name: manimvox-concept
+description: "Explains a topic or concept with no single source document as one narrated 3–10 minute video in the 3Blue1Brown manner with manimvox: a question that hooks, visuals that build the idea step by step, the formula last, every claim still cited. Use when the user asks to explain or visualise an idea, an algorithm, or a piece of maths, science or engineering."
+license: MIT
+---
+
+# manimvox concept: one idea, one video
+
+You explain one idea in the manner of 3Blue1Brown: a question first, pictures that move until the viewer could guess the rule, the name after the idea, the formula last. Every claim is still cited. The authoring rules are in [manimvox-core](../manimvox-core/SKILL.md), the look, story and narration in [manimvox-creative](../manimvox-creative/SKILL.md), the motion patterns in [manimvox-animation](../manimvox-animation/SKILL.md), the voice in [manimvox-voice](../manimvox-voice/SKILL.md) and the commands in [manimvox-cli](../manimvox-cli/SKILL.md).
+
+Copy this checklist and keep it current:
+
+```text
+- [ ] 0 Setup      manimvox doctor; manimvox new <dir> --series "…" (outside any code repo)
+- [ ] 1 Sources    two or three reputable references; URLs in FACTS.md, labelled [EXTERNAL]
+- [ ] 2 Facts      FACTS.md: one claim per line, source, labelled
+- [ ] 3 Theme      series.json theme (manimvox-creative); manimvox check theme passes
+- [ ] 4 Shape      question, intuition, name, formula last, where it shows up; show the user
+- [ ] 5 Episode    episodes/ep01_*.py (manimvox-core); draft until every sheet is clean
+- [ ] 6 Final      manimvox render ep01; audio check ok; look at 4–6 frames
+- [ ] 7 Report     path, duration, chapters, unverifiable claims and their labels
+```
+
+## Consent, before anything else
+
+Ask the user before you install anything (a system package, `uv tool install`), download a model, fetch from the web, or use an online voice. If you cannot ask, the answer is no: stop and report exactly what is needed. A URL the user gave you is their go-ahead to fetch that URL, and nothing else.
+
+## 0 Setup
+
+Run `manimvox doctor`. If a line is `FAIL`, follow [manimvox-cli](../manimvox-cli/SKILL.md) (it names the fix; installing it needs the user's go-ahead). Then create the project in a new folder, not inside a code repository:
+
+```bash
+manimvox new concept-video --series "Name of the idea"
+```
+
+Work from inside that folder.
+
+## 1 Sources
+
+Pick two or three reputable references: a textbook, the original paper, the standard documentation. Reading them needs the web or files the user gave you, so ask first; where you cannot fetch, use the files the user supplied, and where there are none, rely only on what you know to be standard and label it plainly in the report as unverified. Save what you read to `research/`. The audience is a beginner unless the user says otherwise.
+
+## 2 Facts
+
+Write `FACTS.md` before any narration: one claim per line, with its source (a URL, or a book with chapter and page) and a label. Everything from these references is `[EXTERNAL]`, and so is labelled on screen where it appears. Rules and labels are in [facts](../manimvox-creative/references/facts.md). An example you invent for the picture, such as sample numbers, is marked on screen as an example and kept as the running example. A claim you cannot source is not spoken as fact; either drop it or show it as open.
+
+## 3 Theme
+
+The theme comes from the request and the subject. For maths the 3Blue1Brown-style example in [theming](../manimvox-creative/references/theming.md) is a good default unless the user or the subject says otherwise. Put the theme in `series.json` and run `manimvox check theme`; it must print `theme check: ok` before any scene. Do not download a font; use one already on the machine.
+
+## 4 Shape
+
+Follow the concept shape in [story](../manimvox-creative/references/story.md):
+
+1. **The question first.** Something the viewer wants answered, before any term.
+2. **Intuition with moving pictures** before any symbol. One example, moved step by step.
+3. **Name the idea** only after showing it, defined in a phrase.
+4. **The formula last.** It should read as a summary of what the viewer saw. Write it with `T()` or `code()` in Unicode (for example `a² + b² = c²`); the kit uses no LaTeX.
+5. **End on where it shows up**: two or three real places.
+
+Plan 3 to 6 chapters, one idea each, and for each the picture that carries it. Draw them with the patterns in [manimvox-animation](../manimvox-animation/SKILL.md). Write the shape into `SERIES.md`, with the facts each chapter uses.
+
+Show the shape to the user and wait for approval. If the user cannot be asked, state the shape in your reply and continue.
+
+## 5 Episode
+
+Register one episode in `series.json` and write `episodes/ep01_<name>.py` as [manimvox-core](../manimvox-core/SKILL.md) and its author guide say. Narration is about 470 to 1,500 words for 3 to 10 minutes (see [narration](../manimvox-creative/references/narration.md)).
+
+Then loop: `manimvox draft ep01 --every 5`, read every contact sheet in `sheets/`, fix, repeat until it prints `layout check: ok` and the sheets read well. If you cannot view images, run `manimvox check layout ep01` and say so in the report. The draft uses no voice and downloads nothing.
+
+## 6 Final
+
+Run `manimvox render ep01`. This needs the narration voice. If it asks to download a model or to go online, that needs the user's go-ahead; with none, stop and report. The render is done only when it prints `audio check: ok`. If a line is silent, reword it and render again.
+
+Look at 4 to 6 frames of the finished video, or at least run `manimvox check layout ep01`.
+
+## 7 Report
+
+Give the user:
+- the path of `out/ep01_<name>.mp4` and its `.srt`, the length, and the chapter titles;
+- the voice used, and why if it is not the default;
+- each reference used, and every claim that could not be verified, with its label;
+- every invented example, which is marked on screen as one;
+- anything you could not do (images not viewed, references not fetched) and the pronunciations you added.

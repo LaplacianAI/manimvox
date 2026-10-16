@@ -9,6 +9,10 @@
       "sha256": "b7e3b0204f4208c625956e87674b0dae103bba386db46913d0fe9f42ab9ca68c",
       "files": 1
     },
+    "manimvox-concept": {
+      "sha256": "67ced2582df08ed3b57f868339038ab39e8ea4d1d899e14ef0b80c68d79035ea",
+      "files": 1
+    },
     "manimvox-core": {
       "sha256": "ff6afbcc75f59aa680919ca2211a81a15fd3853bafa8b32675b7d449da05d751",
       "files": 2
@@ -16,6 +20,10 @@
     "manimvox-creative": {
       "sha256": "5160dc36599089f879c2a481db2a6543219d702cc41cd3e09984cd1ccad86f41",
       "files": 5
+    },
+    "manimvox-paper": {
+      "sha256": "31207c42a1fccfe2aa82b0352afa6c880f22f051843ebf1b308a960b62fea079",
+      "files": 1
     },
     "manimvox-voice": {
       "sha256": "0977d006a18e99f8e113ac6fa42f18d9ad5d0192a912596c7415f48816559bc8",
