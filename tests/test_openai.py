@@ -79,3 +79,19 @@ def test_other_refusals_scrub_the_key_from_the_detail(server, tmp_path):
 def test_voice_key_includes_model():
     e = oa.OpenAIEngine(env=KEY)
     assert e.voice_key("alloy") == "gpt-4o-mini-tts/alloy" != e.voice_key("tts-1/alloy")
+
+
+@pytest.mark.parametrize("voice", ["tts-1/", "", "/alloy"])
+def test_prepare_refuses_an_empty_model_or_voice(voice):
+    with pytest.raises(VoiceError, match="needs a voice name"):
+        oa.OpenAIEngine(env=KEY).prepare(voice, lambda p: True, None)
+
+
+def test_prepare_refuses_an_unknown_voice_with_close_matches():
+    with pytest.raises(VoiceError, match=r"no OpenAI voice 'alloyy'.*did you mean alloy.*manimvox voices openai"):
+        oa.OpenAIEngine(env=KEY).prepare("alloyy", lambda p: True, None)
+
+
+def test_prepare_accepts_known_voices():
+    oa.OpenAIEngine(env=KEY).prepare("alloy", lambda p: True, None)
+    oa.OpenAIEngine(env=KEY).prepare("tts-1-hd/onyx", lambda p: True, None)

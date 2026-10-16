@@ -75,7 +75,8 @@ class VoiceEngine:
         return [(v, "") for v in self.voices()]
 
     def prepare(self, voice: str, confirm: Callable[[str], bool], root: Path) -> None:
-        """Everything a render needs, checked before Manim starts. May ask (download) through `confirm`."""
+        """Everything a render needs, checked before Manim starts. May ask (download) through `confirm`.
+        prepare() checks the voice exists, for every engine: a misspelt voice is refused here, not inside Manim."""
         return
 
     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:

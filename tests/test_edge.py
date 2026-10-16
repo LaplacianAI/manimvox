@@ -72,3 +72,25 @@ def test_voices_list(stub_edge):
     e = ed.EdgeEngine(sleep=lambda t: None)
     assert e.voices() == ["en-GB-RyanNeural", "en-US-AriaNeural"]
     assert ("en-US-AriaNeural", "en-US, Female") in e.describe_voices()
+
+
+def test_prepare_accepts_a_listed_voice(stub_edge):
+    ed.EdgeEngine(sleep=lambda t: None).prepare("en-US-AriaNeural", lambda p: True, None)
+
+
+def test_prepare_refuses_an_unlisted_voice_with_close_matches(stub_edge):
+    with pytest.raises(VoiceError, match=r"no Edge voice 'en-US-AriaNeuralx'.*did you mean en-US-AriaNeural.*voices edge"):
+        ed.EdgeEngine(sleep=lambda t: None).prepare("en-US-AriaNeuralx", lambda p: True, None)
+
+
+def test_prepare_lists_once_and_the_listing_hint_is_not_about_cached_lines(stub_edge, monkeypatch):
+    calls = []
+
+    async def boom():
+        calls.append(1)
+        raise ConnectionResetError("dropped")
+
+    monkeypatch.setitem(sys.modules, "edge_tts", types.SimpleNamespace(list_voices=boom))
+    with pytest.raises(VoiceError) as ei:
+        ed.EdgeEngine(sleep=lambda t: None).prepare("en-US-AriaNeural", lambda p: True, None)
+    assert len(calls) == 4 and "lines already spoken" not in str(ei.value)

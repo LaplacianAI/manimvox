@@ -14,6 +14,7 @@ from ..convert import pcm16_to_wav
 from ..http import request
 
 TTS_URL = "https://api.elevenlabs.io/v1/text-to-speech/{voice_id}"
+VOICE_URL = "https://api.elevenlabs.io/v1/voices/{voice_id}"
 VOICES_URL = "https://api.elevenlabs.io/v2/voices"
 DEFAULT_MODEL = "eleven_multilingual_v2"
 SPEED_RANGE = (0.7, 1.2)
@@ -66,11 +67,12 @@ class ElevenLabsEngine(VoiceEngine):
                              "or choose an offline voice with --voice")
         return key
 
-    def _call(self, method: str, url: str, body: bytes | None = None) -> bytes:
+    def _call(self, method: str, url: str, body: bytes | None = None, *, resumable: bool = True) -> bytes:
         key = self._key()
         headers = {"xi-api-key": key, "Content-Type": "application/json"}
         try:
-            return request("ElevenLabs", method, url, headers=headers, body=body, sleep=self._sleep, secrets=[key])
+            return request("ElevenLabs", method, url, headers=headers, body=body, sleep=self._sleep, secrets=[key],
+                           resumable=resumable)
         except VoiceError as e:
             if "HTTP 401" in str(e):
                 raise VoiceError(f"ElevenLabs rejected the key in {KEY_VAR} (HTTP 401)") from None
@@ -89,7 +91,7 @@ class ElevenLabsEngine(VoiceEngine):
             for _ in range(MAX_VOICE_PAGES):
                 q = {"page_size": "100"} | ({"next_page_token": token} if token else {})
                 url = f"{VOICES_URL}?{urllib.parse.urlencode(q)}"
-                page_rows, token, has_more = _read_voice_page(self._call("GET", url))
+                page_rows, token, has_more = _read_voice_page(self._call("GET", url, resumable=False))
                 rows += page_rows
                 if not has_more or not token:
                     break
@@ -109,6 +111,16 @@ class ElevenLabsEngine(VoiceEngine):
 
     def prepare(self, voice: str, confirm, root) -> None:
         self._key()
+        model, vid = split_voice(voice)
+        if not model or not vid:
+            raise VoiceError(f"elevenlabs voice '{voice}' needs a voice id (and a model before the slash, if any); "
+                             "see `manimvox voices elevenlabs`")
+        try:
+            self._call("GET", VOICE_URL.format(voice_id=urllib.parse.quote(vid, safe="")), resumable=False)
+        except VoiceError as e:
+            if "HTTP 404" in str(e):
+                raise VoiceError(f"no ElevenLabs voice '{vid}'; see `manimvox voices elevenlabs`") from None
+            raise
 
     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
         lo, hi = SPEED_RANGE

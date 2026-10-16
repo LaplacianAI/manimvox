@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import difflib
 import json
 import os
 import time
@@ -61,6 +62,13 @@ class OpenAIEngine(VoiceEngine):
     def prepare(self, voice: str, confirm, root) -> None:
         self._key()
         model, name = split_voice(voice)
+        if not model or not name:
+            raise VoiceError(f"openai voice '{voice}' needs a voice name (and a model before the slash, if any); "
+                             "see `manimvox voices openai`")
+        if name not in VOICES:
+            near = difflib.get_close_matches(name, VOICES, n=3)
+            raise VoiceError(f"no OpenAI voice '{name}'" + (f" (did you mean {', '.join(near)}?)" if near else "")
+                             + "; see `manimvox voices openai`")
         if model in LEGACY_MODELS and name not in LEGACY_VOICES:
             raise VoiceError(f"{model} has no voice '{name}' (it has {', '.join(LEGACY_VOICES)})")
 

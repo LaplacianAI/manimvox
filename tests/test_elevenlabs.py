@@ -115,3 +115,38 @@ def test_endless_fresh_tokens_stop_at_the_page_cap(server):
     with pytest.raises(VoiceError, match="kept paging"):
         el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).describe_voices()
     assert len(s.requests) == 100
+
+
+@pytest.mark.parametrize("voice", ["model/", "", "/abc"])
+def test_prepare_refuses_an_empty_voice_id(server, voice):
+    s = server()
+    with pytest.raises(VoiceError, match="needs a voice id"):
+        el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).prepare(voice, lambda p: True, None)
+    assert s.requests == []
+
+
+def test_prepare_checks_the_voice_exists(server):
+    s = server(b'{"voice_id":"abc"}')
+    el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).prepare("eleven_turbo_v2/abc", lambda p: True, None)
+    assert s.requests[0].full_url == "https://api.elevenlabs.io/v1/voices/abc"
+    assert s.requests[0].get_header("Xi-api-key") == "el-SECRET"
+
+
+def test_prepare_404_names_the_voice_not_the_key(server):
+    server(404, error_body=b'{"detail":"voice el-SECRET not found"}')
+    with pytest.raises(VoiceError) as e:
+        el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).prepare("nope", lambda p: True, None)
+    assert str(e.value) == "no ElevenLabs voice 'nope'; see `manimvox voices elevenlabs`"
+
+
+def test_prepare_401_names_the_variable(server):
+    server(401)
+    with pytest.raises(VoiceError, match="ELEVENLABS_API_KEY"):
+        el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).prepare("abc", lambda p: True, None)
+
+
+def test_listing_failures_do_not_claim_lines_were_cached(server):
+    server(503, 503, 503, 503)
+    with pytest.raises(VoiceError) as e:
+        el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).describe_voices()
+    assert "failed after 4 tries" in str(e.value) and "lines already spoken" not in str(e.value)

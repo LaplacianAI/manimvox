@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import difflib
 import os
 import time
 from collections.abc import Callable
@@ -45,11 +46,17 @@ class EdgeEngine(VoiceEngine):
 
     def prepare(self, voice: str, confirm, root) -> None:
         _module()
+        known = self.voices()  # one listing request, retried
+        if voice not in known:
+            near = difflib.get_close_matches(voice, known, n=3)
+            raise VoiceError(f"no Edge voice '{voice}'" + (f" (did you mean {', '.join(near)}?)" if near else "")
+                             + "; see `manimvox voices edge`")
 
     def describe_voices(self) -> list[tuple[str, str]]:
         if self._list is None:
             m = _module()
-            rows = with_retries(lambda: asyncio.run(m.list_voices()), "edge-tts", sleep=self._sleep)
+            rows = with_retries(lambda: asyncio.run(m.list_voices()), "edge-tts", sleep=self._sleep,
+                               resumable=False)
             self._list = sorted((v["ShortName"], f"{v.get('Locale', '')}, {v.get('Gender', '')}") for v in rows)
         return self._list
 
