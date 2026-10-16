@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -67,29 +68,74 @@ def load_project(root: Path) -> Project:
     if not f.exists():
         raise ProjectError(f"no series.json in {root}; run `manimvox new <dir>` first")
     try:
-        data = json.loads(f.read_text(encoding="utf-8"))
+        text = f.read_text(encoding="utf-8")
+    except UnicodeDecodeError as e:
+        raise ProjectError(f"{f} is not UTF-8 text: {e}") from e
+    try:
+        data = json.loads(text)
     except json.JSONDecodeError as e:
         raise ProjectError(f"{f} is not valid JSON: {e}") from e
+    if not isinstance(data, dict):
+        raise ProjectError(f"{f}: top level must be a JSON object")
     if not isinstance(data.get("series"), str) or not data["series"].strip():
         raise ProjectError(f"{f}: 'series' (the name shown on every title card) is required")
-    episodes = []
-    for e in data.get("episodes", []):
-        stem = str(e.get("stem", ""))
-        if not stem.startswith("ep"):
-            raise ProjectError(f"{f}: episode stem '{stem}' must start with 'ep' (e.g. ep01_intro)")
-        episodes.append(
-            EpisodeRef(int(e["n"]), stem, str(e["cls"]), str(e.get("title", "")), root / "episodes" / f"{stem}.py")
-        )
+    speed = data.get("speed", 1.0)
+    if isinstance(speed, bool) or not isinstance(speed, (int, float)) or not math.isfinite(speed):
+        raise ProjectError(f"{f}: 'speed' must be a number, got {speed!r}")
+    theme = data.get("theme", {})
+    if not isinstance(theme, dict):
+        raise ProjectError(f"{f}: 'theme' must be an object, got {theme!r}")
     return Project(
         root=root,
         series=data["series"],
         tagline=data.get("tagline", ""),
         voice=data.get("voice"),
-        speed=float(data.get("speed", 1.0)),
-        pron=[(str(a), str(b)) for a, b in data.get("pron", [])],
-        theme=dict(data.get("theme", {})),
-        episodes=episodes,
+        speed=float(speed),
+        pron=_pron(f, data.get("pron", [])),
+        theme=dict(theme),
+        episodes=_episodes(f, root, data.get("episodes", [])),
     )
+
+
+def _episodes(f: Path, root: Path, raw: object) -> list[EpisodeRef]:
+    if not isinstance(raw, list):
+        raise ProjectError(f"{f}: 'episodes' must be a list, got {raw!r}")
+    refs = []
+    for i, e in enumerate(raw, start=1):
+        if not isinstance(e, dict):
+            raise ProjectError(f"{f}: episode {i} must be an object, got {e!r}")
+        for key in ("n", "stem", "cls"):
+            if key not in e:
+                raise ProjectError(f"{f}: episode {i} is missing '{key}'")
+        n = _int(f, f"episode {i} 'n'", e["n"])
+        for key in ("stem", "cls"):
+            if not isinstance(e[key], str):
+                raise ProjectError(f"{f}: episode {i} '{key}' must be a string, got {e[key]!r}")
+        stem = e["stem"]
+        if not stem.startswith("ep"):
+            raise ProjectError(f"{f}: episode stem '{stem}' must start with 'ep' (e.g. ep01_intro)")
+        refs.append(EpisodeRef(n, stem, e["cls"], str(e.get("title", "")), root / "episodes" / f"{stem}.py"))
+    return refs
+
+
+def _pron(f: Path, raw: object) -> list[tuple[str, str]]:
+    if not isinstance(raw, list):
+        raise ProjectError(f"{f}: 'pron' must be a list of [pattern, spoken] pairs, got {raw!r}")
+    pairs = []
+    for i, entry in enumerate(raw, start=1):
+        if not (isinstance(entry, list) and len(entry) == 2 and all(isinstance(x, str) for x in entry)):
+            raise ProjectError(f"{f}: pron entry {i} must be a 2-item list of strings, got {entry!r}")
+        pairs.append((entry[0], entry[1]))
+    return pairs
+
+
+def _int(f: Path, where: str, value: object) -> int:
+    if not isinstance(value, bool) and isinstance(value, (int, str)):
+        try:
+            return int(value)
+        except ValueError:
+            pass
+    raise ProjectError(f"{f}: {where} must be an integer, got {value!r}")
 
 
 def find_project(start: Path) -> Path:

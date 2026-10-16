@@ -1,4 +1,5 @@
 import json
+import re
 
 import pytest
 
@@ -81,3 +82,54 @@ def test_voice_and_speed_default(tmp_path):
     (tmp_path / "series.json").write_text(json.dumps({"series": "S", "episodes": []}), encoding="utf-8")
     p = load_project(tmp_path)
     assert p.voice is None and p.speed == 1.0 and p.pron == [] and p.theme == {}
+
+
+def test_top_level_must_be_a_json_object(tmp_path):
+    (tmp_path / "series.json").write_text("[]", encoding="utf-8")
+    with pytest.raises(ProjectError, match=re.escape("series.json: top level must be a JSON object")):
+        load_project(tmp_path)
+
+
+def test_episode_missing_cls_names_the_episode(tmp_path):
+    write_series(
+        tmp_path,
+        episodes=[
+            {"n": 1, "stem": "ep01_hello", "cls": "Ep01"},
+            {"n": 2, "stem": "ep02_more"},
+        ],
+    )
+    with pytest.raises(ProjectError, match=re.escape("series.json: episode 2 is missing 'cls'")):
+        load_project(tmp_path)
+
+
+@pytest.mark.parametrize(
+    ("over", "problem"),
+    [
+        ({"speed": "fast"}, "'speed' must be a number, got 'fast'"),
+        ({"speed": True}, "'speed' must be a number, got True"),
+        ({"pron": [["\\bGPT\\b", "G P T", "extra"]]}, "pron entry 1 must be a 2-item list"),
+        ({"pron": {"\\bGPT\\b": "G P T"}}, "'pron' must be a list"),
+        ({"theme": ["#8A83FF"]}, "'theme' must be an object, got ['#8A83FF']"),
+        ({"episodes": {"n": 1}}, "'episodes' must be a list"),
+        ({"episodes": ["ep01_hello"]}, "episode 1 must be an object, got 'ep01_hello'"),
+        (
+            {"episodes": [{"n": "one", "stem": "ep01_hello", "cls": "Ep01"}]},
+            "episode 1 'n' must be an integer, got 'one'",
+        ),
+        (
+            {"episodes": [{"n": 1, "stem": 7, "cls": "Ep01"}]},
+            "episode 1 'stem' must be a string, got 7",
+        ),
+    ],
+)
+def test_malformed_field_names_the_key_and_value(tmp_path, over, problem):
+    write_series(tmp_path, **over)
+    with pytest.raises(ProjectError, match=re.escape(problem)) as e:
+        load_project(tmp_path)
+    assert "series.json" in str(e.value)
+
+
+def test_non_utf8_series_json_is_a_project_error(tmp_path):
+    (tmp_path / "series.json").write_bytes(b'{"series": "\xff"}')
+    with pytest.raises(ProjectError, match="is not UTF-8 text"):
+        load_project(tmp_path)
