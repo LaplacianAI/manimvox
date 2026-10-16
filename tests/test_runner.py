@@ -72,6 +72,7 @@ def test_manim_output_is_decoded_as_utf8(monkeypatch):
     assert "Fehler: ünicode → boom" in str(ei.value)
     assert seen["encoding"] == "utf-8" and seen["errors"] == "replace"
     assert seen["env"]["PYTHONUTF8"] == "1"
+    assert seen["stdin"] == subprocess.DEVNULL  # nothing can prompt inside a render
 
 
 def test_failed_draft_leaves_no_stale_layout(tmp_path, monkeypatch):

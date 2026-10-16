@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import NamedTuple, Protocol
+from typing import NamedTuple
 
 DEFAULT_VOICE = "kokoro:af_heart"
 
@@ -55,15 +55,49 @@ class EngineStatus(NamedTuple):
     detail: str
 
 
-class VoiceEngine(Protocol):
-    name: str
-    extra: str | None
-    licence: str
+class VoiceEngine:
+    """What every engine provides. Subclasses override what differs; the defaults suit an offline engine."""
 
-    def status(self) -> EngineStatus: ...
+    name: str = ""
+    extra: str | None = None  # the pip extra that installs it
+    licence: str = ""
+    default_voice: str = ""  # used by `voices --prepare ENGINE` with no voice
+    online: str = ""  # the service that receives narration text; "" when nothing leaves the machine
+    noncommercial: bool = False  # the model's licence forbids commercial use
 
-    def voices(self) -> list[str]: ...
+    def status(self) -> EngineStatus:
+        raise NotImplementedError
 
-    def prepare(self, confirm: Callable[[str], bool]) -> None: ...
+    def voices(self) -> list[str]:
+        return []
 
-    def synth(self, text: str, voice: str, speed: float, out: Path) -> None: ...
+    def describe_voices(self) -> list[tuple[str, str]]:
+        return [(v, "") for v in self.voices()]
+
+    def prepare(self, voice: str, confirm: Callable[[str], bool], root: Path) -> None:
+        """Everything a render needs, checked before Manim starts. May ask (download) through `confirm`.
+        prepare() checks the voice exists, for every engine: a misspelt voice is refused here, not inside Manim."""
+        return
+
+    def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
+        """Write a mono 16-bit WAV of `text` to `out`. Runs inside Manim (cwd = project root); never prompts."""
+        raise NotImplementedError
+
+    def voice_key(self, voice: str) -> str:
+        """What the audio cache keys on. Cloning engines hash the recording so a new one is not served stale lines."""
+        return voice
+
+
+def clone_reference(voice: str, root: Path | None = None) -> Path:
+    """`clone=path/to/speaker.wav` -> that file. A relative path is taken from `root` (default: the working directory)."""
+    if not voice.startswith("clone="):
+        raise VoiceError(f"a cloning voice is written clone=<speaker.wav>, got '{voice}'")
+    raw = voice[len("clone="):].strip()
+    if not raw:
+        raise VoiceError("clone= needs a path to a short recording of the speaker (6-30 s WAV)")
+    p = Path(raw).expanduser()
+    if not p.is_absolute():
+        p = (Path(root) if root else Path.cwd()) / p
+    if not p.is_file():
+        raise VoiceError(f"speaker recording not found: {p}")
+    return p

@@ -19,6 +19,12 @@ dependencies = [
 
 [project.optional-dependencies]
 kokoro = ["kokoro-onnx>=0.4,<0.7"]
+piper = ["piper-tts>=1.8,<2"]
+edge = ["edge-tts>=7,<8"]
+xtts = ["coqui-tts>=0.27,<0.28"]
+f5 = ["f5-tts>=1.1,<2"]
+# OpenAI and ElevenLabs use the standard library; the extra keeps the documented install command working
+cloud = []
 dev = ["pytest>=8", "ruff>=0.6"]
 
 [project.scripts]
@@ -35,8 +41,9 @@ testpaths = ["tests"]
 markers = [
   "slow: renders video with Manim (seconds to a minute)",
   "kokoro: needs the kokoro extra and its model files on disk",
+  "piper: needs the piper extra and network or a downloaded voice",
 ]
-addopts = "-m 'not kokoro'"
+addopts = "-m 'not kokoro and not piper'"
 
 [tool.ruff]
 line-length = 120
