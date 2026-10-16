@@ -18,11 +18,16 @@ from .registry import engine_names, get_engine, register
 
 register("fake", FakeEngine)
 
+from .kokoro import KokoroEngine
+
+register("kokoro", KokoroEngine)
+
 __all__ = [
     "DEFAULT_VOICE",
     "EngineNotInstalled",
     "EngineStatus",
     "FakeEngine",
+    "KokoroEngine",
     "UnknownEngine",
     "VoiceEngine",
     "VoiceError",
