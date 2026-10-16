@@ -14,9 +14,15 @@ class VoiceError(Exception):
     """A voice cannot be used as asked. Never answered by switching voices silently."""
 
 
+def install_hint(extra: str) -> str:
+    """How to add an extra: manimvox is not on PyPI, and --force keeps the kokoro default voice."""
+    wanted = "kokoro" if extra == "kokoro" else f"kokoro,{extra}"
+    return f'uv tool install --force "manimvox[{wanted}] @ git+https://github.com/LaplacianAI/manimvox"'
+
+
 class EngineNotInstalled(VoiceError):
     def __init__(self, engine: str, extra: str):
-        super().__init__(f"voice engine '{engine}' is not installed: uv tool install \"manimvox[{extra}]\"")
+        super().__init__(f"voice engine '{engine}' is not installed: {install_hint(extra)}")
         self.engine, self.extra = engine, extra
 
 

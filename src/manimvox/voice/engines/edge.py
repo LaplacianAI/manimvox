@@ -9,7 +9,7 @@ import time
 from collections.abc import Callable
 from pathlib import Path
 
-from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError
+from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError, install_hint
 from ..convert import to_wav
 from ..http import with_retries
 
@@ -41,7 +41,7 @@ class EdgeEngine(VoiceEngine):
         try:
             _module()
         except EngineNotInstalled:
-            return EngineStatus(False, 'not installed: uv tool install "manimvox[edge]"')
+            return EngineStatus(False, f"not installed: {install_hint('edge')}")
         return EngineStatus(True, "online, no key needed")
 
     def prepare(self, voice: str, confirm, root) -> None:

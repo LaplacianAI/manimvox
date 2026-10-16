@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import argparse
+import shlex
 import sys
+from pathlib import Path
 
 from . import __version__
 
@@ -195,6 +197,187 @@ def _cmd_doctor(args) -> int:
     return 1 if problems else 0
 
 
+def _cmd_index(args) -> int:
+    from .playlist import build_index, unrendered
+
+    project = _project()
+    page, n, total = build_index(project)
+    for stem in unrendered(project):
+        print(f"skipped {stem} (not rendered)")
+    print(f"wrote {page}: {n} episode{'s' if n != 1 else ''}, about {max(1, round(total / 60))} min")
+    return 0
+
+
+def _cmd_package(args) -> int:
+    from .playlist import package, unrendered
+
+    project = _project()
+    zips = package(project)
+    for stem in unrendered(project):
+        print(f"skipped {stem} (not rendered)")
+    for z in zips:
+        print(f"{z.name}: {z.stat().st_size / 1e6:.1f} MB")
+        if (project.root / "FACTS.md").is_file():
+            print(f"share/{z.stem}/ includes FACTS.md (it cites your sources and code paths); "
+                  "remove it before sharing if those are private")
+    return 0
+
+
+def _skills_scope(args) -> str:
+    return "global" if getattr(args, "global_", False) else "project"
+
+
+def _ask(prompt: str) -> str | None:
+    try:
+        return input(prompt).strip().lower()
+    except EOFError:
+        return None  # no answer is a no
+
+
+def _pick_agents(args, found):
+    """The agents to install for, or None after saying why not (the caller's exit code is in `_NO_AGENTS`)."""
+    from . import skills_admin as sa
+
+    if args.agent:
+        return [sa.BY_ID[a] for a in args.agent]
+    if args.yes:
+        return list(found)
+    if sa.is_tty():
+        for i, a in enumerate(found, 1):
+            print(f"  {i}. {a.id}")
+        reply = _ask("Install for which agents? (e.g. 1,3 or all) ")
+        if reply is None:
+            return []
+        if reply in ("", "all"):
+            return list(found)
+        try:
+            return [found[int(n) - 1] for n in reply.replace(" ", "").split(",") if n]
+        except (ValueError, IndexError):
+            raise ValueError(f"not a list of numbers from 1 to {len(found)}: {reply}") from None
+    print(
+        "manimvox: no terminal to ask which agents: pass --agent ID (repeatable) or --yes for every detected agent",
+        file=sys.stderr,
+    )
+    return None
+
+
+def _skills_npx(args, sa, npx, ids, scope_global, home, src) -> int:
+    """Hand the install to `npx skills`, after checking that it cannot clobber anything that is not ours."""
+    scope = "global" if scope_global else "project"
+    root = Path.cwd()
+    agents = [sa.BY_ID[i] for i in ids] if ids else list(sa.AGENTS)
+    dirs = sa.targets(agents + [sa.BY_ID["universal"]], scope, root, home)
+    for d in dirs:
+        sa._guard(d, src)
+    refused = False
+    for d in dirs:
+        for name in sa.SKILL_NAMES:
+            e = d / name
+            if (e.exists() or sa._is_link(e)) and not sa._is_ours(e):
+                print(f"{e} exists and is not a manimvox skill; left untouched")
+                refused = True
+    if refused:
+        return 1
+    cmd = sa.npx_command(ids, scope_global, args.copy, args.yes, src, npx)
+    print("manimvox: running " + shlex.join(cmd))
+    code = sa.run_npx(cmd)
+    if code:
+        print("manimvox: npx failed; `manimvox skills install --native` installs without it", file=sys.stderr)
+    return code
+
+
+def _skills_install(args, home) -> int:
+    from . import skills_admin as sa
+    from .skills import skills_path
+
+    unknown = [a for a in args.agent or [] if a not in sa.BY_ID]
+    if unknown:
+        print(f"manimvox: unknown agent {unknown[0]}; known: {', '.join(sa.BY_ID)}", file=sys.stderr)
+        return 2
+    if not args.yes and not sa.is_tty():
+        print("manimvox: no terminal to ask: pass --yes (with --agent ID to choose agents)", file=sys.stderr)
+        return 2
+    found = sa.detect_agents(home)
+    scope_global = getattr(args, "global_", False)
+    npx, ignored = (None, False) if args.native else sa.find_npx()
+    if ignored and not npx:
+        print("manimvox: ignored npx in the current folder; using the built-in installer", file=sys.stderr)
+    if npx:
+        real = [a.id for a in found if a.id != "universal"]  # npx maps "universal" to another folder
+        ids = list(args.agent) if args.agent else (real if args.yes else None)
+        if args.yes and not ids:
+            # no -a would make npx install into every agent it knows (about 80): use the shared folder instead
+            print("manimvox: no agent detected; installed into the shared .agents/skills folder")
+        else:
+            return _skills_npx(args, sa, npx, ids, scope_global, home, skills_path())
+    agents = _pick_agents(args, found)
+    if agents is None:
+        return 2
+    if not agents:
+        print("manimvox: no agents chosen", file=sys.stderr)
+        return 1
+    if args.project:
+        scope = "project"
+    elif scope_global:
+        scope = "global"
+    elif args.yes or not sa.is_tty():
+        scope = "project"
+    else:
+        scope = "global" if (_ask("Install for this project or globally? [P/g] ") or "").startswith("g") else "project"
+    msgs, skipped = sa.install_checked(sa.targets(agents, scope, Path.cwd(), home), "copy" if args.copy else "link")
+    for line in msgs:
+        print(line)
+    return 1 if skipped else 0
+
+
+def _cmd_skills(args) -> int:
+    from . import skills_admin as sa
+
+    home = Path.home()
+    if args.action == "install":
+        return _skills_install(args, home)
+    scope = _skills_scope(args)
+    dirs = [t for t in sa.known_targets(scope, Path.cwd(), home) if sa.holds_ours(t)]
+    if args.action == "check":
+        if not dirs:
+            print(f"no manimvox skills installed in {scope} agent folders; run manimvox skills install")
+            return 1
+        bad = False
+        for t in dirs:
+            st = sa.status(t)
+            if set(st.values()) == {"ok"}:
+                print(f"{t}: ok")
+            else:
+                bad = True
+                print(f"{t}: " + ", ".join(f"{n} {v}" for n, v in st.items() if v != "ok"))
+        return 1 if bad else 0
+    if args.action == "update":
+        if not dirs:
+            print(f"no manimvox skills installed in {scope} agent folders; run manimvox skills install")
+            return 1
+        skipped = False
+        for t in dirs:
+            linked = any(sa._is_link(t / n) and sa._is_ours(t / n) for n in sa.SKILL_NAMES)
+            msgs, sk = sa.install_checked([t], "link" if linked else "copy")
+            skipped = skipped or sk
+            for line in msgs:
+                print(line)
+        return 1 if skipped else 0
+    if not dirs:
+        print("no manimvox skills found")
+        return 0
+    if not args.yes:
+        if not sa.is_tty():
+            print("manimvox: no terminal to ask: pass --yes to remove the skills", file=sys.stderr)
+            return 2
+        reply = _ask(f"Remove the manimvox skills from {', '.join(str(t) for t in dirs)}? [y/N] ")
+        if not (reply or "").startswith("y"):
+            return 1
+    for gone in sa.remove(dirs):
+        print(f"removed {gone}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="manimvox", description="Narrated, animated explainer videos with Manim.")
     p.add_argument("--version", action="version", version=f"manimvox {__version__}")
@@ -222,6 +405,12 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("episode", nargs="?")
     s.set_defaults(func=_cmd_check)
 
+    s = p._sub.add_parser("index", help="playlist page out/index.html from the rendered episodes")
+    s.set_defaults(func=_cmd_index)
+
+    s = p._sub.add_parser("package", help="share/<Name> and share/<Name>-720p folders and zips")
+    s.set_defaults(func=_cmd_package)
+
     s = p._sub.add_parser("voices", help="voice engines: ready or not, licence, voices")
     s.add_argument("engine", nargs="?", help="list this engine's voices")
     s.add_argument(
@@ -229,6 +418,30 @@ def build_parser() -> argparse.ArgumentParser:
     )
     s.add_argument("-y", "--yes", action="store_true", default=argparse.SUPPRESS, help="answer yes to confirmations")
     s.set_defaults(func=_cmd_voices)
+
+    s = p._sub.add_parser("skills", help="install, check, update or remove the agent skills")
+    sub = s.add_subparsers(dest="action", metavar="<action>", required=True)
+    yes = {"action": "store_true", "default": argparse.SUPPRESS, "help": "answer yes to confirmations"}
+    a = sub.add_parser("install", help="put the skills where your coding agents look")
+    a.add_argument("--agent", action="append", metavar="ID", help="an agent id (repeatable)")
+    g = a.add_mutually_exclusive_group()
+    g.add_argument("--global", dest="global_", action="store_true", help="install for every project")
+    g.add_argument("--project", action="store_true", help="install in this project (default)")
+    a.add_argument("--copy", action="store_true", help="copy the skills instead of linking them")
+    a.add_argument("--native", action="store_true", help="do not use npx even if it is present")
+    a.add_argument("-y", "--yes", **yes)
+    for verb, text, ask in (
+        ("check", "say whether installed skills match this version", False),
+        ("update", "reinstall the skills where they already are", True),
+        ("remove", "delete the manimvox skills, and only those", True),
+    ):
+        a = sub.add_parser(verb, help=text)
+        g = a.add_mutually_exclusive_group()
+        g.add_argument("--global", dest="global_", action="store_true", help="the global agent folders")
+        g.add_argument("--project", action="store_true", help="this project's agent folders (default)")
+        if ask:
+            a.add_argument("-y", "--yes", **yes)
+    s.set_defaults(func=_cmd_skills)
 
     s = p._sub.add_parser("doctor", help="check system libraries, fonts and voice engines")
     s.set_defaults(func=_cmd_doctor)

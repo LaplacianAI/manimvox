@@ -51,7 +51,7 @@ def test_flagged_non_commercial():
 
 def test_not_installed(monkeypatch, tmp_path):
     monkeypatch.setitem(sys.modules, "TTS.api", None)
-    with pytest.raises(EngineNotInstalled, match=r"manimvox\[xtts\]"):
+    with pytest.raises(EngineNotInstalled, match=r"manimvox\[kokoro,xtts\]"):
         xt.XTTSEngine().prepare("clone=me.wav", lambda p: True, tmp_path)
 
 
@@ -108,7 +108,7 @@ def test_voice_key_changes_with_recording(stub_tts, tmp_path, monkeypatch):
 def test_status_not_installed_when_spec_absent(monkeypatch):
     monkeypatch.setattr(xt.importlib.util, "find_spec", lambda name: None)
     st = xt.XTTSEngine().status()
-    assert not st.ready and "manimvox[xtts]" in st.detail
+    assert not st.ready and "manimvox[kokoro,xtts]" in st.detail
 
 
 def test_status_treats_broken_spec_as_not_installed(monkeypatch):

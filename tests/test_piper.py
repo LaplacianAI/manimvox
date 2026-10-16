@@ -70,8 +70,8 @@ def stub_piper(monkeypatch):
 def test_not_installed_names_the_extra(monkeypatch, tmp_path):
     monkeypatch.setitem(sys.modules, "piper", None)  # import piper → ImportError
     e = pp.PiperEngine()
-    assert not e.status().ready and "manimvox[piper]" in e.status().detail
-    with pytest.raises(EngineNotInstalled, match=r"manimvox\[piper\]"):
+    assert not e.status().ready and "manimvox[kokoro,piper]" in e.status().detail
+    with pytest.raises(EngineNotInstalled, match=r"manimvox\[kokoro,piper\]"):
         e.prepare("en_US-amy-medium", lambda p: True, tmp_path)
 
 

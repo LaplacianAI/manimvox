@@ -49,7 +49,7 @@ def test_flagged_non_commercial():
 
 def test_not_installed(monkeypatch, tmp_path):
     monkeypatch.setitem(sys.modules, "f5_tts.api", None)
-    with pytest.raises(EngineNotInstalled, match=r"manimvox\[f5\]"):
+    with pytest.raises(EngineNotInstalled, match=r"manimvox\[kokoro,f5\]"):
         f5.F5Engine().prepare("clone=me.wav", lambda p: True, tmp_path)
 
 
@@ -129,7 +129,7 @@ def test_voice_key_changes_with_transcript(stub_f5, tmp_path, monkeypatch):
 def test_status_not_installed_when_spec_absent(monkeypatch):
     monkeypatch.setattr(f5.importlib.util, "find_spec", lambda name: None)
     st = f5.F5Engine().status()
-    assert not st.ready and "manimvox[f5]" in st.detail
+    assert not st.ready and "manimvox[kokoro,f5]" in st.detail
 
 
 def test_status_treats_broken_spec_as_not_installed(monkeypatch):

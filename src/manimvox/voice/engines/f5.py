@@ -10,7 +10,7 @@ from pathlib import Path
 
 import soundfile as sf
 
-from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError, clone_reference
+from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError, clone_reference, install_hint
 from ..download import engine_dir, file_digest, scoped_env
 
 
@@ -69,7 +69,7 @@ class F5Engine(VoiceEngine):
 
     def status(self) -> EngineStatus:
         if not _installed():
-            return EngineStatus(False, 'not installed: uv tool install "manimvox[f5]"')
+            return EngineStatus(False, f"not installed: {install_hint('f5')}")
         state = "model ready" if model_present() else "model downloads on first use (asks first)"
         return EngineStatus(True, f"{state}; voice is clone=<speaker.wav>, words spoken in <speaker>.txt (required)")
 

@@ -22,6 +22,8 @@ class EpisodeRef:
     cls: str
     title: str
     path: Path
+    level: str = ""
+    blurb: str = ""
 
 
 @dataclass
@@ -128,7 +130,8 @@ def _episodes(f: Path, root: Path, raw: object) -> list[EpisodeRef]:
         stem = e["stem"]
         if not stem.startswith("ep"):
             raise ProjectError(f"{f}: episode stem '{stem}' must start with 'ep' (e.g. ep01_intro)")
-        refs.append(EpisodeRef(n, stem, e["cls"], str(e.get("title", "")), root / "episodes" / f"{stem}.py"))
+        refs.append(EpisodeRef(n, stem, e["cls"], str(e.get("title", "")), root / "episodes" / f"{stem}.py",
+                        str(e.get("level", "")), str(e.get("blurb", ""))))
     return refs
 
 

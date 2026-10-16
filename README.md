@@ -6,7 +6,7 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
 ![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)
 
-> **Status:** early development (0.1). The engine and CLI work today; agent skills, extra animation libraries and a PyPI release are on the [roadmap](#roadmap).
+> **Status:** early development (0.1). The engine, CLI and agent skills work today; extra animation libraries and a PyPI release are on the [roadmap](#roadmap).
 
 ## Features
 
@@ -48,7 +48,12 @@ manimvox doctor
 
 `manimvox doctor` checks the system libraries, fonts and voice engines, and names the command that fixes anything missing. The first run can take a few minutes while Pango builds its font cache.
 
-Add more voices with extras, for example `manimvox[kokoro,piper]`:
+Add more voices by reinstalling with the extras you want, keeping `kokoro`:
+
+```bash
+uv tool install --force "manimvox[kokoro,piper] @ git+https://github.com/LaplacianAI/manimvox"
+```
+
 
 | Extra | Adds |
 |---|---|
@@ -112,6 +117,50 @@ manimvox render ep01 --yes   # 1080p with the voice; --yes allows the one-time 3
 ```
 
 The result is `out/ep01_vectors.mp4` and `out/ep01_vectors.srt`. The render finishes with `audio check: ok` or exits 1.
+
+## Use it from your coding agent
+
+manimvox ships ten agent skills, so your coding agent can plan, write, render and check a video for you. Install them into the agents you use:
+
+```bash
+npx skills add LaplacianAI/manimvox                      # detects your agents and lets you pick
+npx skills add LaplacianAI/manimvox -g -y                # your detected agents, for all projects, no prompts
+npx skills add LaplacianAI/manimvox -a claude-code -a codex -y
+```
+
+Without Node.js, manimvox installs the same skills itself:
+
+```bash
+manimvox skills install                  # pick agents; add --agent ID (repeatable) to name them
+manimvox skills install --global --yes   # every project, no questions
+manimvox skills check                    # are the installed skills current?
+manimvox skills update
+manimvox skills remove
+```
+
+Other flags: `--project` (the default) installs in the current project, `--copy` copies the skills instead of linking them, and `--native` skips npx even when it is present. Without a terminal, `install` and `remove` need `--yes` (with `--agent ID` to choose agents), npx or not. An `npx` in the current folder is ignored. Only the ten manimvox skills are ever touched.
+
+`npx skills add LaplacianAI/manimvox` fetches from GitHub, so it installs whatever is on the default branch. `manimvox skills install` installs the skills that match your installed manimvox version.
+
+Agent-specific routes:
+- **Claude Code:** `claude plugin marketplace add LaplacianAI/manimvox`, then `claude plugin install manimvox@manimvox`.
+- **Gemini CLI:** `gemini extensions install https://github.com/LaplacianAI/manimvox`.
+- **Codex and Cursor:** the plugin manifests in the repository root (`.codex-plugin/`, `.cursor-plugin/`) point at `skills/`.
+
+Then ask your agent: "make an explainer video of <paper / repo / idea / PR>".
+
+| Skill | What it does |
+|---|---|
+| `manimvox` | Picks the workflow for your request and checks the setup |
+| `manimvox-core` | The authoring contract for episodes: structure, timing, safe stage, components |
+| `manimvox-animation` | Motion patterns: carry-overs, reveals, tables, graphs, zooms, sequence diagrams |
+| `manimvox-creative` | Theme, story and narration, and the facts discipline |
+| `manimvox-voice` | Choosing and preparing the voice: engines, licences, pronunciation, cloning consent |
+| `manimvox-cli` | The command line and how to read its output |
+| `manimvox-paper` | One document into a 5-10 minute explainer, every claim traced to the source |
+| `manimvox-playlist` | A codebase or spec into a beginner-to-advanced playlist, with page and zips |
+| `manimvox-concept` | An idea with no source document into a 3Blue1Brown-style video |
+| `manimvox-pr` | A pull request into a 1-3 minute walkthrough |
 
 ## Usage
 
@@ -250,17 +299,24 @@ src/manimvox/
   cli.py            the manimvox command
   project.py        series.json loading and validation
   scaffold.py       manimvox new
+  skills.py         finds the bundled agent skills
+  skills_admin.py   manimvox skills install|check|update|remove
+  playlist.py       manimvox index and package
   runner.py         runs Manim in a subprocess
   kit/              Episode, components, theme, text (what episodes import)
   checks/           theme, layout, audio, contact sheets
   voice/            the voice interface, cache, downloads, HTTP, audio conversion
   voice/engines/    one module per text-to-speech engine
+skills/             the ten agent skills (bundled into the wheel)
+.claude-plugin/     Claude Code plugin and marketplace manifests
+.codex-plugin/      Codex plugin manifest
+.cursor-plugin/     Cursor plugin manifest
+gemini-extension.json, plugin.json   Gemini CLI and agent-plugins manifests
 tests/
 ```
 
 ## Roadmap
 
-- Agent skills for Claude Code, Codex, Cursor, Gemini CLI and others, with a one-command install into the agents you pick
 - Scene adapters for Matplotlib, Plotly and Pillow/Cairo; MoviePy finishing; reusable scene blocks
 - Tools for Python agent frameworks (Agno, LangChain Deep Agents, Pydantic AI, OpenAI Agents SDK)
 - PyPI release and CI on macOS, Linux and Windows
