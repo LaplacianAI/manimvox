@@ -63,3 +63,18 @@ def test_with_retries_lets_voice_errors_through_at_once():
     with pytest.raises(VoiceError, match="no such voice"):
         http.with_retries(boom, "Svc", sleep=lambda t: pytest.fail("slept"))
     assert calls == [1]
+
+
+def test_a_key_with_a_newline_never_escapes(server):
+    key = "sk-SECRET123\n"
+    header = "Bearer " + key
+    # http.client refuses a header value that holds a line break, and its message echoes the value
+    s = server(ValueError(f"Invalid header value {header.encode('latin-1')!r}"))
+    with pytest.raises(VoiceError) as e:
+        http.request("Svc", "GET", "https://svc.test", headers={"Authorization": header},
+                     sleep=lambda t: pytest.fail("slept"), secrets=[key])
+    text = str(e.value)
+    assert key not in text
+    assert "sk-SECRET123\\n" not in text
+    assert "sk-SECRET123" not in text and "***" in text
+    assert len(s.requests) == 1

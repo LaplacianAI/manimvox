@@ -16,9 +16,11 @@ _urlopen = urllib.request.urlopen
 
 
 def _scrub(text: str, secrets: Sequence[str]) -> str:
+    # a secret with a line break shows up raw, and escaped (repr without its quotes) in messages that repr a header
     for s in secrets:
         if s:
-            text = text.replace(s, "***")
+            for form in (s, repr(s)[1:-1]):
+                text = text.replace(form, "***")
     return text
 
 
@@ -89,3 +91,7 @@ def request(
             detail = ""
         msg = f"{service} refused the request (HTTP {e.code}): {detail or e.reason}"
         raise VoiceError(_scrub(msg, secrets)) from None
+    except VoiceError:
+        raise
+    except Exception as e:  # noqa: BLE001 - http.client can echo a header value in its message
+        raise VoiceError(f"{service} request failed: {type(e).__name__}: {_scrub(str(e), secrets)}") from None
