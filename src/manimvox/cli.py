@@ -43,6 +43,6 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         return func(args)
-    except (ProjectError, VoiceError, FileNotFoundError) as e:
+    except (ProjectError, VoiceError, OSError) as e:
         print(f"manimvox: {e}", file=sys.stderr)
         return 1

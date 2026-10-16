@@ -19,6 +19,8 @@ def new_project(directory: Path, series: str, tagline: str = "", voice: str = DE
     d = Path(directory).expanduser().resolve()
     if (d / SERIES_FILE).exists():
         raise ProjectError(f"{d} already holds a project; edit its series.json instead")
+    if not series.strip():
+        raise ProjectError('series name is empty: pass --series "Name, Explained"')
     parse_voice(voice)  # fail before writing anything
     for sub in ("episodes", "out", "research"):
         (d / sub).mkdir(parents=True, exist_ok=True)

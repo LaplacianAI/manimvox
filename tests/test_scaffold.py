@@ -44,3 +44,21 @@ def test_cli_expected_errors_print_one_line(tmp_path, capsys):
     assert "Traceback" not in captured.err
     assert "manimvox: " in captured.err and "already holds a project" in captured.err
     assert "engine:voice" in captured.err
+
+
+@pytest.mark.parametrize("series", ["", "   "])
+def test_blank_series_is_refused_before_anything_is_written(tmp_path, series):
+    with pytest.raises(ProjectError, match="series name is empty"):
+        new_project(tmp_path / "demo", series)
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_cli_os_error_prints_one_line(tmp_path, capsys):
+    afile = tmp_path / "afile"
+    afile.write_text("not a folder", encoding="utf-8")
+    assert main(["new", str(afile), "--series", "X"]) == 1
+    captured = capsys.readouterr()
+    assert captured.out == ""
+    assert captured.err.count("\n") == 1
+    assert captured.err.startswith("manimvox: ")
+    assert "Traceback" not in captured.err
