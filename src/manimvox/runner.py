@@ -35,14 +35,14 @@ def render_episode(project: Project, ep: EpisodeRef, quality: Quality, voice: Vo
     built = built_path(project, ep, quality)
     built.unlink(missing_ok=True)
     env = {k: v for k, v in os.environ.items() if not k.startswith("MANIMVOX_") or k == "MANIMVOX_CACHE"}
-    env |= {"MANIMVOX_PROJECT": str(project.root), "MANIMVOX_STEM": ep.stem}
+    env |= {"MANIMVOX_PROJECT": str(project.root), "MANIMVOX_STEM": ep.stem, "PYTHONUTF8": "1"}
     if quality == "draft":
         env["MANIMVOX_NOTTS"] = "1"
     else:
         env["MANIMVOX_VOICE_RESOLVED"] = str(voice)
     media = built.parents[3]
     r = subprocess.run(manim_command(ep, quality, media), check=False, cwd=project.root, env=env,
-                       capture_output=True, text=True)
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
     if r.returncode != 0 or not built.exists():
         tail = "\n".join((r.stderr or r.stdout).strip().splitlines()[-25:])
         raise RenderError(f"manim failed for {ep.stem}:\n{tail}")

@@ -1,6 +1,8 @@
 import io
 from pathlib import Path
 
+import pytest
+
 from manimvox.confirm import make_confirm
 from manimvox.project import EpisodeRef
 from manimvox.runner import manim_command
@@ -42,3 +44,31 @@ def test_draft_command_is_fast_and_uncached():
 def test_final_command_is_1080p30():
     cmd = manim_command(EP, "final", Path("/m"))
     assert "-qh" in cmd and cmd[cmd.index("--fps") + 1] == "30"
+
+
+def test_manim_output_is_decoded_as_utf8(monkeypatch):
+    import shutil
+    import subprocess
+    import tempfile
+
+    from manimvox.project import find_project, load_project
+    from manimvox.runner import RenderError, render_episode
+
+    fixture = Path(__file__).parent / "fixtures" / "hello"
+    with tempfile.TemporaryDirectory() as d:
+        root = Path(d) / "hello"
+        shutil.copytree(fixture, root)
+        project = load_project(find_project(root))
+        ep = project.episode("ep01")
+        seen = {}
+
+        def fake_run(cmd, **kw):
+            seen.update(kw)
+            return subprocess.CompletedProcess(cmd, 1, stdout="", stderr="Fehler: ünicode → boom")
+
+        monkeypatch.setattr("manimvox.runner.subprocess.run", fake_run)
+        with pytest.raises(RenderError) as ei:
+            render_episode(project, ep, "draft", None)
+    assert "Fehler: ünicode → boom" in str(ei.value)
+    assert seen["encoding"] == "utf-8" and seen["errors"] == "replace"
+    assert seen["env"]["PYTHONUTF8"] == "1"
