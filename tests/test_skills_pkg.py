@@ -1,0 +1,88 @@
+import json
+from pathlib import Path
+
+import pytest
+
+import manimvox
+from manimvox import skills as sk
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def _skill(root, name, desc="Does a thing.", extra=""):
+    d = root / name
+    d.mkdir(parents=True)
+    (d / "SKILL.md").write_text(f"---\nname: {name}\ndescription: {desc}\n{extra}---\n# {name}\n", encoding="utf-8")
+    return d
+
+
+def test_skills_path_finds_the_repo_skills_in_a_dev_install():
+    p = manimvox.skills_path()
+    assert p.is_dir() and (p / "manimvox-voice" / "SKILL.md").is_file()
+
+
+def test_read_frontmatter_with_metadata(tmp_path):
+    d = _skill(tmp_path, "x-one", extra="license: MIT\nmetadata:\n  internal: \"true\"\n  owner: me\n")
+    fm = sk.read_frontmatter(d / "SKILL.md")
+    assert fm == {"name": "x-one", "description": "Does a thing.", "license": "MIT",
+                  "metadata": {"internal": "true", "owner": "me"}}
+
+
+def test_read_frontmatter_rejects_a_file_without_one(tmp_path):
+    (tmp_path / "SKILL.md").write_text("# no frontmatter\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="frontmatter"):
+        sk.read_frontmatter(tmp_path / "SKILL.md")
+
+
+def test_content_hash_ignores_line_endings_and_counts_files(tmp_path):
+    a = _skill(tmp_path / "a", "s")
+    (a / "references").mkdir()
+    (a / "references" / "x.md").write_bytes(b"one\ntwo\n")
+    b = _skill(tmp_path / "b", "s")
+    (b / "references").mkdir()
+    (b / "references" / "x.md").write_bytes(b"one\r\ntwo\r\n")
+    assert sk.content_hash(a) == sk.content_hash(b)
+    assert sk.content_hash(a)[1] == 2
+
+
+def test_content_hash_changes_with_content_and_with_a_rename(tmp_path):
+    a = _skill(tmp_path, "s")
+    h1 = sk.content_hash(a)
+    (a / "extra.md").write_text("x", encoding="utf-8")
+    h2 = sk.content_hash(a)
+    (a / "extra.md").rename(a / "other.md")
+    assert len({h1, h2, sk.content_hash(a)}) == 3
+
+
+def test_build_manifest(tmp_path):
+    _skill(tmp_path, "s-one")
+    _skill(tmp_path, "s-two")
+    m = sk.build_manifest(tmp_path, "9.9.9")
+    assert m["version"] == "9.9.9" and sorted(m["skills"]) == ["s-one", "s-two"]
+    assert m["skills"]["s-one"]["files"] == 1 and len(m["skills"]["s-one"]["sha256"]) == 64
+
+
+def test_committed_manifest_matches_the_skills_folder():
+    want = sk.build_manifest(ROOT / "skills", manimvox.__version__)
+    have = json.loads((ROOT / sk.MANIFEST_NAME).read_text(encoding="utf-8"))
+    assert have == want, "run: uv run python -m manimvox.skills manifest --write"
+
+
+def test_module_cli_check_fails_on_drift(tmp_path, capsys):
+    _skill(tmp_path, "s-one")
+    (tmp_path.parent / "m.json").write_text("{}", encoding="utf-8")
+    assert sk.main(["manifest", "--check", "--root", str(tmp_path), "--out", str(tmp_path.parent / "m.json")]) == 1
+    assert sk.main(["manifest", "--write", "--root", str(tmp_path), "--out", str(tmp_path.parent / "m.json")]) == 0
+    assert sk.main(["manifest", "--check", "--root", str(tmp_path), "--out", str(tmp_path.parent / "m.json")]) == 0
+
+
+@pytest.mark.slow
+def test_wheel_bundles_the_skills(tmp_path):
+    import subprocess
+    import zipfile
+
+    subprocess.run(["uv", "build", "--wheel", "--out-dir", str(tmp_path)], cwd=ROOT, check=True,
+                   capture_output=True)
+    wheel = next(tmp_path.glob("manimvox-*.whl"))
+    names = zipfile.ZipFile(wheel).namelist()
+    assert "manimvox/_skills/manimvox-voice/SKILL.md" in names

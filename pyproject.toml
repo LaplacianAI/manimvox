@@ -36,6 +36,9 @@ path = "src/manimvox/__init__.py"
 [tool.hatch.build.targets.wheel]
 packages = ["src/manimvox"]
 
+[tool.hatch.build.targets.wheel.force-include]
+"skills" = "manimvox/_skills"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [
