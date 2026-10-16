@@ -12,11 +12,19 @@ from manimvox.voice.engines import f5
 @pytest.fixture
 def stub_f5(monkeypatch, tmp_path):
     monkeypatch.setenv("MANIMVOX_CACHE", str(tmp_path / "cache"))
-    calls = {"init": [], "infer": []}
+    monkeypatch.delenv("HF_HUB_OFFLINE", raising=False)
+    calls = {"init": [], "infer": [], "offline": []}
 
     class F5TTS:
         def __init__(self, **kw):
+            import os
             calls["init"].append(kw)
+            calls["offline"].append(os.environ.get("HF_HUB_OFFLINE"))
+            if kw.get("hf_cache_dir"):  # what huggingface_hub leaves behind
+                from pathlib import Path
+                w = Path(kw["hf_cache_dir"]) / "models--SWivid--F5-TTS" / "snapshots" / "abc"
+                w.mkdir(parents=True, exist_ok=True)
+                (w / "model_1250000.safetensors").write_bytes(b"w")
 
         def infer(self, ref_file, ref_text, gen_text, file_wave=None, speed=1.0, **kw):
             calls["infer"].append(
@@ -138,3 +146,61 @@ def test_status_never_imports_f5_api(monkeypatch, tmp_path):
     monkeypatch.setattr(f5.importlib.util, "find_spec", lambda name: object())
     assert f5.F5Engine().status().ready
     assert "f5_tts.api" not in sys.modules
+
+
+def _marker_only():
+    f5.accepted_marker().parent.mkdir(parents=True)
+    f5.accepted_marker().write_text("F5TTS_v1_Base", encoding="utf-8")
+
+
+def test_synth_loads_offline_and_restores(stub_f5, tmp_path, monkeypatch):
+    import os
+    calls, _ = stub_f5
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setenv("HF_HUB_OFFLINE", "0")
+    e = f5.F5Engine()
+    e.prepare("clone=me.wav", lambda p: True, tmp_path)
+    assert calls["offline"] == ["0"]  # downloading is allowed in prepare
+    e.synth("Hi.", "clone=me.wav", 1.0, tmp_path / "a.wav")
+    assert calls["offline"] == ["0", "1"] and os.environ["HF_HUB_OFFLINE"] == "0"
+
+
+def test_synth_imports_f5_inside_the_offline_block(stub_f5, tmp_path, monkeypatch):
+    import os
+    calls, _ = stub_f5
+    monkeypatch.chdir(tmp_path)
+    f5.F5Engine().prepare("clone=me.wav", lambda p: True, tmp_path)
+    seen = []
+    monkeypatch.setattr(f5, "_api", lambda: (seen.append(os.environ.get("HF_HUB_OFFLINE")),
+                                             sys.modules["f5_tts.api"].F5TTS)[1])
+    f5.F5Engine().synth("Hi.", "clone=me.wav", 1.0, tmp_path / "a.wav")
+    assert seen == ["1"]
+
+
+def test_synth_with_marker_but_no_weights_never_constructs(stub_f5, tmp_path, monkeypatch):
+    calls, _ = stub_f5
+    monkeypatch.chdir(tmp_path)
+    _marker_only()
+    (f5.accepted_marker().parent / "hf").mkdir()
+    with pytest.raises(VoiceError, match="voices --prepare f5:clone="):
+        f5.F5Engine().synth("hi", "clone=me.wav", 1.0, tmp_path / "a.wav")
+    assert calls["init"] == []
+
+
+def test_prepare_with_marker_but_no_weights_asks_again(stub_f5, tmp_path):
+    calls, _ = stub_f5
+    _marker_only()
+    prompts = []
+    f5.F5Engine().prepare("clone=me.wav", lambda p: prompts.append(p) or True, tmp_path)
+    assert len(prompts) == 1 and len(calls["init"]) == 1 and f5.model_present()
+
+
+def test_prepare_drops_the_model(stub_f5, tmp_path):
+    e = f5.F5Engine()
+    e.prepare("clone=me.wav", lambda p: True, tmp_path)
+    assert e._model is None
+
+
+def test_transcript_with_a_bom_is_read_clean(stub_f5, tmp_path):
+    (tmp_path / "me.txt").write_bytes(b"\xef\xbb\xbfThis is me talking.")
+    assert f5.transcript_for(tmp_path / "me.wav") == "This is me talking."

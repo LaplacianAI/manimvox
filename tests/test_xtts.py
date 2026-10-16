@@ -13,13 +13,21 @@ from manimvox.voice.engines import xtts as xt
 def stub_tts(monkeypatch, tmp_path):
     monkeypatch.setenv("MANIMVOX_CACHE", str(tmp_path / "cache"))
     monkeypatch.delenv("COQUI_TOS_AGREED", raising=False)
-    calls = {"init": [], "tts": [], "tos": []}
+    monkeypatch.delenv("TTS_HOME", raising=False)
+    calls = {"init": [], "tts": [], "tos": [], "home": []}
 
     class TTS:
         def __init__(self, model_name, **kw):
             import os
             calls["init"].append(model_name)
             calls["tos"].append(os.environ.get("COQUI_TOS_AGREED"))
+            home = os.environ.get("TTS_HOME")
+            calls["home"].append(home)
+            if home:  # what coqui's model manager does: weights under <TTS_HOME>/tts/<model>/
+                from pathlib import Path
+                w = Path(home) / "tts" / "tts_models--multilingual--multi-dataset--xtts_v2"
+                w.mkdir(parents=True, exist_ok=True)
+                (w / "model.pth").write_bytes(b"weights")
 
         def to(self, device):
             return self
@@ -116,3 +124,53 @@ def test_status_never_imports_tts_api(monkeypatch, tmp_path):
     monkeypatch.setattr(xt.importlib.util, "find_spec", lambda name: object())
     assert xt.XTTSEngine().status().ready
     assert "TTS.api" not in sys.modules
+
+
+def test_tts_home_is_ours_while_loading_and_restored(stub_tts, tmp_path, monkeypatch):
+    import os
+    calls, _ = stub_tts
+    monkeypatch.setenv("TTS_HOME", "/somewhere/else")
+    xt.XTTSEngine().prepare("clone=me.wav", lambda p: True, tmp_path)
+    assert calls["home"] == [str(xt.engine_dir("xtts") / "models")]
+    assert os.environ["TTS_HOME"] == "/somewhere/else"
+    assert (xt.engine_dir("xtts") / "models").is_dir()
+
+
+def test_tts_home_unset_again_after_loading(stub_tts, tmp_path):
+    import os
+    xt.XTTSEngine().prepare("clone=me.wav", lambda p: True, tmp_path)
+    assert "TTS_HOME" not in os.environ
+
+
+def test_synth_with_marker_but_no_weights_never_constructs_tts(stub_tts, tmp_path, monkeypatch):
+    calls, _ = stub_tts
+    monkeypatch.chdir(tmp_path)
+    xt.accepted_marker().parent.mkdir(parents=True)
+    xt.accepted_marker().write_text(xt.MODEL, encoding="utf-8")
+    with pytest.raises(VoiceError, match="voices --prepare xtts:clone="):
+        xt.XTTSEngine().synth("hi", "clone=me.wav", 1.0, tmp_path / "a.wav")
+    assert calls["init"] == []
+
+
+def test_prepare_with_marker_but_no_weights_asks_again(stub_tts, tmp_path):
+    calls, _ = stub_tts
+    xt.accepted_marker().parent.mkdir(parents=True)
+    xt.accepted_marker().write_text(xt.MODEL, encoding="utf-8")
+    prompts = []
+    xt.XTTSEngine().prepare("clone=me.wav", lambda p: prompts.append(p) or True, tmp_path)
+    assert len(prompts) == 1 and calls["init"] == [xt.MODEL] and xt.model_present()
+
+
+def test_status_reflects_the_weights(stub_tts, tmp_path, monkeypatch):
+    monkeypatch.setattr(xt.importlib.util, "find_spec", lambda name: object())
+    assert "downloads on first use" in xt.XTTSEngine().status().detail
+    xt.XTTSEngine().prepare("clone=me.wav", lambda p: True, tmp_path)
+    assert xt.XTTSEngine().status().detail.startswith("model ready")
+    next((xt.engine_dir("xtts") / "models").rglob("model.pth")).unlink()
+    assert "downloads on first use" in xt.XTTSEngine().status().detail
+
+
+def test_prepare_drops_the_model(stub_tts, tmp_path):
+    e = xt.XTTSEngine()
+    e.prepare("clone=me.wav", lambda p: True, tmp_path)
+    assert e._tts is None

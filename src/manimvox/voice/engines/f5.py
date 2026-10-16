@@ -3,6 +3,7 @@ The pretrained weights are CC-BY-NC: non-commercial use only."""
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import importlib.util
 from pathlib import Path
@@ -10,16 +11,26 @@ from pathlib import Path
 import soundfile as sf
 
 from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError, clone_reference
-from ..download import engine_dir, file_digest
+from ..download import engine_dir, file_digest, scoped_env
 
 
 def accepted_marker() -> Path:
     return engine_dir("f5") / "licence-accepted"
 
 
+def hf_dir() -> Path:
+    return engine_dir("f5") / "hf"
+
+
+def model_present() -> bool:
+    """The licence was accepted and weights (*.safetensors or *.pt) sit in our Hugging Face cache."""
+    return accepted_marker().exists() and any(
+        p.exists() for pat in ("*.safetensors", "*.pt") for p in hf_dir().rglob(pat))
+
+
 def transcript_for(ref: Path) -> str:
     t = ref.with_suffix(".txt")
-    return t.read_text(encoding="utf-8").strip() if t.is_file() else ""
+    return t.read_text(encoding="utf-8-sig").strip() if t.is_file() else ""
 
 
 def _installed() -> bool:
@@ -59,7 +70,7 @@ class F5Engine(VoiceEngine):
     def status(self) -> EngineStatus:
         if not _installed():
             return EngineStatus(False, 'not installed: uv tool install "manimvox[f5]"')
-        state = "model ready" if accepted_marker().exists() else "model downloads on first use (asks first)"
+        state = "model ready" if model_present() else "model downloads on first use (asks first)"
         return EngineStatus(True, f"{state}; voice is clone=<speaker.wav>, words spoken in <speaker>.txt (required)")
 
     def voice_key(self, voice: str) -> str:
@@ -67,34 +78,37 @@ class F5Engine(VoiceEngine):
         text = hashlib.sha256(transcript_for(ref).encode("utf-8")).hexdigest()[:8]
         return f"clone={file_digest(ref, 'sha256')[:16]}+{text}"
 
-    def _load(self):
+    def _load(self, offline: bool):
         if self._model is None:
-            self._model = _api()(hf_cache_dir=str(accepted_marker().parent / "hf"))
+            # huggingface_hub reads HF_HUB_OFFLINE when it is imported, so the import is inside the block too
+            with scoped_env(HF_HUB_OFFLINE="1") if offline else contextlib.nullcontext():
+                self._model = _api()(hf_cache_dir=str(hf_dir()))
         return self._model
 
     def prepare(self, voice: str, confirm, root: Path) -> None:
         _api()
         ref = clone_reference(voice, root)
         _need_transcript(ref)
-        if accepted_marker().exists():
+        if model_present():
             return
         if not confirm("Download the F5-TTS model (about 1.3 GB)? Its weights are CC-BY-NC: "
                        "non-commercial use only."):
             raise VoiceError("F5-TTS needs its model: rerun with --yes to download it (non-commercial use only), "
                              "or choose another voice with --voice")
-        self._load()
+        self._load(offline=False)
         accepted_marker().parent.mkdir(parents=True, exist_ok=True)
         accepted_marker().write_text("F5TTS_v1_Base", encoding="utf-8")
+        self._model = None  # Manim loads its own copy; keeping this one would hold the weights twice
 
     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
-        if not accepted_marker().exists():
-            raise VoiceError("F5-TTS is not set up; run `manimvox render` (it asks) or "
+        if not model_present():
+            raise VoiceError("F5-TTS is not set up (or its model files are missing); run `manimvox render` (it asks) or "
                              "`manimvox voices --prepare f5:clone=<speaker.wav>`")
         ref = clone_reference(voice)  # cwd = project root inside Manim
         ref_text = _need_transcript(ref)
         raw = out.with_name(out.stem + ".raw.wav")
         try:
-            self._load().infer(ref_file=str(ref), ref_text=ref_text, gen_text=text,
+            self._load(offline=True).infer(ref_file=str(ref), ref_text=ref_text, gen_text=text,
                                file_wave=str(raw), speed=speed, show_info=lambda *a, **k: None)
             data, sr = sf.read(str(raw), dtype="int16")
             sf.write(str(out), data if data.ndim == 1 else data.mean(axis=1).astype("int16"), sr,

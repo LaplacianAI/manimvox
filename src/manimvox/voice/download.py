@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import contextlib
 import hashlib
 import os
 import shutil
 import sys
 import urllib.request
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -35,6 +36,21 @@ def cache_root(env: Mapping[str, str] = os.environ, platform: str = sys.platform
 
 def engine_dir(engine: str) -> Path:
     return cache_root() / engine
+
+
+@contextlib.contextmanager
+def scoped_env(**values: str) -> Iterator[None]:
+    """Set environment variables for the duration of a block, then put back what was there."""
+    old = {k: os.environ.get(k) for k in values}
+    os.environ.update(values)
+    try:
+        yield
+    finally:
+        for k, v in old.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
 
 
 def fetch(url: str, dest: Path) -> None:

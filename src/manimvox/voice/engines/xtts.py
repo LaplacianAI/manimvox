@@ -5,14 +5,12 @@ from __future__ import annotations
 
 import contextlib
 import importlib.util
-import os
-from collections.abc import Iterator
 from pathlib import Path
 
 import soundfile as sf
 
 from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError, clone_reference
-from ..download import engine_dir, file_digest
+from ..download import engine_dir, file_digest, scoped_env
 
 MODEL = "tts_models/multilingual/multi-dataset/xtts_v2"
 
@@ -21,18 +19,19 @@ def accepted_marker() -> Path:
     return engine_dir("xtts") / "licence-accepted"
 
 
-@contextlib.contextmanager
-def tos_agreed() -> Iterator[None]:
-    """coqui-tts asks on stdin unless COQUI_TOS_AGREED=1; set it only while loading, then restore."""
-    old = os.environ.get("COQUI_TOS_AGREED")
-    os.environ["COQUI_TOS_AGREED"] = "1"
-    try:
-        yield
-    finally:
-        if old is None:
-            os.environ.pop("COQUI_TOS_AGREED", None)
-        else:
-            os.environ["COQUI_TOS_AGREED"] = old
+def models_dir() -> Path:
+    return engine_dir("xtts") / "models"
+
+
+def loading() -> contextlib.AbstractContextManager[None]:
+    """coqui-tts asks on stdin unless COQUI_TOS_AGREED=1, and keeps weights in its own user dir unless TTS_HOME
+    says otherwise (its get_user_data_dir reads it). Set both only while loading, then restore."""
+    return scoped_env(COQUI_TOS_AGREED="1", TTS_HOME=str(models_dir()))
+
+
+def model_present() -> bool:
+    """The licence was accepted and the weights are where we keep them."""
+    return accepted_marker().exists() and any(p.is_file() for p in models_dir().rglob("model.pth"))
 
 
 def _installed() -> bool:
@@ -64,7 +63,7 @@ class XTTSEngine(VoiceEngine):
     def status(self) -> EngineStatus:
         if not _installed():
             return EngineStatus(False, 'not installed: uv tool install "manimvox[xtts]"')
-        if not accepted_marker().exists():
+        if not model_present():
             return EngineStatus(True, "model downloads on first use (asks first); voice is clone=<speaker.wav>")
         return EngineStatus(True, "model ready; voice is clone=<speaker.wav>")
 
@@ -74,7 +73,7 @@ class XTTSEngine(VoiceEngine):
     def _load(self):
         if self._tts is None:
             TTS = _api()
-            with tos_agreed():
+            with loading():
                 tts = TTS(MODEL)
             try:
                 import torch
@@ -87,7 +86,7 @@ class XTTSEngine(VoiceEngine):
     def prepare(self, voice: str, confirm, root: Path) -> None:
         _api()
         clone_reference(voice, root)
-        if accepted_marker().exists():
+        if model_present():
             return
         if not confirm("Download the XTTS-v2 model (about 1.9 GB) and accept its licence, the Coqui Public "
                        "Model License, which allows non-commercial use only?"):
@@ -96,10 +95,11 @@ class XTTSEngine(VoiceEngine):
         self._load()
         accepted_marker().parent.mkdir(parents=True, exist_ok=True)
         accepted_marker().write_text(MODEL, encoding="utf-8")
+        self._tts = None  # Manim loads its own copy; keeping this one would hold the weights twice
 
     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
-        if not accepted_marker().exists():
-            raise VoiceError("XTTS-v2 is not set up; run `manimvox render` (it asks) or "
+        if not model_present():
+            raise VoiceError("XTTS-v2 is not set up (or its model files are missing); run `manimvox render` (it asks) or "
                              "`manimvox voices --prepare xtts:clone=<speaker.wav>`")
         ref = clone_reference(voice)  # cwd = project root inside Manim
         raw = out.with_name(out.stem + ".raw.wav")
