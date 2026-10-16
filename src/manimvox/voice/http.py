@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import http.client
 import time
 import urllib.request
 from collections.abc import Callable, Mapping, Sequence
@@ -39,6 +40,7 @@ def with_retries(
     backoff: float = 1.0,
     sleep: Callable[[float], None] = time.sleep,
     secrets: Sequence[str] = (),
+    resumable: bool = True,
 ) -> T:
     last: Exception | None = None
     for i in range(attempts):
@@ -52,10 +54,8 @@ def with_retries(
             last = e
             if i < attempts - 1:
                 sleep(backoff * 2**i)
-    raise VoiceError(
-        _scrub(f"{service} failed after {attempts} tries: {_describe(last)}; "
-               "lines already spoken are cached, so a re-run picks up where this stopped", secrets)
-    ) from None
+    tail = "; lines already spoken are cached, so a re-run picks up where this stopped" if resumable else ""
+    raise VoiceError(_scrub(f"{service} failed after {attempts} tries: {_describe(last)}{tail}", secrets)) from None
 
 
 def request(
@@ -70,6 +70,7 @@ def request(
     backoff: float = 1.0,
     sleep: Callable[[float], None] = time.sleep,
     secrets: Sequence[str] = (),
+    resumable: bool = True,
 ) -> bytes:
     def once() -> bytes:
         req = urllib.request.Request(url, data=body, headers=dict(headers), method=method)
@@ -79,18 +80,19 @@ def request(
     def retryable(e: Exception) -> bool:
         if isinstance(e, HTTPError):
             return e.code in RETRY_STATUS
-        return isinstance(e, OSError)  # URLError, timeouts, connection resets
+        # URLError, timeouts, connection resets; and a body cut short or a dropped connection
+        return isinstance(e, (OSError, http.client.HTTPException))
 
     try:
         return with_retries(once, service, retryable=retryable, attempts=attempts, backoff=backoff,
-                            sleep=sleep, secrets=secrets)
+                            sleep=sleep, secrets=secrets, resumable=resumable)
     except HTTPError as e:
         try:
-            detail = e.read().decode("utf-8", "replace").strip()[:300]
+            detail = _scrub(e.read().decode("utf-8", "replace"), secrets).strip()[:300]
         except Exception:  # noqa: BLE001
             detail = ""
-        msg = f"{service} refused the request (HTTP {e.code}): {detail or e.reason}"
-        raise VoiceError(_scrub(msg, secrets)) from None
+        raise VoiceError(_scrub(f"{service} refused the request (HTTP {e.code}): {detail or e.reason}",
+                                secrets)) from None
     except VoiceError:
         raise
     except Exception as e:  # noqa: BLE001 - http.client can echo a header value in its message

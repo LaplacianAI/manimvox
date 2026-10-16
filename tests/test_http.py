@@ -78,3 +78,30 @@ def test_a_key_with_a_newline_never_escapes(server):
     assert "sk-SECRET123\\n" not in text
     assert "sk-SECRET123" not in text and "***" in text
     assert len(s.requests) == 1
+
+
+@pytest.mark.parametrize("offset", [250, 280, 295, 299, 300])
+def test_a_key_straddling_the_truncation_point_leaves_no_prefix(server, offset):
+    key = "sk-" + "Zq7Lm2Xv9Rt4Bw8Nc6Hd1Jf5Gk3Ps0Ya"
+    body = ("x" * offset + key + " tail").encode()
+    server(400, error_body=body)
+    with pytest.raises(VoiceError) as ei:
+        http.request("Svc", "GET", "https://svc.test", headers={}, sleep=lambda t: None, secrets=[key])
+    msg = str(ei.value)
+    assert not any(key[i:i + 8] in msg for i in range(len(key) - 7))
+
+
+def test_http_client_errors_are_retried(server):
+    import http.client as hc
+    s = server(hc.IncompleteRead(b"ab"), hc.RemoteDisconnected("gone"), b"ok")
+    assert http.request("Svc", "GET", "https://svc.test", headers={}, sleep=lambda t: None) == b"ok"
+    assert len(s.requests) == 3
+
+
+def test_resumable_controls_the_cached_lines_hint():
+    def boom():
+        raise OSError("down")
+    for flag, expect in ((True, True), (False, False)):
+        with pytest.raises(VoiceError) as ei:
+            http.with_retries(boom, "Svc", attempts=2, sleep=lambda t: None, resumable=flag)
+        assert ("lines already spoken" in str(ei.value)) is expect
