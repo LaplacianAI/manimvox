@@ -125,3 +125,53 @@ def test_check_theme_has_no_note_when_every_role_is_set(project, capsys):
 def test_draft_rejects_a_non_positive_every(project, capsys):
     assert main(["draft", "ep01", "--every", "0"]) == 2
     assert "--every must be greater than 0" in capsys.readouterr().err
+
+
+def test_voices_table_flags_online_and_noncommercial(project, capsys, monkeypatch):
+    from manimvox.voice import FakeEngine, register
+
+    class Cloud(FakeEngine):
+        name, online, noncommercial, licence = "cloudy", "Cloudy Inc.", True, "test licence"
+
+    register("cloudy", Cloud)
+    try:
+        assert main(["voices"]) == 0
+        out = capsys.readouterr().out
+        assert "narration text is sent to Cloudy Inc." in out and "non-commercial" in out
+    finally:
+        from manimvox.voice import registry
+
+        registry._FACTORIES.pop("cloudy"), registry._LIVE.pop("cloudy", None)
+
+
+def test_voices_for_one_engine_lists_its_voices(project, capsys):
+    assert main(["voices", "fake"]) == 0
+    out = capsys.readouterr().out
+    assert "tone" in out and "silence" in out
+
+
+def test_voices_unknown_engine_is_a_clean_error(project, capsys):
+    assert main(["voices", "nope"]) == 1
+    assert "unknown voice engine 'nope'" in capsys.readouterr().err
+
+
+def test_prepare_accepts_engine_or_engine_voice(project, capsys):
+    assert main(["voices", "--prepare", "fake"]) == 0
+    assert main(["voices", "--prepare", "fake:silence"]) == 0
+    assert main(["voices", "--prepare", "fake:nope"]) == 1
+    assert "fake voice 'nope' unknown" in capsys.readouterr().err
+
+
+def test_render_prepares_with_voice_and_root(project, monkeypatch, capsys):
+    from manimvox.voice import VoiceError, get_engine
+
+    seen = {}
+
+    def prepare(self, voice, confirm, root):
+        seen.update(voice=voice, root=root)
+        raise VoiceError("stop here")
+
+    monkeypatch.setattr(type(get_engine("fake")), "prepare", prepare)
+    assert main(["render", "ep01", "--voice", "fake:tone"]) == 1
+    assert seen == {"voice": "tone", "root": project.resolve()}
+    assert "stop here" in capsys.readouterr().err

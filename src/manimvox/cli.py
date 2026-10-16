@@ -65,7 +65,12 @@ def _cmd_render(args) -> int:
     pr = _project()
     ep = pr.episode(args.episode)
     spec = resolve_voice(args.voice, pr.voice, os.environ)
-    get_engine(spec.engine).prepare(_confirm(args))
+    eng = get_engine(spec.engine)
+    eng.prepare(spec.voice, _confirm(args), pr.root)
+    if eng.online:
+        print(f"note: narration text is sent to {eng.online} ({spec})")
+    if eng.noncommercial:
+        print(f"note: {spec.engine} is for non-commercial use only: {eng.licence}")
     out = pr.out_dir / f"{ep.stem}.mp4"
     out.unlink(missing_ok=True)
     (pr.out_dir / f"{ep.stem}.srt").unlink(missing_ok=True)
@@ -110,18 +115,44 @@ def _cmd_check(args) -> int:
 
 
 def _cmd_voices(args) -> int:
-    from .voice import engine_names, get_engine
+    from pathlib import Path
+
+    from .project import ProjectError, find_project
+    from .voice import engine_names, get_engine, parse_voice
 
     if args.prepare:
-        get_engine(args.prepare).prepare(_confirm(args))
+        p = args.prepare
+        if ":" in p:
+            spec = parse_voice(p)
+            eng = get_engine(spec.engine)
+            voice = spec.voice
+        else:
+            eng = get_engine(p.strip().lower())
+            voice = eng.default_voice
+        try:
+            root = find_project(Path.cwd())
+        except ProjectError:
+            root = Path.cwd()
+        eng.prepare(voice, _confirm(args), root)
+        print(f"ready: {eng.name}:{voice}")
+    if args.engine:
+        eng = get_engine(args.engine.strip().lower())
+        rows = eng.describe_voices()
+        if not rows:
+            print(f"{eng.name}: no voices listed ({eng.status().detail})")
+        for v, desc in rows:
+            print(f"{v:<36} {desc}".rstrip())
+        return 0
     for name in engine_names():
         e = get_engine(name)
         st = e.status()
-        print(f"{name:<10} {'ready' if st.ready else 'not ready':<10} {st.detail}")
-        print(f"{'':<10} licence: {e.licence}")
-        if st.ready:
-            vs = e.voices()
-            print(f"{'':<10} voices: {', '.join(vs[:12])}{' …' if len(vs) > 12 else ''}")
+        print(f"{name:<11}{'ready' if st.ready else 'not ready':<10} {st.detail}")
+        print(f"{'':<11}licence: {e.licence}")
+        if e.online:
+            print(f"{'':<11}online: narration text is sent to {e.online}")
+        if e.noncommercial:
+            print(f"{'':<11}non-commercial use only")
+    print("voices of one engine: manimvox voices <engine>")
     return 0
 
 
@@ -190,7 +221,10 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=_cmd_check)
 
     s = p._sub.add_parser("voices", help="voice engines: ready or not, licence, voices")
-    s.add_argument("--prepare", metavar="ENGINE", help="download what ENGINE needs (asks first)")
+    s.add_argument("engine", nargs="?", help="list this engine's voices")
+    s.add_argument(
+        "--prepare", metavar="ENGINE[:VOICE]", help="get ENGINE (or one of its voices) ready: downloads ask first"
+    )
     s.add_argument("-y", "--yes", action="store_true", default=argparse.SUPPRESS, help="answer yes to confirmations")
     s.set_defaults(func=_cmd_voices)
 

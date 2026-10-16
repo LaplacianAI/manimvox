@@ -8,16 +8,17 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from ..base import EngineStatus, VoiceError
+from ..base import EngineStatus, VoiceEngine, VoiceError
 
 RATE = 24000
 WORDS_PER_SECOND = 2.6
 
 
-class FakeEngine:
+class FakeEngine(VoiceEngine):
     name = "fake"
     extra = None
     licence = "MIT (part of manimvox)"
+    default_voice = "tone"
 
     def status(self) -> EngineStatus:
         return EngineStatus(True, "built in")
@@ -25,8 +26,9 @@ class FakeEngine:
     def voices(self) -> list[str]:
         return ["tone", "silence"]
 
-    def prepare(self, confirm: Callable[[str], bool]) -> None:
-        return None
+    def prepare(self, voice: str, confirm: Callable[[str], bool], root: Path) -> None:
+        if voice not in self.voices():
+            raise VoiceError(f"fake voice '{voice}' unknown (have: tone, silence)")
 
     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
         if voice not in self.voices():

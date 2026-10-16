@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pytest
 import soundfile as sf
 
@@ -5,8 +7,10 @@ from manimvox.voice import (
     DEFAULT_VOICE,
     EngineNotInstalled,
     UnknownEngine,
+    VoiceEngine,
     VoiceError,
     VoiceSpec,
+    clone_reference,
     get_engine,
     parse_voice,
     resolve_voice,
@@ -76,3 +80,43 @@ def test_blank_line_is_an_error(tmp_path, blank):
 def test_no_temp_files_left_behind(tmp_path):
     synth_cached(parse_voice("fake:tone"), "hello", 1.0, tmp_path)
     assert not list(tmp_path.glob("*.tmp.wav"))
+
+
+def test_engine_base_defaults():
+    e = VoiceEngine()
+    assert e.online == "" and e.noncommercial is False
+    assert e.voice_key("x") == "x"
+    assert e.prepare("x", lambda p: True, Path(".")) is None
+
+
+def test_describe_voices_defaults_to_blank_descriptions():
+    class Two(VoiceEngine):
+        def voices(self):
+            return ["a", "b"]
+
+    assert Two().describe_voices() == [("a", ""), ("b", "")]
+
+
+def test_cache_key_uses_voice_key(tmp_path, monkeypatch):
+    monkeypatch.setattr(type(get_engine("fake")), "voice_key", lambda self, v: "same")
+    a, _ = synth_cached(parse_voice("fake:tone"), "hello there", 1.0, tmp_path)
+    b, _ = synth_cached(parse_voice("fake:silence"), "hello there", 1.0, tmp_path)
+    assert a == b  # the key came from voice_key, not the raw voice string
+
+
+def test_clone_reference_relative_to_root(tmp_path):
+    (tmp_path / "voices").mkdir()
+    rec = tmp_path / "voices" / "me.wav"
+    rec.write_bytes(b"RIFF")
+    assert clone_reference("clone=voices/me.wav", tmp_path) == rec
+    assert clone_reference(f"clone={rec}") == rec
+
+
+@pytest.mark.parametrize("bad, msg", [
+    ("me.wav", "clone=<speaker.wav>"),
+    ("clone=", "needs a path"),
+    ("clone=missing.wav", "not found"),
+])
+def test_clone_reference_errors(tmp_path, bad, msg):
+    with pytest.raises(VoiceError, match=msg):
+        clone_reference(bad, tmp_path)

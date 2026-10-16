@@ -8,6 +8,7 @@ from .base import (
     VoiceEngine,
     VoiceError,
     VoiceSpec,
+    clone_reference,
     parse_voice,
     resolve_voice,
 )
@@ -32,6 +33,7 @@ __all__ = [
     "VoiceEngine",
     "VoiceError",
     "VoiceSpec",
+    "clone_reference",
     "engine_names",
     "get_engine",
     "parse_voice",
