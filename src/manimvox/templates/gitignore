@@ -1,0 +1,5 @@
+build/
+.manimvox/
+sheets/
+media/
+__pycache__/
