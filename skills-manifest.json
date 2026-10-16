@@ -25,6 +25,14 @@
       "sha256": "80be9fd83d5f30519950a8ac079cf57c92cf2c6f68d26ea6c1223ddcf58a4856",
       "files": 1
     },
+    "manimvox-playlist": {
+      "sha256": "e1097929055b0853975333adc4f648cebb4992cc3754130e472ccdc08a8dcf46",
+      "files": 3
+    },
+    "manimvox-pr": {
+      "sha256": "7fdbbd952048eb4c382c14284ae145510e4859912a7595d909a7a24b79f34342",
+      "files": 1
+    },
     "manimvox-voice": {
       "sha256": "0977d006a18e99f8e113ac6fa42f18d9ad5d0192a912596c7415f48816559bc8",
       "files": 1
