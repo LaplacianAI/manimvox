@@ -84,8 +84,26 @@ def test_wheel_bundles_the_skills(tmp_path):
     subprocess.run(["uv", "build", "--wheel", "--out-dir", str(tmp_path)], cwd=ROOT, check=True,
                    capture_output=True)
     wheel = next(tmp_path.glob("manimvox-*.whl"))
-    names = zipfile.ZipFile(wheel).namelist()
-    assert "manimvox/_skills/manimvox-voice/SKILL.md" in names
+    with zipfile.ZipFile(wheel) as z:
+        assert "manimvox/_skills/manimvox-voice/SKILL.md" in z.namelist()
+        z.extractall(tmp_path / "unpacked")
+    have = sk.build_manifest(tmp_path / "unpacked" / "manimvox" / "_skills", manimvox.__version__)
+    want = json.loads((ROOT / sk.MANIFEST_NAME).read_text(encoding="utf-8"))
+    assert have == want
+
+
+@pytest.mark.slow
+def test_sdist_never_ships_specs_plans_or_sdd_notes(tmp_path):
+    import subprocess
+    import tarfile
+
+    subprocess.run(["uv", "build", "--sdist", "--out-dir", str(tmp_path)], cwd=ROOT, check=True,
+                   capture_output=True)
+    with tarfile.open(next(tmp_path.glob("manimvox-*.tar.gz"))) as t:
+        names = t.getnames()
+    assert names
+    for banned in ("/docs/specs", "/docs/plans", "/.superpowers"):
+        assert not any(banned in n for n in names), banned
 
 
 @pytest.mark.parametrize("body, key", [

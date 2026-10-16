@@ -33,6 +33,9 @@ manimvox = "manimvox.cli:main"
 [tool.hatch.version]
 path = "src/manimvox/__init__.py"
 
+[tool.hatch.build.targets.sdist]
+exclude = ["docs/specs", "docs/plans", ".superpowers"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/manimvox"]
 
