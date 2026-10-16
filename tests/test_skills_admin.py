@@ -121,9 +121,9 @@ def test_cli_install_hands_off_to_npx(home, proj, monkeypatch, no_tty):
     monkeypatch.setattr(sa.subprocess, "run",
                         lambda cmd, **kw: seen.update(cmd=cmd, env=kw.get("env")) or subprocess.CompletedProcess(cmd, 0))
     assert main(["skills", "install", "--yes"]) == 0
-    assert seen["cmd"][:4] == ["npx", "--yes", sa.SKILLS_CLI, "add"] and "-y" in seen["cmd"]
+    assert seen["cmd"][:4] == ["/usr/bin/npx", "--yes", sa.SKILLS_CLI, "add"] and "-y" in seen["cmd"]
     assert seen["env"]["DISABLE_TELEMETRY"] == "1"
-    assert seen["cmd"].count("-a") == 4  # claude-code, codex, cursor, universal
+    assert seen["cmd"].count("-a") == 3  # claude-code, codex, cursor; never universal
 
 
 def test_cli_native_install_and_check(home, proj, no_npx, no_tty, capsys):
@@ -141,7 +141,7 @@ def test_no_tty_needs_flags(home, proj, no_npx, no_tty, capsys):
 def test_cli_update_and_remove(home, proj, no_npx, no_tty, capsys):
     main(["skills", "install", "--agent", "codex", "--copy", "--yes"])
     t = proj / ".agents" / "skills"
-    (t / "manimvox" / "SKILL.md").write_text("old", encoding="utf-8")
+    (t / "manimvox" / "SKILL.md").write_text("---\nname: manimvox\ndescription: older\n---\n", encoding="utf-8")
     assert main(["skills", "check"]) == 1
     assert main(["skills", "update"]) == 0 and main(["skills", "check"]) == 0
     assert main(["skills", "remove"]) == 2  # no terminal, no --yes
@@ -175,3 +175,113 @@ def test_npx_with_terminal_lets_npx_ask(home, proj, with_npx, monkeypatch):
     monkeypatch.setattr(sa, "is_tty", lambda: True)
     assert main(["skills", "install"]) == 0
     assert "-y" not in with_npx[0] and "-a" not in with_npx[0]
+
+
+def _own(path, name, text=None):
+    path.mkdir(parents=True)
+    (path / "SKILL.md").write_text(text or f"---\nname: {name}\ndescription: mine\n---\n", encoding="utf-8")
+
+
+@pytest.mark.parametrize("verb", ["install", "update"])
+@pytest.mark.parametrize("kind", ["folder", "file"])
+def test_foreign_same_name_is_left_untouched(home, proj, no_npx, no_tty, capsys, verb, kind):
+    t = proj / ".agents" / "skills"
+    assert main(["skills", "install", "--agent", "codex", "--copy", "--yes"]) == 0
+    victim = t / "manimvox-pr"
+    sa._clear(victim)
+    if kind == "folder":
+        _own(victim, "manimvox-pr", "---\nname: something-else\ndescription: mine\n---\n")
+    else:
+        victim.write_text("precious", encoding="utf-8")
+    capsys.readouterr()
+    assert main(["skills", verb, "--agent", "codex", "--yes"] if verb == "install" else ["skills", verb]) == 1
+    assert "left untouched" in capsys.readouterr().out
+    if kind == "file":
+        assert victim.read_text(encoding="utf-8") == "precious"
+    else:
+        assert "something-else" in (victim / "SKILL.md").read_text(encoding="utf-8")
+    assert (t / "manimvox" / "SKILL.md").is_file()
+
+
+def test_dangling_link_ours_only_when_named_alike(home, proj, tmp_path):
+    t = proj / ".agents" / "skills"
+    t.mkdir(parents=True)
+    os.symlink(tmp_path / "x" / "manimvox-pr", t / "manimvox-pr", target_is_directory=True)
+    os.symlink(tmp_path / "x" / "other", t / "manimvox-cli", target_is_directory=True)
+    assert sa._is_ours(t / "manimvox-pr") and not sa._is_ours(t / "manimvox-cli")
+
+
+def test_target_inside_src_is_refused(home, proj, tmp_path):
+    src = tmp_path / "src"
+    for n in sk.SKILL_NAMES:
+        _own(src / n, n)
+    alias = tmp_path / "alias"
+    os.symlink(src, alias, target_is_directory=True)
+    for call in (lambda: sa.install([alias], "copy", src), lambda: sa.install([src / "manimvox"], "copy", src),
+                 lambda: sa.remove([alias], src)):
+        with pytest.raises(ValueError, match="own skills folder"):
+            call()
+    assert all((src / n / "SKILL.md").is_file() for n in sk.SKILL_NAMES)
+
+
+def test_undetected_agent_install_is_found_later(home, proj, no_npx, no_tty, capsys):
+    assert main(["skills", "install", "--agent", "opencode", "--global", "--yes"]) == 0
+    t = home / ".config" / "opencode" / "skills"
+    assert (t / "manimvox").is_symlink()
+    assert main(["skills", "check", "--global"]) == 0
+    assert main(["skills", "update", "--global"]) == 0
+    assert main(["skills", "remove", "--global", "--yes"]) == 0 and not any(t.iterdir())
+
+
+def test_check_with_nothing_installed(home, proj, no_npx, no_tty, capsys):
+    assert main(["skills", "check"]) == 1
+    assert "no manimvox skills installed in project" in capsys.readouterr().out
+
+
+def test_global_through_the_cli(home, proj, no_npx, no_tty):
+    assert main(["skills", "install", "--agent", "claude-code", "--global", "--yes"]) == 0
+    assert (home / ".claude" / "skills" / "manimvox").is_symlink()
+    assert not (proj / ".claude").exists()
+
+
+def test_unknown_agent_is_usage_error(home, proj, no_npx, no_tty, capsys):
+    assert main(["skills", "install", "--agent", "nope", "--yes"]) == 2
+    assert "unknown agent nope" in capsys.readouterr().err
+
+
+@pytest.mark.parametrize("answer,gone", [("y", True), ("n", False), (None, False)])
+def test_remove_on_a_terminal(home, proj, no_npx, monkeypatch, answer, gone):
+    main(["skills", "install", "--agent", "codex", "--copy", "--yes"])
+    t = proj / ".agents" / "skills"
+    monkeypatch.setattr(sa, "is_tty", lambda: True)
+
+    def fake_input(prompt=""):
+        if answer is None:
+            raise EOFError
+        return answer
+
+    monkeypatch.setattr("builtins.input", fake_input)
+    assert main(["skills", "remove"]) == (0 if gone else 1)
+    assert (not any(t.iterdir())) == gone
+
+
+def test_yes_on_a_terminal_skips_the_questions(home, proj, no_npx, monkeypatch):
+    monkeypatch.setattr(sa, "is_tty", lambda: True)
+
+    def boom(prompt=""):
+        raise AssertionError("asked: " + prompt)
+
+    monkeypatch.setattr("builtins.input", boom)
+    assert main(["skills", "install", "--yes", "--copy"]) == 0
+    assert (proj / ".claude" / "skills" / "manimvox").is_dir() and (proj / ".agents" / "skills" / "manimvox").is_dir()
+
+
+def test_eof_at_the_agent_prompt_is_no(home, proj, no_npx, monkeypatch):
+    monkeypatch.setattr(sa, "is_tty", lambda: True)
+
+    def eof(prompt=""):
+        raise EOFError
+
+    monkeypatch.setattr("builtins.input", eof)
+    assert main(["skills", "install"]) == 1
+    assert not (proj / ".agents").exists()

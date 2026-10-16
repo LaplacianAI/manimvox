@@ -216,26 +216,33 @@ def _skills_scope(args) -> str:
     return "global" if getattr(args, "global_", False) else "project"
 
 
+def _ask(prompt: str) -> str | None:
+    try:
+        return input(prompt).strip().lower()
+    except EOFError:
+        return None  # no answer is a no
+
+
 def _pick_agents(args, found):
+    """The agents to install for, or None after saying why not (the caller's exit code is in `_NO_AGENTS`)."""
     from . import skills_admin as sa
 
     if args.agent:
-        unknown = [a for a in args.agent if a not in sa.BY_ID]
-        if unknown:
-            raise ValueError(f"unknown agent {unknown[0]}; known: {', '.join(sa.BY_ID)}")
         return [sa.BY_ID[a] for a in args.agent]
+    if args.yes:
+        return list(found)
     if sa.is_tty():
         for i, a in enumerate(found, 1):
             print(f"  {i}. {a.id}")
-        reply = input("Install for which agents? (e.g. 1,3 or all) ").strip().lower()
+        reply = _ask("Install for which agents? (e.g. 1,3 or all) ")
+        if reply is None:
+            return []
         if reply in ("", "all"):
             return list(found)
         try:
             return [found[int(n) - 1] for n in reply.replace(" ", "").split(",") if n]
         except (ValueError, IndexError):
             raise ValueError(f"not a list of numbers from 1 to {len(found)}: {reply}") from None
-    if args.yes:
-        return list(found)
     print(
         "manimvox: no terminal to ask which agents: pass --agent ID (repeatable) or --yes for every detected agent",
         file=sys.stderr,
@@ -247,31 +254,38 @@ def _skills_install(args, home) -> int:
     from . import skills_admin as sa
     from .skills import skills_path
 
+    unknown = [a for a in args.agent or [] if a not in sa.BY_ID]
+    if unknown:
+        print(f"manimvox: unknown agent {unknown[0]}; known: {', '.join(sa.BY_ID)}", file=sys.stderr)
+        return 2
     found = sa.detect_agents(home)
     scope_global = getattr(args, "global_", False)
-    if sa.has_npx() and not args.native:
+    npx = sa.npx_path()
+    if npx and not args.native:
         if not args.yes and not sa.is_tty():
-            print(
-                "manimvox: no terminal to ask: pass --yes (with --agent ID to choose agents)",
-                file=sys.stderr,
-            )
+            print("manimvox: no terminal to ask: pass --yes (with --agent ID to choose agents)", file=sys.stderr)
             return 2
-        ids = list(args.agent) if args.agent else ([a.id for a in found] if args.yes else None)
-        return sa.run_npx(sa.npx_command(ids, scope_global, args.copy, args.yes, skills_path()))
+        real = [a.id for a in found if a.id != "universal"]  # npx maps "universal" to another folder
+        ids = list(args.agent) if args.agent else (real if args.yes else None)
+        return sa.run_npx(sa.npx_command(ids, scope_global, args.copy, args.yes, skills_path(), npx))
     agents = _pick_agents(args, found)
     if agents is None:
         return 2
+    if not agents:
+        print("manimvox: no agents chosen", file=sys.stderr)
+        return 1
     if args.project:
         scope = "project"
     elif scope_global:
         scope = "global"
-    elif sa.is_tty():
-        scope = "global" if input("Install for this project or globally? [P/g] ").strip().lower().startswith("g") else "project"
-    else:
+    elif args.yes or not sa.is_tty():
         scope = "project"
-    for line in sa.install(sa.targets(agents, scope, Path.cwd(), home), "copy" if args.copy else "link"):
+    else:
+        scope = "global" if (_ask("Install for this project or globally? [P/g] ") or "").startswith("g") else "project"
+    msgs, skipped = sa.install_checked(sa.targets(agents, scope, Path.cwd(), home), "copy" if args.copy else "link")
+    for line in msgs:
         print(line)
-    return 0
+    return 1 if skipped else 0
 
 
 def _cmd_skills(args) -> int:
@@ -280,12 +294,14 @@ def _cmd_skills(args) -> int:
     home = Path.home()
     if args.action == "install":
         return _skills_install(args, home)
-    dirs = sa.targets(sa.detect_agents(home), _skills_scope(args), Path.cwd(), home)
+    scope = _skills_scope(args)
+    dirs = [t for t in sa.known_targets(scope, Path.cwd(), home) if sa.holds_ours(t)]
     if args.action == "check":
+        if not dirs:
+            print(f"no manimvox skills installed in {scope} agent folders; run manimvox skills install")
+            return 1
         bad = False
         for t in dirs:
-            if not sa.holds_ours(t):
-                continue
             st = sa.status(t)
             if set(st.values()) == {"ok"}:
                 print(f"{t}: ok")
@@ -294,23 +310,25 @@ def _cmd_skills(args) -> int:
                 print(f"{t}: " + ", ".join(f"{n} {v}" for n, v in st.items() if v != "ok"))
         return 1 if bad else 0
     if args.action == "update":
+        skipped = False
         for t in dirs:
-            if sa.holds_ours(t):
-                linked = any((t / n).is_symlink() for n in sa.SKILL_NAMES)
-                for line in sa.install([t], "link" if linked else "copy"):
-                    print(line)
-        return 0
-    ours = [t for t in dirs if sa.holds_ours(t)]
-    if not ours:
+            linked = any((t / n).is_symlink() for n in sa.SKILL_NAMES)
+            msgs, sk = sa.install_checked([t], "link" if linked else "copy")
+            skipped = skipped or sk
+            for line in msgs:
+                print(line)
+        return 1 if skipped else 0
+    if not dirs:
         print("no manimvox skills found")
         return 0
     if not args.yes:
         if not sa.is_tty():
             print("manimvox: no terminal to ask: pass --yes to remove the skills", file=sys.stderr)
             return 2
-        if not input(f"Remove the manimvox skills from {', '.join(str(t) for t in ours)}? [y/N] ").strip().lower().startswith("y"):
+        reply = _ask(f"Remove the manimvox skills from {', '.join(str(t) for t in dirs)}? [y/N] ")
+        if not (reply or "").startswith("y"):
             return 1
-    for gone in sa.remove(ours):
+    for gone in sa.remove(dirs):
         print(f"removed {gone}")
     return 0
 

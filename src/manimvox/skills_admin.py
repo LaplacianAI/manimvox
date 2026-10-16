@@ -12,6 +12,8 @@ from typing import Literal
 
 from .skills import SKILL_NAMES, content_hash, read_frontmatter, skills_path
 
+SKILLS_CLI = "skills@1.7.2"  # bump deliberately: npx runs this package
+
 
 @dataclass(frozen=True)
 class Agent:
@@ -47,13 +49,22 @@ def targets(agents, scope: Literal["project", "global"], root: Path, home: Path)
 
 
 def _is_ours(entry: Path) -> bool:
-    if entry.is_symlink() and not entry.exists():
-        return entry.name in SKILL_NAMES
+    """A manimvox skill we may replace or delete: a link or folder named like one of ours that really is one."""
+    name = entry.name
+    if name not in SKILL_NAMES:
+        return False
+    if entry.is_symlink():
+        if Path(os.readlink(entry)).name != name:
+            return False
+        if not entry.exists():
+            return True  # dangling
+    elif not entry.is_dir():
+        return False
     md = entry / "SKILL.md"
     if not md.is_file():
         return False
     try:
-        return read_frontmatter(md).get("name") in SKILL_NAMES
+        return read_frontmatter(md).get("name") == name
     except ValueError:
         return False
 
@@ -65,28 +76,51 @@ def _clear(entry: Path) -> None:
         shutil.rmtree(entry)
 
 
-def install(target_dirs: list[Path], mode: Literal["link", "copy"], src: Path | None = None) -> list[str]:
+def _guard(target: Path, src: Path) -> None:
+    rt, rs = Path(target).resolve(), Path(src).resolve()
+    if rt == rs or rs in rt.parents:
+        raise ValueError(f"{target} is manimvox's own skills folder; nothing to install")
+
+
+def install_checked(
+    target_dirs: list[Path], mode: Literal["link", "copy"], src: Path | None = None
+) -> tuple[list[str], bool]:
+    """Install; returns the messages and whether anything was skipped because it was not ours."""
     src = Path(src) if src else skills_path()
+    for t in target_dirs:
+        _guard(t, src)
     msgs: list[str] = []
+    skipped = False
     fell_back = False
     for t in target_dirs:
         t.mkdir(parents=True, exist_ok=True)
         used = mode
+        done = 0
         for name in SKILL_NAMES:
             dest = t / name
             if dest.exists() or dest.is_symlink():
+                if not _is_ours(dest):
+                    msgs.append(f"{dest} exists and is not a manimvox skill; left untouched")
+                    skipped = True
+                    continue
                 _clear(dest)
             if used == "link":
                 try:
                     os.symlink(src / name, dest, target_is_directory=True)
+                    done += 1
                     continue
                 except OSError:
                     used, fell_back = "copy", True
             shutil.copytree(src / name, dest)
-        msgs.append(f"{t}: {len(SKILL_NAMES)} skills ({'linked' if used == 'link' else 'copied'})")
+            done += 1
+        msgs.append(f"{t}: {done} skills ({'linked' if used == 'link' else 'copied'})")
     if fell_back:
         msgs.append("symlinks unavailable here; copied the skills instead")
-    return msgs
+    return msgs, skipped
+
+
+def install(target_dirs: list[Path], mode: Literal["link", "copy"], src: Path | None = None) -> list[str]:
+    return install_checked(target_dirs, mode, src)[0]
 
 
 def status(target_dir: Path, src: Path | None = None) -> dict[str, str]:
@@ -107,7 +141,10 @@ def holds_ours(target_dir: Path) -> bool:
     return target_dir.is_dir() and any(_is_ours(e) for e in target_dir.iterdir())
 
 
-def remove(target_dirs: list[Path]) -> list[Path]:
+def remove(target_dirs: list[Path], src: Path | None = None) -> list[Path]:
+    src = Path(src) if src else skills_path()
+    for t in target_dirs:
+        _guard(t, src)
     removed = []
     for t in target_dirs:
         if not t.is_dir():
@@ -119,8 +156,8 @@ def remove(target_dirs: list[Path]) -> list[Path]:
     return removed
 
 
-def npx_command(agent_ids, scope_global: bool, copy: bool, yes: bool, src: Path) -> list[str]:
-    cmd = ["npx", "--yes", SKILLS_CLI, "add", str(src), "--skill", "*"]
+def npx_command(agent_ids, scope_global: bool, copy: bool, yes: bool, src: Path, npx: str = "npx") -> list[str]:
+    cmd = [npx, "--yes", SKILLS_CLI, "add", str(src), "--skill", "*"]
     for a in agent_ids or []:
         cmd += ["-a", a]
     if scope_global:
@@ -132,11 +169,18 @@ def npx_command(agent_ids, scope_global: bool, copy: bool, yes: bool, src: Path)
     return cmd
 
 
-SKILLS_CLI = "skills@1.7.2"  # bump deliberately: npx runs this package
+def npx_path() -> str | None:
+    """The resolved npx executable (npx.cmd on Windows), so no shell is needed."""
+    return shutil.which("npx")
 
 
 def has_npx() -> bool:
-    return shutil.which("npx") is not None
+    return npx_path() is not None
+
+
+def known_targets(scope: Literal["project", "global"], root: Path, home: Path) -> list[Path]:
+    """Every agent folder for the scope, detected or not: where an install may have gone."""
+    return targets(AGENTS, scope, root, home)
 
 
 def run_npx(cmd: list[str]) -> int:
