@@ -12,13 +12,13 @@ from .base import (
     resolve_voice,
 )
 from .cache import synth_cached
-from .fake import FakeEngine
+from .engines.fake import FakeEngine
 from .pron import spoken_form
 from .registry import engine_names, get_engine, register
 
 register("fake", FakeEngine)
 
-from .kokoro import KokoroEngine
+from .engines.kokoro import KokoroEngine
 
 register("kokoro", KokoroEngine)
 

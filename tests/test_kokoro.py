@@ -3,7 +3,7 @@ import hashlib
 import pytest
 
 from manimvox.voice import VoiceError, get_engine
-from manimvox.voice import kokoro as kk
+from manimvox.voice.engines import kokoro as kk
 
 
 @pytest.fixture

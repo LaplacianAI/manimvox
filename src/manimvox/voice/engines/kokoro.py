@@ -13,7 +13,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from .base import EngineNotInstalled, EngineStatus, VoiceError
+from ..base import EngineNotInstalled, EngineStatus, VoiceError
 
 MODEL_BASE = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0"
 MODELS: dict[str, tuple[str, int]] = {

@@ -8,7 +8,7 @@ from pathlib import Path
 import numpy as np
 import soundfile as sf
 
-from .base import EngineStatus, VoiceError
+from ..base import EngineStatus, VoiceError
 
 RATE = 24000
 WORDS_PER_SECOND = 2.6
