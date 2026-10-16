@@ -64,3 +64,17 @@ def test_empty_source_fails(tmp_path):
 def test_bad_hex_is_a_finding_not_a_crash(tmp_path):
     t = Theme.from_dict({"source": "x", "accent": "purple"})
     assert any(f.subject == "accent" and "hex" in f.message for f in check_theme(t, tmp_path, fonts=FONTS))
+
+
+def test_missing_font_file_is_a_finding_not_a_crash(tmp_path):
+    t = Theme.from_dict({"source": "x", "font_files": ["fonts/missing.ttf"]})
+    found = check_theme(t, tmp_path)
+    assert any(f.subject == "font_files: fonts/missing.ttf" and "no file at" in f.message for f in found)
+
+
+def test_font_file_pango_cannot_register_is_a_finding(tmp_path):
+    (tmp_path / "fonts").mkdir()
+    (tmp_path / "fonts" / "bogus.ttf").write_bytes(b"not a font")
+    t = Theme.from_dict({"source": "x", "font_files": ["fonts/bogus.ttf"]})
+    found = check_theme(t, tmp_path)
+    assert [f.subject for f in found if f.subject.startswith("font_files")] == ["font_files: fonts/bogus.ttf"]

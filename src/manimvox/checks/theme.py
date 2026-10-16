@@ -22,12 +22,22 @@ def contrast(a: str, b: str) -> float:
     return (la + 0.05) / (lb + 0.05)
 
 
-def _pango_fonts(theme: Theme, root: Path) -> set[str]:
+def _pango_fonts(theme: Theme, root: Path) -> tuple[set[str], list[Finding]]:
     import manimpango
 
+    findings: list[Finding] = []
     for f in theme.font_files:
-        manimpango.register_font(str((root / f).resolve()))
-    return set(manimpango.list_fonts())
+        path = root / f
+        if not path.is_file():
+            findings.append(Finding("theme", f"font_files: {f}", f"no file at {path}"))
+            continue
+        try:
+            registered = manimpango.register_font(str(path.resolve()))
+        except Exception:  # noqa: BLE001 - native registration errors are findings, not crashes
+            registered = False
+        if not registered:
+            findings.append(Finding("theme", f"font_files: {f}", "Pango could not register this font file"))
+    return set(manimpango.list_fonts()), findings
 
 
 def check_theme(theme: Theme, root: Path, fonts: set[str] | None = None) -> list[Finding]:
@@ -50,7 +60,10 @@ def check_theme(theme: Theme, root: Path, fonts: set[str] | None = None) -> list
         rb = contrast(hx, bg)
         if rb < 3.0:
             out.append(Finding("theme", name, f"contrast {rb:.2f} on bg; colours need 3.0"))
-    have = fonts if fonts is not None else _pango_fonts(theme, root)
+    have = fonts
+    if have is None:
+        have, font_findings = _pango_fonts(theme, root)
+        out.extend(font_findings)
     for role, fam in (("font", theme.font), ("mono", theme.mono)):
         if fam not in have:
             out.append(Finding("theme", role, f"'{fam}' is not installed or registered; Pango would substitute it"))
