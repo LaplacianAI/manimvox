@@ -3,3 +3,4 @@ build/
 sheets/
 media/
 __pycache__/
+share/

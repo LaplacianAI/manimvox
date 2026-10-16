@@ -195,6 +195,22 @@ def _cmd_doctor(args) -> int:
     return 1 if problems else 0
 
 
+def _cmd_index(args) -> int:
+    from .playlist import build_index
+
+    page, n, total = build_index(_project())
+    print(f"wrote {page}: {n} episode{'s' if n != 1 else ''}, about {max(1, round(total / 60))} min")
+    return 0
+
+
+def _cmd_package(args) -> int:
+    from .playlist import package
+
+    for z in package(_project()):
+        print(f"{z.name}: {z.stat().st_size / 1e6:.1f} MB")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="manimvox", description="Narrated, animated explainer videos with Manim.")
     p.add_argument("--version", action="version", version=f"manimvox {__version__}")
@@ -221,6 +237,12 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("what", choices=["theme", "layout", "audio"])
     s.add_argument("episode", nargs="?")
     s.set_defaults(func=_cmd_check)
+
+    s = p._sub.add_parser("index", help="playlist page out/index.html from the rendered episodes")
+    s.set_defaults(func=_cmd_index)
+
+    s = p._sub.add_parser("package", help="share/<Name> and share/<Name>-720p folders and zips")
+    s.set_defaults(func=_cmd_package)
 
     s = p._sub.add_parser("voices", help="voice engines: ready or not, licence, voices")
     s.add_argument("engine", nargs="?", help="list this engine's voices")
