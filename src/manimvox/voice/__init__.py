@@ -43,6 +43,10 @@ from .engines.say import SayEngine
 
 register("say", SayEngine)
 
+from .engines.xtts import XTTSEngine
+
+register("xtts", XTTSEngine)
+
 __all__ = [
     "DEFAULT_VOICE",
     "EdgeEngine",
@@ -58,6 +62,7 @@ __all__ = [
     "VoiceEngine",
     "VoiceError",
     "VoiceSpec",
+    "XTTSEngine",
     "clone_reference",
     "engine_names",
     "get_engine",

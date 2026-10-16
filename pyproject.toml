@@ -21,6 +21,7 @@ dependencies = [
 kokoro = ["kokoro-onnx>=0.4,<0.7"]
 piper = ["piper-tts>=1.8,<2"]
 edge = ["edge-tts>=7,<8"]
+xtts = ["coqui-tts>=0.27,<0.28"]
 # OpenAI and ElevenLabs use the standard library; the extra keeps the documented install command working
 cloud = []
 dev = ["pytest>=8", "ruff>=0.6"]
