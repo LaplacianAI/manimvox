@@ -45,7 +45,7 @@ Read the whole document, not the abstract. Keep a copy in `research/` and cite f
   uv run --with pypdf python -c "import sys, pypdf; r = pypdf.PdfReader(sys.argv[1]); [print(f'--- page {i}\n' + (p.extract_text() or '')) for i, p in enumerate(r.pages, 1)]" research/source.pdf
   ```
 
-  Put the PDF at `research/source.pdf` first. If pages come back empty, say so in the report: the text of those pages could not be read, and nothing may be claimed from them.
+  Put the PDF at `research/source.pdf` first. If some pages come back empty, say so in the report: nothing may be claimed from them. If every page is empty (a scan), stop and ask the user for a text version or the source document; reading a scan needs OCR, which is an install and needs their go-ahead.
 - **A web page.** The URL the user gave is their go-ahead to fetch it (with `curl` or whatever fetch your environment has). Save the page text to `research/`, and note the URL and the date. Do not follow links to other sites without asking.
 - **Notes or a pasted text.** Save it to `research/` as it is.
 
@@ -75,9 +75,9 @@ Then loop: `manimvox draft ep01 --every 5`, read every contact sheet in `sheets/
 
 ## 6 Final
 
-Run `manimvox render ep01`. This needs the narration voice. If it asks to download a model or to go online, that needs the user's go-ahead; with none, stop and report. The render is done only when it prints `audio check: ok`. If a line is silent, reword it and render again.
+Run `manimvox render ep01`. This needs the narration voice. If it asks to download a model or to go online, that needs the user's go-ahead; with none, stop and report. Pass `--yes` (or `-y`) only after the user has said yes to that download. If the chosen voice cannot be used and the user cannot be asked, follow [manimvox-voice](../manimvox-voice/SKILL.md): use only a local voice that `manimvox voices` shows ready, name it in the report, otherwise stop. The render is done only when it prints `audio check: ok`. If a line is silent, reword it and render again.
 
-Look at 4 to 6 frames of the finished video, one from each stage of the story, or at least run `manimvox check layout ep01`.
+If you can view video or images, look at 4 to 6 moments of `out/ep01_<name>.mp4`, one from each stage of the story. Otherwise the draft's sheets and `manimvox check layout ep01` (which reads the last draft, not the final) are the check, and the report says the final's frames were not viewed.
 
 ## 7 Report
 

@@ -37,11 +37,11 @@ Work from inside that folder.
 
 ## 1 Sources
 
-Pick two or three reputable references: a textbook, the original paper, the standard documentation. Reading them needs the web or files the user gave you, so ask first; where you cannot fetch, use the files the user supplied, and where there are none, rely only on what you know to be standard and label it plainly in the report as unverified. Save what you read to `research/`. The audience is a beginner unless the user says otherwise.
+Pick two or three reputable references: a textbook, the original paper, the standard documentation. Use files or URLs the user gave you. If the user gave none, ask for sources (files or URLs) or for permission to fetch references; fetching is a web request and needs their go-ahead. If no reference can be fetched and none was supplied, stop and ask; if the user cannot be asked, stop and report what is needed. Do not write from memory. Save what you read to `research/`, and note the URLs; they go into `FACTS.md` in step 2. The audience is a beginner unless the user says otherwise.
 
 ## 2 Facts
 
-Write `FACTS.md` before any narration: one claim per line, with its source (a URL, or a book with chapter and page) and a label. Everything from these references is `[EXTERNAL]`, and so is labelled on screen where it appears. Rules and labels are in [facts](../manimvox-creative/references/facts.md). An example you invent for the picture, such as sample numbers, is marked on screen as an example and kept as the running example. A claim you cannot source is not spoken as fact; either drop it or show it as open.
+Write `FACTS.md` before any narration, adding the URLs from step 1: every spoken or on-screen claim is a line with a source. One claim per line, with its source (a URL, or a book with chapter and page) and a label. Everything from these references is `[EXTERNAL]`, and so is labelled on screen where it appears. Rules and labels are in [facts](../manimvox-creative/references/facts.md). An example you invent for the picture, such as sample numbers, is marked on screen as an example and kept as the running example. A claim with no source line is dropped, or shown as open.
 
 ## 3 Theme
 
@@ -69,15 +69,15 @@ Then loop: `manimvox draft ep01 --every 5`, read every contact sheet in `sheets/
 
 ## 6 Final
 
-Run `manimvox render ep01`. This needs the narration voice. If it asks to download a model or to go online, that needs the user's go-ahead; with none, stop and report. The render is done only when it prints `audio check: ok`. If a line is silent, reword it and render again.
+Run `manimvox render ep01`. This needs the narration voice. If it asks to download a model or to go online, that needs the user's go-ahead; with none, stop and report. Pass `--yes` (or `-y`) only after the user has said yes to that download. If the chosen voice cannot be used and the user cannot be asked, follow [manimvox-voice](../manimvox-voice/SKILL.md): use only a local voice that `manimvox voices` shows ready, name it in the report, otherwise stop. The render is done only when it prints `audio check: ok`. If a line is silent, reword it and render again.
 
-Look at 4 to 6 frames of the finished video, or at least run `manimvox check layout ep01`.
+If you can view video or images, look at 4 to 6 moments of `out/ep01_<name>.mp4`, one from each stage of the story. Otherwise the draft's sheets and `manimvox check layout ep01` (which reads the last draft, not the final) are the check, and the report says the final's frames were not viewed.
 
 ## 7 Report
 
 Give the user:
 - the path of `out/ep01_<name>.mp4` and its `.srt`, the length, and the chapter titles;
 - the voice used, and why if it is not the default;
-- each reference used, and every claim that could not be verified, with its label;
+- each reference used, and any claim that could only be partly verified, with its label;
 - every invented example, which is marked on screen as one;
-- anything you could not do (images not viewed, references not fetched) and the pronunciations you added.
+- anything you could not do (images or the final's frames not viewed) and the pronunciations you added.
