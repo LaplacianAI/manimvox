@@ -41,31 +41,47 @@ def read_frontmatter(skill_md: Path) -> dict[str, object]:
     end = 1 + [x.strip() for x in lines[1:]].index("---")
     out: dict[str, object] = {}
     current: dict[str, str] | None = None
-    last: str | None = None
+    map_key: str | None = None  # the top-level key of `current`
+    map_indent = 0
+    last: str | None = None  # the key whose value a continuation line would extend
+
+    def check(key: str, raw: str) -> None:
+        val = raw.strip()
+        if val and val[0] in "|>[{":
+            raise ValueError(f"{skill_md}: key {key!r}: block and flow values are not supported; "
+                             "write a plain or quoted one-line value")
+
     for line in lines[1:end]:
         if not line.strip() or line.lstrip().startswith("#"):
             continue
-        if line[0] in " \t":
-            if current is None:
-                raise ValueError(
-                    f"{skill_md}: key {last!r}: multi-line values are not supported; write it on one line"
-                    if last else f"{skill_md}: indented line outside a map: {line!r}")
-            k, _, v = line.strip().partition(":")
-            current[k.strip()] = _value(v)
+        indent = len(line) - len(line.lstrip(" \t"))
+        k, sep, v = line.strip().partition(":")
+        k = k.strip()
+        if indent == 0:
+            if not sep:
+                raise ValueError(f"{skill_md}: key {last!r}: multi-line values are not supported; "
+                                 "write it on one line" if last else f"{skill_md}: not a `key: value` line: {line!r}")
+            check(k, v)
+            if v.strip():
+                out[k] = _value(v)
+                current = None
+            else:
+                current = {}
+                map_key, map_indent = k, 0
+                out[k] = current
+            last = k
             continue
-        k, _, v = line.partition(":")
-        if v.strip():
-            val = v.strip()
-            if val in {"|", ">", "|-", ">-", "|+", ">+"} or val[0] in "[{":
-                raise ValueError(f"{skill_md}: key {k.strip()!r}: block and flow values are not supported; "
-                                 "write a plain or quoted one-line value")
-            out[k.strip()] = _value(v)
-            current = None
-            last = k.strip()
-        else:
-            current = {}
-            out[k.strip()] = current
-            last = None
+        if current is None:
+            raise ValueError(f"{skill_md}: key {last!r}: multi-line values are not supported; write it on one line")
+        if map_indent == 0:
+            map_indent = indent
+        if indent > map_indent:
+            raise ValueError(f"{skill_md}: key {map_key!r}: maps nest one level only (line {line.strip()!r})")
+        if not sep or not v.strip():
+            raise ValueError(f"{skill_md}: key {map_key!r}: each entry is `name: value` on one line "
+                             f"(line {line.strip()!r})")
+        check(k, v)
+        current[k] = _value(v)
     return out
 
 

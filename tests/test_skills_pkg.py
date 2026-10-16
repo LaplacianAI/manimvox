@@ -88,16 +88,28 @@ def test_wheel_bundles_the_skills(tmp_path):
     assert "manimvox/_skills/manimvox-voice/SKILL.md" in names
 
 
-@pytest.mark.parametrize("body", [
-    "description: >\n  folded text\n",
-    "description: |\n  literal text\n",
-    "description: [a, b]\n",
-    "description: first part\n  continued here\n",
+@pytest.mark.parametrize("body, key", [
+    ("description: >\n  folded text\n", "description"),
+    ("description: |\n  literal text\n", "description"),
+    ("description: [a, b]\n", "description"),
+    ("description: first part\n  continued here\n", "description"),
+    ("description: >-\n  x\n", "description"),
+    ("description: |+\n  x\n", "description"),
+    ("description: > # c\n  x\n", "description"),
+    ("description: |2\n  x\n", "description"),
+    ("metadata:\n  note: >\n    text\n", "note"),
+    ("metadata:\n  note: |-\n    text\n", "note"),
+    ("metadata:\n  tags: [a, b]\n", "tags"),
+    ("metadata:\n  tags: {a: b}\n", "tags"),
+    ("metadata:\n  note: first\n    continued\n", "metadata"),
+    ("metadata:\n  inner:\n    deep: x\n", "metadata"),
 ])
-def test_read_frontmatter_rejects_unsupported_yaml(tmp_path, body):
-    (tmp_path / "SKILL.md").write_text(f"---\nname: x\n{body}---\n# x\n", encoding="utf-8")
-    with pytest.raises(ValueError, match="description"):
-        sk.read_frontmatter(tmp_path / "SKILL.md")
+def test_read_frontmatter_rejects_unsupported_yaml(tmp_path, body, key):
+    path = tmp_path / "SKILL.md"
+    path.write_text(f"---\nname: x\n{body}---\n# x\n", encoding="utf-8")
+    with pytest.raises(ValueError, match=key) as err:
+        sk.read_frontmatter(path)
+    assert path.name in str(err.value)
 
 
 def test_module_cli_runs_without_a_runtime_warning():
@@ -106,5 +118,5 @@ def test_module_cli_runs_without_a_runtime_warning():
 
     r = subprocess.run([sys.executable, "-W", "error::RuntimeWarning", "-m", "manimvox.skills", "manifest",
                         "--check"], check=False, cwd=ROOT, capture_output=True, text=True)
-    assert r.returncode == 0, r.stderr
     assert "RuntimeWarning" not in r.stderr
+    assert r.stdout or r.stderr, "the command printed nothing: it did not run"

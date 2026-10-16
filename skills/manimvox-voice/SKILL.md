@@ -17,7 +17,7 @@ A voice is written `engine:voice`, for example `kokoro:af_heart`. manimvox takes
 3. the `MANIMVOX_VOICE` environment variable
 4. `kokoro:af_heart`
 
-If the voice is missing, not installed or lacks its key, the render stops with a one-line reason. manimvox never switches voice silently, and neither should you: when a voice fails, tell the user and ask. If you cannot ask, you may use only a voice that is local and already ready (`manimvox voices` shows it as ready): Kokoro if its model is present, else `say` on macOS. Never use the fake test engine for a final render. Otherwise stop and report what is needed: a go-ahead for the download, the install or the online service.
+If the voice is missing, not installed or lacks its key, the render stops with a one-line reason. manimvox never switches voice silently, and neither should you: when a voice fails, tell the user and ask. If you cannot ask, you may use only a voice that is local and already ready (`manimvox voices` shows it as ready): Kokoro if its model is present, else `say` on macOS. Never use the `fake:` test engine for a final render. Say in your report which voice you used instead and why (`say` is non-commercial). Otherwise stop and report what is needed: a go-ahead for the download, the install or the online service.
 
 See what exists:
 - `manimvox voices` lists every engine: ready or not, its licence, whether text goes online, whether it is non-commercial.
