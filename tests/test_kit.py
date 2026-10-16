@@ -63,4 +63,5 @@ def test_draft_render_writes_layout(tmp_path):
     assert r.returncode == 0, r.stderr[-2000:]
     layout = json.loads((p / "build" / "ep01_hello" / "layout.json").read_text())
     texts = [t["text"] for fr in layout["frames"] for t in fr["texts"]]
+    assert "a node" in texts
     assert "Box" in texts and layout["stage"] == [-6.6, -3.45, 6.6, 3.15]

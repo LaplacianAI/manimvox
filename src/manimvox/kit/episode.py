@@ -277,9 +277,13 @@ class Episode(Scene):
                 if m.get_fill_opacity() <= 0.05 or not m.family_members_with_points():  # glyph points live in submobjects
                     continue
                 if isinstance(m, Paragraph):
-                    label = " ".join(m.lines_text.text.split()) if hasattr(m, "lines_text") else "paragraph"
+                    if hasattr(m, "lines_text"):
+                        raw = getattr(m.lines_text, "original_text", None) or m.lines_text.text
+                    else:
+                        raw = "paragraph"
                 else:
-                    label = m.text
+                    raw = getattr(m, "original_text", None) or m.text
+                label = " ".join(raw.split())
                 box = (m.get_left()[0], m.get_bottom()[1], m.get_right()[0], m.get_top()[1])
                 texts.append({"text": label, "box": [round(float(v), 3) for v in box]})
         self._frames.append({"t": round(self.time, 2), "texts": texts})
