@@ -9,10 +9,14 @@ manimvox renders narrated, animated explainer videos with Manim and a text-to-sp
 ```text
 src/manimvox/
   cli.py            the manimvox command
+  confirm.py        when a download may go ahead without asking
+  playlist.py       index page and share packages
   project.py        series.json loading and validation
   scaffold.py       manimvox new
   runner.py         runs Manim in a subprocess
   skills.py         skill discovery, manifest generation
+  skills_admin.py   manimvox skills install, check, update, remove
+  templates/        files manimvox new writes
   kit/              Episode, components, theme, text (what episodes import)
   checks/           theme, layout, audio, contact sheets
   voice/            the voice interface, cache, downloads, HTTP, audio conversion
@@ -29,6 +33,7 @@ uv sync --extra dev --extra kokoro
 uv run pytest
 uv run ruff check src tests
 uv run python -m manimvox.skills manifest --write   # after any skill edit
+uv run manimvox skills install|check|update|remove  # skills in your coding agents
 ```
 
 Tests that render with Manim are marked `slow`; tests needing real engines are opt-in markers.

@@ -1,6 +1,6 @@
 ---
 name: manimvox-cli
-description: "The manimvox command line and how to read its output: doctor, new, draft, render, check theme|layout|audio, voices, index and package. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
+description: "The manimvox command line and how to read its output: doctor, new, draft, render, check theme|layout|audio, voices, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
 license: MIT
 ---
 
@@ -48,21 +48,22 @@ Ask the user before installing anything: a system package, manimvox itself, or a
 | `manimvox voices [ENGINE]` | `--prepare ENGINE[:VOICE]`, `-y` | model files in the cache | 1 on a voice error |
 | `manimvox index` | none | `out/index.html` | 1 on error |
 | `manimvox package` | none | `share/<Name>/`, `share/<Name>-720p/` and a zip of each | 1 on error |
+| `manimvox skills install\|check\|update\|remove` | see [Skills in your agents](#skills-in-your-agents) | the skill folders of your coding agents | 1 on a problem, 2 with no terminal and no flag |
 
 Notes:
 - `-y` / `--yes` (or `MANIMVOX_ASSUME_YES=1`) answers yes to download prompts. Use it only with the user's go-ahead.
 - `draft` renders 480p at 10 fps with no voice. `render` renders 1080p at 30 fps with the voice and ends with the audio check.
 - `check layout` reads the report of the last `draft`; run `draft` first or it says so.
 - `index` and `package` use only episodes that have a finished `out/<stem>.mp4`. Render first.
-- Voice choice, engines and pronunciation are in [manimvox-voice](../manimvox-voice/SKILL.md).
+- Voice choice, engines and pronunciation are in [manimvox-voice](../manimvox-voice/SKILL.md). Ask the user before using an online voice: the narration text leaves the machine.
 
 ## Reading the output
 
-**Theme check.** `manimvox check theme` prints one line per failure and ends `theme check: ok` or `theme check: N failure(s)`. A line such as `accent: contrast 3.10 on bg, 3.40 on panel; text needs 4.5` means that colour is too dim for text. Lighten it in `series.json` under `theme` (text roles need 4.5:1, hues and named colours 3:1) and say in the theme's `source` that it was lightened for the video and from what. Other lines name a font Pango cannot load, a value that is not a `#RRGGBB` hex, or an empty `source`. A `note: roles from the kit's neutral default` line is not a failure: those roles were left out of the theme.
+**Theme check.** `manimvox check theme` prints one line per failure and ends `theme check: ok` or `theme check: N failure(s)`. A line such as `theme: accent: contrast 3.10 on bg, 3.40 on panel; text needs 4.5` means that colour is too dim for text. Lighten it in `series.json` under `theme` (text roles need 4.5:1, hues and named colours 3:1) and say in the theme's `source` that it was lightened for the video and from what. Other lines name a font Pango cannot load, a value that is not a `#RRGGBB` hex, or an empty `source`. A `note: roles from the kit's neutral default` line is not a failure: those roles were left out of the theme.
 
 **Layout findings.** `draft` prints one line per problem, then `layout check: ok` or `layout check: N finding(s)`. Two kinds, each with the time in the draft:
-- `<text> leaves the stage (left, bottom) at 0:42`: the text crosses the safe stage. Shrink it, shorten it or move it in.
-- `<text> overlaps '<other>' at 1:05`: two texts collide. Space them or split the scene.
+- `layout: <text>: leaves the stage (left, bottom) at 0:42`: the text crosses the safe stage. Shrink it, shorten it or move it in.
+- `layout: <text>: overlaps '<other>' at 1:05`: two texts collide. Space them or split the scene.
 
 Fix every finding, then draft again. A draft that exits `0` only proves the code runs and nothing overlaps; look at the picture too.
 
@@ -77,6 +78,19 @@ Fix every finding, then draft again. A draft that exits `0` only proves the code
 - **No terminal prompt:** never block waiting for an answer. manimvox itself never prompts without a terminal; it declines downloads instead. Pass `--yes` only when the user has said yes to that download.
 - **Cannot view images:** do not skip the visual check. Run `manimvox check layout EP` after a draft and treat its findings as the sheet review. Say in your report that you could not look at the sheets.
 
+## Skills in your agents
+
+These skills reach a coding agent through `manimvox skills`. Run it only with the user's go-ahead; it writes into each agent's skills folder.
+
+| Command | What it does |
+|---|---|
+| `manimvox skills install` | puts the ten skills in each agent's skills folder. With `npx` present it hands off to `npx skills`; `--native` forces manimvox's own installer |
+| `manimvox skills check` | prints `<folder>: ok`, or which skills are `outdated`, `missing` or `broken`; exits `1` on any of those |
+| `manimvox skills update` | installs again, in the mode (link or copy) each folder already uses |
+| `manimvox skills remove` | deletes only the manimvox skills, never another entry |
+
+Flags: `--agent ID` (repeatable) picks agents; `--global` works on every project, `--project` (the default) on this one; `--copy` copies instead of linking; `-y` / `--yes` answers yes, and with `install` and no `--agent` means every detected agent. With no terminal, `install` needs `--agent` or `--yes`, and `remove` needs `--yes`; otherwise they exit `2`. After upgrading manimvox, run `manimvox skills update`.
+
 ## Speed
 
 - Render at most two finals at once; more is slower overall.
@@ -88,7 +102,7 @@ Fix every finding, then draft again. A draft that exits `0` only proves the code
 
 | Path | What it is |
 |---|---|
-| `series.json` | `series`, `tagline`, `voice`, `speed`, `pron`, `theme`, `episodes` (each with `n`, `stem`, `cls`, `title`; optional `level`, `blurb`) |
+| `series.json` | `manimvox` (the version that wrote it, set by `manimvox new`), `series`, `tagline`, `voice`, `speed`, `pron`, `theme`, `episodes` (each with `n`, `stem`, `cls`, `title`; optional `level`, `blurb`) |
 | `FACTS.md` | every claim the video makes, with its source and a label |
 | `SERIES.md` | the outline each episode is written against |
 | `episodes/` | one `epNN_name.py` per episode |

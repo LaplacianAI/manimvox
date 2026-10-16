@@ -17,6 +17,8 @@ manimvox turns a source into an animated video with a spoken voice, using Manim 
 | a topic or concept with no source | [manimvox-concept](../manimvox-concept/SKILL.md): one idea, one video |
 | a PR URL, `owner/repo#N`, `PR #N`, `#N` or "this PR" (the workflow asks which repository if it is not given) | [manimvox-pr](../manimvox-pr/SKILL.md): a 1 to 3 minute walkthrough |
 
+When a request matches more than one row, the most specific row wins (a PR URL is a PR, not a page).
+
 Open the workflow skill and follow it to the end. If the input is unclear, ask at most one question, for example "Is there a document or repository to explain, or should I explain the idea itself?". If the user cannot be asked and there is a candidate subject (a document, URL, repo, topic or PR), pick the most likely workflow, say which one and why, and continue. If there is no subject at all ("make a video") and no way to ask, stop and report what is needed: what to explain, and any source.
 
 ## 2 Check the setup

@@ -2,7 +2,7 @@
   "version": "0.1.0",
   "skills": {
     "manimvox": {
-      "sha256": "7e13a5cfec1fb45404603a453684e4cdc439c1ea3cdee05085be615be5c7c034",
+      "sha256": "94ffe1f8058a4f677eb64c009b9a376188e76256ea57068593ca068f96899e1c",
       "files": 1
     },
     "manimvox-animation": {
@@ -10,7 +10,7 @@
       "files": 2
     },
     "manimvox-cli": {
-      "sha256": "b7e3b0204f4208c625956e87674b0dae103bba386db46913d0fe9f42ab9ca68c",
+      "sha256": "7373a314709524e80fc13b2e9dff7eb3ae7fcd44a230452b52ef3630294a6510",
       "files": 1
     },
     "manimvox-concept": {
@@ -18,7 +18,7 @@
       "files": 1
     },
     "manimvox-core": {
-      "sha256": "ff6afbcc75f59aa680919ca2211a81a15fd3853bafa8b32675b7d449da05d751",
+      "sha256": "37dc56cf8b74655eacceb730590b957b195f5bd22e71e3e5fcb3e7db67df19a1",
       "files": 2
     },
     "manimvox-creative": {

@@ -106,7 +106,7 @@ When you finish an episode, report:
 
 ## 6 · Recipes
 
-- **Colour single words:** `T()` colours a whole line. Build `Text(...)` and slice its glyphs; spaces have no glyphs, so count only non-space characters.
+- **Colour single words:** `T()` colours a whole line. Build `Text(...)` and slice its glyphs; the glyph count differs by Manim version; use the colour_words recipe in [manimvox-animation](../../manimvox-animation/references/patterns.md).
 - **A 2D plane without Axes:** `Axes` labels numbers through LaTeX. Draw the plane from `Line`s, a `DashedVMobject(Circle())` and `Arrow`s.
 - **A live number:** no `DecimalNumber`. Use `always_redraw(lambda: T(f"{v.get_value():.2f}", ...))` driven by a `ValueTracker`.
 - **Title card:** with a mark, the title and tagline wrap at 8.4 units to stay clear of it. A long tagline wraps by itself; do not hand-insert `\n`.
