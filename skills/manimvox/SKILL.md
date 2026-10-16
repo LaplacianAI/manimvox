@@ -12,12 +12,12 @@ manimvox turns a source into an animated video with a spoken voice, using Manim 
 
 | The user gives you | Workflow |
 |---|---|
-| a PDF, article, URL, white paper or notes | [manimvox-paper](../manimvox-paper/SKILL.md): one document, one video |
-| a codebase, spec, design doc, or asks for "a series" | [manimvox-playlist](../manimvox-playlist/SKILL.md): a ladder of 5 to 9 episodes |
+| a PDF, white paper, notes, or a URL to a document or page | [manimvox-paper](../manimvox-paper/SKILL.md): one document, one video |
+| a codebase, repo URL or local repo, spec, design doc, or asks for "a series" | [manimvox-playlist](../manimvox-playlist/SKILL.md): a ladder of 5 to 9 episodes |
 | a topic or concept with no source | [manimvox-concept](../manimvox-concept/SKILL.md): one idea, one video |
-| a PR URL, `owner/repo#N` or "this PR" | [manimvox-pr](../manimvox-pr/SKILL.md): a 1 to 3 minute walkthrough |
+| a PR URL, `owner/repo#N`, `PR #N`, `#N` or "this PR" (the workflow asks which repository if it is not given) | [manimvox-pr](../manimvox-pr/SKILL.md): a 1 to 3 minute walkthrough |
 
-Open the workflow skill and follow it to the end. If the input is unclear, ask at most one question, for example "Is there a document or repository to explain, or should I explain the idea itself?". If the user cannot be asked, pick the most likely workflow, say which one and why, and continue.
+Open the workflow skill and follow it to the end. If the input is unclear, ask at most one question, for example "Is there a document or repository to explain, or should I explain the idea itself?". If the user cannot be asked and there is a candidate subject (a document, URL, repo, topic or PR), pick the most likely workflow, say which one and why, and continue. If there is no subject at all ("make a video") and no way to ask, stop and report what is needed: what to explain, and any source.
 
 ## 2 Check the setup
 
