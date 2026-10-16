@@ -3,6 +3,26 @@ from pathlib import Path
 
 import av
 import numpy as np
+import pytest
+
+
+def make_mp3(path: Path, seconds: float = 1.0, rate: int = 24000) -> Path:
+    try:
+        av.codec.Codec("mp3", "w")
+    except Exception:  # noqa: BLE001 - any failure to open the encoder means this build has none
+        pytest.skip("this PyAV build has no MP3 encoder")
+    c = av.open(str(path), "w")
+    s = c.add_stream("mp3", rate=rate, layout="mono")
+    t = np.arange(int(seconds * rate)) / rate
+    fr = av.AudioFrame.from_ndarray((0.3 * np.sin(2 * np.pi * 220 * t) * 32767).astype(np.int16).reshape(1, -1),
+                                    format="s16", layout="mono")
+    fr.sample_rate = rate
+    for p in s.encode(fr):
+        c.mux(p)
+    for p in s.encode():
+        c.mux(p)
+    c.close()
+    return path
 
 
 def make_video(path: Path, seconds: float, fps: int = 10, size=(320, 180), audio=None, rate: int = 8000) -> Path:
