@@ -527,7 +527,7 @@ kokoro = [
 requires-dist = [
     { name = "av", specifier = ">=12" },
     { name = "kokoro-onnx", marker = "extra == 'kokoro'", specifier = ">=0.4,<0.7" },
-    { name = "manim", specifier = ">=0.19,<0.23" },
+    { name = "manim", specifier = ">=0.22,<0.23" },
     { name = "numpy", specifier = ">=1.26" },
     { name = "pillow", specifier = ">=10" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },

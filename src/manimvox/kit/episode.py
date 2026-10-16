@@ -37,7 +37,7 @@ from manim import (
     smooth,
 )
 
-from ..voice import spoken_form, synth_cached
+from ..voice import VoiceError, spoken_form, synth_cached
 from ._context import NOTTS, PROJECT, STEM, THEME, VOICE
 from .colours import ACCENT, BG, INK, LINE, MUTED, PANEL, TEAL
 from .components import box, bullets, heading
@@ -46,6 +46,11 @@ from .text import STAGE_BOTTOM, STAGE_TOP, P, T
 config.background_color = BG
 WORDS_PER_SECOND = 2.6
 STAGE = [-6.6, STAGE_BOTTOM, 6.6, STAGE_TOP]
+
+
+def _require_words(spoken):
+    if not spoken.strip():
+        raise VoiceError("empty narration line: every say/steps/narrate needs words to speak")
 
 
 def _srt_time(t):
@@ -81,6 +86,7 @@ class Episode(Scene):
         """Play the voice line; animations inside the block run over it.
         On exit, waits until the line (plus `pad`) has finished."""
         spoken = spoken_form(tts or text, PROJECT.pron if PROJECT else [])
+        _require_words(spoken)
         if NOTTS:
             path, dur = None, max(1.4, len(spoken.split()) / WORDS_PER_SECOND)
         else:

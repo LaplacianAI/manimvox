@@ -78,3 +78,18 @@ def test_font_file_pango_cannot_register_is_a_finding(tmp_path):
     t = Theme.from_dict({"source": "x", "font_files": ["fonts/bogus.ttf"]})
     found = check_theme(t, tmp_path)
     assert [f.subject for f in found if f.subject.startswith("font_files")] == ["font_files: fonts/bogus.ttf"]
+
+
+def test_defaulted_lists_roles_the_theme_did_not_set():
+    t = Theme.from_dict({"accent": "#8A83FF", "bg": "#000000"})
+    assert "accent" not in t.defaulted and "bg" not in t.defaulted
+    assert "code_bg" in t.defaulted and "ink" in t.defaulted
+    assert Theme.from_dict({"code_bg": "#000000"}).defaulted.count("code_bg") == 0
+    assert Theme.from_dict(dict(DEFAULTS)).defaulted == ()
+
+
+def test_named_colour_shadowing_a_manim_name_is_a_finding(tmp_path):
+    t = Theme.from_dict({"source": "x", "named": {"up": "#8FCB7B"}})
+    found = check_theme(t, tmp_path, fonts=FONTS)
+    assert [(f.subject, f.message) for f in found] == [
+        ("up", "named colour would replace Manim's UP; rename it")]

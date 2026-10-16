@@ -49,12 +49,14 @@ class Theme:
     font_files: tuple[str, ...] = ()
     mark_svg: str | None = None
     source: str = ""
+    defaulted: tuple[str, ...] = ()
 
     @classmethod
     def from_dict(cls, d: dict, platform: str = sys.platform) -> Theme:
         roles = {r: str(d.get(r, v)) for r, v in DEFAULTS.items()}
         if "code_bg" not in d:
             roles["code_bg"] = roles["bg"]
+        defaulted = tuple(r for r in DEFAULTS if r not in d)
         font, mono = platform_fonts(platform)
         return cls(
             roles=roles,
@@ -64,6 +66,7 @@ class Theme:
             font_files=tuple(d.get("font_files", ())),
             mark_svg=d.get("mark_svg"),
             source=str(d.get("source", "")).strip(),
+            defaulted=defaulted,
         )
 
     def __getitem__(self, role: str) -> str:

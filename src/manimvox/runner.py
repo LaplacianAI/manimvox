@@ -34,6 +34,8 @@ def render_episode(project: Project, ep: EpisodeRef, quality: Quality, voice: Vo
         raise RenderError(f"{ep.path} does not exist")
     built = built_path(project, ep, quality)
     built.unlink(missing_ok=True)
+    if quality == "draft":  # a failed draft must not leave the last good run's layout behind
+        (project.build_dir / ep.stem / "layout.json").unlink(missing_ok=True)
     env = {k: v for k, v in os.environ.items() if not k.startswith("MANIMVOX_") or k == "MANIMVOX_CACHE"}
     env |= {"MANIMVOX_PROJECT": str(project.root), "MANIMVOX_STEM": ep.stem, "PYTHONUTF8": "1"}
     if quality == "draft":

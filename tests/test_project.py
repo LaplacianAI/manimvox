@@ -174,3 +174,13 @@ def test_find_project_skips_directory_named_series_json(tmp_path):
     inner = tmp_path / "inner"
     (inner / "series.json").mkdir(parents=True)
     assert find_project(inner) == tmp_path
+
+
+@pytest.mark.parametrize("key,value,msg", [("speed", 0, "speed"), ("speed", -1.5, "speed"), ("voice", 7, "voice"),
+                                           ("voice", ["kokoro:af_heart"], "voice")])
+def test_speed_and_voice_are_validated(tmp_path, key, value, msg):
+    import json
+
+    (tmp_path / "series.json").write_text(json.dumps({"series": "S", key: value}), encoding="utf-8")
+    with pytest.raises(ProjectError, match=msg):
+        load_project(tmp_path)

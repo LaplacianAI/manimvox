@@ -91,6 +91,11 @@ def load_project(root: Path) -> Project:
         raise ProjectError(f"{f}: 'speed' is too large to be a number") from e
     if not math.isfinite(speed):
         raise ProjectError(f"{f}: 'speed' must be a number, got {raw_speed!r}")
+    if speed <= 0:
+        raise ProjectError(f"{f}: 'speed' must be greater than 0, got {raw_speed!r}")
+    voice = data.get("voice")
+    if voice is not None and not isinstance(voice, str):
+        raise ProjectError(f"{f}: 'voice' must be a string like 'kokoro:af_heart', got {voice!r}")
     theme = data.get("theme", {})
     if not isinstance(theme, dict):
         raise ProjectError(f"{f}: 'theme' must be an object, got {theme!r}")
@@ -98,7 +103,7 @@ def load_project(root: Path) -> Project:
         root=root,
         series=data["series"],
         tagline=data.get("tagline", ""),
-        voice=data.get("voice"),
+        voice=voice,
         speed=float(speed),
         pron=_pron(f, data.get("pron", [])),
         theme=dict(theme),

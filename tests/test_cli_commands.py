@@ -82,3 +82,46 @@ def test_crashed_render_leaves_no_stale_output(project, capsys):
 def test_yes_flag_is_accepted_after_the_subcommand(project, capsys):
     assert main(["voices", "--yes"]) == 0
     assert main(["--yes", "voices"]) == 0
+
+
+def test_check_layout_survives_a_cp1252_pipe(project, monkeypatch):
+    import io
+    import sys
+
+    layout = {"stage": [-6.6, -3.45, 6.6, 3.15], "frames": [{"t": 1.0, "texts": [
+        {"text": "Agent → Tool", "box": [-2.5, 1.0, -0.5, 1.3]},
+        {"text": "other", "box": [-1.0, 1.0, 1.0, 1.3]}]}]}
+    d = project / "build" / "ep01_hello"
+    d.mkdir(parents=True)
+    (d / "layout.json").write_text(json.dumps(layout), encoding="utf-8")
+    raw = io.BytesIO()
+    out = io.TextIOWrapper(raw, encoding="cp1252")
+    monkeypatch.setattr(sys, "stdout", out)
+    assert main(["check", "layout", "ep01"]) == 1
+    out.flush()
+    text = raw.getvalue().decode("cp1252")
+    assert "Agent \\u2192 Tool" in text and "overlaps" in text
+
+
+def test_check_theme_notes_defaulted_roles(project, capsys):
+    assert main(["check", "theme"]) == 0
+    out = capsys.readouterr().out
+    lines = out.strip().splitlines()
+    assert lines[-1] == "theme check: ok"
+    assert lines[-2].startswith("note: roles from the kit's neutral default: ")
+    assert "bg" in lines[-2] and "accent" not in lines[-2]
+
+
+def test_check_theme_has_no_note_when_every_role_is_set(project, capsys):
+    from manimvox.kit.theme import DEFAULTS
+
+    data = json.loads((project / "series.json").read_text(encoding="utf-8"))
+    data["theme"].update(DEFAULTS)
+    (project / "series.json").write_text(json.dumps(data), encoding="utf-8")
+    assert main(["check", "theme"]) == 0
+    assert "note:" not in capsys.readouterr().out
+
+
+def test_draft_rejects_a_non_positive_every(project, capsys):
+    assert main(["draft", "ep01", "--every", "0"]) == 2
+    assert "--every must be greater than 0" in capsys.readouterr().err

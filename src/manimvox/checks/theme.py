@@ -45,6 +45,11 @@ def check_theme(theme: Theme, root: Path, fonts: set[str] | None = None) -> list
     bad_hex = [k for k, v in {**theme.roles, **theme.named}.items() if not _HEX.fullmatch(v)]
     for k in bad_hex:
         out.append(Finding("theme", k, f"'{theme.roles.get(k, theme.named.get(k))}' is not a #RRGGBB hex colour"))
+    import manim
+
+    for k in theme.named:
+        if hasattr(manim, k.upper()):
+            out.append(Finding("theme", k, f"named colour would replace Manim's {k.upper()}; rename it"))
     bg, panel = theme["bg"], theme["panel"]
     if "bg" in bad_hex or "panel" in bad_hex:
         return out

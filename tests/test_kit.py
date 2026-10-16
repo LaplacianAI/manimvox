@@ -61,7 +61,26 @@ def test_draft_render_writes_layout(tmp_path):
                         str(p / "episodes" / "ep01_hello.py"), "Ep01"], check=False, capture_output=True, text=True, env=env,
                        cwd=p)
     assert r.returncode == 0, r.stderr[-2000:]
-    layout = json.loads((p / "build" / "ep01_hello" / "layout.json").read_text())
+    layout = json.loads((p / "build" / "ep01_hello" / "layout.json").read_text(encoding="utf-8"))
     texts = [t["text"] for fr in layout["frames"] for t in fr["texts"]]
     assert "a node" in texts
     assert "Box" in texts and layout["stage"] == [-6.6, -3.45, 6.6, 3.15]
+
+
+def test_named_colour_never_replaces_a_manim_name(tmp_path):
+    p = copy_fixture(tmp_path)
+    data = json.loads((p / "series.json").read_text(encoding="utf-8"))
+    data["theme"]["named"]["up"] = "#8FCB7B"
+    (p / "series.json").write_text(json.dumps(data), encoding="utf-8")
+    r = run_py("from manimvox.kit import *; print(type(UP).__name__, AGENT)", p)
+    assert r.returncode == 0, r.stderr
+    assert r.stdout.split() == ["ndarray", "#3987E5"]
+
+
+def test_empty_narration_fails_in_draft_too():
+    from manimvox.kit.episode import _require_words
+    from manimvox.voice import VoiceError
+
+    _require_words("a word")
+    with pytest.raises(VoiceError, match="empty narration line"):
+        _require_words("   ")

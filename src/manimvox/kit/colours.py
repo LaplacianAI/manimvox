@@ -1,6 +1,8 @@
 """Theme roles as the module constants episodes use (ACCENT, BG, …, plus named colours)."""
 from __future__ import annotations
 
+import manim
+
 from ._context import THEME
 
 BG = THEME["bg"]
@@ -19,5 +21,6 @@ ORANGE = THEME["orange"]
 VIOLET = THEME["violet"]
 PINK = THEME["pink"]
 TEAL = THEME["teal"]
-NAMED = {k.upper(): v for k, v in THEME.named.items() if k.upper() not in globals()}
+NAMED = {k.upper(): v for k, v in THEME.named.items()
+         if k.upper() not in globals() and not hasattr(manim, k.upper())}
 globals().update(NAMED)

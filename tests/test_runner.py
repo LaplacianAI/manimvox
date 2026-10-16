@@ -72,3 +72,23 @@ def test_manim_output_is_decoded_as_utf8(monkeypatch):
     assert "Fehler: ünicode → boom" in str(ei.value)
     assert seen["encoding"] == "utf-8" and seen["errors"] == "replace"
     assert seen["env"]["PYTHONUTF8"] == "1"
+
+
+def test_failed_draft_leaves_no_stale_layout(tmp_path, monkeypatch):
+    import subprocess
+
+    from manimvox.project import Project
+    from manimvox.runner import RenderError, render_episode
+
+    ep_file = tmp_path / "episodes" / "ep01_hello.py"
+    ep_file.parent.mkdir()
+    ep_file.write_text("", encoding="utf-8")
+    ep = EpisodeRef(1, "ep01_hello", "Ep01", "Hello", ep_file)
+    pr = Project(root=tmp_path, series="S", episodes=[ep])
+    stale = pr.build_dir / ep.stem / "layout.json"
+    stale.parent.mkdir(parents=True)
+    stale.write_text("{}", encoding="utf-8")
+    monkeypatch.setattr(subprocess, "run", lambda *a, **k: subprocess.CompletedProcess(a, 1, "", "boom"))
+    with pytest.raises(RenderError):
+        render_episode(pr, ep, "draft", None)
+    assert not stale.exists()

@@ -38,6 +38,9 @@ def _cmd_draft(args) -> int:
     from .checks.sheets import contact_sheets
     from .runner import render_episode
 
+    if not args.every > 0:
+        print("manimvox: --every must be greater than 0", file=sys.stderr)
+        return 2
     pr = _project()
     ep = pr.episode(args.episode)
     mp4 = render_episode(pr, ep, "draft", None)
@@ -83,9 +86,12 @@ def _cmd_check(args) -> int:
 
     pr = _project()
     if args.what == "theme":
-        found = check_theme(Theme.from_dict(pr.theme), pr.root)
+        theme = Theme.from_dict(pr.theme)
+        found = check_theme(theme, pr.root)
         for f in found:
             print(f)
+        if theme.defaulted:
+            print(f"note: roles from the kit's neutral default: {', '.join(theme.defaulted)}")
         print("theme check: ok" if not found else f"theme check: {len(found)} failure(s)")
         return 1 if found else 0
     if not args.episode:
@@ -194,6 +200,11 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    for stream in (sys.stdout, sys.stderr):
+        try:  # a piped Windows console is cp1252: print what it cannot encode as escapes, never crash
+            stream.reconfigure(errors="backslashreplace")
+        except (AttributeError, ValueError):
+            pass
     p = build_parser()
     args = p.parse_args(argv)
     func = getattr(args, "func", None)
