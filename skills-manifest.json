@@ -1,6 +1,14 @@
 {
   "version": "0.1.0",
   "skills": {
+    "manimvox-cli": {
+      "sha256": "b7e3b0204f4208c625956e87674b0dae103bba386db46913d0fe9f42ab9ca68c",
+      "files": 1
+    },
+    "manimvox-core": {
+      "sha256": "ff6afbcc75f59aa680919ca2211a81a15fd3853bafa8b32675b7d449da05d751",
+      "files": 2
+    },
     "manimvox-voice": {
       "sha256": "0977d006a18e99f8e113ac6fa42f18d9ad5d0192a912596c7415f48816559bc8",
       "files": 1

@@ -1,0 +1,102 @@
+---
+name: manimvox-cli
+description: "The manimvox command line and how to read its output: doctor, new, draft, render, check theme|layout|audio, voices, index and package. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
+license: MIT
+---
+
+# manimvox command line
+
+Every command prints plain lines and exits `0` on success, `1` on a failed check or error, `2` on a bad argument. Nothing prompts unless a person is at a terminal. Run commands from inside the project folder (or any folder below it): manimvox finds `series.json` by walking up.
+
+## Setup
+
+Run `manimvox doctor` first. Each line starts with one of three marks:
+
+| Mark | Meaning | What to do |
+|---|---|---|
+| `ok` | present | nothing |
+| `FAIL` | a required part is missing; the line ends with `→` and the fix | apply that fix, run `manimvox doctor` again |
+| `--` | a voice engine that is not ready (not an error) | ignore unless you need that voice; see [manimvox-voice](../manimvox-voice/SKILL.md) |
+
+`doctor` exits `1` if any line is `FAIL`. It checks Python 3.11+, `cairo`, `manimpango`, `av`, `manim`, the fonts Pango can see, and each voice engine.
+
+The usual fix is a system package for Manim's text rendering:
+
+| OS | Command |
+|---|---|
+| macOS | `brew install cairo pkg-config` |
+| Debian / Ubuntu | `sudo apt install libcairo2-dev pkg-config python3-dev` |
+| Windows | nothing; reinstall manimvox if `cairo` is missing |
+
+After a system package is installed, reinstall manimvox so it rebuilds against it.
+
+Ask the user before installing anything: a system package, manimvox itself, or a voice extra. If you cannot ask, the answer is no: stop and report the exact command that is needed.
+
+## The commands
+
+`EP` is `ep01`, `1`, or the episode's file stem; it must be listed in `series.json`.
+
+| Command | Flags | Writes | Exit |
+|---|---|---|---|
+| `manimvox doctor` | none | nothing | 1 if any `FAIL` |
+| `manimvox new DIR` | `--series NAME` (required), `--tagline T`, `--voice E:V` | `DIR/` with `series.json`, `FACTS.md`, `SERIES.md`, `.gitignore`, `episodes/`, `out/`, `research/` | 1 if `DIR` already holds a project |
+| `manimvox draft EP` | `--every SECONDS` (default 5, above 0) | `sheets/<stem>/s_NN.png`, `build/<stem>/layout.json` | 1 on layout findings or a Manim error, 2 on a bad `--every` |
+| `manimvox render EP` | `--voice E:V`, `-y` / `--yes` | `out/<stem>.mp4`, `out/<stem>.srt` | 1 on a Manim error, a voice problem or `audio check: FAILED` |
+| `manimvox check theme` | none | nothing | 1 on any failure |
+| `manimvox check layout EP` | none | nothing | 1 on findings |
+| `manimvox check audio EP` | none | nothing | 1 if a line is silent |
+| `manimvox voices [ENGINE]` | `--prepare ENGINE[:VOICE]`, `-y` | model files in the cache | 1 on a voice error |
+| `manimvox index` | none | `out/index.html` | 1 on error |
+| `manimvox package` | none | `share/<Name>/`, `share/<Name>-720p/` and a zip of each | 1 on error |
+
+Notes:
+- `-y` / `--yes` (or `MANIMVOX_ASSUME_YES=1`) answers yes to download prompts. Use it only with the user's go-ahead.
+- `draft` renders 480p at 10 fps with no voice. `render` renders 1080p at 30 fps with the voice and ends with the audio check.
+- `check layout` reads the report of the last `draft`; run `draft` first or it says so.
+- `index` and `package` use only episodes that have a finished `out/<stem>.mp4`. Render first.
+- Voice choice, engines and pronunciation are in [manimvox-voice](../manimvox-voice/SKILL.md).
+
+## Reading the output
+
+**Theme check.** `manimvox check theme` prints one line per failure and ends `theme check: ok` or `theme check: N failure(s)`. A line such as `accent: contrast 3.10 on bg, 3.40 on panel; text needs 4.5` means that colour is too dim for text. Lighten it in `series.json` under `theme` (text roles need 4.5:1, hues and named colours 3:1) and say in the theme's `source` that it was lightened for the video and from what. Other lines name a font Pango cannot load, a value that is not a `#RRGGBB` hex, or an empty `source`. A `note: roles from the kit's neutral default` line is not a failure: those roles were left out of the theme.
+
+**Layout findings.** `draft` prints one line per problem, then `layout check: ok` or `layout check: N finding(s)`. Two kinds, each with the time in the draft:
+- `<text> leaves the stage (left, bottom) at 0:42`: the text crosses the safe stage. Shrink it, shorten it or move it in.
+- `<text> overlaps '<other>' at 1:05`: two texts collide. Space them or split the scene.
+
+Fix every finding, then draft again. A draft that exits `0` only proves the code runs and nothing overlaps; look at the picture too.
+
+**Contact sheets.** `draft` writes `sheets/<stem>/s_01.png`, `s_02.png`, and so on. Each is a 3 by 3 grid of frames taken every `--every` seconds, left to right, top to bottom, so sheet 1 holds the first 9 samples. Use `--every 5` to survey and `--every 1` to look closely at a busy scene. Old sheets for the episode are replaced on each draft.
+
+**Audio check.** After `render`, `audio check: ok  (N lines, all audible)` is the finish line. `audio check: FAILED  K of N lines are silent` lists each silent line with its time and text. Run `manimvox check audio EP` to re-check, then render again; if the same line stays silent, reword it. Other failures say a file is missing or has no audio track: render again.
+
+**Render errors.** When Manim fails, manimvox prints `manim failed for <stem>:` and the last 25 lines of Manim's output. The real error is usually the last line (a `NameError`, `TypeError`, or a kit message). Fix the episode file and run the command again. Voice errors are one line; see [manimvox-voice](../manimvox-voice/SKILL.md).
+
+## When you have no terminal or cannot view images
+
+- **No terminal prompt:** never block waiting for an answer. manimvox itself never prompts without a terminal; it declines downloads instead. Pass `--yes` only when the user has said yes to that download.
+- **Cannot view images:** do not skip the visual check. Run `manimvox check layout EP` after a draft and treat its findings as the sheet review. Say in your report that you could not look at the sheets.
+
+## Speed
+
+- Render at most two finals at once; more is slower overall.
+- A draft takes about 30 seconds.
+- The very first run builds a font cache and can take several minutes. Do not interrupt it.
+- Cached narration is keyed by the spoken text, so only changed lines are re-synthesised on a re-render.
+
+## Files a project holds
+
+| Path | What it is |
+|---|---|
+| `series.json` | `series`, `tagline`, `voice`, `speed`, `pron`, `theme`, `episodes` (each with `n`, `stem`, `cls`, `title`; optional `level`, `blurb`) |
+| `FACTS.md` | every claim the video makes, with its source and a label |
+| `SERIES.md` | the outline each episode is written against |
+| `episodes/` | one `epNN_name.py` per episode |
+| `research/` | source material |
+| `out/` | finished `.mp4` and `.srt`, and `index.html` |
+| `sheets/` | contact sheets from drafts |
+| `build/` | Manim's working files and the layout report (safe to delete) |
+| `.manimvox/tts` | cached narration audio |
+| `share/` | packages from `manimvox package` |
+
+`build/`, `.manimvox/`, `sheets/`, `media/` and `share/` are listed in the project's `.gitignore`. To write episodes, see [manimvox-core](../manimvox-core/SKILL.md).
