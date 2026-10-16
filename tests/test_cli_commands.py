@@ -175,3 +175,14 @@ def test_render_prepares_with_voice_and_root(project, monkeypatch, capsys):
     assert main(["render", "ep01", "--voice", "fake:tone"]) == 1
     assert seen == {"voice": "tone", "root": project.resolve()}
     assert "stop here" in capsys.readouterr().err
+
+
+def test_render_without_key_stops_before_manim(project, capsys, monkeypatch):
+    from manimvox import runner
+
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    monkeypatch.setattr("sys.stdin", __import__("io").StringIO())
+    monkeypatch.setattr(runner, "render_episode", lambda *a, **k: pytest.fail("Manim started"))
+    assert main(["render", "ep01", "--voice", "openai:alloy"]) == 1
+    assert "OPENAI_API_KEY" in capsys.readouterr().err
+    assert not (project / "out" / "ep01_hello.mp4").exists()

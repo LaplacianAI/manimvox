@@ -862,7 +862,7 @@ requires-dist = [
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
     { name = "soundfile", specifier = ">=0.12" },
 ]
-provides-extras = ["dev", "edge", "kokoro", "piper"]
+provides-extras = ["cloud", "dev", "edge", "kokoro", "piper"]
 
 [[package]]
 name = "mapbox-earcut"

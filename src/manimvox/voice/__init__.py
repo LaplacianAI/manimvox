@@ -27,6 +27,10 @@ from .engines.kokoro import KokoroEngine
 
 register("kokoro", KokoroEngine)
 
+from .engines.openai import OpenAIEngine
+
+register("openai", OpenAIEngine)
+
 from .engines.piper import PiperEngine
 
 register("piper", PiperEngine)
@@ -42,6 +46,7 @@ __all__ = [
     "EngineStatus",
     "FakeEngine",
     "KokoroEngine",
+    "OpenAIEngine",
     "PiperEngine",
     "SayEngine",
     "UnknownEngine",
