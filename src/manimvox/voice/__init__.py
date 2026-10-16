@@ -27,6 +27,10 @@ from .engines.elevenlabs import ElevenLabsEngine
 
 register("elevenlabs", ElevenLabsEngine)
 
+from .engines.f5 import F5Engine
+
+register("f5", F5Engine)
+
 from .engines.kokoro import KokoroEngine
 
 register("kokoro", KokoroEngine)
@@ -53,6 +57,7 @@ __all__ = [
     "ElevenLabsEngine",
     "EngineNotInstalled",
     "EngineStatus",
+    "F5Engine",
     "FakeEngine",
     "KokoroEngine",
     "OpenAIEngine",
