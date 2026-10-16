@@ -67,3 +67,13 @@ def test_commands_named_exist(d):
     for p, text in _texts(d):
         for cmd in re.findall(r"`manimvox ([a-z]+)", text):
             assert cmd in known, f"{p}: names `manimvox {cmd}`, which the CLI does not have"
+
+
+def test_exactly_the_ten_skills():
+    assert sorted(d.name for d in DIRS) == sorted(sk.SKILL_NAMES)
+
+
+def test_router_links_every_workflow():
+    text = (ROOT / "manimvox" / "SKILL.md").read_text(encoding="utf-8")
+    for w in ("manimvox-paper", "manimvox-playlist", "manimvox-concept", "manimvox-pr"):
+        assert f"../{w}/SKILL.md" in text
