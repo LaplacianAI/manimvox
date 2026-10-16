@@ -119,4 +119,5 @@ def test_module_cli_runs_without_a_runtime_warning():
     r = subprocess.run([sys.executable, "-W", "error::RuntimeWarning", "-m", "manimvox.skills", "manifest",
                         "--check"], check=False, cwd=ROOT, capture_output=True, text=True)
     assert "RuntimeWarning" not in r.stderr
-    assert r.stdout or r.stderr, "the command printed nothing: it did not run"
+    assert r.returncode == 0, r.stderr
+    assert "ok" in r.stdout
