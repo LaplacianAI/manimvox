@@ -23,12 +23,17 @@ from .engines.kokoro import KokoroEngine
 
 register("kokoro", KokoroEngine)
 
+from .engines.say import SayEngine
+
+register("say", SayEngine)
+
 __all__ = [
     "DEFAULT_VOICE",
     "EngineNotInstalled",
     "EngineStatus",
     "FakeEngine",
     "KokoroEngine",
+    "SayEngine",
     "UnknownEngine",
     "VoiceEngine",
     "VoiceError",
