@@ -86,3 +86,25 @@ def test_wheel_bundles_the_skills(tmp_path):
     wheel = next(tmp_path.glob("manimvox-*.whl"))
     names = zipfile.ZipFile(wheel).namelist()
     assert "manimvox/_skills/manimvox-voice/SKILL.md" in names
+
+
+@pytest.mark.parametrize("body", [
+    "description: >\n  folded text\n",
+    "description: |\n  literal text\n",
+    "description: [a, b]\n",
+    "description: first part\n  continued here\n",
+])
+def test_read_frontmatter_rejects_unsupported_yaml(tmp_path, body):
+    (tmp_path / "SKILL.md").write_text(f"---\nname: x\n{body}---\n# x\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="description"):
+        sk.read_frontmatter(tmp_path / "SKILL.md")
+
+
+def test_module_cli_runs_without_a_runtime_warning():
+    import subprocess
+    import sys
+
+    r = subprocess.run([sys.executable, "-W", "error::RuntimeWarning", "-m", "manimvox.skills", "manifest",
+                        "--check"], check=False, cwd=ROOT, capture_output=True, text=True)
+    assert r.returncode == 0, r.stderr
+    assert "RuntimeWarning" not in r.stderr

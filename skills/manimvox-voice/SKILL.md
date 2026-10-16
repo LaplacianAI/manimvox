@@ -17,7 +17,7 @@ A voice is written `engine:voice`, for example `kokoro:af_heart`. manimvox takes
 3. the `MANIMVOX_VOICE` environment variable
 4. `kokoro:af_heart`
 
-If the voice is missing, not installed or lacks its key, the render stops with a one-line reason. manimvox never switches voice silently, and neither should you: when a voice fails, tell the user and ask (or, if you cannot ask, state the voice you chose instead and why).
+If the voice is missing, not installed or lacks its key, the render stops with a one-line reason. manimvox never switches voice silently, and neither should you: when a voice fails, tell the user and ask. If you cannot ask, you may use only a voice that is local and already ready (`manimvox voices` shows it as ready): Kokoro if its model is present, else `say` on macOS. Never use the fake test engine for a final render. Otherwise stop and report what is needed: a go-ahead for the download, the install or the online service.
 
 See what exists:
 - `manimvox voices` lists every engine: ready or not, its licence, whether text goes online, whether it is non-commercial.
@@ -116,4 +116,4 @@ Each failure is one line. What to do:
 | ElevenLabs speaks at speed 0.7 to 1.2 | change `speed` in `series.json` |
 | `audio check` fails after a render | the report lists silent lines: rerun `manimvox check audio <episode>`, then re-render; if one line keeps failing, reword it |
 
-Never install, download or go online to get past a failure without the user's go-ahead.
+Never install, download, go online or clone a voice to get past a failure without the user's explicit go-ahead. If you cannot ask, the answer is no: stop and report what you need.
