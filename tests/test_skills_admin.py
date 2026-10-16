@@ -9,6 +9,20 @@ from manimvox import skills_admin as sa
 from manimvox.cli import main
 
 
+def _symlinks_work() -> bool:
+    import tempfile
+
+    with tempfile.TemporaryDirectory() as d:
+        try:
+            os.symlink(d, Path(d) / "l", target_is_directory=True)
+        except (OSError, NotImplementedError):
+            return False
+    return True
+
+
+needs_symlinks = pytest.mark.skipif(not _symlinks_work(), reason="symlinks are not permitted here")
+
+
 @pytest.fixture
 def home(tmp_path, monkeypatch):
     h = tmp_path / "home"
@@ -30,7 +44,7 @@ def proj(tmp_path, monkeypatch):
 
 @pytest.fixture
 def no_npx(monkeypatch):
-    monkeypatch.setattr(sa.shutil, "which", lambda name: None)
+    monkeypatch.setattr(sa, "find_npx", lambda: (None, False))
 
 
 @pytest.fixture
@@ -51,7 +65,7 @@ def test_targets_dedupe_the_shared_folder(home, proj):
         home / ".claude" / "skills", home / ".agents" / "skills", home / ".cursor" / "skills"]
 
 
-@pytest.mark.parametrize("mode", ["link", "copy"])
+@pytest.mark.parametrize("mode", [pytest.param("link", marks=needs_symlinks), "copy"])
 def test_install_then_check_ok(home, proj, mode):
     t = proj / ".agents" / "skills"
     sa.install([t], mode)
@@ -71,6 +85,7 @@ def test_reinstall_replaces_only_ours(home, proj):
     assert (t / "manimvox").is_symlink()
 
 
+@needs_symlinks
 def test_status_flags_outdated_missing_and_broken(home, proj, tmp_path):
     t = proj / ".agents" / "skills"
     sa.install([t], "copy")
@@ -117,7 +132,7 @@ def test_npx_command(tmp_path):
 
 def test_cli_install_hands_off_to_npx(home, proj, monkeypatch, no_tty):
     seen = {}
-    monkeypatch.setattr(sa.shutil, "which", lambda name: "/usr/bin/npx" if name == "npx" else None)
+    monkeypatch.setattr(sa, "find_npx", lambda: ("/usr/bin/npx", False))
     monkeypatch.setattr(sa.subprocess, "run",
                         lambda cmd, **kw: seen.update(cmd=cmd, env=kw.get("env")) or subprocess.CompletedProcess(cmd, 0))
     assert main(["skills", "install", "--yes"]) == 0
@@ -148,6 +163,7 @@ def test_cli_update_and_remove(home, proj, no_npx, no_tty, capsys):
     assert main(["skills", "remove", "--yes"]) == 0 and not any(t.iterdir())
 
 
+@needs_symlinks
 def test_cli_update_keeps_links(home, proj, no_npx, no_tty):
     main(["skills", "install", "--agent", "codex", "--yes"])
     t = proj / ".agents" / "skills"
@@ -159,7 +175,7 @@ def test_cli_update_keeps_links(home, proj, no_npx, no_tty):
 @pytest.fixture
 def with_npx(monkeypatch):
     calls = []
-    monkeypatch.setattr(sa.shutil, "which", lambda name: "/usr/bin/npx" if name == "npx" else None)
+    monkeypatch.setattr(sa, "find_npx", lambda: ("/usr/bin/npx", False))
     monkeypatch.setattr(sa.subprocess, "run",
                         lambda cmd, **kw: calls.append(cmd) or subprocess.CompletedProcess(cmd, 0))
     return calls
@@ -203,6 +219,7 @@ def test_foreign_same_name_is_left_untouched(home, proj, no_npx, no_tty, capsys,
     assert (t / "manimvox" / "SKILL.md").is_file()
 
 
+@needs_symlinks
 def test_dangling_link_ours_only_when_named_alike(home, proj, tmp_path):
     t = proj / ".agents" / "skills"
     t.mkdir(parents=True)
@@ -211,6 +228,7 @@ def test_dangling_link_ours_only_when_named_alike(home, proj, tmp_path):
     assert sa._is_ours(t / "manimvox-pr") and not sa._is_ours(t / "manimvox-cli")
 
 
+@needs_symlinks
 def test_target_inside_src_is_refused(home, proj, tmp_path):
     src = tmp_path / "src"
     for n in sk.SKILL_NAMES:
@@ -224,6 +242,7 @@ def test_target_inside_src_is_refused(home, proj, tmp_path):
     assert all((src / n / "SKILL.md").is_file() for n in sk.SKILL_NAMES)
 
 
+@needs_symlinks
 def test_undetected_agent_install_is_found_later(home, proj, no_npx, no_tty, capsys):
     assert main(["skills", "install", "--agent", "opencode", "--global", "--yes"]) == 0
     t = home / ".config" / "opencode" / "skills"
@@ -238,6 +257,7 @@ def test_check_with_nothing_installed(home, proj, no_npx, no_tty, capsys):
     assert "no manimvox skills installed in project" in capsys.readouterr().out
 
 
+@needs_symlinks
 def test_global_through_the_cli(home, proj, no_npx, no_tty):
     assert main(["skills", "install", "--agent", "claude-code", "--global", "--yes"]) == 0
     assert (home / ".claude" / "skills" / "manimvox").is_symlink()
@@ -285,3 +305,193 @@ def test_eof_at_the_agent_prompt_is_no(home, proj, no_npx, monkeypatch):
     monkeypatch.setattr("builtins.input", eof)
     assert main(["skills", "install"]) == 1
     assert not (proj / ".agents").exists()
+
+
+# --- F1: an npx in the current folder is never run ---------------------------------------------------------------
+
+
+def _fake_npx(folder, name="npx"):
+    folder.mkdir(parents=True, exist_ok=True)
+    f = folder / name
+    f.write_text("#!/bin/sh\necho pwned\n", encoding="utf-8")
+    f.chmod(0o755)
+    return f
+
+
+@pytest.mark.parametrize("entry", [".", "", "./bin", "ABS_CWD"])
+def test_npx_in_the_current_folder_is_ignored(home, proj, monkeypatch, entry):
+    _fake_npx(proj / "bin")
+    _fake_npx(proj)
+    monkeypatch.setenv("PATH", str(proj) if entry == "ABS_CWD" else entry)
+    assert sa.find_npx() == (None, True)
+    assert sa.npx_path() is None and not sa.has_npx()
+
+
+def test_windows_npx_cmd_in_the_current_folder_is_ignored(home, proj, monkeypatch):
+    _fake_npx(proj, "npx.cmd")
+    monkeypatch.setattr(sa.sys, "platform", "win32")
+    monkeypatch.setenv("PATHEXT", ".COM;.EXE;.BAT;.CMD")
+    monkeypatch.setenv("PATH", ".")
+    assert sa.find_npx() == (None, True)
+
+
+def test_a_safe_absolute_npx_elsewhere_is_used(home, proj, tmp_path, monkeypatch):
+    safe = _fake_npx(tmp_path / "tools")
+    _fake_npx(proj)
+    monkeypatch.setenv("PATH", os.pathsep.join([".", str(tmp_path / "tools")]))
+    assert sa.find_npx() == (str(safe), True)
+
+
+def test_cli_with_only_an_unsafe_npx_uses_the_native_installer(home, proj, no_tty, monkeypatch, capsys):
+    _fake_npx(proj)
+    monkeypatch.setenv("PATH", ".")
+    ran = []
+    monkeypatch.setattr(sa.subprocess, "run", lambda *a, **k: ran.append(a) or subprocess.CompletedProcess(a, 0))
+    assert main(["skills", "install", "--agent", "codex", "--copy", "--yes"]) == 0
+    assert ran == []
+    assert "ignored npx in the current folder; using the built-in installer" in capsys.readouterr().err
+    assert (proj / ".agents" / "skills" / "manimvox" / "SKILL.md").is_file()
+
+
+# --- F2: --yes with nothing detected never lets npx pick every agent ---------------------------------------------
+
+
+def test_yes_with_no_detected_agent_installs_into_the_shared_folder(tmp_path, proj, with_npx, no_tty, monkeypatch, capsys):
+    empty = tmp_path / "emptyhome"
+    empty.mkdir()
+    monkeypatch.setattr(Path, "home", classmethod(lambda cls: empty))
+    assert main(["skills", "install", "--yes", "--copy"]) == 0
+    assert with_npx == []
+    assert "no agent detected; installed into the shared .agents/skills folder" in capsys.readouterr().out
+    assert (proj / ".agents" / "skills" / "manimvox" / "SKILL.md").is_file()
+    assert main(["skills", "install", "--yes", "--copy", "--global"]) == 0
+    assert (empty / ".agents" / "skills" / "manimvox" / "SKILL.md").is_file()
+
+
+# --- F3: the npx path checks ownership first ----------------------------------------------------------------------
+
+
+def test_npx_path_refuses_a_foreign_skill_and_never_runs(home, proj, with_npx, no_tty, capsys):
+    _own(proj / ".agents" / "skills" / "manimvox-pr", "manimvox-pr", "---\nname: other\ndescription: mine\n---\n")
+    assert main(["skills", "install", "--yes"]) == 1
+    assert with_npx == []
+    assert "manimvox-pr exists and is not a manimvox skill; left untouched" in capsys.readouterr().out
+
+
+def test_npx_path_checks_the_folders_of_the_chosen_agents(home, proj, with_npx, no_tty, capsys):
+    foreign = proj / ".claude" / "skills" / "manimvox"
+    foreign.parent.mkdir(parents=True)
+    foreign.write_text("precious", encoding="utf-8")
+    assert main(["skills", "install", "--agent", "claude-code", "--yes"]) == 1
+    assert with_npx == [] and foreign.read_text(encoding="utf-8") == "precious"
+    assert "left untouched" in capsys.readouterr().out
+    assert main(["skills", "install", "--agent", "codex", "--yes"]) == 0  # codex's folder is clean
+    assert len(with_npx) == 1
+
+
+def test_npx_path_runs_when_only_our_skills_are_there(home, proj, with_npx, no_tty, capsys):
+    sa.install([proj / ".agents" / "skills"], "copy")
+    assert main(["skills", "install", "--yes"]) == 0
+    assert len(with_npx) == 1
+    assert "running /usr/bin/npx --yes" in capsys.readouterr().out  # M12: the command is shown first
+
+
+@needs_symlinks
+def test_npx_path_refuses_a_target_that_resolves_into_the_skills_source(home, proj, with_npx, no_tty, tmp_path):
+    (proj / ".agents").mkdir()
+    os.symlink(sk.skills_path(), proj / ".agents" / "skills", target_is_directory=True)
+    assert main(["skills", "install", "--yes"]) == 1
+    assert with_npx == []
+
+
+def test_npx_failure_points_at_native(home, proj, no_tty, monkeypatch, capsys):
+    monkeypatch.setattr(sa, "find_npx", lambda: ("/usr/bin/npx", False))
+    monkeypatch.setattr(sa.subprocess, "run", lambda cmd, **kw: subprocess.CompletedProcess(cmd, 3))
+    assert main(["skills", "install", "--yes"]) == 3
+    assert "`manimvox skills install --native` installs without it" in capsys.readouterr().err
+
+
+# --- F4: Windows junctions -----------------------------------------------------------------------------------------
+
+
+def test_clear_removes_a_junction_with_rmdir_never_rmtree(home, proj, monkeypatch):
+    d = proj / ".agents" / "skills" / "manimvox"
+    _own(d, "manimvox")
+    removed = []
+    monkeypatch.setattr(sa, "_is_link", lambda p: Path(p) == d)
+    monkeypatch.setattr(sa.os, "rmdir", lambda p: removed.append(Path(p)))
+    monkeypatch.setattr(sa.shutil, "rmtree", lambda *a, **k: pytest.fail("rmtree through a junction"))
+    sa._clear(d)
+    assert removed == [d]
+
+
+def test_is_link_sees_a_junction_through_isjunction_or_the_reparse_tag(proj, monkeypatch):
+    d = proj / "j"
+    d.mkdir()
+    assert not sa._is_link(d)
+    monkeypatch.setattr(sa.os.path, "isjunction", lambda p: Path(p) == d, raising=False)
+    assert sa._is_link(d)
+    monkeypatch.delattr(sa.os.path, "isjunction")
+    monkeypatch.setattr(sa.stat, "IO_REPARSE_TAG_MOUNT_POINT", 0xA0000003, raising=False)
+    real = os.lstat
+
+    class St:
+        st_reparse_tag = 0xA0000003
+
+    monkeypatch.setattr(sa.os, "lstat", lambda p: St() if Path(p) == d else real(p))
+    assert sa._is_link(d)
+
+
+def test_a_junction_is_ours_when_it_points_at_a_folder_of_the_same_name(home, proj, tmp_path, monkeypatch):
+    d = proj / ".agents" / "skills" / "manimvox-pr"
+    _own(d, "manimvox-pr")
+    monkeypatch.setattr(sa, "_is_link", lambda p: Path(p) == d)
+    monkeypatch.setattr(sa.os, "readlink", lambda p: str(tmp_path / "elsewhere" / "manimvox-pr"))
+    assert sa._is_ours(d)
+    monkeypatch.setattr(sa.os, "readlink", lambda p: str(tmp_path / "elsewhere" / "other"))
+    assert not sa._is_ours(d)
+
+
+def test_update_counts_only_our_own_links(home, proj, no_npx, no_tty):
+    main(["skills", "install", "--agent", "codex", "--copy", "--yes"])
+    t = proj / ".agents" / "skills"
+    assert main(["skills", "update"]) == 0
+    assert not any(sa._is_link(t / n) for n in sk.SKILL_NAMES)
+
+
+# --- CLI behaviour: M9 to M12 ----------------------------------------------------------------------------------------
+
+
+def test_update_with_nothing_installed_exits_1(home, proj, no_npx, no_tty, capsys):
+    assert main(["skills", "update"]) == 1
+    assert "no manimvox skills installed in project agent folders; run manimvox skills install" in capsys.readouterr().out
+
+
+def test_project_and_yes_flags_are_accepted_on_every_subcommand(home, proj, no_npx, no_tty):
+    assert main(["skills", "install", "--agent", "codex", "--copy", "--yes"]) == 0
+    assert main(["skills", "check", "--project"]) == 0
+    assert main(["skills", "update", "--project", "--yes"]) == 0
+    assert main(["skills", "remove", "--project", "--yes"]) == 0
+
+
+def test_native_install_without_a_terminal_needs_yes(home, proj, no_npx, no_tty, capsys):
+    assert main(["skills", "install", "--agent", "codex"]) == 2
+    assert main(["skills", "install", "--native", "--agent", "codex"]) == 2
+    assert "--yes" in capsys.readouterr().err
+    assert not (proj / ".agents").exists()
+
+
+# --- minors -----------------------------------------------------------------------------------------------------------
+
+
+def test_dotfiles_are_not_hashed_or_installed(home, proj, tmp_path):
+    src = tmp_path / "src"
+    for n in sk.SKILL_NAMES:
+        _own(src / n, n)
+    before = sk.content_hash(src / "manimvox")
+    (src / "manimvox" / ".DS_Store").write_bytes(b"junk")
+    assert sk.content_hash(src / "manimvox") == before
+    t = proj / ".agents" / "skills"
+    sa.install([t], "copy", src)
+    assert not (t / "manimvox" / ".DS_Store").exists()
+    assert set(sa.status(t, src).values()) == {"ok"}

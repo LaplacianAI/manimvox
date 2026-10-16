@@ -122,3 +122,24 @@ def test_series_json_level_and_blurb_are_optional(tmp_path):
 
     pr = load_project(FIXTURE)
     assert pr.episodes[0].level == "" and pr.episodes[0].blurb == ""
+
+
+def test_index_and_package_name_unrendered_episodes(project, capsys):
+    data = json.loads((project / "series.json").read_text(encoding="utf-8"))
+    data["episodes"].append({**data["episodes"][0], "n": 2, "stem": "ep02_later", "title": "Later"})
+    (project / "series.json").write_text(json.dumps(data), encoding="utf-8")
+    (project / "episodes" / "ep02_later.py").write_text("", encoding="utf-8")
+    capsys.readouterr()
+    assert main(["index"]) == 0
+    assert "skipped ep02_later (not rendered)" in capsys.readouterr().out
+    assert main(["package"]) == 0
+    assert "skipped ep02_later (not rendered)" in capsys.readouterr().out
+
+
+def test_package_warns_that_facts_md_is_included(project, capsys):
+    assert main(["package"]) == 0
+    out = capsys.readouterr().out
+    assert "share/Hello-Explained/ includes FACTS.md (it cites your sources and code paths)" in out
+    (project / "FACTS.md").unlink()
+    assert main(["package"]) == 0
+    assert "includes FACTS.md" not in capsys.readouterr().out

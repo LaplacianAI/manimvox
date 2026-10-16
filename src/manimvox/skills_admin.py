@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import shutil
+import stat
 import subprocess
 import sys
 from dataclasses import dataclass
@@ -48,13 +49,29 @@ def targets(agents, scope: Literal["project", "global"], root: Path, home: Path)
     return out
 
 
+def _is_link(p) -> bool:
+    """A symlink or, on Windows, a junction (which Path.is_symlink() does not report before Python 3.14)."""
+    p = Path(p)
+    if p.is_symlink():
+        return True
+    isjunction = getattr(os.path, "isjunction", None)
+    if isjunction is not None:
+        return bool(isjunction(p))
+    tag = getattr(os.lstat(p), "st_reparse_tag", None) if os.path.lexists(p) else None
+    mount_point = getattr(stat, "IO_REPARSE_TAG_MOUNT_POINT", None)
+    return tag is not None and tag == mount_point
+
+
 def _is_ours(entry: Path) -> bool:
     """A manimvox skill we may replace or delete: a link or folder named like one of ours that really is one."""
     name = entry.name
     if name not in SKILL_NAMES:
         return False
-    if entry.is_symlink():
-        if Path(os.readlink(entry)).name != name:
+    if _is_link(entry):
+        try:
+            if Path(os.readlink(entry)).name != name:
+                return False
+        except OSError:
             return False
         if not entry.exists():
             return True  # dangling
@@ -70,7 +87,13 @@ def _is_ours(entry: Path) -> bool:
 
 
 def _clear(entry: Path) -> None:
-    if entry.is_symlink() or entry.is_file():
+    """Remove a file, a link (never what it points at) or a folder; rmtree refuses junctions, so rmdir those."""
+    if _is_link(entry):
+        if entry.is_symlink():
+            entry.unlink()
+        else:
+            os.rmdir(entry)
+    elif entry.is_file():
         entry.unlink()
     elif entry.is_dir():
         shutil.rmtree(entry)
@@ -98,7 +121,7 @@ def install_checked(
         done = 0
         for name in SKILL_NAMES:
             dest = t / name
-            if dest.exists() or dest.is_symlink():
+            if dest.exists() or _is_link(dest):
                 if not _is_ours(dest):
                     msgs.append(f"{dest} exists and is not a manimvox skill; left untouched")
                     skipped = True
@@ -111,7 +134,7 @@ def install_checked(
                     continue
                 except OSError:
                     used, fell_back = "copy", True
-            shutil.copytree(src / name, dest)
+            shutil.copytree(src / name, dest, ignore=shutil.ignore_patterns(".*", "__pycache__"))
             done += 1
         msgs.append(f"{t}: {done} skills ({'linked' if used == 'link' else 'copied'})")
     if fell_back:
@@ -128,7 +151,7 @@ def status(target_dir: Path, src: Path | None = None) -> dict[str, str]:
     out = {}
     for name in SKILL_NAMES:
         p = target_dir / name
-        if p.is_symlink() and not p.exists():
+        if _is_link(p) and not p.exists():
             out[name] = "broken"
         elif not (p / "SKILL.md").is_file():
             out[name] = "missing"
@@ -169,9 +192,45 @@ def npx_command(agent_ids, scope_global: bool, copy: bool, yes: bool, src: Path,
     return cmd
 
 
+def _npx_names() -> list[str]:
+    if sys.platform == "win32":
+        exts = [e for e in os.environ.get("PATHEXT", ".COM;.EXE;.BAT;.CMD").split(";") if e]
+        return ["npx" + e.lower() for e in exts]
+    return ["npx"]
+
+
+def find_npx() -> tuple[str | None, bool]:
+    """The npx to run, and whether an unsafe one was ignored.
+
+    Only absolute PATH entries outside the current folder count: an npx in the working folder (always searched on
+    Windows, or a "." / relative PATH entry elsewhere) is code from whatever repo the user is standing in.
+    """
+    cwd = Path.cwd().resolve()
+    cwd_key = os.path.normcase(str(cwd))
+    ignored = False
+    seen: set[str] = set()
+    for entry in os.environ.get("PATH", "").split(os.pathsep):
+        base = Path(entry) if entry else cwd
+        found = next((base / n for n in _npx_names() if (base / n).is_file()), None)
+        if found is None:
+            continue
+        real = os.path.normcase(str(base.resolve()))
+        inside = real == cwd_key or real.startswith(cwd_key.rstrip(os.sep) + os.sep)
+        if not entry or not os.path.isabs(entry) or inside:
+            ignored = True
+            continue
+        if sys.platform != "win32" and not os.access(found, os.X_OK):
+            continue
+        if real in seen:
+            continue
+        seen.add(real)
+        return str(found), ignored
+    return None, ignored
+
+
 def npx_path() -> str | None:
     """The resolved npx executable (npx.cmd on Windows), so no shell is needed."""
-    return shutil.which("npx")
+    return find_npx()[0]
 
 
 def has_npx() -> bool:

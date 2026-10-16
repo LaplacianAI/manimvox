@@ -28,6 +28,11 @@ def _clock(s: float) -> str:
     return f"{s // 60}:{s % 60:02d}"
 
 
+def unrendered(project: Project) -> list[str]:
+    """Stems of the episodes that have no MP4 in out/ yet."""
+    return [e.stem for e in project.episodes if not (project.out_dir / f"{e.stem}.mp4").is_file()]
+
+
 def _rendered(project: Project) -> list[tuple]:
     items = []
     for e in project.episodes:
