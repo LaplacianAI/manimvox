@@ -1,6 +1,10 @@
 {
   "version": "0.1.0",
   "skills": {
+    "manimvox-animation": {
+      "sha256": "8846a74f8aed24e5a84b8f60506f383a5d80774f26f7b22590ffd0a768d86e1b",
+      "files": 2
+    },
     "manimvox-cli": {
       "sha256": "b7e3b0204f4208c625956e87674b0dae103bba386db46913d0fe9f42ab9ca68c",
       "files": 1
