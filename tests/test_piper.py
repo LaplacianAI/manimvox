@@ -32,12 +32,14 @@ def hub(tmp_path, monkeypatch):
     idx = json.dumps(_index()).encode()
     monkeypatch.setattr(pp, "INDEX", RemoteFile("voices.json", f"{pp.BASE}/voices.json",
                                                  hashlib.sha256(idx).hexdigest(), len(idx)))
-    served = {"voices.json": idx, "en_US-amy-medium.onnx": ONNX, "en_US-amy-medium.onnx.json": CONF}
+    served = {"voices.json": idx, "en_US-amy-medium.onnx": ONNX, "en_US-amy-medium.onnx.json": CONF,
+              "en_US-amy-medium.MODEL_CARD": b"card"}
     urls = []
 
     def fetch(url, dest):
         urls.append(url)
-        dest.write_bytes(served[url.rsplit("/", 1)[1]])
+        name = url.rsplit("/", 1)[1]
+        dest.write_bytes(served[name if name != "MODEL_CARD" else "en_US-amy-medium.MODEL_CARD"])
 
     return fetch, urls
 
@@ -79,7 +81,8 @@ def test_index_pinned_to_a_revision():
 
 def test_voice_files_pick_model_and_config_with_md5():
     files = pp.voice_files(_index(), "en_US-amy-medium")
-    assert [f.name for f in files] == ["en_US-amy-medium.onnx", "en_US-amy-medium.onnx.json"]
+    assert [f.name for f in files] == ["en_US-amy-medium.MODEL_CARD", "en_US-amy-medium.onnx",
+                                       "en_US-amy-medium.onnx.json"]
     assert all(f.algo == "md5" and f.url.startswith(pp.BASE) for f in files)
 
 
@@ -93,7 +96,9 @@ def test_prepare_downloads_index_without_asking_and_voice_after_asking(hub, stub
     prompts = []
     pp.PiperEngine(fetch=fetch).prepare("en_US-amy-medium", lambda p: prompts.append(p) or True, tmp_path)
     assert len(prompts) == 1 and "Piper voice en_US-amy-medium" in prompts[0]
-    assert [u.rsplit("/", 1)[1] for u in urls] == ["voices.json", "en_US-amy-medium.onnx", "en_US-amy-medium.onnx.json"]
+    assert [u.rsplit("/", 1)[1] for u in urls] == ["voices.json", "MODEL_CARD", "en_US-amy-medium.onnx",
+                                                   "en_US-amy-medium.onnx.json"]
+    assert (pp.voice_dir() / "en_US-amy-medium.MODEL_CARD").read_bytes() == b"card"
 
 
 def test_declined_voice_download_names_yes(hub, stub_piper, tmp_path):
@@ -139,6 +144,29 @@ def test_voices_come_from_the_cached_index(hub, stub_piper, tmp_path):
 @pytest.mark.piper
 def test_real_piper_speaks(tmp_path):
     e = pp.PiperEngine()
-    e.prepare("en_US-lessac-medium", lambda p: True, tmp_path)
-    e.synth("Hello from manimvox.", "en_US-lessac-medium", 1.0, tmp_path / "a.wav")
+    e.prepare("en_US-libritts_r-medium", lambda p: True, tmp_path)
+    e.synth("Hello from manimvox.", "en_US-libritts_r-medium", 1.0, tmp_path / "a.wav")
     assert sf.info(str(tmp_path / "a.wav")).duration > 0.5
+
+
+def test_voice_downloaded_before_cards_still_synthesises(hub, stub_piper, tmp_path):
+    fetch, _ = hub
+    e = pp.PiperEngine(fetch=fetch)
+    e.prepare("en_US-amy-medium", lambda p: True, tmp_path)
+    (pp.voice_dir() / "en_US-amy-medium.MODEL_CARD").unlink()
+    e.synth("hi", "en_US-amy-medium", 1.0, tmp_path / "a.wav")
+
+
+def test_default_voice_has_a_permissive_card_and_is_not_lessac():
+    assert pp.PiperEngine.default_voice == "en_US-libritts_r-medium"
+
+
+def test_local_voice_key_follows_the_file_contents(stub_piper, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "me.onnx").write_bytes(ONNX)
+    e = pp.PiperEngine()
+    k1 = e.voice_key("me.onnx")
+    assert k1.startswith("me.onnx@")
+    (tmp_path / "me.onnx").write_bytes(ONNX + b"x")
+    assert e.voice_key("me.onnx") != k1
+    assert e.voice_key("en_US-amy-medium") == "en_US-amy-medium"

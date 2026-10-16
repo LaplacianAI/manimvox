@@ -135,6 +135,8 @@ def _cmd_voices(args) -> int:
             root = Path.cwd()
         eng.prepare(voice, _confirm(args), root)
         print(f"ready: {eng.name}:{voice}")
+        if not args.engine:
+            return 0
     if args.engine:
         eng = get_engine(args.engine.strip().lower())
         rows = eng.describe_voices()

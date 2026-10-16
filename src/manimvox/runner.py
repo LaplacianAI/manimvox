@@ -44,7 +44,7 @@ def render_episode(project: Project, ep: EpisodeRef, quality: Quality, voice: Vo
         env["MANIMVOX_VOICE_RESOLVED"] = str(voice)
     media = built.parents[3]
     r = subprocess.run(manim_command(ep, quality, media), check=False, cwd=project.root, env=env,
-                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+                       stdin=subprocess.DEVNULL, capture_output=True, text=True, encoding="utf-8", errors="replace")
     if r.returncode != 0 or not built.exists():
         tail = "\n".join((r.stderr or r.stdout).strip().splitlines()[-25:])
         raise RenderError(f"manim failed for {ep.stem}:\n{tail}")

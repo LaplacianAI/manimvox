@@ -167,7 +167,7 @@ def test_synth_loads_offline_and_restores(stub_f5, tmp_path, monkeypatch):
 
 def test_synth_imports_f5_inside_the_offline_block(stub_f5, tmp_path, monkeypatch):
     import os
-    calls, _ = stub_f5
+    _, _ = stub_f5
     monkeypatch.chdir(tmp_path)
     f5.F5Engine().prepare("clone=me.wav", lambda p: True, tmp_path)
     seen = []

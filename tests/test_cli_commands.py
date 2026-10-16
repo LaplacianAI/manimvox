@@ -155,6 +155,18 @@ def test_voices_unknown_engine_is_a_clean_error(project, capsys):
     assert "unknown voice engine 'nope'" in capsys.readouterr().err
 
 
+def test_prepare_prints_ready_and_not_the_whole_table(project, capsys):
+    assert main(["voices", "--prepare", "fake:silence"]) == 0
+    out = capsys.readouterr().out
+    assert out.strip() == "ready: fake:silence" and "voices of one engine" not in out
+
+
+def test_prepare_with_an_engine_positional_also_lists_it(project, capsys):
+    assert main(["voices", "--prepare", "fake:silence", "fake"]) == 0
+    out = capsys.readouterr().out
+    assert out.startswith("ready: fake:silence") and "silence" in out.splitlines()
+
+
 def test_prepare_accepts_engine_or_engine_voice(project, capsys):
     assert main(["voices", "--prepare", "fake"]) == 0
     assert main(["voices", "--prepare", "fake:silence"]) == 0

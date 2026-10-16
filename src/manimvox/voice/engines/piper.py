@@ -9,7 +9,7 @@ from collections.abc import Callable
 from pathlib import Path
 
 from ..base import EngineNotInstalled, EngineStatus, VoiceEngine, VoiceError
-from ..download import RemoteFile, engine_dir, ensure_files, fetch, verified
+from ..download import RemoteFile, engine_dir, ensure_files, fetch, file_digest, verified
 
 REV = "c10ece1aade47bb51c153c893d14e5bf8e5b7117"  # rhasspy/piper-voices, 2026-09-17
 BASE = f"https://huggingface.co/rhasspy/piper-voices/resolve/{REV}"
@@ -29,8 +29,12 @@ def voice_files(index: dict, key: str) -> list[RemoteFile]:
                          + "; see `manimvox voices piper`")
     files = []
     for path, meta in sorted(entry["files"].items()):
-        if path.endswith((".onnx", ".onnx.json")):
-            files.append(RemoteFile(Path(path).name, f"{BASE}/{path}", meta["md5_digest"], meta["size_bytes"], "md5"))
+        name = Path(path).name
+        if name == "MODEL_CARD":  # the voice's licence, kept beside it so the engine's licence pointer is true
+            name = f"{key}.MODEL_CARD"
+        elif not path.endswith((".onnx", ".onnx.json")):
+            continue
+        files.append(RemoteFile(name, f"{BASE}/{path}", meta["md5_digest"], meta["size_bytes"], "md5"))
     return files
 
 
@@ -45,8 +49,8 @@ def _installed() -> bool:
 class PiperEngine(VoiceEngine):
     name = "piper"
     extra = "piper"
-    default_voice = "en_US-lessac-medium"
-    licence = "piper-tts GPL-3.0-or-later (optional extra); each voice has its own licence in its MODEL_CARD"
+    default_voice = "en_US-libritts_r-medium"  # CC BY 4.0 (lessac's Blizzard licence is not clearly commercial)
+    licence = "piper-tts GPL-3.0-or-later (optional extra); each voice has its own licence, saved beside it as <voice>.MODEL_CARD"
 
     def __init__(self, fetch: Callable[[str, Path], None] = fetch) -> None:
         self._fetch = fetch
@@ -99,10 +103,17 @@ class PiperEngine(VoiceEngine):
             return local
         idx = self._index(download=False)
         files = voice_files(idx, voice) if idx else []
-        if not files or not all(verified(voice_dir() / f.name, f) for f in files):
+        needed = [f for f in files if not f.name.endswith(".MODEL_CARD")]  # voices fetched before cards still work
+        if not needed or not all(verified(voice_dir() / f.name, f) for f in needed):
             raise VoiceError(f"Piper voice '{voice}' is not downloaded; run `manimvox render` (it asks) or "
                              f"`manimvox voices --prepare piper:{voice}`")
         return voice_dir() / f"{voice}.onnx"
+
+    def voice_key(self, voice: str) -> str:
+        local = self._local(voice, None)  # cwd = project root; a replaced file at the same path is a new voice
+        if local is not None and local.is_file():
+            return f"{voice}@{file_digest(local, 'sha256')[:16]}"
+        return voice
 
     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
         try:
