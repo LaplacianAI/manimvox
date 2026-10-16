@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 
 from . import __version__
 
@@ -211,6 +212,108 @@ def _cmd_package(args) -> int:
     return 0
 
 
+def _skills_scope(args) -> str:
+    return "global" if getattr(args, "global_", False) else "project"
+
+
+def _pick_agents(args, found):
+    from . import skills_admin as sa
+
+    if args.agent:
+        unknown = [a for a in args.agent if a not in sa.BY_ID]
+        if unknown:
+            raise ValueError(f"unknown agent {unknown[0]}; known: {', '.join(sa.BY_ID)}")
+        return [sa.BY_ID[a] for a in args.agent]
+    if sa.is_tty():
+        for i, a in enumerate(found, 1):
+            print(f"  {i}. {a.id}")
+        reply = input("Install for which agents? (e.g. 1,3 or all) ").strip().lower()
+        if reply in ("", "all"):
+            return list(found)
+        try:
+            return [found[int(n) - 1] for n in reply.replace(" ", "").split(",") if n]
+        except (ValueError, IndexError):
+            raise ValueError(f"not a list of numbers from 1 to {len(found)}: {reply}") from None
+    if args.yes:
+        return list(found)
+    print(
+        "manimvox: no terminal to ask which agents: pass --agent ID (repeatable) or --yes for every detected agent",
+        file=sys.stderr,
+    )
+    return None
+
+
+def _skills_install(args, home) -> int:
+    from . import skills_admin as sa
+    from .skills import skills_path
+
+    found = sa.detect_agents(home)
+    scope_global = getattr(args, "global_", False)
+    if sa.has_npx() and not args.native:
+        if args.agent:
+            ids = list(args.agent)
+        elif args.yes or not sa.is_tty():
+            ids = [a.id for a in found]
+        else:
+            ids = None
+        return sa.run_npx(sa.npx_command(ids, scope_global, args.copy, args.yes or not sa.is_tty(), skills_path()))
+    agents = _pick_agents(args, found)
+    if agents is None:
+        return 2
+    if args.project:
+        scope = "project"
+    elif scope_global:
+        scope = "global"
+    elif sa.is_tty():
+        scope = "global" if input("Install for this project or globally? [P/g] ").strip().lower().startswith("g") else "project"
+    else:
+        scope = "project"
+    for line in sa.install(sa.targets(agents, scope, Path.cwd(), home), "copy" if args.copy else "link"):
+        print(line)
+    return 0
+
+
+def _cmd_skills(args) -> int:
+    from . import skills_admin as sa
+
+    home = Path.home()
+    if args.action == "install":
+        return _skills_install(args, home)
+    dirs = sa.targets(sa.detect_agents(home), _skills_scope(args), Path.cwd(), home)
+    if args.action == "check":
+        bad = False
+        for t in dirs:
+            if not sa.holds_ours(t):
+                continue
+            st = sa.status(t)
+            if set(st.values()) == {"ok"}:
+                print(f"{t}: ok")
+            else:
+                bad = True
+                print(f"{t}: " + ", ".join(f"{n} {v}" for n, v in st.items() if v != "ok"))
+        return 1 if bad else 0
+    if args.action == "update":
+        for t in dirs:
+            if sa.holds_ours(t):
+                linked = any((t / n).is_symlink() for n in sa.SKILL_NAMES)
+                for line in sa.install([t], "link" if linked else "copy"):
+                    print(line)
+        return 0
+    ours = [t for t in dirs if sa.holds_ours(t)]
+    if not ours:
+        print("no manimvox skills found")
+        return 0
+    if not args.yes:
+        if not sa.is_tty():
+            print("manimvox: no terminal to ask: pass --yes to remove the skills", file=sys.stderr)
+            return 2
+        if not input(f"Remove the manimvox skills from {', '.join(str(t) for t in ours)}? [y/N] ").strip().lower().startswith("y"):
+            return 1
+    for gone in sa.remove(ours):
+        print(f"removed {gone}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="manimvox", description="Narrated, animated explainer videos with Manim.")
     p.add_argument("--version", action="version", version=f"manimvox {__version__}")
@@ -251,6 +354,26 @@ def build_parser() -> argparse.ArgumentParser:
     )
     s.add_argument("-y", "--yes", action="store_true", default=argparse.SUPPRESS, help="answer yes to confirmations")
     s.set_defaults(func=_cmd_voices)
+
+    s = p._sub.add_parser("skills", help="install, check, update or remove the agent skills")
+    sub = s.add_subparsers(dest="action", metavar="<action>", required=True)
+    yes = {"action": "store_true", "default": argparse.SUPPRESS, "help": "answer yes to confirmations"}
+    a = sub.add_parser("install", help="put the skills where your coding agents look")
+    a.add_argument("--agent", action="append", metavar="ID", help="an agent id (repeatable)")
+    g = a.add_mutually_exclusive_group()
+    g.add_argument("--global", dest="global_", action="store_true", help="install for every project")
+    g.add_argument("--project", action="store_true", help="install in this project (default)")
+    a.add_argument("--copy", action="store_true", help="copy the skills instead of linking them")
+    a.add_argument("--native", action="store_true", help="do not use npx even if it is present")
+    a.add_argument("-y", "--yes", **yes)
+    a = sub.add_parser("check", help="say whether installed skills match this version")
+    a.add_argument("--global", dest="global_", action="store_true")
+    a = sub.add_parser("update", help="reinstall the skills where they already are")
+    a.add_argument("--global", dest="global_", action="store_true")
+    a = sub.add_parser("remove", help="delete the manimvox skills, and only those")
+    a.add_argument("--global", dest="global_", action="store_true")
+    a.add_argument("-y", "--yes", **yes)
+    s.set_defaults(func=_cmd_skills)
 
     s = p._sub.add_parser("doctor", help="check system libraries, fonts and voice engines")
     s.set_defaults(func=_cmd_doctor)
