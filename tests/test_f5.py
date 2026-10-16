@@ -31,6 +31,7 @@ def stub_f5(monkeypatch, tmp_path):
     monkeypatch.setitem(sys.modules, "f5_tts.api", api)
     rec = tmp_path / "me.wav"
     sf.write(str(rec), np.zeros(24000 * 8, dtype=np.int16), 24000, format="WAV", subtype="PCM_16")
+    (tmp_path / "me.txt").write_text("This is me talking.", encoding="utf-8")
     return calls, rec
 
 
@@ -44,10 +45,21 @@ def test_not_installed(monkeypatch, tmp_path):
         f5.F5Engine().prepare("clone=me.wav", lambda p: True, tmp_path)
 
 
-def test_prompt_mentions_transcriber_only_without_transcript(stub_f5, tmp_path):
+def test_prompt_names_licence_not_a_recogniser(stub_f5, tmp_path):
     prompts = []
     f5.F5Engine().prepare("clone=me.wav", lambda p: prompts.append(p) or True, tmp_path)
-    assert "speech recogniser" in prompts[0] and "CC-BY-NC" in prompts[0]
+    assert "CC-BY-NC" in prompts[0] and "recogniser" not in prompts[0]
+
+
+@pytest.mark.parametrize("sidecar", [None, "", "  \n"])
+def test_prepare_requires_a_transcript(stub_f5, tmp_path, sidecar):
+    calls, _ = stub_f5
+    (tmp_path / "me.txt").unlink()
+    if sidecar is not None:
+        (tmp_path / "me.txt").write_text(sidecar, encoding="utf-8")
+    with pytest.raises(VoiceError, match=r"me\.txt"):
+        f5.F5Engine().prepare("clone=me.wav", lambda p: pytest.fail("asked"), tmp_path)
+    assert calls["init"] == []
 
 
 def test_model_files_go_to_the_manimvox_cache(stub_f5, tmp_path):
@@ -60,7 +72,30 @@ def test_declined(stub_f5, tmp_path):
     calls, _ = stub_f5
     with pytest.raises(VoiceError, match="--yes"):
         f5.F5Engine().prepare("clone=me.wav", lambda p: False, tmp_path)
-    assert calls["init"] == []
+    assert calls["init"] == [] and not f5.accepted_marker().exists()
+
+
+def test_accept_writes_marker_and_is_not_asked_again(stub_f5, tmp_path):
+    f5.F5Engine().prepare("clone=me.wav", lambda p: True, tmp_path)
+    assert f5.accepted_marker().exists()
+    f5.F5Engine().prepare("clone=me.wav", lambda p: pytest.fail("asked again"), tmp_path)
+
+
+def test_synth_before_acceptance_says_how(stub_f5, tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    with pytest.raises(VoiceError, match="voices --prepare f5"):
+        f5.F5Engine().synth("hi", "clone=me.wav", 1.0, tmp_path / "a.wav")
+
+
+def test_synth_without_transcript_never_calls_infer(stub_f5, tmp_path, monkeypatch):
+    calls, _ = stub_f5
+    monkeypatch.chdir(tmp_path)
+    e = f5.F5Engine()
+    e.prepare("clone=me.wav", lambda p: True, tmp_path)
+    (tmp_path / "me.txt").unlink()
+    with pytest.raises(VoiceError, match=r"me\.txt"):
+        e.synth("hi", "clone=me.wav", 1.0, tmp_path / "a.wav")
+    assert calls["infer"] == []
 
 
 def test_synth_passes_transcript_and_speed(stub_f5, tmp_path, monkeypatch):
@@ -79,7 +114,7 @@ def test_voice_key_changes_with_transcript(stub_f5, tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     e = f5.F5Engine()
     k1 = e.voice_key("clone=me.wav")
-    (tmp_path / "me.txt").write_text("words", encoding="utf-8")
+    (tmp_path / "me.txt").write_text("other words", encoding="utf-8")
     assert e.voice_key("clone=me.wav") != k1
 
 

@@ -30,6 +30,14 @@ def _installed() -> bool:
         return False
 
 
+def _need_transcript(ref: Path) -> str:
+    text = transcript_for(ref)
+    if not text:
+        raise VoiceError(f"F5-TTS needs the words spoken in {ref.name}: "
+                         f"write them in {ref.with_suffix('.txt').name} beside it")
+    return text
+
+
 def _api():
     try:
         from f5_tts.api import F5TTS
@@ -52,7 +60,7 @@ class F5Engine(VoiceEngine):
         if not _installed():
             return EngineStatus(False, 'not installed: uv tool install "manimvox[f5]"')
         state = "model ready" if accepted_marker().exists() else "model downloads on first use (asks first)"
-        return EngineStatus(True, f"{state}; voice is clone=<speaker.wav>, transcript in <speaker>.txt")
+        return EngineStatus(True, f"{state}; voice is clone=<speaker.wav>, words spoken in <speaker>.txt (required)")
 
     def voice_key(self, voice: str) -> str:
         ref = clone_reference(voice)
@@ -67,11 +75,10 @@ class F5Engine(VoiceEngine):
     def prepare(self, voice: str, confirm, root: Path) -> None:
         _api()
         ref = clone_reference(voice, root)
+        _need_transcript(ref)
         if accepted_marker().exists():
             return
-        extra = "" if transcript_for(ref) else (f", plus a speech recogniser to transcribe the recording "
-                                                f"(put its words in {ref.with_suffix('.txt').name} to skip that)")
-        if not confirm(f"Download the F5-TTS model (about 1.3 GB{extra})? Its weights are CC-BY-NC: "
+        if not confirm("Download the F5-TTS model (about 1.3 GB)? Its weights are CC-BY-NC: "
                        "non-commercial use only."):
             raise VoiceError("F5-TTS needs its model: rerun with --yes to download it (non-commercial use only), "
                              "or choose another voice with --voice")
@@ -84,9 +91,10 @@ class F5Engine(VoiceEngine):
             raise VoiceError("F5-TTS is not set up; run `manimvox render` (it asks) or "
                              "`manimvox voices --prepare f5:clone=<speaker.wav>`")
         ref = clone_reference(voice)  # cwd = project root inside Manim
+        ref_text = _need_transcript(ref)
         raw = out.with_name(out.stem + ".raw.wav")
         try:
-            self._load().infer(ref_file=str(ref), ref_text=transcript_for(ref), gen_text=text,
+            self._load().infer(ref_file=str(ref), ref_text=ref_text, gen_text=text,
                                file_wave=str(raw), speed=speed, show_info=lambda *a, **k: None)
             data, sr = sf.read(str(raw), dtype="int16")
             sf.write(str(out), data if data.ndim == 1 else data.mean(axis=1).astype("int16"), sr,
