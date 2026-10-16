@@ -69,7 +69,12 @@ def check_audio(video: Path, srt: Path) -> AudioReport:
     if not Path(srt).exists():
         return AudioReport(0, error=f"no subtitles at {srt}; render writes them beside the video")
     cues = read_cues(srt)
-    pcm = _pcm(video)
+    if not Path(video).exists():
+        return AudioReport(len(cues), error=f"no video at {video}; run manimvox render first")
+    try:
+        pcm = _pcm(video)
+    except (av.error.FFmpegError, OSError) as e:
+        return AudioReport(len(cues), error=f"cannot read {Path(video).name}: {e}")
     if pcm is None:
         return AudioReport(len(cues), error=f"{Path(video).name} has no audio track")
     silent = []

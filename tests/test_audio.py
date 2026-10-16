@@ -50,3 +50,15 @@ def test_missing_srt_is_an_error(tmp_path):
     v = make_video(tmp_path / "v.mkv", 2, audio=tone(2), rate=RATE)
     rep = check_audio(v, tmp_path / "missing.srt")
     assert not rep.ok and "subtitles" in rep.error
+
+
+def test_missing_video_is_an_error(tmp_path):
+    rep = check_audio(tmp_path / "missing.mkv", write_srt(tmp_path / "v.srt", [(0.2, 1.8, "a")]))
+    assert not rep.ok and "no video at" in rep.error
+
+
+def test_corrupt_video_is_an_error(tmp_path):
+    bad = tmp_path / "bad.mkv"
+    bad.write_bytes(b"not a video")
+    rep = check_audio(bad, write_srt(tmp_path / "v.srt", [(0.2, 1.8, "a")]))
+    assert not rep.ok and "cannot read bad.mkv" in rep.error
