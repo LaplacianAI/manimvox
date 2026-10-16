@@ -89,7 +89,12 @@ These skills reach a coding agent through `manimvox skills`. Run it only with th
 | `manimvox skills update` | installs again, in the mode (link or copy) each folder already uses |
 | `manimvox skills remove` | deletes only the manimvox skills, never another entry |
 
-Flags: `--agent ID` (repeatable) picks agents; `--global` works on every project, `--project` (the default) on this one; `--copy` copies instead of linking; `-y` / `--yes` answers yes, and with `install` and no `--agent` means every detected agent. With no terminal, `install` needs `--agent` or `--yes`, and `remove` needs `--yes`; otherwise they exit `2`. After upgrading manimvox, run `manimvox skills update`.
+Flags: `--agent ID` (repeatable) picks agents; `--global` works on every project, `--project` (the default) on this one; `--copy` copies instead of linking; `-y` / `--yes` answers yes.
+
+- `install`, `update` and `remove` touch only the ten manimvox skills. Anything else at one of those names is skipped with a message ("exists and is not a manimvox skill; left untouched") and the command exits `1`.
+- `check`, `update` and `remove` look in every known agent folder for the scope, not only the detected agents. `check` exits `1` and says so when nothing is installed.
+- With no terminal, `install` needs `--yes` (add `--agent ID` to choose agents; without it every detected agent gets the skills) and `remove` needs `--yes`; otherwise they exit `2`. On a terminal, `--yes` skips the questions.
+- After upgrading manimvox, run `manimvox skills update`.
 
 ## Speed
 
