@@ -20,6 +20,7 @@ dependencies = [
 [project.optional-dependencies]
 kokoro = ["kokoro-onnx>=0.4,<0.7"]
 piper = ["piper-tts>=1.8,<2"]
+edge = ["edge-tts>=7,<8"]
 dev = ["pytest>=8", "ruff>=0.6"]
 
 [project.scripts]

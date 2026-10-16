@@ -19,6 +19,10 @@ from .registry import engine_names, get_engine, register
 
 register("fake", FakeEngine)
 
+from .engines.edge import EdgeEngine
+
+register("edge", EdgeEngine)
+
 from .engines.kokoro import KokoroEngine
 
 register("kokoro", KokoroEngine)
@@ -33,6 +37,7 @@ register("say", SayEngine)
 
 __all__ = [
     "DEFAULT_VOICE",
+    "EdgeEngine",
     "EngineNotInstalled",
     "EngineStatus",
     "FakeEngine",
