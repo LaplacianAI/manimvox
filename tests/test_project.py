@@ -1,5 +1,6 @@
 import json
 import re
+from pathlib import Path
 
 import pytest
 
@@ -133,3 +134,43 @@ def test_non_utf8_series_json_is_a_project_error(tmp_path):
     (tmp_path / "series.json").write_bytes(b'{"series": "\xff"}')
     with pytest.raises(ProjectError, match="is not UTF-8 text"):
         load_project(tmp_path)
+
+
+def test_huge_integer_speed_is_a_project_error(tmp_path):
+    # 1 followed by 400 zeros: an int that float() cannot represent
+    (tmp_path / "series.json").write_text('{"series": "S", "speed": 1' + "0" * 400 + "}", encoding="utf-8")
+    with pytest.raises(ProjectError, match=re.escape("series.json: 'speed' is too large to be a number")):
+        load_project(tmp_path)
+
+
+def test_integer_past_python_digit_limit_is_a_project_error(tmp_path):
+    (tmp_path / "series.json").write_text('{"series": "S", "speed": ' + "1" * 5000 + "}", encoding="utf-8")
+    with pytest.raises(ProjectError, match="is not valid JSON"):
+        load_project(tmp_path)
+
+
+def test_directory_named_series_json_is_not_a_project(tmp_path):
+    (tmp_path / "series.json").mkdir()
+    with pytest.raises(ProjectError, match="no series.json"):
+        load_project(tmp_path)
+
+
+def test_unreadable_series_json_is_a_project_error(tmp_path, monkeypatch):
+    write_series(tmp_path)
+    real_read_text = Path.read_text
+
+    def refuse(self, *args, **kwargs):
+        if self.name == "series.json":
+            raise PermissionError(13, "Permission denied")
+        return real_read_text(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", refuse)
+    with pytest.raises(ProjectError, match="cannot be read: .*Permission denied"):
+        load_project(tmp_path)
+
+
+def test_find_project_skips_directory_named_series_json(tmp_path):
+    write_series(tmp_path)
+    inner = tmp_path / "inner"
+    (inner / "series.json").mkdir(parents=True)
+    assert find_project(inner) == tmp_path

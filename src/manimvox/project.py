@@ -65,23 +65,32 @@ class Project:
 def load_project(root: Path) -> Project:
     root = Path(root).resolve()
     f = root / SERIES_FILE
-    if not f.exists():
+    if not f.is_file():
         raise ProjectError(f"no series.json in {root}; run `manimvox new <dir>` first")
     try:
         text = f.read_text(encoding="utf-8")
     except UnicodeDecodeError as e:
         raise ProjectError(f"{f} is not UTF-8 text: {e}") from e
+    except OSError as e:
+        raise ProjectError(f"{f} cannot be read: {e}") from e
     try:
         data = json.loads(text)
-    except json.JSONDecodeError as e:
+    except ValueError as e:
+        # JSONDecodeError, plus the int-digit limit that json raises as a bare ValueError
         raise ProjectError(f"{f} is not valid JSON: {e}") from e
     if not isinstance(data, dict):
         raise ProjectError(f"{f}: top level must be a JSON object")
     if not isinstance(data.get("series"), str) or not data["series"].strip():
         raise ProjectError(f"{f}: 'series' (the name shown on every title card) is required")
-    speed = data.get("speed", 1.0)
-    if isinstance(speed, bool) or not isinstance(speed, (int, float)) or not math.isfinite(speed):
-        raise ProjectError(f"{f}: 'speed' must be a number, got {speed!r}")
+    raw_speed = data.get("speed", 1.0)
+    if isinstance(raw_speed, bool) or not isinstance(raw_speed, (int, float)):
+        raise ProjectError(f"{f}: 'speed' must be a number, got {raw_speed!r}")
+    try:
+        speed = float(raw_speed)
+    except OverflowError as e:
+        raise ProjectError(f"{f}: 'speed' is too large to be a number") from e
+    if not math.isfinite(speed):
+        raise ProjectError(f"{f}: 'speed' must be a number, got {raw_speed!r}")
     theme = data.get("theme", {})
     if not isinstance(theme, dict):
         raise ProjectError(f"{f}: 'theme' must be an object, got {theme!r}")
@@ -141,6 +150,6 @@ def _int(f: Path, where: str, value: object) -> int:
 def find_project(start: Path) -> Path:
     start = Path(start).resolve()
     for d in (start, *start.parents):
-        if (d / SERIES_FILE).exists():
+        if (d / SERIES_FILE).is_file():
             return d
     raise ProjectError(f"no series.json in {start} or any parent; run `manimvox new <dir>` first")
