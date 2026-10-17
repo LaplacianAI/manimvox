@@ -189,11 +189,61 @@ def test_value_x_follows_the_chart_when_it_moves_and_scales(tmp_path, monkeypatc
     assert m.value_x(chart, 50) == pytest.approx((before + 1.0) * 2.0, abs=1e-6)
 
 
+def _move_and_scale(chart):
+    chart.shift([0.5, -1.0, 0]).scale(1.7, about_point=[2.0, 1.0, 0.0])
+
+
 def test_point_and_place_follow_the_chart(tmp_path, monkeypatch):
     lv = _import_block(tmp_path, monkeypatch, "line-by-level")
     c = lv.line_by_level(["a", "b", "c"], [("s", [0, 5, 10], "#ffffff")], y_max=10, width=4.0, height=2.0)
-    c.shift([0.5, -1.0, 0])
-    assert lv.point(c, 2, 10) == pytest.approx(c.frame[1].get_center())
+    _move_and_scale(c)
+    assert lv.point(c, 1, 5) == pytest.approx(c.lines[0][1][1].get_center(), abs=1e-6)
     ls = _import_block(tmp_path, monkeypatch, "log-scatter")
-    s = ls.log_scatter([("p", 1.0, 50, "#ffffff")], x_range=(0.1, 10), width=4.0, height=2.0)
-    assert ls.place(s, 1.0, 50) == pytest.approx(s.marks[0][0].get_center())
+    s = ls.log_scatter([("p", 1.0, 50, "#ffffff"), ("q", 5.0, 20, "#ffffff")], x_range=(0.1, 10),
+                       width=4.0, height=2.0)
+    _move_and_scale(s)
+    assert ls.place(s, 1.0, 50) == pytest.approx(s.marks[0][0].get_center(), abs=1e-6)
+    assert ls.place(s, 5.0, 20) == pytest.approx(s.marks[1][0].get_center(), abs=1e-6)
+
+
+def test_line_by_level_default_ticks_are_quarters(tmp_path, monkeypatch):
+    lv = _import_block(tmp_path, monkeypatch, "line-by-level")
+    c = lv.line_by_level(["a", "b"], [("s", [0.2, 0.8], "#ffffff")], y_max=1.0)
+    assert len(c.grid) == 10
+    ys = {round(float(line.get_center()[1]), 6) for line in c.grid[0::2]}
+    assert len(ys) == 5
+    texts = [m.text for m in c.grid[1::2]]
+    assert texts == ["0", "0.25", "0.5", "0.75", "1"]
+
+
+@pytest.mark.parametrize("call", [
+    lambda m: m.bar_ranking([]),
+    lambda m: m.bar_ranking([("a", -1.0)]),
+    lambda m: m.bar_ranking([("a", 0.0)]),
+    lambda m: m.bar_ranking([("a", 1.0)], max_value=0),
+])
+def test_bar_ranking_rejects_degenerate_input(tmp_path, monkeypatch, call):
+    m = _import_block(tmp_path, monkeypatch, "bar-ranking")
+    with pytest.raises(ValueError):
+        call(m)
+
+
+@pytest.mark.parametrize("call", [
+    lambda m: m.line_by_level([], [], y_max=1),
+    lambda m: m.line_by_level(["a", "b"], [("s", [1], "#ffffff")], y_max=1),
+    lambda m: m.line_by_level(["a"], [("s", [1], "#ffffff")], y_max=0),
+])
+def test_line_by_level_rejects_degenerate_input(tmp_path, monkeypatch, call):
+    m = _import_block(tmp_path, monkeypatch, "line-by-level")
+    with pytest.raises(ValueError):
+        call(m)
+
+
+@pytest.mark.parametrize("x_range,pts", [
+    ((0, 10), []), ((-1, 10), []), ((10, 1), []), ((1, 1), []),
+    ((0.1, 10), [("p", 0, 5, "#ffffff")]), ((0.1, 10), [("p", -2, 5, "#ffffff")]),
+])
+def test_log_scatter_rejects_degenerate_input(tmp_path, monkeypatch, x_range, pts):
+    m = _import_block(tmp_path, monkeypatch, "log-scatter")
+    with pytest.raises(ValueError):
+        m.log_scatter(pts, x_range=x_range)

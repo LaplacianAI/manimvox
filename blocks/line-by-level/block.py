@@ -8,8 +8,16 @@ def line_by_level(levels, series, y_max, y_ticks=None, width=7.0, height=4.2, si
     """`levels` names the x steps; `series` is a list of (name, values, colour) with one value per level;
     the y axis runs from 0 to `y_max` with gridlines at `y_ticks` (default: quarters). Returns a VGroup with
     .grid (gridlines and their numbers), .xlabels, .lines (one VGroup(line, dots, value labels) per series),
-    .legend (one entry per series) and .frame (hidden corner points used by `point`)."""
-    ticks = y_ticks or [round(y_max * k / 3) for k in range(4)]
+    .legend (one entry per series) and .frame (hidden corner points used by `point`).
+    Raises ValueError for empty `levels`, a series with a value count other than len(levels), or `y_max` not above 0."""
+    if not levels:
+        raise ValueError("levels must not be empty")
+    if not y_max > 0:
+        raise ValueError("y_max must be above 0")
+    for name, vals, _col in series:
+        if len(vals) != len(levels):
+            raise ValueError(f"series {name!r} must have one value per level ({len(levels)})")
+    ticks = y_ticks or [y_max * k / 4 for k in range(5)]
     n = len(levels)
 
     def at(i, v):
@@ -18,7 +26,7 @@ def line_by_level(levels, series, y_max, y_ticks=None, width=7.0, height=4.2, si
     grid = VGroup()
     for v in ticks:
         grid.add(Line(at(0, v) + LEFT * 0.3, at(n - 1, v) + RIGHT * 0.3).set_stroke(LINE, 1.5))
-        grid.add(T(str(v), size - 1, MUTED).next_to(at(0, v) + LEFT * 0.3, LEFT, buff=0.12))
+        grid.add(T(f"{v:g}", size - 1, MUTED).next_to(at(0, v) + LEFT * 0.3, LEFT, buff=0.12))
     xlabels = VGroup(*[T(name, size + 1, MUTED).move_to(at(i, 0) + DOWN * 0.32) for i, name in enumerate(levels)])
     lines = VGroup()
     for _name, vals, col in series:

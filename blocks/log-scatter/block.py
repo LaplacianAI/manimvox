@@ -10,7 +10,12 @@ def log_scatter(points, x_range, y_range=(0, 100), x_ticks=(), y_ticks=(), width
     """`points` is a list of (label, x, y, colour) with x > 0. `x_range` (low, high) sets the log axis and
     `y_range` the linear one; `x_ticks` and `y_ticks` are lists of (value, text). Each label sits up and to the
     left of its point, or to the right in the left third of the plot. Returns a VGroup with .axes (axis lines and
-    tick text), .marks (one VGroup(dot, label) per point, in order) and .frame (hidden corners used by `place`)."""
+    tick text), .marks (one VGroup(dot, label) per point, in order) and .frame (hidden corners used by `place`).
+    Raises ValueError unless 0 < x_range[0] < x_range[1] and every point has x > 0."""
+    if not 0 < x_range[0] < x_range[1]:
+        raise ValueError("x_range must be (low, high) with 0 < low < high")
+    if any(x <= 0 for _, x, _, _ in points):
+        raise ValueError("every point needs x above 0")
     lo, hi = math.log10(x_range[0]), math.log10(x_range[1])
     y0, y1 = y_range
 

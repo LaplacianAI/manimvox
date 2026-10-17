@@ -6,8 +6,15 @@ def bar_ranking(rows, max_value=None, width=7.4, row_h=0.36, colors=None, size=1
     """Bars for `rows`, a list of (label, value), drawn top to bottom in the order given; bar length is value /
     `max_value` (default: the largest value) of `width`. `colors` maps a row index to a colour; other rows are
     MUTED with dimmed text (default: the first row in ACCENT). Returns a VGroup with .rows (each
-    VGroup(label, bar, value)) and .axis (hidden points at value 0 and `max_value`, used by `value_x`)."""
+    VGroup(label, bar, value)) and .axis (hidden points at value 0 and `max_value`, used by `value_x`).
+    Raises ValueError for empty `rows`, a negative value, or a `max_value` that is not above 0."""
+    if not rows:
+        raise ValueError("rows must not be empty")
+    if any(v < 0 for _, v in rows):
+        raise ValueError("rows must not hold a negative value")
     top = max(v for _, v in rows) if max_value is None else max_value
+    if not top > 0:
+        raise ValueError("max_value (or the largest value) must be above 0")
     colors = {0: ACCENT} if colors is None else colors
     out = VGroup()
     for i, (name, v) in enumerate(rows):
