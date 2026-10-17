@@ -19,14 +19,6 @@ def _cmd_new(args) -> int:
     return 0
 
 
-def _project():
-    from pathlib import Path
-
-    from .project import find_project, load_project
-
-    return load_project(find_project(Path.cwd()))
-
-
 def _confirm(args):
     import os
 
@@ -58,6 +50,7 @@ def _cmd_render(args) -> int:
     print(r.audio)
     return 0 if r.ok else 1
 
+
 def _cmd_check(args) -> int:
     from .tools import check
 
@@ -75,63 +68,27 @@ def _cmd_check(args) -> int:
 
 
 def _cmd_join(args) -> int:
-    from .checks.audio import Cue, read_cues
-    from .kit.theme import Theme
-    from .playlist import duration, series_slug
-    from .post.finish import concat, srt_text
-    from .project import ProjectError
+    from .tools import join
 
-    pr = _project()
-    if args.episodes:
-        eps = [pr.episode(e) for e in args.episodes]
-        missing = [e.stem for e in eps if not (pr.out_dir / f"{e.stem}.mp4").is_file()]
-        if missing:
-            raise ProjectError(f"not rendered yet: {', '.join(missing)}; run manimvox render first")
-    else:
-        eps = [e for e in pr.episodes if (pr.out_dir / f"{e.stem}.mp4").is_file()]
-        if not eps:
-            raise ProjectError("no rendered episodes in out/: run `manimvox render <episode>` first")
-    dst = Path(args.output) if args.output else pr.out_dir / f"{series_slug(pr.series)}.mp4"
-    if dst.suffix.lower() != ".mp4":
-        raise ValueError(f"--output must end in .mp4, got {dst.name}")
-    parts = [pr.out_dir / f"{e.stem}.mp4" for e in eps]
-    if dst.resolve() in {p.resolve() for p in parts}:
-        raise ValueError(f"{dst} is one of the episodes being joined; choose another --output")
-    dst.parent.mkdir(parents=True, exist_ok=True)
-    title = None if args.no_cards else [pr.series] + ([pr.tagline] if pr.tagline else [])
-    dst.with_suffix(".srt").unlink(missing_ok=True)  # a failed join must not leave subtitles for another film
-    # no end card here: render already put post.end_card at the end of every episode
-    starts = concat(parts, dst, Theme.from_dict(pr.theme), title=title, card_seconds=pr.post.card_seconds)
-    cues = []
-    for e, s in zip(eps, starts):
-        srt = pr.out_dir / f"{e.stem}.srt"
-        if srt.is_file():
-            cues += [Cue(c.start + s, c.end + s, c.text) for c in read_cues(srt)]
-    dst.with_suffix(".srt").write_text(srt_text(cues), encoding="utf-8")
-    secs = round(duration(dst))
-    print(f"joined {len(eps)} episode{'s' if len(eps) != 1 else ''}: {dst} ({secs // 60}:{secs % 60:02d})")
+    out = str(Path(args.output).resolve()) if args.output else None  # -o is relative to where the command runs
+    r = join(str(Path.cwd()), args.episodes or None, out, cards=not args.no_cards)
+    secs = round(r.seconds)
+    n = len(r.episodes)
+    print(f"joined {n} episode{'s' if n != 1 else ''}: {r.video} ({secs // 60}:{secs % 60:02d})")
     return 0
 
 
 def _cmd_add(args) -> int:
-    from .blocks import add_block, all_blocks, get_block
+    from .tools import _add_blocks, list_blocks
 
     if args.list or not args.names:
-        for b in all_blocks():
+        for b in list_blocks().blocks:
             print(f"{b.name:<18} {b.description}  [{', '.join(b.tags)}]")
         if not args.list:
             print("add one: manimvox add <block>")
         return 0
-    blocks = [get_block(n) for n in args.names]  # every name checked before anything is copied
-    pr = _project()
-    if not args.force:
-        clash = [b.name for b in blocks if (pr.root / "blocks" / f"{b.module}.py").exists()]
-        if clash:
-            raise ValueError(f"already in this project: {', '.join(clash)} (they may hold your edits); "
-                             "pass --force to replace them")
-    for b in blocks:
-        dest = add_block(pr.root, b.name, force=args.force)
-        print(f"added {b.name}: {dest}")
+    for b in _add_blocks(str(Path.cwd()), args.names, args.force, "pass --force to replace them").added:
+        print(f"added {b.name}: {b.path}")
         print(f"  in an episode: {b.import_line}")
     return 0
 
@@ -162,71 +119,34 @@ def _cmd_voices(args) -> int:
     return 0
 
 def _cmd_doctor(args) -> int:
-    import platform
+    from .tools import doctor
 
-    problems = 0
-
-    def row(ok, what, hint=""):
-        nonlocal problems
-        problems += not ok
-        print(f"{'ok  ' if ok else 'FAIL'} {what}{'' if ok else '  → ' + hint}")
-
-    row(sys.version_info >= (3, 11), f"python {platform.python_version()}", "manimvox needs Python 3.11+")
-    cairo_hint = {
-        "darwin": "brew install cairo pkg-config, then reinstall manimvox",
-        "win32": "reinstall manimvox (pycairo ships Windows wheels; check your Python is 64-bit)",
-    }.get(sys.platform, "sudo apt install libcairo2-dev pkg-config python3-dev (or your distro's cairo dev "
-                        "package), then reinstall manimvox")
-    for mod, hint in (("cairo", cairo_hint), ("manimpango", "reinstall manimvox"), ("av", "reinstall manimvox"),
-                      ("manim", "reinstall manimvox")):
-        try:
-            m = __import__(mod)
-            row(True, f"{mod} {getattr(m, '__version__', '')}".strip())
-        except ImportError:
-            row(False, mod, hint)
-    try:
-        import manimpango
-
-        row(True, f"{len(manimpango.list_fonts())} fonts visible to Pango")
-    except ImportError:
-        pass
-    import importlib.util
-
-    for mod, extra in (("matplotlib", "matplotlib"), ("plotly", "plotly"), ("kaleido", "plotly")):
-        found = importlib.util.find_spec(mod) is not None
-        print(f"{'ok  ' if found else '--  '} charts {mod}: "
-              f"{'installed' if found else 'not installed (extra: ' + extra + ')'}")
-    from .voice import engine_names, get_engine
-
-    for name in engine_names():
-        st = get_engine(name).status()
-        print(f"{'ok  ' if st.ready else '--  '} voice {name}: {st.detail}")
-    return 1 if problems else 0
+    r = doctor()
+    for row in r.rows:
+        print(f"{row.mark:<4} {row.what}{'  → ' + row.hint if row.mark == 'FAIL' else ''}")
+    return 0 if r.ok else 1
 
 
 def _cmd_index(args) -> int:
-    from .playlist import build_index, unrendered
+    from .tools import index
 
-    project = _project()
-    page, n, total = build_index(project)
-    for stem in unrendered(project):
+    r = index(str(Path.cwd()))
+    for stem in r.skipped:
         print(f"skipped {stem} (not rendered)")
-    print(f"wrote {page}: {n} episode{'s' if n != 1 else ''}, about {max(1, round(total / 60))} min")
+    print(f"wrote {r.page}: {r.episodes} episode{'s' if r.episodes != 1 else ''}, about {r.minutes} min")
     return 0
 
 
 def _cmd_package(args) -> int:
-    from .playlist import package, unrendered
+    from .tools import package
 
-    project = _project()
-    zips = package(project)
-    for stem in unrendered(project):
+    r = package(str(Path.cwd()))
+    for stem in r.skipped:
         print(f"skipped {stem} (not rendered)")
-    for z in zips:
-        print(f"{z.name}: {z.stat().st_size / 1e6:.1f} MB")
-        if (project.root / "FACTS.md").is_file():
-            print(f"share/{z.stem}/ includes FACTS.md (it cites your sources and code paths); "
-                  "remove it before sharing if those are private")
+    for z in r.zips:
+        print(f"{Path(z.path).name}: {z.megabytes:.1f} MB")
+        if z.note:
+            print(z.note)
     return 0
 
 
@@ -418,10 +338,10 @@ def build_parser() -> argparse.ArgumentParser:
     s = p._sub.add_parser("package", help="share/<Name> and share/<Name>-720p folders and zips")
     s.set_defaults(func=_cmd_package)
 
-    s = p._sub.add_parser("join", help="join rendered episodes into one video, with a title card and an end card")
+    s = p._sub.add_parser("join", help="join rendered episodes into one video behind a title card")
     s.add_argument("episodes", nargs="*", help="episodes in order (default: every rendered episode)")
     s.add_argument("-o", "--output", help="the joined MP4 (default: out/<series>.mp4)")
-    s.add_argument("--no-cards", action="store_true", help="no title card or end card")
+    s.add_argument("--no-cards", action="store_true", help="no title card (each episode keeps its own end card)")
     s.set_defaults(func=_cmd_join)
 
     s = p._sub.add_parser("add", help="copy blocks (reusable scene components) into this project's blocks/")

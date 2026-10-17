@@ -359,3 +359,245 @@ def prepare_voice(voice: str, project: str | None = None, allow_download: bool =
         allow_download: True only when the user has agreed to download the model.
     """
     return _prepare_voice(voice, project, _consent(allow_download))
+
+
+@dataclass(frozen=True)
+class BlockInfo:
+    name: str
+    description: str
+    tags: list[str]
+    import_line: str  # the line an episode uses after add_block
+
+
+@dataclass(frozen=True)
+class BlocksResult:
+    ok: bool
+    blocks: list[BlockInfo]
+
+
+@dataclass(frozen=True)
+class AddedBlock:
+    name: str
+    path: str
+    import_line: str
+
+
+@dataclass(frozen=True)
+class AddResult:
+    ok: bool
+    added: list[AddedBlock]
+
+
+@dataclass(frozen=True)
+class JoinResult:
+    ok: bool
+    video: str
+    subtitles: str
+    episodes: list[str]
+    seconds: float
+
+
+@dataclass(frozen=True)
+class IndexResult:
+    ok: bool
+    page: str
+    episodes: int
+    minutes: int
+    skipped: list[str]  # episodes not rendered yet
+
+
+@dataclass(frozen=True)
+class PackageZip:
+    path: str
+    megabytes: float
+    note: str = ""
+
+
+@dataclass(frozen=True)
+class PackageResult:
+    ok: bool
+    zips: list[PackageZip]
+    skipped: list[str]
+
+
+@dataclass(frozen=True)
+class DoctorRow:
+    mark: str  # "ok"; "FAIL": a required part is missing and hint is the fix; "--": optional, not ready
+    what: str
+    hint: str = ""
+
+
+@dataclass(frozen=True)
+class DoctorResult:
+    ok: bool
+    rows: list[DoctorRow]
+
+
+@_tool
+def list_blocks() -> BlocksResult:
+    """List the blocks: ready-made charts and diagrams that add_block copies into a project."""
+    from .blocks import all_blocks
+
+    return BlocksResult(True, [BlockInfo(b.name, b.description, list(b.tags), b.import_line) for b in all_blocks()])
+
+
+def _add_blocks(project: str, names: list[str], force: bool, hint: str) -> AddResult:
+    from .blocks import add_block as copy_block
+    from .blocks import get_block
+
+    blocks = [get_block(n) for n in names]  # every name checked before anything is copied
+    pr = _open(project)
+    if not force:
+        clash = [b.name for b in blocks if (pr.root / "blocks" / f"{b.module}.py").exists()]
+        if clash:
+            raise ValueError(f"already in this project: {', '.join(clash)} (they may hold your edits); {hint}")
+    return AddResult(True, [AddedBlock(b.name, str(copy_block(pr.root, b.name, force=force)), b.import_line)
+                            for b in blocks])
+
+
+@_tool
+def add_block(project: str, names: list[str], force: bool = False) -> AddResult:
+    """Copy blocks into the project's blocks/ folder; an episode then imports them with each block's import_line.
+
+    Args:
+        project: The project folder, or any folder inside it.
+        names: Block names from list_blocks, e.g. ["bar-ranking"].
+        force: Replace a copy already in the project, losing any edits made to it.
+    """
+    if not names:
+        raise ValueError("name at least one block; list_blocks lists them")
+    return _add_blocks(project, names, force, "call add_block with force=True to replace them")
+
+
+@_tool
+def join(project: str, episodes: list[str] | None = None, output: str | None = None,
+         cards: bool = True) -> JoinResult:
+    """Join rendered episodes into one MP4 behind a title card, with the subtitles shifted to match.
+
+    Args:
+        project: The project folder, or any folder inside it.
+        episodes: The episodes in order; by default every rendered episode in series.json order.
+        output: The joined MP4, relative to the project folder or absolute; by default out/<Series>.mp4.
+        cards: False for no title card. Each episode keeps its own end card either way.
+    """
+    from .checks.audio import Cue, read_cues
+    from .kit.theme import Theme
+    from .playlist import duration, series_slug
+    from .post.finish import concat, srt_text
+    from .project import ProjectError
+
+    pr = _open(project)
+    if episodes:
+        eps = [pr.episode(e) for e in episodes]
+        missing = [e.stem for e in eps if not (pr.out_dir / f"{e.stem}.mp4").is_file()]
+        if missing:
+            raise ProjectError(f"not rendered yet: {', '.join(missing)}; run manimvox render first")
+    else:
+        eps = [e for e in pr.episodes if (pr.out_dir / f"{e.stem}.mp4").is_file()]
+        if not eps:
+            raise ProjectError("no rendered episodes in out/: run `manimvox render <episode>` first")
+    dst = Path(output).expanduser() if output else pr.out_dir / f"{series_slug(pr.series)}.mp4"
+    if not dst.is_absolute():
+        dst = pr.root / dst  # relative to the project, not to wherever the caller runs
+    if dst.suffix.lower() != ".mp4":
+        raise ValueError(f"the output must end in .mp4, got {dst.name}")
+    parts = [pr.out_dir / f"{e.stem}.mp4" for e in eps]
+    if dst.exists() and any(os.path.samefile(dst, p) for p in parts):  # samefile: case-insensitive disks too
+        raise ValueError(f"{dst} is one of the episodes being joined; choose another output")
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    title = [pr.series] + ([pr.tagline] if pr.tagline else []) if cards else None
+    dst.with_suffix(".srt").unlink(missing_ok=True)  # a failed join must not leave subtitles for another film
+    # no end card here: render already put post.end_card at the end of every episode
+    starts = concat(parts, dst, Theme.from_dict(pr.theme), title=title, card_seconds=pr.post.card_seconds)
+    cues = []
+    for e, s in zip(eps, starts):
+        srt = pr.out_dir / f"{e.stem}.srt"
+        if srt.is_file():
+            cues += [Cue(c.start + s, c.end + s, c.text) for c in read_cues(srt)]
+    dst.with_suffix(".srt").write_text(srt_text(cues), encoding="utf-8")
+    return JoinResult(True, str(dst), str(dst.with_suffix(".srt")), [e.stem for e in eps], round(duration(dst), 2))
+
+
+@_tool
+def index(project: str) -> IndexResult:
+    """Write the playlist page out/index.html from the rendered episodes.
+
+    Args:
+        project: The project folder, or any folder inside it.
+    """
+    from .playlist import build_index, unrendered
+
+    pr = _open(project)
+    page, n, total = build_index(pr)
+    return IndexResult(True, str(page), n, max(1, round(total / 60)), unrendered(pr))
+
+
+@_tool
+def package(project: str) -> PackageResult:
+    """Write share/<Name>/ and share/<Name>-720p/ with a zip of each, from the rendered episodes.
+
+    Args:
+        project: The project folder, or any folder inside it.
+    """
+    from .playlist import package as build_packages
+    from .playlist import unrendered
+
+    pr = _open(project)
+    zips = build_packages(pr)
+    facts = (pr.root / "FACTS.md").is_file()
+    return PackageResult(True, [
+        PackageZip(str(z), round(z.stat().st_size / 1e6, 1),
+                   f"share/{z.stem}/ includes FACTS.md (it cites your sources and code paths); "
+                   "remove it before sharing if those are private" if facts else "")
+        for z in zips], unrendered(pr))
+
+
+@_tool
+def doctor() -> DoctorResult:
+    """Check Python, cairo, Pango and its fonts, Manim, the chart extras and every voice engine; a FAIL row names its fix."""
+    import importlib.util
+    import platform
+    import sys
+
+    rows: list[DoctorRow] = []
+
+    def row(ok: bool, what: str, hint: str = "") -> None:
+        rows.append(DoctorRow("ok" if ok else "FAIL", what, "" if ok else hint))
+
+    row(sys.version_info >= (3, 11), f"python {platform.python_version()}", "manimvox needs Python 3.11+")
+    cairo_hint = {
+        "darwin": "brew install cairo pkg-config, then reinstall manimvox",
+        "win32": "reinstall manimvox (pycairo ships Windows wheels; check your Python is 64-bit)",
+    }.get(sys.platform, "sudo apt install libcairo2-dev pkg-config python3-dev (or your distro's cairo dev "
+                        "package), then reinstall manimvox")
+    for mod, hint in (("cairo", cairo_hint), ("manimpango", "reinstall manimvox"), ("av", "reinstall manimvox"),
+                      ("manim", "reinstall manimvox")):
+        try:
+            m = __import__(mod)
+            row(True, f"{mod} {getattr(m, '__version__', '')}".strip())
+        except ImportError:
+            row(False, mod, hint)
+    try:
+        import manimpango
+
+        row(True, f"{len(manimpango.list_fonts())} fonts visible to Pango")
+    except ImportError:
+        pass
+    for mod, extra in (("matplotlib", "matplotlib"), ("plotly", "plotly"), ("kaleido", "plotly")):
+        found = importlib.util.find_spec(mod) is not None
+        rows.append(DoctorRow("ok" if found else "--",
+                              f"charts {mod}: {'installed' if found else 'not installed (extra: ' + extra + ')'}"))
+    from .voice import engine_names, get_engine
+
+    for name in engine_names():
+        st = get_engine(name).status()
+        rows.append(DoctorRow("ok" if st.ready else "--", f"voice {name}: {st.detail}"))
+    return DoctorResult(not any(r.mark == "FAIL" for r in rows), rows)
+
+
+TOOLS = (new_project, draft, render, check, contact_sheet, voices, prepare_voice, list_blocks, add_block, join,
+         index, package, doctor)
+# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks
+COMMANDS = {"new": "new_project", "draft": "draft", "render": "render", "check": "check", "voices": "voices",
+            "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor"}
+SHELL_ONLY = frozenset({"skills"})  # installs skills into coding agents; a framework agent reads skills_path() instead
