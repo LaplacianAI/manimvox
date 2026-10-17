@@ -3,12 +3,28 @@ from __future__ import annotations
 
 import importlib
 import io
+import logging
+from contextlib import contextmanager
 
 from ..voice.base import install_hint
 from .clip import DEFAULT_WIDTH, Clip, SceneError
 from .raster import frame_count
 
 SERIES_ROLES = ("accent", "blue", "orange", "violet", "pink", "teal", "ok", "warn")
+
+
+@contextmanager
+def _quiet_kaleido():
+    """Kaleido logs at INFO, and a Manim process prints INFO to the console; keep only its warnings meanwhile."""
+    loggers = [logging.getLogger(name) for name in ("kaleido", "choreographer")]
+    levels = [lg.level for lg in loggers]
+    for lg in loggers:
+        lg.setLevel(logging.WARNING)
+    try:
+        yield
+    finally:
+        for lg, level in zip(loggers, levels):
+            lg.setLevel(level)
 
 
 def _theme(theme):
@@ -119,13 +135,14 @@ def from_plotly(fig, seconds: float | None = None, fps: float = 10, size: tuple[
     else:
         figs, fps = [fig], 1
     opts = {"format": "png", "width": size[0], "height": size[1]}
-    try:
-        kaleido.start_sync_server(silence_warnings=True)
+    with _quiet_kaleido():
         try:
-            frames = [kaleido.calc_fig_sync(f, opts=opts) for f in figs]
-        finally:
-            kaleido.stop_sync_server(silence_warnings=True)
-    except chrome_missing as e:
-        raise SceneError("Plotly export needs Chrome and none was found. Install Google Chrome, or run "
-                         "`plotly_get_chrome`, which downloads a copy (ask the user first).") from e
+            kaleido.start_sync_server(silence_warnings=True)
+            try:
+                frames = [kaleido.calc_fig_sync(f, opts=opts) for f in figs]
+            finally:
+                kaleido.stop_sync_server(silence_warnings=True)
+        except chrome_missing as e:
+            raise SceneError("Plotly export needs Chrome and none was found. Install Google Chrome, or run "
+                             "`plotly_get_chrome`, which downloads a copy (ask the user first).") from e
     return Clip(frames, fps, width)
