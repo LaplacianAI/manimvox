@@ -59,6 +59,8 @@ Structure
 - `self.clear()` between scenes; `self.outro(recap_list, narration, next_title=None)` last. The last episode can point elsewhere with `next_label="READ", next_title="docs/design.md"`.
 - `self.pulse([mob, ...])` sends a dot along a chain; `self.swap(old, new)` cross-fades; `self.dim(*mobs)` dims the mobjects you pass.
 
+Before drawing a chart or diagram by hand, run `manimvox add --list`: a block may already draw it (see the manimvox-blocks skill).
+
 ## 2 · Lessons already paid for
 
 - A render that "worked" can still have silent narration. The kit writes sounds straight to the video file so a cached animation cannot drop one, and `manimvox render` ends with the audio check. Never report done without `audio check: ok`.

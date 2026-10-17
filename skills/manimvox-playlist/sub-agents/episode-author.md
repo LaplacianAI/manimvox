@@ -24,6 +24,8 @@ wrong, draft again, until every sheet is clean and the draft prints
 and fix every finding. Edit only your own file. Install nothing, download
 nothing and fetch nothing from the web; if you need something, say so in the report.
 
+Before drawing a chart or diagram by hand, check `manimvox add --list` and copy a block if one fits.
+
 Every on-screen or spoken claim must be a line in FACTS.md. If you need a claim
 that is not there, find its source, use it labelled, and report it.
 

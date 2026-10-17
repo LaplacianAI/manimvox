@@ -18,9 +18,14 @@ src/manimvox/
   skills_admin.py   manimvox skills install, check, update, remove
   templates/        files manimvox new writes
   kit/              Episode, components, theme, text (what episodes import)
+  scenes/           clips from Pillow, Cairo, Matplotlib, Plotly
+  post/             music bed, captions, cards, join
+  blocks.py         block registry, manimvox add, the preview tool
+  _cairo.py         pycairo helpers shared by scenes and post
   checks/           theme, layout, audio, contact sheets
   voice/            the voice interface, cache, downloads, HTTP, audio conversion
   voice/engines/    one module per text-to-speech engine
+blocks/<name>/      block code, demo, block.json, preview.png
 skills/<name>/      agent skills: SKILL.md plus references/
 skills-manifest.json  generated list of the skills
 tests/
@@ -34,6 +39,7 @@ uv run pytest
 uv run ruff check src tests
 uv run python -m manimvox.skills manifest --write   # after any skill edit
 uv run manimvox skills install|check|update|remove  # skills in your coding agents
+uv run python -m manimvox.blocks preview --write|--check [NAME]   # after any block edit
 ```
 
 Tests that render with Manim are marked `slow`; tests needing real engines are opt-in markers.
@@ -62,3 +68,4 @@ Tests that render with Manim are marked `slow`; tests needing real engines are o
 | `manimvox-animation` | domain | motion patterns |
 | `manimvox-voice` | domain | engines, voices, pronunciation, cloning consent |
 | `manimvox-cli` | domain | commands and their output |
+| `manimvox-blocks` | domain | finding, copying and writing blocks |

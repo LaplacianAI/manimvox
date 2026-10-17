@@ -31,6 +31,6 @@ How things move in an episode. A scene is picture and voice together, so each pa
 - An `always_redraw` mobject keeps redrawing until you call `clear_updaters()` on it; stop it before it fades.
 - After writing a scene, run `manimvox draft epNN --every 3` and read the contact sheets, or `manimvox check layout epNN` where you cannot view images. A pattern that staged cleanly in `patterns.md` can still collide with your own content.
 
-## Not yet available
+## Charts and frames from other libraries
 
-Charts from Matplotlib or Plotly, and frames drawn with Pillow or Cairo, arrive in a later manimvox release; until then draw charts with kit shapes.
+`manimvox.scenes` turns frames from Matplotlib, Plotly, Pillow or Cairo into a clip you place and play like any mobject, in the theme's colours: see [references/adapters.md](references/adapters.md). For a simple chart prefer a block (`manimvox add --list`, see [manimvox-blocks](../manimvox-blocks/SKILL.md)) or kit shapes, which reveal part by part as the narration speaks. Use an adapter for what Manim draws badly: dense data, real plots, heatmaps, image processing.

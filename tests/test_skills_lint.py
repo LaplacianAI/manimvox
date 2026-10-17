@@ -69,7 +69,7 @@ def test_commands_named_exist(d):
             assert cmd in known, f"{p}: names `manimvox {cmd}`, which the CLI does not have"
 
 
-def test_exactly_the_ten_skills():
+def test_exactly_the_eleven_skills():
     assert sorted(d.name for d in DIRS) == sorted(sk.SKILL_NAMES)
 
 
