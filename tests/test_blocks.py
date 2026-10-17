@@ -33,8 +33,9 @@ def test_blocks_path_finds_the_repo_blocks_in_a_dev_install():
     assert blocks_path() == REG
 
 
-def test_registry_has_the_first_blocks():
-    assert {"venn", "bug-grid"} <= {b.name for b in BLOCKS}
+def test_registry_is_the_starter_set():
+    assert {b.name for b in BLOCKS} == {"venn", "bar-ranking", "bug-grid", "line-by-level", "log-scatter",
+                                        "token-panel", "request-flow", "sequence-diagram", "code-diff"}
 
 
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
@@ -247,3 +248,52 @@ def test_log_scatter_rejects_degenerate_input(tmp_path, monkeypatch, x_range, pt
     m = _import_block(tmp_path, monkeypatch, "log-scatter")
     with pytest.raises(ValueError):
         m.log_scatter(pts, x_range=x_range)
+
+
+def test_sequence_diagram_refuses_an_unknown_actor(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "sequence-diagram")
+    with pytest.raises(ValueError, match="message 1"):
+        m.sequence_diagram(["A", "B"], [("A", "C", "hi")])
+
+
+def test_code_diff_bands_what_changed(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "code-diff")
+    d = m.code_diff("a\nb\nc\n", "a\nB\nc\nd\n")
+    assert len(d.removed) == 1 and len(d.added) == 2
+
+
+@pytest.mark.parametrize("call", [
+    lambda m: m.token_panel([]),
+    lambda m: m.mark(m.token_panel(["a", "b"]), 2),
+    lambda m: m.mark(m.token_panel(["a", "b"]), -1),
+    lambda m: m.mark(m.token_panel(["a", "b"]), 0, 2),
+    lambda m: m.mark(m.token_panel(["a", "b"]), 1, 0),
+])
+def test_token_panel_rejects_degenerate_input(tmp_path, monkeypatch, call):
+    m = _import_block(tmp_path, monkeypatch, "token-panel")
+    with pytest.raises(ValueError):
+        call(m)
+
+
+@pytest.mark.parametrize("call", [
+    lambda m: m.request_flow([]),
+    lambda m: m.hop(m.request_flow(["a", "b"]), 2),
+    lambda m: m.hop(m.request_flow(["a", "b"]), -1),
+])
+def test_request_flow_rejects_degenerate_input(tmp_path, monkeypatch, call):
+    m = _import_block(tmp_path, monkeypatch, "request-flow")
+    with pytest.raises(ValueError):
+        call(m)
+
+
+@pytest.mark.parametrize("actors", [[], ["A"], ["A", "A"]])
+def test_sequence_diagram_rejects_degenerate_input(tmp_path, monkeypatch, actors):
+    m = _import_block(tmp_path, monkeypatch, "sequence-diagram")
+    with pytest.raises(ValueError):
+        m.sequence_diagram(actors, [])
+
+
+def test_code_diff_rejects_two_empty_sides(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "code-diff")
+    with pytest.raises(ValueError):
+        m.code_diff("", "\n")

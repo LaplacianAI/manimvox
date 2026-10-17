@@ -1,0 +1,16 @@
+{
+  "name": "request-flow",
+  "function": "request_flow",
+  "helpers": ["hop"],
+  "description": "A value travelling through a chain of stages, boxes joined by arrows, with a token that hops along.",
+  "tags": ["flow", "pipeline", "request"],
+  "parameters": [
+    {"name": "stages", "description": "box labels, left to right"},
+    {"name": "w", "description": "box width in scene units"},
+    {"name": "color", "description": "box outline colour"},
+    {"name": "gap", "description": "space between boxes"},
+    {"name": "size", "description": "font size"},
+    {"name": "token_color", "description": "the token's starting colour"}
+  ],
+  "returns": "VGroup with .nodes, .arrows, .token; hop(flow, i, colour) moves the token above stage i"
+}
