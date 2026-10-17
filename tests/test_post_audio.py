@@ -31,6 +31,7 @@ def test_post_reads_every_field():
     ({"musik": "x"}, "unknown key 'musik'"),
     ({"captions": "open"}, "captions"),
     ({"music_db": 3}, "music_db"),
+    ({"music_db": 10**400}, "music_db"),
     ({"duck_db": True}, "duck_db"),
     ({"card_seconds": 0.5}, "card_seconds"),
     ({"end_card": ["x"] * 5}, "end_card"),

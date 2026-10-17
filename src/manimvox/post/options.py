@@ -28,7 +28,11 @@ class PostOptions:
 
 def _number(raw: dict, key: str, default: float, lo: float, hi: float) -> float:
     v = raw.get(key, default)
-    if isinstance(v, bool) or not isinstance(v, (int, float)) or not math.isfinite(v) or not lo <= v <= hi:
+    try:
+        ok = not isinstance(v, bool) and isinstance(v, (int, float)) and math.isfinite(v) and lo <= v <= hi
+    except OverflowError:  # an integer too large for a float is out of range, not a crash
+        ok = False
+    if not ok:
         raise ValueError(f"post.{key} must be a number from {lo:g} to {hi:g}, got {v!r}")
     return float(v)
 
