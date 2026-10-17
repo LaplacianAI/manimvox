@@ -34,7 +34,8 @@ def test_each_adapter_needs_only_its_own_framework(module, top, extra):
     pytest.importorskip(top)
     others = [t for _, t, _ in ADAPTERS if t != top]
     code = f"import sys\nfor m in {others!r}:\n    sys.modules[m] = None\nimport manimvox.integrations.{module}\n"
-    subprocess.run([sys.executable, "-c", code], check=True)
+    done = subprocess.run([sys.executable, "-c", code], check=False, capture_output=True, text=True)
+    assert done.returncode == 0, done.stderr
 
 
 def test_agno_toolkit(tmp_path):
@@ -146,6 +147,13 @@ def test_a_missing_framework_names_its_extra_too(monkeypatch, module, top, extra
         importlib.import_module(f"manimvox.integrations.{module}")
 
 
+def test_a_missing_crewai_says_it_needs_python_below_3_14(monkeypatch):
+    block(monkeypatch, "crewai")
+    monkeypatch.delitem(sys.modules, "manimvox.integrations.crewai", raising=False)
+    with pytest.raises(ImportError, match=r"Python below 3\.14"):
+        importlib.import_module("manimvox.integrations.crewai")
+
+
 def test_crewai_tools(tmp_path, monkeypatch):
     pytest.importorskip("crewai")
     monkeypatch.delenv("OPENAI_API_KEY", raising=False)
@@ -216,4 +224,5 @@ def test_each_more_adapter_needs_only_its_own_framework(module, top, extra):
     pytest.importorskip(top)
     others = [t for _, t, _ in ADAPTERS + MORE if t != top]
     code = f"import sys\nfor m in {others!r}:\n    sys.modules[m] = None\nimport manimvox.integrations.{module}\n"
-    subprocess.run([sys.executable, "-c", code], check=True)
+    done = subprocess.run([sys.executable, "-c", code], check=False, capture_output=True, text=True)
+    assert done.returncode == 0, done.stderr

@@ -24,6 +24,7 @@ def build(project, model=None) -> Agent:
         backstory=f"{INSTRUCTIONS}\n\n{project_note(Path(project))}",
         tools=manimvox_tools(project),
         skills=[manimvox.skills_path()],
+        max_iter=500,  # a video takes many tool calls: lift the default limit of 25 iterations
         **extra,
     )
 

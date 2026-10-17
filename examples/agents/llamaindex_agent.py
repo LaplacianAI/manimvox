@@ -25,7 +25,8 @@ async def main() -> None:
     from llama_index.llms.anthropic import Anthropic
 
     agent = build(sys.argv[1], Anthropic(model="claude-opus-5-5"))
-    print(await agent.run(user_msg=" ".join(sys.argv[2:])))
+    # a video takes many tool calls: lift the default limit of 20 iterations
+    print(await agent.run(user_msg=" ".join(sys.argv[2:]), max_iterations=500))
 
 
 if __name__ == "__main__":

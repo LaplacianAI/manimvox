@@ -69,6 +69,12 @@ def test_commands_named_exist(d):
             assert cmd in known, f"{p}: names `manimvox {cmd}`, which the CLI does not have"
 
 
+@pytest.mark.parametrize("d", DIRS, ids=lambda d: d.name)
+def test_no_skill_ships_scripts(d):
+    # Agno's skills tools can execute a skill's scripts/; none ship any, and that must not change unnoticed
+    assert not (d / "scripts").exists(), f"{d.name} has a scripts/ folder"
+
+
 def test_exactly_the_eleven_skills():
     assert sorted(d.name for d in DIRS) == sorted(sk.SKILL_NAMES)
 
