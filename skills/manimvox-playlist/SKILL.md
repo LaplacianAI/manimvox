@@ -15,7 +15,7 @@ Copy this checklist and keep it current:
 - [ ] 1 Facts      FACTS.md, every claim sourced and labelled
 - [ ] 2 Theme      the project's own theme (manimvox-creative); manimvox check theme passes
 - [ ] 3 Ladder     SERIES.md and series.json episodes (with level and blurb); show the user
-- [ ] 4 Episodes   one author per episode: script first, critique answered, then drafts; every sheet read
+- [ ] 4 Episodes   one author per episode: all scripts first and reviewed, then drafts; every sheet read
 - [ ] 5 Finals     manimvox render epNN, two at a time at most; audio check ok on each
 - [ ] 6 Ship       manimvox index; manimvox package; report
 ```
@@ -50,7 +50,7 @@ Fill `SERIES.md` and the `episodes` list in `series.json` as [series design](ref
 
 Before the authors start, you own `blocks/`: run `manimvox add --list`, copy the blocks the series needs with `manimvox add <block>`, and list them, with their import lines, in each author's brief. Authors never run `manimvox add`, so parallel authors do not race on `blocks/`.
 
-Write one episode per author, each given the brief in [episode-author](sub-agents/episode-author.md) with every bracket filled. If your environment can run helpers in parallel, run one author per episode at once; otherwise write the episodes one after another yourself, each against that brief. Authors draft only (`manimvox draft`, no voice, no download) and read every contact sheet. Each author writes and critiques the episode's script before any code, as [script](../manimvox-creative/references/script.md) says. Read every script before the drafts begin: each episode opens on the question the previous one ended on, and ends on the next one's.
+Write one episode per author, each given the brief in [episode-author](sub-agents/episode-author.md) with every bracket filled. If your environment can run helpers in parallel, run one author per episode at once; otherwise write the episodes one after another yourself, each against that brief. Authors draft only (`manimvox draft`, no voice, no download) and read every contact sheet. The work runs in two phases. First, each author writes and critiques the episode's script as [script](../manimvox-creative/references/script.md) says, then stops and reports it (script path, word count, critique). You read every script and check that each opens on the previous episode's exit question and ends on the next one's, and send back fixes. Only then tell each author to draft. Where authors run one after another, the order is the same: all scripts, your review, then the drafts.
 
 Afterwards:
 - read each author's report;

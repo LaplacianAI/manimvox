@@ -20,9 +20,11 @@ yours will teach: [one line each]. Do not take their material.
 
 Your opening question: [previous episode's exit question, or the series' question]. Your exit: [this episode's exit from SERIES.md].
 
-First write episodes/[stem].md: the script, then its critique, every answer yes. Only then write the code.
+Phase 1, the script. Write episodes/[stem].md: the script, then its critique, every answer yes. Then STOP and report: the script path, its word count and the critique. Do not write code yet; the orchestrator reads every script, checks that your opening answers the previous episode's exit question and that your ending hands over to the next, and sends fixes.
 
-Commands: manimvox draft [stem] --every 5 only. Never run manimvox render; the
+Phase 2, the episode. Start only when the orchestrator tells you to draft. Apply any fixes to the script, then write the code.
+
+Commands (phase 2): manimvox draft [stem] --every 5 only. Never run manimvox render; the
 orchestrator renders finals. Read every sheet image in sheets/, fix what is
 wrong, draft again, until every sheet is clean and the draft prints
 "layout check: ok". If you cannot view images, run manimvox check layout [stem]

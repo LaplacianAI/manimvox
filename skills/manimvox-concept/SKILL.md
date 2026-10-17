@@ -1,6 +1,6 @@
 ---
 name: manimvox-concept
-description: "Explains a topic or concept with no single source document as one narrated video of about 1 to 10 minutes in the 3Blue1Brown manner with manimvox: a question that hooks, visuals that build the idea step by step, the formula last, every claim still cited. Use when the user asks to explain or visualise an idea, an algorithm, or a piece of maths, science or engineering."
+description: "Explains a topic or concept with no single source document as one narrated video of up to about 8 minutes (longer only on request) in the 3Blue1Brown manner with manimvox: a question that hooks, visuals that build the idea step by step, the formula last, every claim still cited. Use when the user asks to explain or visualise an idea, an algorithm, or a piece of maths, science or engineering."
 license: MIT
 ---
 

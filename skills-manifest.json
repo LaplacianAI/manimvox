@@ -18,27 +18,27 @@
       "files": 1
     },
     "manimvox-concept": {
-      "sha256": "da91272692b0944f55f3305588791c5bbb92cee06ce9f45caef5ed14ad6f0698",
+      "sha256": "d96e5bd40fc9694527338d554ad061e676756b8382542ffbdcec802daf137eff",
       "files": 1
     },
     "manimvox-core": {
-      "sha256": "a5619b5243d601cd4bba67e572366c3aec1cd52c3909a09549559c593958a8e6",
+      "sha256": "fc7bcb0d19905e59d49c26d16b2091a95df4468f63a17eb4883cbfa826701e76",
       "files": 2
     },
     "manimvox-creative": {
-      "sha256": "a63f723e7d6ab1723301ee282822d6fcfc6a51152733c51f3f2738bd36cfc54b",
+      "sha256": "55ec332709746f66aa3a5c7d0fd9b923df0ad5eb83455894b02a542e9db5df7a",
       "files": 6
     },
     "manimvox-paper": {
-      "sha256": "2771fc497847c0c1442f2998d0a3803ada6373ef4b9bc07d32cfbdcaa6fce559",
+      "sha256": "b08794a1ad4d781be29134ccbb12db0cb9815f649b22c55e4455480e36fb9ee8",
       "files": 1
     },
     "manimvox-playlist": {
-      "sha256": "e1f7a6119cbaeb16fac139e7389f6d4ea28e0083a8f645dfa4fc3684504ed290",
+      "sha256": "33de24f8d2bf8b1190668744c533362dc6efd47520f0d65ec1fcb64e00f7f5fc",
       "files": 3
     },
     "manimvox-pr": {
-      "sha256": "9cf3f995aaa3d4543538ca7347a40b99a57dd622ffe5ec5f13aa920a4076c617",
+      "sha256": "e8dfd726308a4d6d2b0ca14296afddb6dacc1264f26598c07f7758706ee805fe",
       "files": 1
     },
     "manimvox-voice": {

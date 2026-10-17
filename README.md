@@ -161,7 +161,7 @@ Then ask your agent: "make an explainer video of <paper / repo / idea / PR>".
 | `manimvox-voice` | Choosing and preparing the voice: engines, licences, pronunciation, cloning consent |
 | `manimvox-cli` | The command line and how to read its output |
 | `manimvox-blocks` | Ready-made charts and diagrams to copy into a project, and how to write one |
-| `manimvox-paper` | One document into a 5-10 minute explainer, every claim traced to the source |
+| `manimvox-paper` | One document into an explainer video of about 5 to 8 minutes (shorter on request), every claim traced to the source |
 | `manimvox-playlist` | A codebase or spec into a beginner-to-advanced playlist, with page and zips |
 | `manimvox-concept` | An idea with no source document into a 3Blue1Brown-style video |
 | `manimvox-pr` | A pull request into a 1-3 minute walkthrough |

@@ -1,6 +1,6 @@
 ---
 name: manimvox-paper
-description: "Turns one document (a PDF, paper, white paper, report, article, web page or notes) into a narrated 5–10 minute explainer video with manimvox, every on-screen claim traced to the source. Use when the user wants a video that explains a specific document or URL."
+description: "Turns one document (a PDF, paper, white paper, report, article, web page or notes) into a narrated video explainer of about 5 to 8 minutes (shorter on request) with manimvox, every on-screen claim traced to the source. Use when the user wants a video that explains a specific document or URL."
 license: MIT
 ---
 
@@ -15,7 +15,7 @@ Copy this checklist and keep it current:
 - [ ] 1 Source     read the whole document; keep a copy in research/
 - [ ] 2 Facts      FACTS.md: one claim per line, page or URL, labelled
 - [ ] 3 Theme      series.json theme (manimvox-creative); manimvox check theme passes
-- [ ] 4 Outline    5–7 chapters, idea + picture each; show the user
+- [ ] 4 Outline    chapters by requested length (5–7 at the default), idea + picture each; show the user
 - [ ] 5 Script     episodes/ep01_*.md: every line, critique answered; show the user
 - [ ] 6 Episode    episodes/ep01_*.py (manimvox-core); draft until every sheet is clean
 - [ ] 7 Final      manimvox render ep01; audio check ok; manimvox sheets ep01; look at 4–6 frames
@@ -66,7 +66,7 @@ The audience is a beginner unless the user says otherwise. Choose the theme as [
 
 ## 4 Outline
 
-Follow the paper shape in [story](../manimvox-creative/references/story.md): a hook, the claim, the evidence, the limits, the takeaway. Plan 5 to 7 chapters, each one idea with the picture that carries it. Write the outline into `SERIES.md`, with the facts each chapter uses. The opening is the field's problem the paper answers; the ending returns to it with the paper's result.
+Follow the paper shape in [story](../manimvox-creative/references/story.md): a hook, the claim, the evidence, the limits, the takeaway. Choose the chapter count from the requested length with the [length table](../manimvox-creative/references/script.md#when-the-time-is-short) (5 to 7 at the default of 5 to 8 minutes, fewer when shorter), each one idea with the picture that carries it. Write the outline into `SERIES.md`, with the facts each chapter uses. The opening is the field's problem the paper answers; the ending returns to it with the paper's result.
 
 Show the outline to the user and wait for approval. If the user cannot be asked, state the outline in your reply and continue.
 
@@ -76,7 +76,7 @@ Write the narration in `episodes/ep01_<name>.md` before any code, as [script](..
 
 ## 6 Episode
 
-Register one episode in `series.json` and write `episodes/ep01_<name>.py` as [manimvox-core](../manimvox-core/SKILL.md) and its author guide say. Motion patterns are in [manimvox-animation](../manimvox-animation/SKILL.md). The narration for a 5 to 8 minute video is about 750 to 1,150 words (see [narration](../manimvox-creative/references/narration.md)).
+Register one episode in `series.json` and write `episodes/ep01_<name>.py` as [manimvox-core](../manimvox-core/SKILL.md) and its author guide say. Motion patterns are in [manimvox-animation](../manimvox-animation/SKILL.md). Spoken words and timings come from the [length table](../manimvox-creative/references/script.md#when-the-time-is-short) (for 5 to 8 minutes, about 750 to 1,080 words).
 
 Then loop: `manimvox draft ep01 --every 5`, read every contact sheet in `sheets/`, fix, repeat until it prints `layout check: ok` and the sheets read well. If you cannot view images, run `manimvox check layout ep01` and say so in the report. The draft uses no voice and downloads nothing.
 

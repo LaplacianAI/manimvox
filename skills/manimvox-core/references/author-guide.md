@@ -58,7 +58,7 @@ Narration (methods on `Episode`)
 Structure
 - `self.intro(narration, tts=None, question=None)` first: `question` goes on the title card in place of the tagline and is what the outro answers. Anything drawn before `intro()` is a cold open; `intro` clears it.
 - `self.chapter(title, narration=None, tts=None, bridge=None, bridge_tts=None)` for each chapter: `bridge` is a "So…" or "But…" line spoken over the finished picture before the card; a card with no narration is a 1 s breath. A bridge animates nothing: for one that needs a picture, `self.say(line, anims…)` then `self.chapter(...)` with no bridge.
--  `NCHAP` must equal the number of `chapter()` calls.
+- `NCHAP` must equal the number of `chapter()` calls. No bridge on the first chapter: end the intro narration on the route instead (a bridge there plays over an empty stage). A single video is one episode in `series.json`; re-render ep01 if you add another (its title card has no episode number).
 - `self.clear()` between scenes; `self.outro(recap_list, narration, next_title=None, answer=None)` last: `answer` puts the opening question back on screen, then speaks and shows the answer, before the recap; an empty `recap` skips the recap and still speaks `narration`. The last episode can point elsewhere with `next_label="READ", next_title="docs/design.md"`.
 - `self.pulse([mob, ...])` sends a dot along a chain; `self.swap(old, new)` cross-fades; `self.dim(*mobs)` dims the mobjects you pass.
 
@@ -85,7 +85,7 @@ Narration
 - The picture shows what the voice says at that moment. Reveal items as they are named.
 - Define every term the first time it is spoken, in a phrase.
 - Follow the script. Every chapter ends on a takeaway and a bridge; the outro answers the opening question. One `heading()` per scene, stating its claim.
-- Length, chapters and spoken words come from the brief, else from the [length table](../../manimvox-creative/references/script.md#when-the-time-is-short) (a playlist episode: 5 to 8 minutes, 5 to 7 chapters, about 750 to 1,150 words).
+- Length, chapters and spoken words come from the brief, else from the [length table](../../manimvox-creative/references/script.md#when-the-time-is-short) (a playlist episode: 5 to 8 minutes, 5 to 7 chapters, about 750 to 1,080 words).
 
 Visuals
 - One idea per scene. Prefer a diagram that moves over a bullet list. Real identifiers on screen (`code()`, mono), plain words in the voice.

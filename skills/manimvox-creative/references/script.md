@@ -56,10 +56,10 @@ Keep the frame and cut the body. The opening and the ending cost about the same 
 | Length | Opening | Ending | Ideas (chapters) | Spoken words | Total |
 |---|---|---|---|---|---|
 | about 1 minute | 10 to 15 s | 15 to 20 s, recap optional | 1 or 2 | 100 to 120 | 60 to 70 s |
-| about 3 minutes | 15 to 20 s | 20 to 30 s | 3 | 380 to 440 | 170 to 190 s |
-| 5 to 8 minutes | 15 to 25 s | 25 to 40 s | 5 to 7 | 750 to 1,150 | 5.5 to 8 min |
+| about 3 minutes | 15 to 20 s | 20 to 30 s | 3 | 380 to 400 | 170 to 190 s |
+| 5 to 8 minutes | 15 to 25 s | 25 to 40 s | 5 to 7 | 750 to 1,080 | 5.5 to 8 min |
 
-The totals use the formula under [Pace](#pace), with lines of about 14 words at one minute and about 20 above. At one minute, skip the recap: the answer and the "Next" are the ending. Cards and pauses add real time, so count them before you trust a word target.
+The totals use the formula under [Pace](#pace), with lines of about 14 words at one minute and about 20 above. At one minute, skip the recap: the answer and the "Next" are the ending. At about a minute, the promise and the route may be one sentence. Cards and pauses add real time, so count them before you trust a word target.
 
 Cut first: a second example, edge cases, growth and limits (make one of them the "Next"), and any term the question does not need. Never cut: the problem on screen, the payoff, the beat after the key reveal, the callback. Say in your report what you cut and where it went.
 
@@ -86,17 +86,18 @@ A fresh reader catches more than the writer. If your environment can hand work t
 
 ## A worked example: about one minute
 
-`episodes/ep01_binary_search.md`. 118 spoken words (the bridge and the answer included) in 10 lines: about 45 s of speech. With 0.7 s a line, 3 beats and the kit's overhead for 2 chapters (about 12 s), about 68 s in all.
+`episodes/ep01_binary_search.md`. 117 spoken words (the bridge and the answer included) in 9 lines: about 45 s of speech. With 0.7 s a line, 3 beats and the kit's overhead for 2 chapters (about 12 s), about 66 s in all.
 
     OPENING  [cold open: a phone book of a thousand pages, A to Z; a finger flips page after page, a counter climbs]
     A phone book has a thousand pages. Finding a name by flipping could take a thousand
     looks. (beat)
     [title card, question: "How many looks to find one name in a thousand pages?"]
-    Here is how to count the looks yourself.
+    How many looks to find one name in a thousand pages? Halve the book, then count the
+    halvings, and you can count the looks yourself.
 
     01 Halve the pages  [card: silent]
     [the book opens in the middle; the back half greys out: 1,000 pages → 500]
-    The names are in order, so one look at the middle rules out half the book.
+    The names are in order, so one look at the middle rules out half.
     [a second look in the front half: 500 → 250]
     Look again in what is left. Every look halves what remains. (beat)
     [bridge, over the finished picture of 1,000 · 500 · 250 pages; nothing new drawn]
@@ -104,17 +105,15 @@ A fresh reader catches more than the writer. If your environment can hand work t
 
     02 Count the halvings  [card: silent]
     [a bar halves ten times, 1,000 · 500 · 250 · 125 · 63 · 32 · 16 · 8 · 4 · 2 · 1 (rounded up); a counter reaches 10; 2¹⁰ = 1,024 appears]
-    Ten. Two to the tenth is one thousand twenty-four, so ten halvings leave one page.
-    [beside it, a million-page book and a counter that stops at 20; 2²⁰ = 1,048,576]
-    So a million pages need only twenty looks: two to the twentieth is about a million. (beat)
+    Ten. Two to the tenth is one thousand twenty-four, so ten halvings leave one page. (beat)
 
-    ENDING  [sweep; the thousand-page book again, ten marks halve it down to one page, the name lit]
+    ENDING  [sweep; the thousand-page book again, one animation halves it down to a single page, the name lit]
     Ten looks, not a thousand.
-    [outro(answer=…): the question, then the answer spoken and shown. No recap: outro([], …)]
+    [outro(answer=…): the question, then the answer spoken and shown. No recap: outro([], …); the answer stays on screen]
     About ten looks to find one name in a thousand pages: halve what remains.
     [next plate: NEXT "Names keep being added"]
     Next: what happens when names keep being added.
 
-In code: `self.say` for the cold open with the counter, `self.intro("Here is how to count the looks yourself.", question="How many looks to find one name in a thousand pages?")`, two `self.chapter(...)` calls (the second with `bridge=`), a `self.say` for the payoff, and `self.outro([], "Next: what happens when names keep being added.", next_title="Names keep being added", answer="About ten looks to find one name in a thousand pages: halve what remains.")`.
+In code: `self.say` for the cold open with the counter, then `self.beat()`; `self.intro("How many looks to find one name in a thousand pages? Halve the book, then count the halvings, and you can count the looks yourself.", question="How many looks to find one name in a thousand pages?")`; two `self.chapter(...)` calls (the second with `bridge=`), each ending on its takeaway line and `self.beat()`; `self.clear()` and then a `self.say` for the payoff; and `self.outro([], "Next: what happens when names keep being added.", next_title="Names keep being added", answer="About ten looks to find one name in a thousand pages: halve what remains.")`. A short line that carries many steps runs longer than the line, because each step gets at least 0.3 s: the five-word payoff carries one animation, not ten marks. Give a payoff more words or fewer steps.
 
-What was cut for length, and where it went: why the list must stay in order, and what adding names does to it, became the "Next". The recap was skipped.
+What was cut for length, and where it went: the million-page second example, why the list must stay in order, and what adding names does to it. The last became the "Next". The recap was skipped.

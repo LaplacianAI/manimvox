@@ -1,12 +1,12 @@
 ---
 name: manimvox-pr
-description: "Turns a GitHub pull request into a narrated 1–3 minute walkthrough video with manimvox: what changed, why, before and after, the key code highlighted. Use when the user gives a PR URL or owner/repo#N, or says 'this PR', and wants a video of it."
+description: "Turns a GitHub pull request into a narrated 1–3 minute walkthrough video with manimvox: why it changed, what changed, before and after, the key code highlighted. Use when the user gives a PR URL or owner/repo#N, or says 'this PR', and wants a video of it."
 license: MIT
 ---
 
 # manimvox pr: one pull request, one short video
 
-You turn one pull request into a 1 to 3 minute walkthrough for reviewers: what changed, why, before and after, with the key code on screen. The video says what the PR and its diff say, and every claim traces to a `path:line` or the PR description. The authoring rules are in [manimvox-core](../manimvox-core/SKILL.md), the look, story and narration in [manimvox-creative](../manimvox-creative/SKILL.md), the motion patterns in [manimvox-animation](../manimvox-animation/SKILL.md), the voice in [manimvox-voice](../manimvox-voice/SKILL.md) and the commands in [manimvox-cli](../manimvox-cli/SKILL.md).
+You turn one pull request into a 1 to 3 minute walkthrough for reviewers: why it changed, what changed, before and after, with the key code on screen. The video says what the PR and its diff say, and every claim traces to a `path:line` or the PR description. The authoring rules are in [manimvox-core](../manimvox-core/SKILL.md), the look, story and narration in [manimvox-creative](../manimvox-creative/SKILL.md), the motion patterns in [manimvox-animation](../manimvox-animation/SKILL.md), the voice in [manimvox-voice](../manimvox-voice/SKILL.md) and the commands in [manimvox-cli](../manimvox-cli/SKILL.md).
 
 Copy this checklist and keep it current:
 
@@ -15,7 +15,7 @@ Copy this checklist and keep it current:
 - [ ] 1 Read the PR  gh pr view and gh pr diff; keep both in research/
 - [ ] 2 Facts      FACTS.md: one claim per line, path:line or PR description, labelled
 - [ ] 3 Theme      the repository's brand if it has one; manimvox check theme passes
-- [ ] 4 Outline    3–4 chapters, idea + picture each; show the user
+- [ ] 4 Outline    1–3 chapters by length, idea + picture each; show the user
 - [ ] 5 Script     episodes/ep01_*.md: every line, critique answered; show the user
 - [ ] 6 Episode    episodes/ep01_*.py (manimvox-core); draft until every sheet is clean
 - [ ] 7 Final      manimvox render ep01; audio check ok; manimvox sheets ep01; look at 4–6 frames
@@ -61,7 +61,7 @@ Use the repository's brand if it has one, found as [theming](../manimvox-creativ
 
 ## 4 Outline
 
-Follow the code-change shape in the PR section of [story](../manimvox-creative/references/story.md): what changed, why, before and after, risk, how to try it. Fold it into 3 to 4 chapters, one idea each, with the picture that carries it. Write the outline into `SERIES.md`, with the facts each chapter uses.
+Follow the code-change shape in the PR section of [story](../manimvox-creative/references/story.md): why, what changed, before and after, risk, how to try it. Fold it into the chapters the requested length allows (1 or 2 chapters at about a minute, 3 at about three; words and timings in [the length table](../manimvox-creative/references/script.md#when-the-time-is-short)), one idea each, with the picture that carries it. Write the outline into `SERIES.md`, with the facts each chapter uses.
 
 The opening is the problem the PR fixes, shown on the old path; the ending runs the same case on the new path.
 
@@ -73,7 +73,7 @@ Write the narration in `episodes/ep01_<name>.md` before any code, as [script](..
 
 ## 6 Episode
 
-Register one episode in `series.json` and write `episodes/ep01_<name>.py` as [manimvox-core](../manimvox-core/SKILL.md) and its author guide say. Motion patterns are in [manimvox-animation](../manimvox-animation/SKILL.md). The narration for 1 to 3 minutes is 130 to 150 spoken words for one minute and 420 to 470 for three (see [narration](../manimvox-creative/references/narration.md)).
+Register one episode in `series.json` and write `episodes/ep01_<name>.py` as [manimvox-core](../manimvox-core/SKILL.md) and its author guide say. Motion patterns are in [manimvox-animation](../manimvox-animation/SKILL.md). Chapters, spoken words and timings come from [the length table](../manimvox-creative/references/script.md#when-the-time-is-short).
 
 - **Code on screen:** `code()` with the changed lines coloured through `colors={…}`, at most 12 lines per panel. Show only the lines that carry the idea, each copied exactly from the diff, with its file path as the panel title.
 - **Before and after:** two panels, the old code on one side and the new on the other, with the same lines aligned.

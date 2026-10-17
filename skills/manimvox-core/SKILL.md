@@ -35,8 +35,10 @@ class Ep01(Episode):
     NCHAP = 1
 
     def build(self):
-        self.intro("A game moves a ship three steps right and two up. How does it store that move? "
-                   "By the end, you will read it as two numbers.", question="How does a game store a move?")
+        move = arrow(ORIGIN, RIGHT * 3 + UP * 2, color=ACCENT)  # cold open: the problem, drawn
+        self.say("A game moves a ship three steps right and two up.", Create(move))
+        self.intro("How does a game store that move? By the end, you will read it as two numbers.",
+                   question="How does a game store a move?")  # intro() clears the cold open
         self.chapter("A move is an arrow")
         v = arrow(ORIGIN, RIGHT * 3 + UP * 2, color=ACCENT, label="v")
         self.say("Draw the move as an arrow from where the ship started.", Create(v))
@@ -63,7 +65,7 @@ Each is expanded in the [author guide](references/author-guide.md).
 - **Narration drives time.** Use `say`, `steps` or `narrate`. Never hard-code a wait to match speech: a draft estimates the length, the final uses the real audio.
 - **No LaTeX.** Never use `Tex`, `MathTex`, `Integer`, `DecimalNumber` or Manim's `Code`. Write formulas with `T` or the kit's `code()` and Unicode.
 - **Arrows:** `arrow(a, b)` points from `a` to `b` and returns a group; animate it with `Create`, not `GrowArrow`.
-- **Structure:** the opening shows a problem and asks one question; each chapter opens on something concrete, ends on a takeaway with `self.beat()`, and bridges to the next; the outro answers the opening question, recaps in the chapters' words, and says what is next. Each scene's `heading()` states its claim.
+- **Structure:** the opening shows a problem and asks one question; each chapter opens on something concrete, ends on a takeaway with `self.beat()`, and bridges to the next; the outro answers the opening question, recaps (skipped at about a minute) in the chapters' words, and says what is next. Each scene's `heading()` states its claim.
 - **Narration style:** spoken English, short sentences, one idea each, at most 45 words a line. No hype. Define each term the first time it is spoken.
 - **Visuals:** one idea per scene, a diagram that moves over a bullet list, the picture shows what the voice says at that moment.
 - **Accuracy:** say only what `FACTS.md` holds. A designed claim is said as designed; an open question is shown as open. Never invent a number, name, endpoint or path.
