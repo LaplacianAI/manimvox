@@ -22,6 +22,15 @@ class ToolError(Exception):
     """A tool could not do what was asked. The message says why, and what to run first."""
 
 
+def _for_a_model(message: str) -> str:
+    """A voice error as a tool caller should read it: no CLI flags, and a download is the user's decision."""
+    if "--yes" in message:
+        what = message.split(": rerun with --yes")[0].rstrip(".")
+        return (f"{what}. Ask the user whether to download it; with their go-ahead, call this tool again with "
+                "allow_download=true, or pass another voice.")
+    return message.replace("with --voice", "with the voice argument")
+
+
 def _tool(fn):
     """Re-raise every failure the command reports as an error as a ToolError with the same message."""
 
@@ -34,7 +43,9 @@ def _tool(fn):
 
         try:
             return fn(*args, **kwargs)
-        except (ProjectError, VoiceError, RenderError, PostError, ValueError, OSError) as e:
+        except VoiceError as e:
+            raise ToolError(_for_a_model(str(e))) from e
+        except (ProjectError, RenderError, PostError, ValueError, OSError) as e:
             raise ToolError(str(e)) from e
 
     return run

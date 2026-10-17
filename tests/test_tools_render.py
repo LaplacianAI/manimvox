@@ -109,6 +109,30 @@ def test_a_tool_never_prompts_even_at_a_terminal(project, monkeypatch):
     assert seen == [False, True, False, True]
 
 
+def test_a_declined_download_tells_the_model_to_ask_the_user_not_to_use_flags(project, monkeypatch):
+    from manimvox.integrations import common
+    from manimvox.voice import get_engine
+    from manimvox.voice.download import RemoteFile, ensure_files
+
+    def prepare(self, voice, confirm, root):
+        ensure_files(Path(root) / "m", [RemoteFile("w.bin", "http://x/w.bin", "0" * 64, 5_000_000)], confirm, "the test model")
+
+    monkeypatch.setattr(type(get_engine("fake")), "prepare", prepare)
+    monkeypatch.delenv("MANIMVOX_ASSUME_YES", raising=False)
+    bound = {f.__name__: f for f in common.json_tools(project)}
+    calls = [lambda: tools.render(str(project), "ep01", voice="fake:tone"),
+             lambda: tools.prepare_voice("fake:tone", str(project)),
+             lambda: json.loads(bound["render"](episode="ep01", voice="fake:tone"))["error"],
+             lambda: json.loads(bound["prepare_voice"](voice="fake:tone"))["error"]]
+    for call in calls:
+        try:
+            msg = call()
+        except ToolError as e:
+            msg = str(e)
+        assert "the test model" in msg and "allow_download" in msg and "ask the user" in msg.lower(), msg
+        assert "--yes" not in msg and "--voice" not in msg, msg
+
+
 def test_voices_lists_every_engine_with_licence_and_privacy():
     r = tools.voices()
     by = {e.name: e for e in r.engines}
