@@ -143,6 +143,37 @@ def json_tools(project: str | Path | None = None) -> list[Callable[..., str]]:
     return [json_tool(bound(f, project) if project is not None else f) for f in tools.TOOLS]
 
 
+def arg_docs(fn: Callable) -> tuple[str, dict[str, str]]:
+    """The docstring's summary, and each parameter's description from its Google-style Args: section."""
+    doc = inspect.cleandoc(fn.__doc__ or "")
+    summary = " ".join(doc.split("\n\n")[0].split())
+    _, _, rest = doc.partition("\nArgs:\n")
+    args: dict[str, str] = {}
+    cur = None
+    for line in rest.splitlines():
+        m = re.match(r"^    (\w+)(?: \([^)]*\))?:\s*(.*)$", line)
+        if m:
+            cur = m.group(1)
+            args[cur] = m.group(2).strip()
+        elif cur and line.startswith("        "):
+            args[cur] += " " + line.strip()
+        elif line.strip() and not line.startswith(" "):
+            break  # the next section (Returns:, Raises:)
+    return summary, args
+
+
+def args_model(fn: Callable):
+    """A pydantic model of fn's arguments with their descriptions, for frameworks that take a schema and do not read
+    Args: themselves. Every such framework installs pydantic."""
+    from pydantic import Field, create_model
+
+    _, docs = arg_docs(fn)
+    hints = typing.get_type_hints(fn)
+    fields = {n: (hints[n], Field(... if p.default is p.empty else p.default, description=docs.get(n)))
+              for n, p in inspect.signature(fn).parameters.items()}
+    return create_model(f"{fn.__name__}_args", **fields)
+
+
 def _inside(project: str, path: str) -> tuple[Path, Path]:
     root = find_project(Path(project).expanduser())
     target = (root / path).resolve()  # resolve() follows symlinks, so a link out of the project is caught here

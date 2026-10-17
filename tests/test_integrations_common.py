@@ -228,3 +228,37 @@ def test_bound_join_treats_an_empty_output_as_none(project):
     for out in ("", "  "):
         assert json.loads(join(output=out)) == expected
     assert "no rendered episodes" in expected["error"]
+
+
+def test_arg_docs_reads_the_args_section():
+    summary, docs = common.arg_docs(tools.render)
+    assert summary.startswith("Render the final 1080p episode")
+    assert set(docs) == {"project", "episode", "voice", "allow_download"}
+    assert docs["allow_download"].startswith("True only when the user has agreed")
+
+
+def test_arg_docs_joins_wrapped_lines_and_stops_at_the_next_section():
+    def f(a: str, b: int = 1) -> str:
+        """Do it.
+
+        Args:
+            a: The first
+                and longer line.
+            b: The second.
+
+        Returns:
+            Nothing useful.
+        """
+
+    assert common.arg_docs(f) == ("Do it.", {"a": "The first and longer line.", "b": "The second."})
+
+
+@pytest.mark.parametrize("fn", AGENT_FUNCTIONS, ids=lambda f: f.__name__)
+def test_args_model_keeps_types_defaults_and_descriptions(fn):
+    pytest.importorskip("pydantic")
+    schema = common.args_model(fn).model_json_schema()
+    params = inspect.signature(fn).parameters
+    assert set(schema.get("properties", {})) == set(params)
+    assert set(schema.get("required", [])) == {n for n, p in params.items() if p.default is p.empty}
+    for name, prop in schema.get("properties", {}).items():
+        assert prop["description"], f"{fn.__name__}({name}) has no description"

@@ -132,3 +132,88 @@ def test_openai_agents_tools(tmp_path):
     cctx = ToolContext(context=None, tool_name="check", tool_call_id="2", tool_arguments=cargs)
     err = json.loads(asyncio.run(ts["check"].on_invoke_tool(cctx, cargs)))
     assert err["ok"] is False and "series.json" in err["error"]
+
+
+MORE = [("crewai", "crewai", "crewai"), ("llamaindex", "llama_index", "llamaindex"),
+        ("haystack", "haystack", "haystack"), ("google_adk", "google.adk", "google-adk")]
+
+
+@pytest.mark.parametrize("module,top,extra", MORE)
+def test_a_missing_framework_names_its_extra_too(monkeypatch, module, top, extra):
+    block(monkeypatch, top)  # "google.adk", not "google": protobuf lives under google too
+    monkeypatch.delitem(sys.modules, f"manimvox.integrations.{module}", raising=False)
+    with pytest.raises(ImportError, match=re.escape(f"manimvox[{extra}]")):
+        importlib.import_module(f"manimvox.integrations.{module}")
+
+
+def test_crewai_tools(tmp_path, monkeypatch):
+    pytest.importorskip("crewai")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    from manimvox.integrations.crewai import manimvox_tools
+
+    ts = {t.name: t for t in manimvox_tools(tmp_path)}
+    assert set(ts) == TOOL_NAMES | FILE_NAMES and {t.name for t in manimvox_tools(tmp_path, files=False)} == TOOL_NAMES
+    schema = ts["draft"].args_schema.model_json_schema()
+    assert schema["properties"]["every"]["description"] and set(schema["required"]) == {"episode"}
+    assert ts["draft"].description.startswith("Render a fast 480p draft")
+    out = json.loads(ts["check"].run(what="theme"))
+    assert out["ok"] is False and "series.json" in out["error"]
+
+
+def test_llamaindex_tools(tmp_path):
+    pytest.importorskip("llama_index.core")
+    from manimvox.integrations.llamaindex import manimvox_tools
+
+    ts = {t.metadata.name: t for t in manimvox_tools(tmp_path)}
+    assert set(ts) == TOOL_NAMES | FILE_NAMES | {"read_skill"}
+    params = ts["draft"].metadata.get_parameters_dict()
+    assert params["properties"]["every"]["description"] and set(params["required"]) == {"episode"}
+    out = json.loads(asyncio.run(ts["check"].acall(what="theme")).content)
+    assert out["ok"] is False and "series.json" in out["error"]
+
+
+def test_haystack_tools_and_skills(tmp_path, monkeypatch):
+    pytest.importorskip("haystack")
+    monkeypatch.setenv("HAYSTACK_TELEMETRY_ENABLED", "False")
+    from haystack.components.agents import Agent
+    from haystack.components.generators.chat import MockChatGenerator
+    from haystack.dataclasses import ChatMessage, ToolCall
+
+    from manimvox.integrations.haystack import manimvox_skills, manimvox_tools
+
+    ts = manimvox_tools(tmp_path)
+    assert {t.name for t in ts} == TOOL_NAMES | FILE_NAMES
+    draft = next(t for t in ts if t.name == "draft")
+    assert draft.parameters["properties"]["every"]["description"] and "title" not in draft.parameters
+    calls = [ToolCall(tool_name="list_blocks", arguments={}), ToolCall(tool_name="load_skill",
+                                                                        arguments={"name": "manimvox-cli"})]
+    gen = MockChatGenerator(responses=[ChatMessage.from_assistant(tool_calls=calls), "done"])
+    result = Agent(chat_generator=gen, tools=[*ts, manimvox_skills()]).run(messages=[ChatMessage.from_user("go")])
+    results = [m.tool_call_result.result for m in result["messages"] if m.tool_call_result]
+    assert any("bar-ranking" in r for r in results) and any("manimvox command line" in r for r in results)
+
+
+def test_google_adk_tools_and_skills(tmp_path):
+    pytest.importorskip("google.adk")
+    from google.adk.agents import LlmAgent
+
+    from manimvox.integrations.google_adk import SKILL_TOOLS, manimvox_skill_toolset, manimvox_tools
+
+    ts = {t.name: t for t in manimvox_tools(tmp_path)}
+    assert set(ts) == TOOL_NAMES | FILE_NAMES
+    schema = ts["draft"]._get_declaration().parameters_json_schema  # private, but the only view of what the model gets
+    assert schema["properties"]["every"]["description"] and set(schema["required"]) == {"episode"}
+    out = json.loads(asyncio.run(ts["check"].run_async(args={"what": "theme"},
+                                                       tool_context=None)))
+    assert out["ok"] is False and "series.json" in out["error"]
+    skills = manimvox_skill_toolset()
+    assert sorted(t.name for t in asyncio.run(skills.get_tools())) == sorted(SKILL_TOOLS)
+    LlmAgent(name="manimvox", model="gemini-2.5-flash", instruction="x", tools=[*ts.values(), skills])
+
+
+@pytest.mark.parametrize("module,top,extra", MORE)
+def test_each_more_adapter_needs_only_its_own_framework(module, top, extra):
+    pytest.importorskip(top)
+    others = [t for _, t, _ in ADAPTERS + MORE if t != top]
+    code = f"import sys\nfor m in {others!r}:\n    sys.modules[m] = None\nimport manimvox.integrations.{module}\n"
+    subprocess.run([sys.executable, "-c", code], check=True)
