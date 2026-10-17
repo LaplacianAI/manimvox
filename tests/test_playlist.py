@@ -4,39 +4,15 @@ import zipfile
 from pathlib import Path
 
 import av
-import numpy as np
 import pytest
 
 from manimvox.cli import main
 from manimvox.kit.theme import DEFAULTS
 from manimvox.playlist import duration, transcode_720
+from tests.media import make_mp4
 
 FIXTURE = Path(__file__).parent / "fixtures" / "hello"
 SRT = "1\n00:00:00,000 --> 00:00:01,000\nHello </script> & <b>\n"
-
-
-def _mp4(path, seconds=2.0, size=(320, 180), fps=30, rate=48000, layout="stereo"):
-    """An H.264/AAC MP4 shaped like Manim output: 30 fps, stereo 48 kHz fltp audio."""
-    c = av.open(str(path), "w")
-    vs = c.add_stream("libx264", rate=fps)
-    vs.width, vs.height, vs.pix_fmt = size[0], size[1], "yuv420p"
-    a = c.add_stream("aac", rate=rate, layout=layout)
-    for i in range(int(seconds * fps)):
-        img = np.full((size[1], size[0], 3), 20 * (i % 10), dtype=np.uint8)
-        for p in vs.encode(av.VideoFrame.from_ndarray(img, format="rgb24")):
-            c.mux(p)
-    for p in vs.encode():
-        c.mux(p)
-    t = np.arange(int(seconds * rate)) / rate
-    tone = (0.3 * np.sin(2 * np.pi * 220 * t)).astype(np.float32)
-    fr = av.AudioFrame.from_ndarray(np.stack([tone, tone]), format="fltp", layout=layout)
-    fr.sample_rate = rate
-    for p in a.encode(fr):
-        c.mux(p)
-    for p in a.encode():
-        c.mux(p)
-    c.close()
-    return path
 
 
 @pytest.fixture
@@ -48,7 +24,7 @@ def project(tmp_path, monkeypatch):
                                blurb="Says </script> hello")
     (d / "series.json").write_text(json.dumps(data), encoding="utf-8")
     (d / "out").mkdir(exist_ok=True)
-    _mp4(d / "out" / "ep01_hello.mp4")
+    make_mp4(d / "out" / "ep01_hello.mp4", 2.0)
     (d / "out" / "ep01_hello.srt").write_text(SRT, encoding="utf-8")
     (d / "FACTS.md").write_text("# facts\n", encoding="utf-8")
     monkeypatch.chdir(d)
@@ -81,7 +57,7 @@ def test_index_without_renders_is_an_error(project, capsys):
 
 
 def test_transcode_720(tmp_path):
-    src = _mp4(tmp_path / "a.mp4", size=(1920, 1080))
+    src = make_mp4(tmp_path / "a.mp4", 2.0, size=(1920, 1080), rate=48000)
     transcode_720(src, tmp_path / "b.mp4")
     with av.open(str(tmp_path / "b.mp4")) as c:
         assert c.streams.video[0].height == 720 and c.streams.video[0].width == 1280

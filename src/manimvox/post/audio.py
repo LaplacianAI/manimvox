@@ -19,10 +19,14 @@ def read_audio(path: Path, rate: int = RATE) -> np.ndarray:
         with av.open(str(path)) as c:
             if not c.streams.audio:
                 return np.zeros((2, 0), np.float32)
-            res = av.AudioResampler(format="fltp", layout="stereo", rate=rate)
+            # libswresample upmixes mono to stereo 3 dB down; resample mono as mono and copy it to both sides
+            mono = c.streams.audio[0].layout.nb_channels == 1
+            res = av.AudioResampler(format="fltp", layout="mono" if mono else "stereo", rate=rate)
             for frame in c.decode(c.streams.audio[0]):
                 chunks += [f.to_ndarray() for f in res.resample(frame)]
             chunks += [f.to_ndarray() for f in res.resample(None)]
+            if mono:
+                chunks = [np.repeat(x, 2, axis=0) for x in chunks]
     except (av.error.FFmpegError, OSError) as e:
         raise PostError(f"cannot read audio from {Path(path).name}: {e}") from e
     return np.concatenate(chunks, axis=1).astype(np.float32) if chunks else np.zeros((2, 0), np.float32)
