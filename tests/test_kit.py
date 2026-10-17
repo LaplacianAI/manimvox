@@ -1,3 +1,4 @@
+import itertools
 import json
 import os
 import shutil
@@ -84,3 +85,57 @@ def test_empty_narration_fails_in_draft_too():
     _require_words("a word")
     with pytest.raises(VoiceError, match="empty narration line"):
         _require_words("   ")
+
+
+def test_steps_leave_the_last_picture_on_screen():
+    from manimvox.kit.episode import LOOK, _step_slot
+
+    for dur, n, lead in [(4.0, 3, 0.0), (2.0, 2, 0.3), (8.0, 4, 0.0)]:
+        used = lead + n * _step_slot(dur, n, lead)
+        assert dur - used >= min(LOOK, 0.25 * dur) - 1e-9  # time left to look before the line ends
+    assert _step_slot(0.5, 4) == 0.3  # a very short line still gives each animation a moment
+
+
+PACE = '''from manimvox.kit import *
+
+
+class Ep02(Episode):
+    EP = 2
+    TITLE = "Pace"
+    TAGLINE = "Pauses between lines"
+    NCHAP = 1
+
+    def build(self):
+        self.intro("A short test of pacing.")
+        self.chapter("Pace", "One chapter.")
+        a = node("A").move_to(LEFT * 2)
+        b = node("B").move_to(RIGHT * 2)
+        self.steps("First one box, then another box.", [FadeIn(a), FadeIn(b)])
+        self.beat()
+        self.say("Both boxes are on the stage now.", Indicate(a))
+        self.outro(["Two boxes"], "That is the end.")
+'''
+
+
+@pytest.mark.slow
+def test_lines_leave_time_to_look(tmp_path):
+    from manimvox.checks.audio import read_cues
+    from manimvox.kit.episode import PAD
+
+    p = copy_fixture(tmp_path)
+    (p / "episodes" / "ep02_pace.py").write_text(PACE, encoding="utf-8")
+    data = json.loads((p / "series.json").read_text(encoding="utf-8"))
+    data["episodes"].append({"n": 2, "stem": "ep02_pace", "cls": "Ep02", "title": "Pace"})
+    (p / "series.json").write_text(json.dumps(data), encoding="utf-8")
+    # with a voice (the fake one), not a draft: only a voiced render writes subtitles
+    env = {k: v for k, v in os.environ.items() if not k.startswith("MANIMVOX_")}
+    env |= {"MANIMVOX_PROJECT": str(p), "MANIMVOX_STEM": "ep02_pace", "MANIMVOX_VOICE_RESOLVED": "fake:tone"}
+    r = subprocess.run([sys.executable, "-m", "manim", "render", "-ql", "--fps", "10", "--disable_caching",
+                        "--progress_bar", "none", "--media_dir", str(p / "build" / "m"), "-o", "ep02_pace",
+                        str(p / "episodes" / "ep02_pace.py"), "Ep02"], check=False, capture_output=True, text=True,
+                       env=env, cwd=p)
+    assert r.returncode == 0, r.stderr[-2000:]
+    cues = read_cues(p / "out" / "ep02_pace.srt")
+    gaps = [b.start - a.end for a, b in itertools.pairwise(cues)]
+    assert len(cues) == 5 and min(gaps) >= PAD - 0.11  # a frame at 10 fps
+    assert gaps[2] >= PAD + 1.0 - 0.11  # beat() after the steps line adds a second of silence

@@ -45,7 +45,16 @@ from .text import STAGE_BOTTOM, STAGE_TOP, P, T
 
 config.background_color = BG
 WORDS_PER_SECOND = 2.6
+PAD = 0.7  # silence after every line: the viewer looks at what just changed before the next sentence
+LOOK = 0.8  # steps() finishes this long (at most a quarter of the line) before the line ends
 STAGE = [-6.6, STAGE_BOTTOM, 6.6, STAGE_TOP]
+
+
+def _step_slot(dur, n, lead=0.0):
+    """Seconds per animation when steps() spreads n of them over a line of `dur` seconds,
+    leaving the last picture on screen for a moment before the line ends."""
+    look = min(LOOK, 0.25 * dur)
+    return max(0.3, (dur - lead - look) / max(1, n))
 
 
 def _require_words(spoken):
@@ -82,7 +91,7 @@ class Episode(Scene):
 
     # -- narration ---------------------------------------------------------
     @contextmanager
-    def narrate(self, text, tts=None, pad=0.3):
+    def narrate(self, text, tts=None, pad=PAD):
         """Play the voice line; animations inside the block run over it.
         On exit, waits until the line (plus `pad`) has finished."""
         spoken = spoken_form(tts or text, PROJECT.pron if PROJECT else [])
@@ -107,7 +116,7 @@ class Episode(Scene):
             self.wait(rest)
         self._snapshot()
 
-    def say(self, text, *anims, run_time=1.0, tts=None, pad=0.3, lag_ratio=0.0):
+    def say(self, text, *anims, run_time=1.0, tts=None, pad=PAD, lag_ratio=0.0):
         """Voice line + animations played together at its start."""
         with self.narrate(text, tts=tts, pad=pad) as dur:
             if anims:
@@ -117,19 +126,23 @@ class Episode(Scene):
                 else:
                     self.play(*anims, run_time=rt)
 
-    def steps(self, text, anims, run_time=0.7, tts=None, pad=0.3, lead=0.0):
-        """Voice line with `anims` spread evenly across it. Each item is an
-        Animation or a list of Animations played together."""
+    def steps(self, text, anims, run_time=0.7, tts=None, pad=PAD, lead=0.0):
+        """Voice line with `anims` spread evenly across it, the last one finishing a moment
+        before the line ends. Each item is an Animation or a list of Animations played together."""
         with self.narrate(text, tts=tts, pad=pad) as dur:
             if lead:
                 self.wait(lead)
-            slot = max(0.3, (dur - lead) / max(1, len(anims)))
+            slot = _step_slot(dur, len(anims), lead)
             for a in anims:
                 group = a if isinstance(a, (list, tuple)) else [a]
                 rt = min(run_time, slot)
                 self.play(*group, run_time=rt)
                 if slot - rt > 2 / config.frame_rate:
                     self.wait(slot - rt)
+
+    def beat(self, seconds=1.0):
+        """A silent hold after a key reveal, so the picture lands before the next line."""
+        self.wait(seconds)
 
     # -- structure ---------------------------------------------------------
     def stage(self):
