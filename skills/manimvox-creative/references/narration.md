@@ -16,15 +16,9 @@ The voice is read aloud by a speech engine, so write for the ear. The rules belo
 
 ## Length
 
-Plan at 2.6 words a second, about 156 a minute. The draft uses that estimate; the final render uses the real audio length. Never hard-code a wait to match speech. After the render, divide the words in the `.srt` by its length: 145 to 165 a minute. Faster voices (some system voices run near 190) need `speed` below 1.
+Plan at 2.6 words a second, about 156 a minute. The draft uses that estimate; the final render uses the real audio length. Never hard-code a wait to match speech. After the render, check two numbers. Speech rate is the words in the `.srt` divided by the sum of its cue durations: 150 to 175 a minute. Above 175, lower `speed` in `series.json` (0.9 first); below 140, raise it toward 1.0. Overall rate is the words divided by the video's length: lower, because of pauses, cards and beats (about 120 to 150 for long videos, lower for very short ones). If the video runs long, cut words or beats, not the pauses after lines. Some system voices run near 190 and need `speed` below 1.
 
-| Running time | Spoken words | Chapters |
-|---|---|---|
-| about 1 minute | 130 to 150 | 1 to 2 |
-| about 3 minutes | 420 to 470 | 3 |
-| 5 to 8 minutes | 750 to 1,150 | 5 to 7 |
-
-Under three minutes, keep the opening and the ending at full length and cut ideas; see [script](script.md#when-the-time-is-short).
+The [length table in script](script.md#when-the-time-is-short) is the one source for spoken words, chapters and total length at each running time (about 1 minute, about 3 minutes, 5 to 8 minutes). Under three minutes, keep the opening and the ending and cut ideas.
 
 Stay inside the range. A playlist episode below 5 minutes is usually thin; above 8 it usually holds two ideas.
 

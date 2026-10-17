@@ -4,9 +4,11 @@ Write every spoken line before any scene code, and critique it in writing. Code 
 
 ## Where it lives
 
-`episodes/epNN_name.md`, beside the episode file. Chapter by chapter, each line as it will be spoken, with the picture in brackets after it, and `(beat)` where the picture should hold. Put the word count and the estimated length (words ÷ 2.6 seconds) at the top. The critique goes at the bottom of the same file.
+`episodes/epNN_name.md`, beside the episode file. Chapter by chapter, each line as it will be spoken, with the picture in brackets after it, and `(beat)` where the picture should hold. Put the spoken word count (the `answer=` text and any bridge included), the estimated speech length (words ÷ 2.6 seconds) and the estimated total length (see [Pace](#pace)) at the top. The critique goes at the bottom of the same file.
 
-## The opening: 15 to 25 seconds, four moves
+## The opening: four moves
+
+This is 15 to 25 seconds at 5 minutes and up (see the [length table](#when-the-time-is-short) for shorter videos).
 
 1. **The problem, felt.** A concrete situation where the obvious way is slow, wrong or impossible, drawn on screen, not only said over the title card. In a playlist episode, the problem is the question the previous episode ended on.
 2. **The question.** One sentence the whole video answers, in the viewer's words. Keep it: the ending says it again.
@@ -20,38 +22,44 @@ Do not open on a definition, name the idea before the problem is felt, or let th
 - **Open on something concrete**, not a recap: "Here is the request we follow." "Start with the model." The scene's `heading()` states its claim.
 - **Move the running example one step a line**, so the viewer can guess the next step.
 - **End on a takeaway**, one sentence the viewer could repeat, often starting "So". Put it on screen, then `self.beat()`.
-- **Bridge to the next chapter.** One "But…" or "So…" line, or a single question, said over the finished picture, that the next chapter's first line answers: `self.chapter("Two keys, one bucket", bridge="But plum hashes to two as well. Where does it go?")`.
+- **Bridge to the next chapter.** One "But…" or "So…" line, or a single question, that the next chapter's first line answers: `self.chapter("Count the halvings", bridge="But how many halvings does a thousand take?")`. A bridge speaks over the finished picture and animates nothing. If the bridge needs a picture, say it with `self.say(line, anims…)` and call `self.chapter(...)` with no bridge.
 - **Plant what pays off later.** "Remember that; it matters when we reach the agents." Then pay it off by name.
 
 Connectives that carry flow: **So** (a consequence), **But** (a problem), **Now** (a new focus), **Back to** (a return), **Last** or **Finally** (the close). One question at a boundary is a bridge; several in a row is hype.
 
-## The ending: 20 to 40 seconds
+## The ending: four moves
+
+This is 20 to 40 seconds at 3 minutes and up (less for shorter videos, see the [length table](#when-the-time-is-short)).
 
 1. **The payoff.** Go back to the opening's situation and solve it on screen with what was built.
-2. **The callback.** Say the opening question again and answer it in one sentence: `self.outro(recap, narration, answer="…")` shows the question and your answer before the recap.
-3. **The recap.** "To recap." Then one sentence per chapter, in order, in the words of each chapter's takeaway. The bullets on screen are those sentences.
+2. **The callback.** Say the opening question again and answer it in one sentence: `self.outro(recap, narration, answer="…")` shows the question, then speaks and shows your answer, before the recap.
+3. **The recap.** "To recap." Then one sentence per chapter, in order, in the words of each chapter's takeaway. The bullets on screen are those sentences. Skip it when the length is short (about 1 minute): pass an empty list, `self.outro([], narration, answer="…")`, and the narration is still spoken.
 4. **Next.** In a playlist, the next episode's real title. In a single video, the next step: where it shows up, what to read, what to try (`next_label="READ"` or `"TRY"`).
 
 Do not end on a new fact, a bare list of uses, or "That is all X is."
 
 ## Pace
 
-- Plan about 150 words a minute overall. A line is usually 15 to 30 words (5 to 10 seconds). Keep lines under 10 words for emphasis only: a takeaway, a payoff.
+- Speech runs at 2.6 words a second (about 156 a minute). A line is usually 15 to 30 words (5 to 10 seconds). Keep lines under 10 words for emphasis only: a takeaway, a payoff.
 - Hold a picture across two to four lines and add to it, rather than replacing it on every line. Aim for a new scene every 20 to 40 seconds.
 - The kit leaves 0.7 seconds after every line. `self.beat()` adds a one-second silent hold: after the opening question, after each chapter's takeaway, after a surprising reveal, and before the recap. Use it at most twice a chapter.
+- The kit's own transitions cost time too. Read from `kit/episode.py`: the title card settles in 0.8 s; a silent chapter card is 1.8 s on screen plus 0.7 s to dock, and each sweep before it 0.55 s; the outro with an answer is 5 s (sweep 0.55, question fade 0.6, beat 1.0, sweep 0.55, final hold 1.5, fade 0.8). For a single video that is **about 6 s plus 3 s a chapter card**, plus 0.7 s a line and 1 s a beat. A chapter card with narration costs its words and about 2 s.
+- So: estimated total = words ÷ 2.6 + 0.7 × lines + beats + 6 + 3 × chapters, in seconds.
 - `steps()` finishes its last animation shortly before the line ends, so put the reveal that matters last in the list.
 - A chapter card is a breath. Leave its `narration` empty when the previous chapter ended on a bridge, or give it a signpost under eight words ("So, who found what?").
-- After the render, check the real pace: the words in `out/epNN_*.srt` divided by its length should be 145 to 165 a minute. Above 170, lower `speed` in `series.json` (0.9 is a good first step) and render again.
+- After the render, check the pace with two numbers. **Speech rate** is the words in `out/epNN_*.srt` divided by the sum of its cue durations: aim for 150 to 175 words a minute. Above 175, lower `speed` in `series.json` (0.9 first); below 140, raise it toward 1.0. **Overall rate** is the same words divided by the video's length. It is lower because of pauses, cards and beats: about 120 to 150 for long videos, lower for very short ones. If the video runs long, cut words or beats, not the pauses after lines.
 
 ## When the time is short
 
-Keep the frame and cut the body. The opening and the ending cost the same at any length; ideas are what you cut.
+Keep the frame and cut the body. The opening and the ending cost about the same at any length; ideas are what you cut. This table is the one source for length: other skills point here.
 
-| Length | Opening | Ending | Ideas (chapters) | Words |
-|---|---|---|---|---|
-| about 1 minute | 10 to 15 s | 10 to 15 s | 1 or 2 | 130 to 150 |
-| about 3 minutes | 15 to 20 s | 20 to 30 s | 3 | 420 to 470 |
-| 5 to 8 minutes | 15 to 25 s | 25 to 40 s | 5 to 7 | 750 to 1,150 |
+| Length | Opening | Ending | Ideas (chapters) | Spoken words | Total |
+|---|---|---|---|---|---|
+| about 1 minute | 10 to 15 s | 15 to 20 s, recap optional | 1 or 2 | 100 to 120 | 60 to 70 s |
+| about 3 minutes | 15 to 20 s | 20 to 30 s | 3 | 380 to 440 | 170 to 190 s |
+| 5 to 8 minutes | 15 to 25 s | 25 to 40 s | 5 to 7 | 750 to 1,150 | 5.5 to 8 min |
+
+The totals use the formula under [Pace](#pace), with lines of about 14 words at one minute and about 20 above. At one minute, skip the recap: the answer and the "Next" are the ending. Cards and pauses add real time, so count them before you trust a word target.
 
 Cut first: a second example, edge cases, growth and limits (make one of them the "Next"), and any term the question does not need. Never cut: the problem on screen, the payoff, the beat after the key reveal, the callback. Say in your report what you cut and where it went.
 
@@ -67,42 +75,46 @@ Answer each question in writing at the bottom of the script, as "yes" or the fix
 6. Is every chapter boundary a bridge (So, But, Now, a question), and does the next chapter answer it?
 7. Does the running example appear in every chapter, with the same names and values?
 8. Does the ending solve the opening situation on screen?
-9. Do the recap sentences match the chapters' takeaways, and the bullets match the voice?
+9. If there is a recap, do its sentences match the chapters' takeaways, and the bullets the voice?
 10. Is there a "Next"?
-11. Words ÷ target minutes is 130 to 160, no three lines in a row are under 10 words, and no chapter carries two ideas.
+11. Do the spoken words and the estimated total land in the table's row for the length asked, with no three lines in a row under 10 words and no chapter carrying two ideas?
 12. Is every claim a line in `FACTS.md`?
-13. Read the whole script aloud, or play it with a local voice. Where did you stumble, or lose the thread?
+13. Is every on-screen claim true at the numbers shown (sizes, counts, what the picture implies)?
+14. Read the whole script once, top to bottom, and mark where the thread drops or a line depends on something not yet shown. Its estimated length is words ÷ 2.6 seconds plus the kit overhead from [Pace](#pace).
 
-A fresh reader catches more than the writer. If your environment can hand work to a helper, give it only the script, `FACTS.md` and this list, and ask for written answers. Otherwise answer the list yourself after another task, not straight after writing. If you can ask the user, show them the script with the outline.
+A fresh reader catches more than the writer. If your environment can hand work to a helper, give it only the script, `FACTS.md` and this list, and ask for written answers. Otherwise write the outline-to-code mapping first (which kit helper and picture carries each line), then answer the list from it, not straight after drafting the lines. If you can ask the user, show them the script with the outline.
 
 ## A worked example: about one minute
 
-`episodes/ep01_hash_map.md`. 133 words, about 51 seconds of speech; with pauses, beats and cards, about 65 seconds.
+`episodes/ep01_binary_search.md`. 118 spoken words (the bridge and the answer included) in 10 lines: about 45 s of speech. With 0.7 s a line, 3 beats and the kit's overhead for 2 chapters (about 12 s), about 68 s in all.
 
-    OPENING  [cold open: a grid of fruit cards; a pointer checks them one by one, a counter climbs]
-    A thousand fruits and their stock counts. Checking them one by one to find kiwi
-    could take a thousand looks. (beat)
-    [title card, question: "How do you find one without checking them all?"]
-    Here is a way that takes about as long for a million fruits as for ten.
+    OPENING  [cold open: a phone book of a thousand pages, A to Z; a finger flips page after page, a counter climbs]
+    A phone book has a thousand pages. Finding a name by flipping could take a thousand
+    looks. (beat)
+    [title card, question: "How many looks to find one name in a thousand pages?"]
+    Here is how to count the looks yourself.
 
-    01 Compute where it lives  [card: silent]
-    [eight numbered buckets; apple → hash function → 2 → bucket 2]
-    Eight numbered buckets. A hash function turns a name into a bucket number: apple
-    becomes two, so apple goes in bucket two.
-    [apple? → hash function → 2, bucket 2 lights]
-    To find apple again, hash it again. Same name, same bucket, no search. That is a
-    hash map. (beat)
-    [bridge, over the finished picture: plum → hash function → 2]  But plum hashes to two as well.
+    01 Halve the pages  [card: silent]
+    [the book opens in the middle; the back half greys out: 1,000 pages → 500]
+    The names are in order, so one look at the middle rules out half the book.
+    [a second look in the front half: 500 → 250]
+    Look again in what is left. Every look halves what remains. (beat)
+    [bridge, over the finished picture of 1,000 · 500 · 250 pages; nothing new drawn]
+    But how many halvings does a thousand take?
 
-    02 Two keys, one bucket  [card: silent]
-    [bucket 2 grows a short list: apple, plum]
-    Bucket two keeps a short list, apple then plum. That is a collision, and the list
-    handles it. (beat)
+    02 Count the halvings  [card: silent]
+    [a bar halves ten times, 1,000 · 500 · 250 · 125 · 63 · 32 · 16 · 8 · 4 · 2 · 1 (rounded up); a counter reaches 10; 2¹⁰ = 1,024 appears]
+    Ten. Two to the tenth is one thousand twenty-four, so ten halvings leave one page.
+    [beside it, a million-page book and a counter that stops at 20; 2²⁰ = 1,048,576]
+    So a million pages need only twenty looks: two to the twentieth is about a million. (beat)
 
-    ENDING  [back to the grid of a thousand; it folds into the buckets; kiwi lights in one]
-    So, kiwi among a thousand: one hash, one short list. On average, that does not
-    grow with the count.
-    [answer card, then recap: "a hash function picks the bucket" · "a collision shares the bucket's list"; NEXT: when the lists grow long]
-    Python's dictionary works this way. Next: what happens when the lists grow long.
+    ENDING  [sweep; the thousand-page book again, ten marks halve it down to one page, the name lit]
+    Ten looks, not a thousand.
+    [outro(answer=…): the question, then the answer spoken and shown. No recap: outro([], …)]
+    About ten looks to find one name in a thousand pages: halve what remains.
+    [next plate: NEXT "Names keep being added"]
+    Next: what happens when names keep being added.
 
-What was cut for length, and where it went: growing and rehashing the table became the "Next".
+In code: `self.say` for the cold open with the counter, `self.intro("Here is how to count the looks yourself.", question="How many looks to find one name in a thousand pages?")`, two `self.chapter(...)` calls (the second with `bridge=`), a `self.say` for the payoff, and `self.outro([], "Next: what happens when names keep being added.", next_title="Names keep being added", answer="About ten looks to find one name in a thousand pages: halve what remains.")`.
+
+What was cut for length, and where it went: why the list must stay in order, and what adding names does to it, became the "Next". The recap was skipped.

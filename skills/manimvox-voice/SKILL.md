@@ -94,7 +94,7 @@ If a word is mispronounced, fix it in the voice, not in the text on screen.
 
 ## Speed
 
-System voices often speak faster than the default (about 190 words a minute against about 170). When you fall back to one, set `speed` to 0.9 in `series.json` and check the pace after the render.
+System voices often speak faster than the default (about 190 words a minute against about 170). Whenever you use one, chosen or as a fallback, check the speech rate after the render (words in the `.srt` divided by the sum of its cue durations; the check is in [narration](../manimvox-creative/references/narration.md#length)) and lower `speed` in `series.json` only if it is above 175 words a minute (0.9 first).
 
 `speed` in `series.json` is a number above 0, `1.0` by default. ElevenLabs accepts only 0.7 to 1.2 and stops the render outside it.
 

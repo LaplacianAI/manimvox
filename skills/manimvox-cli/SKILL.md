@@ -41,6 +41,7 @@ Ask the user before installing anything: a system package, manimvox itself, or a
 | `manimvox doctor` | none | nothing | 1 if any `FAIL` | `doctor` |
 | `manimvox new DIR` | `--series NAME` (required), `--tagline T`, `--voice E:V` | `DIR/` with `series.json`, `FACTS.md`, `SERIES.md`, `.gitignore`, `episodes/`, `out/`, `research/` | 1 if `DIR` already holds a project | `new_project` |
 | `manimvox draft EP` | `--every SECONDS` (default 5, above 0) | `sheets/<stem>/s_NN.png`, `build/<stem>/layout.json` | 1 on layout findings or a Manim error, 2 on a bad `--every` | `draft` |
+| `manimvox sheets EP` | `--every SECONDS` (default 5, above 0) | `sheets/<stem>/s_NN.png` from `out/<stem>.mp4`, else the last draft | 1 if there is no video yet, 2 on a bad `--every` | `contact_sheet` |
 | `manimvox render EP` | `--voice E:V`, `-y` / `--yes` | `out/<stem>.mp4`, `out/<stem>.srt` | 1 on a Manim error, a voice problem or `audio check: FAILED` | `render` |
 | `manimvox check theme` | none | nothing | 1 on any failure | `check` |
 | `manimvox check layout EP` | none | nothing | 1 on findings | `check` |

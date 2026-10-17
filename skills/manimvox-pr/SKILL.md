@@ -18,7 +18,7 @@ Copy this checklist and keep it current:
 - [ ] 4 Outline    3–4 chapters, idea + picture each; show the user
 - [ ] 5 Script     episodes/ep01_*.md: every line, critique answered; show the user
 - [ ] 6 Episode    episodes/ep01_*.py (manimvox-core); draft until every sheet is clean
-- [ ] 7 Final      manimvox render ep01; audio check ok; look at 4–6 frames
+- [ ] 7 Final      manimvox render ep01; audio check ok; manimvox sheets ep01; look at 4–6 frames
 - [ ] 8 Report     path, duration, chapters, script file and what was cut, unverifiable claims and their labels
 ```
 
@@ -84,7 +84,7 @@ Then loop: `manimvox draft ep01 --every 5`, read every contact sheet in `sheets/
 
 Run `manimvox render ep01`. This needs the narration voice. A model download needs the user's go-ahead (pass `--yes` or `-y` only after they have said yes to it), and so does an online voice. If the user cannot be asked, a needed download counts as the voice being unusable: use [manimvox-voice](../manimvox-voice/SKILL.md)'s local fallback (a local voice `manimvox voices` shows ready, named in the report), else stop and report. The render is done only when it prints `audio check: ok`. If a line is silent, reword it and render again.
 
-If you can view video or images, look at 4 to 6 moments of `out/ep01_<name>.mp4`, one from each chapter. Otherwise the draft's sheets and `manimvox check layout ep01` (which reads the last draft, not the final) are the check, and the report says the final's frames were not viewed.
+If you can view images, run `manimvox sheets ep01 --every 5` and read 4 to 6 moments of the final in `sheets/`, one from each chapter. Otherwise the draft's sheets and `manimvox check layout ep01` (which reads the last draft, not the final) are the check, and the report says the final's frames were not viewed.
 
 ## 8 Report
 

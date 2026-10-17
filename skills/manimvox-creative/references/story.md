@@ -4,7 +4,7 @@ Decide the shape before writing a scene. A video teaches one thing to one viewer
 
 ## The beats table
 
-For each video, write 5 to 7 chapters, each as one idea and the picture that carries it. Naming the picture stops a chapter from becoming a bullet list.
+For each video, write as many chapters as its length allows (see the [length table](script.md#when-the-time-is-short): 1 or 2 at a minute, 3 at three minutes, 5 to 7 for a 5 to 8 minute episode), each as one idea and the picture that carries it. Naming the picture stops a chapter from becoming a bullet list.
 
 | # | Idea | Picture |
 |---|---|---|
@@ -16,7 +16,7 @@ One idea per chapter. If a chapter needs "and", split it. Show the table to the 
 
 ## Paper
 
-Hook, claim, evidence, limits, takeaway, in 5 to 7 chapters.
+Hook, claim, evidence, limits, takeaway; 5 to 7 chapters for a full-length video, fewer for a short one.
 
 1. **Hook:** the problem the paper's field has, in terms a newcomer feels, and the question the video will answer.
 2. **Claim:** what the paper says it did, in one sentence the viewer could repeat.
@@ -33,7 +33,7 @@ A question that hooks, intuition built visually, the name, the formula last, whe
 1. **A question, with its problem on screen:** the obvious way, drawn, and where it is slow or wrong, before any term appears.
 2. **Build the intuition visually:** one example, moved step by step, until the viewer could guess the rule.
 3. **Name it:** only now give the term, defined in a phrase.
-4. **The formula last:** it should read as a summary of what the viewer already saw, written with Unicode in `T` or `code()`, never LaTeX.
+4. **The formula last** (for maths): it should read as a summary of what the viewer already saw, written with Unicode in `T` or `code()`, never LaTeX. A non-maths idea gets a one-line summary on screen instead, such as `bucket = hash(key)`; it may be shown without being spoken.
 5. **Back to the question:** solve the opening situation with the idea, on screen.
 6. **Where it shows up:** two or three places, so the idea is not left as a puzzle.
 
@@ -75,4 +75,4 @@ Thread one concrete scenario through the whole video or series, named identicall
 
 ## Chapters and pacing
 
-A video of 5 to 8 minutes has 5 to 7 chapters. Open each chapter on something concrete, not a recap, and end it on a takeaway and a bridge to the next (see [script](script.md)). Vary the kind of scene: a flow, a hub and spokes, a table lit row by row, a before and after, a zoom into one box, a sequence diagram, a graph drawn node by node. Carry an object from one scene into the next where it helps the viewer keep their place. How to build each scene is in [manimvox-core](../../manimvox-core/SKILL.md).
+A video of 5 to 8 minutes has 5 to 7 chapters; a shorter one has fewer (the [length table](script.md#when-the-time-is-short) is the one source). Open each chapter on something concrete, not a recap, and end it on a takeaway and a bridge to the next (see [script](script.md)). Vary the kind of scene: a flow, a hub and spokes, a table lit row by row, a before and after, a zoom into one box, a sequence diagram, a graph drawn node by node. Carry an object from one scene into the next where it helps the viewer keep their place. How to build each scene is in [manimvox-core](../../manimvox-core/SKILL.md).
