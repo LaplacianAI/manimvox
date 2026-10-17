@@ -196,7 +196,8 @@ def test_bound_prepare_voice_does_not_walk_up_to_an_enclosing_project(project):
 
 
 @pytest.mark.parametrize("name", ["render", "prepare_voice"])
-@pytest.mark.parametrize("voice", ["xtts:clone=/etc/hosts.wav", "xtts:clone=../x.wav", "xtts:clone=~/x.wav",
+@pytest.mark.parametrize("voice", ["xtts:clone=/etc/hosts.wav", "xtts: clone=/abs/outside.wav", "xtts:\tclone=~/x.wav",
+                                   " xtts : clone=../x.wav", "xtts:clone= /abs/outside.wav", "xtts:clone=../x.wav", "xtts:clone=~/x.wav",
                                    "piper:/etc/model.onnx"])
 def test_bound_voice_paths_must_be_inside(project, name, voice):
     fn = by_name(common.json_tools(project))[name]
@@ -212,3 +213,18 @@ def test_bound_voice_ids_and_inside_paths_pass_the_check(project, name):
     for voice in ("fake:tone", "kokoro:af_heart", "piper:en_US-amy-medium", "xtts:clone=refs/me.wav"):
         out = json.loads(fn(voice=voice, **args))
         assert "voice file must be inside" not in out.get("error", ""), voice
+
+
+def test_bound_new_project_refuses_a_voice_file_outside(tmp_path):
+    new = by_name(common.json_tools(tmp_path / "video"))["new_project"]
+    out = json.loads(new(series="S", voice="xtts: clone=/abs.wav"))
+    assert out["ok"] is False and "voice file must be inside" in out["error"]
+    assert not (tmp_path / "video" / "series.json").exists()
+
+
+def test_bound_join_treats_an_empty_output_as_none(project):
+    join = by_name(common.json_tools(project))["join"]
+    expected = json.loads(join())
+    for out in ("", "  "):
+        assert json.loads(join(output=out)) == expected
+    assert "no rendered episodes" in expected["error"]

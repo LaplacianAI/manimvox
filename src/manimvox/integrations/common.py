@@ -19,6 +19,7 @@ from pathlib import Path
 from .. import tools
 from ..project import SERIES_FILE, ProjectError, find_project
 from ..skills import SKILL_NAMES, read_frontmatter, skill_dirs, skills_path
+from ..voice.base import VoiceError, clone_path, parse_voice
 
 REPO = "git+https://github.com/LaplacianAI/manimvox"
 MAX_READ = 200_000  # characters a read returns; the rest is cut, with a note
@@ -71,12 +72,18 @@ def _confined(ref: str, root: Path) -> Path | None:
 
 
 def _voice_path(voice: str) -> str | None:
-    """The file a voice spec points at (xtts:clone=<path>, a piper .onnx), or None for a plain voice id."""
-    ref = voice.split(":", 1)[1] if ":" in voice else ""
-    ref = ref.removeprefix("clone=").strip()
+    """The file a voice spec points at (xtts clone=<path>, a piper .onnx), or None for a plain voice id.
+
+    The spec is read exactly as the engines read it (parse_voice, then clone_path), so it cannot be classified
+    differently here than where it is used. Raises VoiceError for a spec the engines would reject.
+    """
+    ref = parse_voice(voice).voice
+    cloned = clone_path(ref)
+    if cloned is not None:
+        return cloned or None
     looks_like_path = ("/" in ref or "\\" in ref or ref.startswith("~") or Path(ref).is_absolute()
                        or ref.lower().endswith(PATH_SUFFIXES))
-    return ref if ref and looks_like_path else None
+    return ref if looks_like_path else None
 
 
 def bound(fn: Callable, root: str | Path) -> Callable:
@@ -88,7 +95,7 @@ def bound(fn: Callable, root: str | Path) -> Callable:
     inside another project cannot reach that project. A refusal is a ToolError, or an "error: ..." string from a
     function that returns text.
 
-    What is not confined: paths written inside series.json (episode files, post.music) and the episode Python that
+    What is not confined: paths written inside series.json (episode files, post.music, voice) and the episode Python that
     render and draft run. That is the project's own content, and it runs with the user's permissions.
     """
     root = Path(root).expanduser().resolve()
@@ -106,13 +113,18 @@ def bound(fn: Callable, root: str | Path) -> Callable:
         given = new_sig.bind(*args, **kwargs).arguments
         if "project" in pinned and fn.__name__ not in NO_PROJECT_YET and not (root / SERIES_FILE).is_file():
             return refuse(f"no project in {root} yet (no {SERIES_FILE}): create it with new_project")
+        if isinstance(given.get("output"), str) and not given["output"].strip():
+            del given["output"]  # an empty string means "no output": the tool's default
         if given.get("output") is not None:
             out = _confined(given["output"], root)
             if out is None:
                 return refuse(f"the output must be inside the project folder {root}")
             given["output"] = str(out)  # the checked path, so the tool cannot read it any other way
         if given.get("voice"):
-            ref = _voice_path(given["voice"])
+            try:
+                ref = _voice_path(given["voice"])
+            except VoiceError as e:
+                return refuse(str(e))
             if ref is not None and _confined(ref, root) is None:
                 return refuse(f"the voice file must be inside the project folder {root}")
         return fn(**given, **{n: str(root) for n in pinned})
