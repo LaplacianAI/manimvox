@@ -80,12 +80,18 @@ def test_deep_agent_kwargs(tmp_path):
     kw = deep_agent_kwargs(tmp_path / "video")
     assert (tmp_path / "video").is_dir() and kw["skills"] == [SKILLS_ROUTE]
     assert str((tmp_path / "video").resolve()) in kw["system_prompt"]
-    assert {t.name for t in kw["tools"]} == TOOL_NAMES and kw["permissions"]
+    assert {t.name for t in kw["tools"]} == TOOL_NAMES
+    (rule,) = kw["permissions"]
+    assert (rule.operations, rule.paths, rule.mode) == (["write"], [f"{SKILLS_ROUTE}**"], "deny")
+    assert rule.paths == ["/skills/**"]
 
 
-def test_pydantic_ai_toolset():
+@pytest.mark.filterwarnings("ignore::DeprecationWarning:pydantic_graph")
+def test_pydantic_ai_toolset(tmp_path):
     pytest.importorskip("pydantic_ai")
     from pydantic_ai import Agent
+    from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart, ToolReturnPart
+    from pydantic_ai.models.function import FunctionModel
     from pydantic_ai.models.test import TestModel
 
     from manimvox.integrations.pydantic_ai import manimvox_instructions, manimvox_toolset
@@ -96,8 +102,18 @@ def test_pydantic_ai_toolset():
     agent = Agent(TestModel(call_tools=["list_blocks"]), toolsets=[ts], instructions=manimvox_instructions())
     assert "bar-ranking" in agent.run_sync("list the blocks").output
 
+    def call_check_then_echo(messages, info):
+        last = messages[-1].parts[-1]
+        if isinstance(last, ToolReturnPart):
+            return ModelResponse(parts=[TextPart(last.content)])
+        return ModelResponse(parts=[ToolCallPart("check", {"project": str(tmp_path), "what": "theme"})])
 
-def test_openai_agents_tools():
+    out = Agent(FunctionModel(call_check_then_echo), toolsets=[ts]).run_sync("check it").output
+    err = json.loads(out)
+    assert err["ok"] is False and "series.json" in err["error"]
+
+
+def test_openai_agents_tools(tmp_path):
     pytest.importorskip("agents")
     from agents import Agent
     from agents.tool_context import ToolContext
@@ -111,3 +127,7 @@ def test_openai_agents_tools():
     args = json.dumps({"skill": "manimvox-cli"})
     ctx = ToolContext(context=None, tool_name="read_skill", tool_call_id="1", tool_arguments=args)
     assert asyncio.run(ts["read_skill"].on_invoke_tool(ctx, args)).startswith("---\nname: manimvox-cli")
+    cargs = json.dumps({"project": str(tmp_path), "what": "theme"})
+    cctx = ToolContext(context=None, tool_name="check", tool_call_id="2", tool_arguments=cargs)
+    err = json.loads(asyncio.run(ts["check"].on_invoke_tool(cctx, cargs)))
+    assert err["ok"] is False and "series.json" in err["error"]
