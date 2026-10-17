@@ -23,8 +23,9 @@ def text_of(content):
 
 
 def test_every_framework_has_an_example():
-    assert sorted(p.stem for p in EXAMPLES.glob("*.py")) == ["agno_agent", "deep_agent", "openai_agent",
-                                                              "pydantic_ai_agent"]
+    assert sorted(p.stem for p in EXAMPLES.glob("*.py")) == [
+        "adk_agent", "agno_agent", "crewai_agent", "deep_agent", "haystack_agent", "llamaindex_agent",
+        "openai_agent", "pydantic_ai_agent"]
 
 
 def test_agno_example_loads_skills_and_tools(tmp_path):
@@ -108,3 +109,48 @@ def test_openai_agents_example_loads_skills_and_tools(tmp_path):
     agent = load("openai_agent").build(tmp_path / "video")
     assert {"draft", "read_skill", "write_project_file"} <= {t.name for t in agent.tools}
     assert "- manimvox-cli: " in agent.instructions and str((tmp_path / "video").resolve()) in agent.instructions
+
+
+def test_crewai_example_loads_skills_and_tools(tmp_path, monkeypatch):
+    pytest.importorskip("crewai")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+    agent = load("crewai_agent").build(tmp_path / "video")
+    assert "manimvox-cli" in {s.name for s in agent.skills}
+    assert {"draft", "render", "write_project_file"} <= {t.name for t in agent.tools}
+    assert str((tmp_path / "video").resolve()) in agent.backstory
+
+
+def test_llamaindex_example_loads_skills_and_tools(tmp_path):
+    pytest.importorskip("llama_index.core")
+    from llama_index.core.llms import MockLLM
+
+    agent = load("llamaindex_agent").build(tmp_path / "video", MockLLM())
+    assert {"draft", "read_skill", "write_project_file"} <= {t.metadata.name for t in agent.tools}
+    assert "- manimvox-cli: " in agent.system_prompt and str((tmp_path / "video").resolve()) in agent.system_prompt
+
+
+def test_haystack_example_loads_skills_and_tools(tmp_path, monkeypatch):
+    pytest.importorskip("haystack")
+    monkeypatch.setenv("HAYSTACK_TELEMETRY_ENABLED", "False")
+    from haystack.components.generators.chat import MockChatGenerator
+    from haystack.dataclasses import ChatMessage, ToolCall
+
+    call = ToolCall(tool_name="load_skill", arguments={"name": "manimvox"})
+    gen = MockChatGenerator(responses=[ChatMessage.from_assistant(tool_calls=[call]), "done"])
+    agent = load("haystack_agent").build(tmp_path / "video", gen)
+    result = agent.run(messages=[ChatMessage.from_user("go")])
+    assert any(m.tool_call_result and "manimvox: narrated explainer videos" in m.tool_call_result.result
+               for m in result["messages"])  # the router skill's heading
+    system = result["messages"][0].text or ""
+    assert str((tmp_path / "video").resolve()) in system
+
+
+def test_adk_example_loads_skills_and_tools(tmp_path):
+    pytest.importorskip("google.adk")
+    from google.adk.tools.skill_toolset import SkillToolset
+
+    agent = load("adk_agent").build(tmp_path / "video")
+    names = {t.name for t in agent.tools if not isinstance(t, SkillToolset)}
+    assert {"draft", "render", "write_project_file"} <= names
+    assert any(isinstance(t, SkillToolset) for t in agent.tools)
+    assert str((tmp_path / "video").resolve()) in agent.instruction
