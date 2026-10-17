@@ -26,9 +26,9 @@ MAX_READ = 200_000  # characters a read returns; the rest is cut, with a note
 SKIP = {"build", "media", ".manimvox", "__pycache__", ".git"}  # renders, caches and history, never worth listing
 INSTRUCTIONS = (
     "The manimvox tools make narrated explainer videos. Where a skill says to run `manimvox <command>`, call the "
-    "tool the manimvox-cli skill names for that command. Every tool "
-    "returns JSON with `ok`. `ok: false` with `error` means the tool could not run: do what the error says, then "
-    "call it again. `ok: false` without `error` is a failed check: fix its findings and run that step again. "
+    "tool the manimvox-cli skill names for that command. Every manimvox tool "
+    "returns JSON with `ok` (the file tools and read_skill return plain text, and `error: ...` on failure). "
+    "`ok: false` with `error` means the tool could not run: do what the error says, then call it again. `ok: false` without `error` is a failed check: fix its findings and run that step again. "
     "Pass allow_download=true only after the user has agreed to that download."
 )
 
@@ -66,7 +66,10 @@ PATH_SUFFIXES = (".wav", ".onnx")
 
 def _confined(ref: str, root: Path) -> Path | None:
     """The absolute path ref names, resolved as the tools do (~ expanded, relative to root), or None if outside root."""
-    p = Path(ref).expanduser()
+    try:
+        p = Path(ref).expanduser()
+    except RuntimeError:  # ~name for a user that does not exist
+        return None
     p = (p if p.is_absolute() else root / p).resolve()
     return p if p.is_relative_to(root) else None
 
@@ -225,6 +228,8 @@ def list_project_files(project: str, folder: str = ".") -> str:
     """
     try:
         root, base = _inside(project, folder)
+        if not base.is_dir():
+            return f"error: no folder {folder} in the project"
         rows = sorted(p.relative_to(root).as_posix() for p in base.rglob("*")
                       if p.is_file() and not SKIP & set(p.relative_to(root).parts))
     except (ProjectError, ValueError, OSError) as e:

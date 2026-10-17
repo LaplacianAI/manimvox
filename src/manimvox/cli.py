@@ -118,6 +118,7 @@ def _cmd_voices(args) -> int:
     print("voices of one engine: manimvox voices <engine>")
     return 0
 
+
 def _cmd_doctor(args) -> int:
     from .tools import doctor
 

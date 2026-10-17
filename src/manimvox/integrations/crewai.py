@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 from .common import arg_docs, args_model, file_tools, json_tools, missing
@@ -16,7 +17,8 @@ from .common import arg_docs, args_model, file_tools, json_tools, missing
 try:
     from crewai.tools.base_tool import Tool
 except ImportError as e:
-    raise missing("crewai", "crewai") from e
+    raise ImportError(f"{missing('crewai', 'crewai')}. CrewAI supports Python below 3.14 only: on 3.14 the extra "
+                      f"installs nothing (this is Python {sys.version_info.major}.{sys.version_info.minor})") from e
 
 
 def manimvox_tools(project: str | Path, files: bool = True) -> list[Tool]:

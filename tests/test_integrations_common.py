@@ -207,7 +207,17 @@ def test_bound_voice_paths_must_be_inside(project, name, voice):
 
 
 @pytest.mark.parametrize("name", ["render", "prepare_voice"])
-def test_bound_voice_ids_and_inside_paths_pass_the_check(project, name):
+def test_bound_voice_ids_and_inside_paths_pass_the_check(project, name, monkeypatch):
+    from manimvox.runner import RenderError
+    from manimvox.voice import engine_names, get_engine
+
+    def stop(*a, **k):
+        raise RenderError("stub: the voice check passed")
+
+    monkeypatch.delenv("MANIMVOX_ASSUME_YES", raising=False)  # no download, whatever the shell exports
+    for engine in engine_names():
+        monkeypatch.setattr(type(get_engine(engine)), "prepare", lambda self, voice, confirm, root: None)
+    monkeypatch.setattr("manimvox.runner.render_episode", stop)  # no real render either
     fn = by_name(common.json_tools(project))[name]
     args = {"episode": "ep01"} if name == "render" else {}
     for voice in ("fake:tone", "kokoro:af_heart", "piper:en_US-amy-medium", "xtts:clone=refs/me.wav"):
@@ -225,6 +235,21 @@ def test_a_stem_with_dots_and_slashes_cannot_make_a_bound_tool_write_outside(pro
     out = json.loads(by_name(common.json_tools(project))["contact_sheet"](episode="ep/../../../elsewhere/clip"))
     assert out["ok"] is False and "episode stem" in out["error"]
     assert {p.relative_to(tmp_path) for p in tmp_path.rglob("*")} == before
+
+
+def test_an_unknown_user_in_a_path_is_refused_not_a_crash(project):
+    t = by_name(common.json_tools(project))
+    out = json.loads(t["join"](output="~nosuchuser_xyz/film.mp4"))
+    assert out["ok"] is False and "inside the project" in out["error"]
+    out = json.loads(t["prepare_voice"](voice="xtts:clone=~nosuchuser_xyz/me.wav"))
+    assert out["ok"] is False and "voice file must be inside" in out["error"]
+
+
+def test_listing_a_missing_folder_or_a_file_is_an_error(project):
+    ls = by_name(common.file_tools(project))["list_project_files"]
+    assert ls(folder="nowhere").startswith("error: no folder nowhere in the project")
+    assert ls(folder="series.json").startswith("error: no folder series.json in the project")
+    assert "series.json" in ls()
 
 
 def test_bound_new_project_refuses_a_voice_file_outside(tmp_path):
