@@ -6,9 +6,9 @@ a URL. A video says only what is here.
 
 Labels:
 
-- **[SOURCE]** stated by the source being explained
-- **[BUILT]** exists in the code today
-- **[DESIGN]** decided in a design document, not built: say "designed", never "shipped"
+- **[SOURCE]** stated by the source being explained: for a concept or paper video, the citation (URL, or book with chapter and page)
+- **[BUILT]** exists in the code today: for a codebase, with `path:line`
+- **[DESIGN]** decided in a design document, not built: say "designed", never "shipped"; with `path:line`
 - **[OPEN]** explicitly undecided: show it as open
 - **[EXTERNAL]** from outside the subject (another paper, another product's docs): label it on screen
 

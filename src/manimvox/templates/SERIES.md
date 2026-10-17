@@ -4,6 +4,14 @@ The contract every episode is written against. An episode author reads this,
 `FACTS.md`, the kit, and nothing else of the series, so whatever an episode
 must know about its neighbours is written here.
 
+## The question
+
+Question: <!-- one sentence the video answers, in the viewer's words -->
+
+Situation that shows it: <!-- the concrete case where the obvious way is slow, wrong or impossible -->
+
+(A single video fills these two and the viewer, theme and running example; the ladder and episode beats below are for a series.)
+
 ## The viewer
 
 <!-- One concrete person. What they already know, what they do not. Example:
@@ -17,13 +25,13 @@ set in `series.json` → `theme`. Domain colours used by the product itself:
 <!-- e.g. Agent = AGENT (blue), as on the dashboard's Graph page -->. Keep each
 entity's colour fixed across every episode.
 
-## The ladder
+## The ladder (for a series)
 
 | # | File | Title | Level | Teaches | Assumes |
 |---|---|---|---|---|---|
 | 1 | `ep01_*.py` | | Beginner | | nothing |
 
-## Episode beats
+## Episode beats (for a series)
 
 ### 1 · <!-- title -->
 
