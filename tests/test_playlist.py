@@ -24,7 +24,7 @@ def project(tmp_path, monkeypatch):
                                blurb="Says </script> hello")
     (d / "series.json").write_text(json.dumps(data), encoding="utf-8")
     (d / "out").mkdir(exist_ok=True)
-    make_mp4(d / "out" / "ep01_hello.mp4", 2.0)
+    make_mp4(d / "out" / "ep01_hello.mp4", 2.0, fps=30, rate=48000, layout="stereo")
     (d / "out" / "ep01_hello.srt").write_text(SRT, encoding="utf-8")
     (d / "FACTS.md").write_text("# facts\n", encoding="utf-8")
     monkeypatch.chdir(d)
@@ -57,7 +57,7 @@ def test_index_without_renders_is_an_error(project, capsys):
 
 
 def test_transcode_720(tmp_path):
-    src = make_mp4(tmp_path / "a.mp4", 2.0, size=(1920, 1080), rate=48000)
+    src = make_mp4(tmp_path / "a.mp4", 2.0, size=(1920, 1080), fps=30, rate=48000, layout="stereo")
     transcode_720(src, tmp_path / "b.mp4")
     with av.open(str(tmp_path / "b.mp4")) as c:
         assert c.streams.video[0].height == 720 and c.streams.video[0].width == 1280
