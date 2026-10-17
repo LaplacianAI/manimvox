@@ -15,7 +15,7 @@ Run `manimvox add --list`. Each line is a block's name, what it draws, and its t
 | Block | Draws |
 |---|---|
 | `venn` | two overlapping circles with a count in each region |
-| `bar-ranking` | horizontal bars ranked by value, leaders highlighted, a threshold line |
+| `bar-ranking` | horizontal bars ranked by value, leaders highlighted; `value_x` places a threshold line |
 | `line-by-level` | a line chart over named steps (effort levels, versions, weeks) |
 | `log-scatter` | labelled points on a log-scale x axis (cost, size, time) |
 | `bug-grid` | one square per item, a slice lit as they are counted |

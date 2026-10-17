@@ -178,7 +178,7 @@ Then ask your agent: "make an explainer video of <paper / repo / idea / PR>".
 | `manimvox voices [ENGINE]` | Engines with status and licence, or the voices of one engine |
 | `manimvox voices --prepare ENGINE[:VOICE] [--yes]` | Download and check a voice ahead of a render |
 | `manimvox add [BLOCK ...] [--list] [--force]` | Copy a scene block into the project's `blocks/` folder |
-| `manimvox join [EP ...] [-o OUT.mp4] [--no-cards]` | Join rendered episodes into one video with a title card and an end card |
+| `manimvox join [EP ...] [-o OUT.mp4] [--no-cards]` | Join rendered episodes into one video with a title card (each episode keeps its own end card) |
 | `manimvox doctor` | System libraries, fonts and voice engines |
 
 `EP` can be written `ep01`, `1`, or the episode's file stem. Commands exit non-zero on any failed check. Without a terminal, manimvox never prompts: pass `--yes` (or set `MANIMVOX_ASSUME_YES=1`) to allow downloads.
@@ -247,7 +247,7 @@ Install the `matplotlib` or `plotly` extra for them (see the extras table). Plot
 "post": {"music": "music/bed.mp3", "music_db": -16, "duck_db": -12, "captions": "burn", "end_card": ["Sources: FACTS.md"], "card_seconds": 3}
 ```
 
-`music` is a file you provide; it loops under the narration and dips by `duck_db` while someone speaks. `captions` is `"srt"` (default) or `"burn"`. `end_card` is up to 4 lines. `manimvox join` then makes one video of the rendered episodes.
+`music` is a file you provide; it loops under the narration and dips by `duck_db` while someone speaks. `captions` is `"srt"` (default) or `"burn"`. `end_card` is up to 4 lines. `manimvox join` then makes one video of the rendered episodes: a title card, then each episode with its own end card.
 
 ## Configuration
 

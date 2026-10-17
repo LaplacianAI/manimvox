@@ -2,7 +2,7 @@
 from manimvox.kit import *
 
 
-def sequence_diagram(actors, messages, top=2.1, bottom=-3.1, width=11.0, colors=None, size=15):
+def sequence_diagram(actors, messages, top=2.1, bottom=-3.1, width=10.6, colors=None, size=15):
     """`actors` are column names, left to right, spread across `width`. `messages` are (from, to, label) or
     (from, to, label, "reply"), naming actors as in `actors`; replies are dashed and muted. Returns a VGroup
     with .lifelines (one per actor) and .messages (in order, to reveal one at a time).

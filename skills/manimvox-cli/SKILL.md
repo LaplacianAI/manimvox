@@ -47,7 +47,7 @@ Ask the user before installing anything: a system package, manimvox itself, or a
 | `manimvox check audio EP` | none | nothing | 1 if a line is silent |
 | `manimvox voices [ENGINE]` | `--prepare ENGINE[:VOICE]`, `-y` | model files in the cache | 1 on a voice error |
 | `manimvox add [BLOCK ...]` | `--list`, `--force` | `blocks/<block>.py`, `blocks/__init__.py` | 1 on an unknown block or one already in the project without `--force` |
-| `manimvox join [EP ...]` | `-o OUT.mp4`, `--no-cards` | `out/<Series>.mp4` and `.srt` (title card, the episodes in order, end card) | 1 if an episode is not rendered or the frame rates differ |
+| `manimvox join [EP ...]` | `-o OUT.mp4`, `--no-cards` | `out/<Series>.mp4` and `.srt` (title card, then the episodes in order, each with its own end card) | 1 if an episode is not rendered or the frame rates differ |
 | `manimvox index` | none | `out/index.html` | 1 on error |
 | `manimvox package` | none | `share/<Name>/`, `share/<Name>-720p/` and a zip of each | 1 on error |
 | `manimvox skills install\|check\|update\|remove` | see [Skills in your agents](#skills-in-your-agents) | the skill folders of your coding agents | 1 on a problem, 2 with no terminal and no flag |
@@ -120,7 +120,7 @@ Flags by subcommand: `install` takes `--agent ID` (repeatable), `--global` or `-
 | `out/` | finished `.mp4` and `.srt`, and `index.html` |
 | `blocks/` | blocks copied by `manimvox add`, owned by the project |
 | `sheets/` | contact sheets from drafts |
-| `build/` | Manim's working files and the layout report (safe to delete) |
+| `build/` | Manim's working files and the layout report (safe to delete; `check audio` needs it when `post.music` is set) |
 | `.manimvox/tts` | cached narration audio |
 | `share/` | packages from `manimvox package` |
 

@@ -107,7 +107,7 @@ If a word is mispronounced, fix it in the voice, not in the text on screen.
 ```
 
 - `music` is a file in the project. It loops or is cut to the episode, fades in and out, and dips `duck_db` under every narration line. `music_db` (default -16) is its level; `duck_db` (default -12) is the extra cut while someone speaks. Both are numbers from -60 to 0.
-- `captions` is `"srt"` (the default, ship the `.srt` only) or `"burn"` (draw the subtitles into the picture as well). Burned captions cover the bottom of the stage, so keep notes clear of it or ship the `.srt` only.
+- `captions` is `"srt"` (the default, ship the `.srt` only) or `"burn"` (draw the subtitles into the picture as well). Burned captions cover the bottom of the stage, so keep notes clear of it or ship the `.srt` only. Burned captions are drawn without complex-script shaping; for Arabic, CJK or other complex scripts ship the `.srt` instead.
 - `end_card` adds up to 4 lines (80 characters each) on a closing card; a single string is accepted. `card_seconds` (default 3, from 1 to 10) is how long it shows.
 
 **Music rights.** manimvox ships no music and never downloads any. Use only a file the user provides and has the right to use; ask before fetching any music. With no way to ask, render without music.
