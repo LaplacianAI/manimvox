@@ -10,11 +10,11 @@
       "files": 3
     },
     "manimvox-blocks": {
-      "sha256": "b0b1ddee2126b85c74d7205328c7db364127f90f8b3eb60a4b6ec9d111e4ded3",
+      "sha256": "16359844a17d9397d82e6c578f35c138708293e146e8de2bd64f62cc02135f12",
       "files": 2
     },
     "manimvox-cli": {
-      "sha256": "7ed5197d8b8edda5f806609f0fd8a7edfd0432137350bff9019a29e3d689be6b",
+      "sha256": "e7dc74f60d565ac0b70aa847abdc3675d85b08b731134012f8a19747f36e7202",
       "files": 1
     },
     "manimvox-concept": {
@@ -42,7 +42,7 @@
       "files": 1
     },
     "manimvox-voice": {
-      "sha256": "634827586b3cc23450b6c73674b310b6e9f0fa944ef74bbee8e6fbd3d9ed26f0",
+      "sha256": "14773f9ab33aa28b475f36d04af835116b51599812b6905c458eedbca047ede4",
       "files": 1
     }
   }
