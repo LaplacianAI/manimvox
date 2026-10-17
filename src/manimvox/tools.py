@@ -9,6 +9,7 @@ whose message says what to do first. Nothing here prompts: a download goes ahead
 from __future__ import annotations
 
 import functools
+import os
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -195,3 +196,166 @@ def contact_sheet(project: str, episode: str, every: float = 5.0) -> SheetsResul
         raise ProjectError(f"no video of {ep.stem} yet: draft it first (manimvox draft {ep.stem}, tool: draft)")
     sheets = contact_sheets(video, pr.sheets_dir / ep.stem, every=every)
     return SheetsResult(True, str(video), [str(s) for s in sheets])
+
+
+@dataclass(frozen=True)
+class RenderResult:
+    ok: bool
+    video: str
+    subtitles: str
+    voice: str
+    audio: str  # the audio check's report: "audio check: ok  (N lines, all audible)" or FAILED with each silent line
+    notes: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class EngineInfo:
+    name: str
+    ready: bool
+    detail: str
+    licence: str
+    online: str  # the service that receives the narration text; "" when nothing leaves the machine
+    noncommercial: bool
+
+
+@dataclass(frozen=True)
+class VoiceInfo:
+    voice: str
+    description: str
+
+
+@dataclass(frozen=True)
+class VoicesResult:
+    ok: bool
+    engines: list[EngineInfo] = field(default_factory=list)
+    voices: list[VoiceInfo] = field(default_factory=list)
+    notes: list[str] = field(default_factory=list)
+
+
+@dataclass(frozen=True)
+class PrepareResult:
+    ok: bool
+    voice: str
+
+
+def _consent(allow: bool) -> Callable[[str], bool]:
+    """A confirm that never prompts: yes only when the caller allowed it, or MANIMVOX_ASSUME_YES=1."""
+    return lambda _prompt: allow or os.environ.get("MANIMVOX_ASSUME_YES") == "1"
+
+
+def _render(project: str, episode: str, voice: str | None, confirm: Callable[[str], bool],
+            say: Say | None) -> RenderResult:
+    import shutil
+
+    from . import runner
+    from .checks.audio import check_audio
+    from .voice import get_engine, resolve_voice
+
+    notes: list[str] = []
+
+    def note(line: str) -> None:
+        notes.append(line)
+        if say:
+            say(line)
+
+    pr = _open(project)
+    ep = pr.episode(episode)
+    spec = resolve_voice(voice, pr.voice, os.environ)
+    eng = get_engine(spec.engine)
+    eng.prepare(spec.voice, confirm, pr.root)
+    if eng.online:
+        note(f"note: narration text is sent to {eng.online} ({spec})")
+    if eng.noncommercial:
+        note(f"note: {spec.engine} is for non-commercial use only: {eng.licence}")
+    out = pr.out_dir / f"{ep.stem}.mp4"
+    srt = pr.out_dir / f"{ep.stem}.srt"
+    if pr.post.music is not None and not (pr.root / pr.post.music).is_file():
+        from .post.options import PostError
+
+        raise PostError(f"post.music: no file at {pr.root / pr.post.music}")  # before a long render, not after
+    out.unlink(missing_ok=True)
+    srt.unlink(missing_ok=True)
+    built = runner.render_episode(pr, ep, "final", spec)
+    pr.out_dir.mkdir(parents=True, exist_ok=True)
+    rep = check_audio(built, srt)  # the narration alone: a music bed would hide a silent line
+    if pr.post.active and rep.ok:
+        from .checks.audio import read_cues
+        from .kit.theme import Theme
+        from .post.finish import finish
+
+        steps = [n for n, on in (("music", pr.post.music is not None), ("captions", pr.post.captions == "burn"),
+                                 ("end card", bool(pr.post.end_card))) if on]
+        note(f"post: finishing ({', '.join(steps)}) ...")  # the re-encode takes minutes on a long episode
+        for line in finish(built, out, read_cues(srt), pr.post, Theme.from_dict(pr.theme), pr.root):
+            note(f"post: {line}")
+    else:
+        shutil.copy2(built, out)
+        if pr.post.active:
+            note("post: skipped until the audio check passes")
+    return RenderResult(rep.ok, str(out), str(srt), str(spec), str(rep), notes)
+
+
+@_tool
+def render(project: str, episode: str, voice: str | None = None, allow_download: bool = False) -> RenderResult:
+    """Render the final 1080p episode with the voice, apply series.json post, and run the audio check; takes minutes.
+
+    Args:
+        project: The project folder, or any folder inside it.
+        episode: The episode as listed in series.json: ep01, 1, or its file stem.
+        voice: engine:voice for this render; by default series.json's voice, then MANIMVOX_VOICE, then kokoro:af_heart.
+        allow_download: True only when the user has agreed to download the voice model if it is missing.
+    """
+    return _render(project, episode, voice, _consent(allow_download), None)
+
+
+@_tool
+def voices(engine: str | None = None) -> VoicesResult:
+    """List the voice engines (ready or not, licence, whether narration text leaves the machine), or one engine's voices.
+
+    Args:
+        engine: An engine name such as kokoro, to list its voices; leave it out to list the engines.
+    """
+    from .voice import engine_names, get_engine
+
+    if engine:
+        eng = get_engine(engine.strip().lower())
+        rows = [VoiceInfo(v, d) for v, d in eng.describe_voices()]
+        notes = [] if rows else [f"{eng.name}: no voices listed ({eng.status().detail})"]
+        return VoicesResult(True, voices=rows, notes=notes)
+    infos = []
+    for name in engine_names():
+        e = get_engine(name)
+        st = e.status()
+        infos.append(EngineInfo(name, st.ready, st.detail, e.licence, e.online, e.noncommercial))
+    return VoicesResult(True, engines=infos)
+
+
+def _prepare_voice(voice: str, project: str | None, confirm: Callable[[str], bool]) -> PrepareResult:
+    from .project import ProjectError, find_project
+    from .voice import get_engine, parse_voice
+
+    if ":" in voice:
+        spec = parse_voice(voice)
+        eng, name = get_engine(spec.engine), spec.voice
+    else:
+        eng = get_engine(voice.strip().lower())
+        name = eng.default_voice
+    start = Path(project).expanduser() if project else Path.cwd()
+    try:
+        root = find_project(start)
+    except ProjectError:
+        root = start.resolve()
+    eng.prepare(name, confirm, root)
+    return PrepareResult(True, f"{eng.name}:{name}")
+
+
+@_tool
+def prepare_voice(voice: str, project: str | None = None, allow_download: bool = False) -> PrepareResult:
+    """Get a voice engine, or one of its voices, ready to render: checks the voice and fetches a missing model.
+
+    Args:
+        voice: An engine (kokoro) or engine:voice (kokoro:af_heart).
+        project: The project folder, where a cloning voice's reference recording is found.
+        allow_download: True only when the user has agreed to download the model.
+    """
+    return _prepare_voice(voice, project, _consent(allow_download))

@@ -51,51 +51,12 @@ def _cmd_draft(args) -> int:
 
 
 def _cmd_render(args) -> int:
-    import os
-    import shutil
+    from .tools import _render
 
-    from .checks.audio import check_audio
-    from .runner import render_episode
-    from .voice import get_engine, resolve_voice
-
-    pr = _project()
-    ep = pr.episode(args.episode)
-    spec = resolve_voice(args.voice, pr.voice, os.environ)
-    eng = get_engine(spec.engine)
-    eng.prepare(spec.voice, _confirm(args), pr.root)
-    if eng.online:
-        print(f"note: narration text is sent to {eng.online} ({spec})")
-    if eng.noncommercial:
-        print(f"note: {spec.engine} is for non-commercial use only: {eng.licence}")
-    out = pr.out_dir / f"{ep.stem}.mp4"
-    srt = pr.out_dir / f"{ep.stem}.srt"
-    if pr.post.music is not None and not (pr.root / pr.post.music).is_file():
-        from .post.options import PostError
-
-        raise PostError(f"post.music: no file at {pr.root / pr.post.music}")  # before a long render, not after
-    out.unlink(missing_ok=True)
-    srt.unlink(missing_ok=True)
-    built = render_episode(pr, ep, "final", spec)
-    pr.out_dir.mkdir(parents=True, exist_ok=True)
-    rep = check_audio(built, srt)  # the narration alone: a music bed would hide a silent line
-    if pr.post.active and rep.ok:
-        from .checks.audio import read_cues
-        from .kit.theme import Theme
-        from .post.finish import finish
-
-        steps = [n for n, on in (("music", pr.post.music is not None), ("captions", pr.post.captions == "burn"),
-                                 ("end card", bool(pr.post.end_card))) if on]
-        print(f"post: finishing ({', '.join(steps)}) ...")  # the re-encode takes minutes on a long episode
-        for line in finish(built, out, read_cues(srt), pr.post, Theme.from_dict(pr.theme), pr.root):
-            print(f"post: {line}")
-    else:
-        shutil.copy2(built, out)
-        if pr.post.active:
-            print("post: skipped until the audio check passes")
-    print(f"final: {out}  (voice {spec})")
-    print(rep)
-    return 0 if rep.ok else 1
-
+    r = _render(str(Path.cwd()), args.episode, args.voice, _confirm(args), print)
+    print(f"final: {r.video}  (voice {r.voice})")
+    print(r.audio)
+    return 0 if r.ok else 1
 
 def _cmd_check(args) -> int:
     from .tools import check
@@ -176,40 +137,22 @@ def _cmd_add(args) -> int:
 
 
 def _cmd_voices(args) -> int:
-    from pathlib import Path
-
-    from .project import ProjectError, find_project
-    from .voice import engine_names, get_engine, parse_voice
+    from .tools import _prepare_voice, voices
 
     if args.prepare:
-        p = args.prepare
-        if ":" in p:
-            spec = parse_voice(p)
-            eng = get_engine(spec.engine)
-            voice = spec.voice
-        else:
-            eng = get_engine(p.strip().lower())
-            voice = eng.default_voice
-        try:
-            root = find_project(Path.cwd())
-        except ProjectError:
-            root = Path.cwd()
-        eng.prepare(voice, _confirm(args), root)
-        print(f"ready: {eng.name}:{voice}")
+        r = _prepare_voice(args.prepare, None, _confirm(args))
+        print(f"ready: {r.voice}")
         if not args.engine:
             return 0
     if args.engine:
-        eng = get_engine(args.engine.strip().lower())
-        rows = eng.describe_voices()
-        if not rows:
-            print(f"{eng.name}: no voices listed ({eng.status().detail})")
-        for v, desc in rows:
-            print(f"{v:<36} {desc}".rstrip())
+        r = voices(args.engine)
+        for n in r.notes:
+            print(n)
+        for v in r.voices:
+            print(f"{v.voice:<36} {v.description}".rstrip())
         return 0
-    for name in engine_names():
-        e = get_engine(name)
-        st = e.status()
-        print(f"{name:<11}{'ready' if st.ready else 'not ready':<10} {st.detail}")
+    for e in voices().engines:
+        print(f"{e.name:<11}{'ready' if e.ready else 'not ready':<10} {e.detail}")
         print(f"{'':<11}licence: {e.licence}")
         if e.online:
             print(f"{'':<11}online: narration text is sent to {e.online}")
@@ -217,7 +160,6 @@ def _cmd_voices(args) -> int:
             print(f"{'':<11}non-commercial use only")
     print("voices of one engine: manimvox voices <engine>")
     return 0
-
 
 def _cmd_doctor(args) -> int:
     import platform
