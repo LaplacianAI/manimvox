@@ -189,6 +189,12 @@ def _cmd_doctor(args) -> int:
         row(True, f"{len(manimpango.list_fonts())} fonts visible to Pango")
     except ImportError:
         pass
+    import importlib.util
+
+    for mod, extra in (("matplotlib", "matplotlib"), ("plotly", "plotly"), ("kaleido", "plotly")):
+        found = importlib.util.find_spec(mod) is not None
+        print(f"{'ok  ' if found else '--  '} charts {mod}: "
+              f"{'installed' if found else 'not installed (extra: ' + extra + ')'}")
     from .voice import engine_names, get_engine
 
     for name in engine_names():

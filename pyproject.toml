@@ -26,7 +26,9 @@ xtts = ["coqui-tts>=0.27,<0.28"]
 f5 = ["f5-tts>=1.1,<2"]
 # OpenAI and ElevenLabs use the standard library; the extra keeps the documented install command working
 cloud = []
-dev = ["pytest>=8", "ruff>=0.6"]
+matplotlib = ["matplotlib>=3.8,<4"]
+plotly = ["plotly>=6.1,<8", "kaleido>=1.1,<2"]
+dev = ["pytest>=8", "ruff>=0.6", "matplotlib>=3.8,<4", "plotly>=6.1,<8"]
 
 [project.scripts]
 manimvox = "manimvox.cli:main"
