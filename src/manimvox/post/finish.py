@@ -3,9 +3,11 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .audio import limit, music_bed, read_audio
+import numpy as np
+
+from .audio import RATE, limit, music_bed, read_audio
 from .draw import caption_overlay, card_image
-from .encode import Writer, frames, video_info
+from .encode import Writer, frame_count, frames, video_info
 from .options import PostError, PostOptions
 
 
@@ -34,7 +36,12 @@ def finish(src: Path, dst: Path, cues, opts: PostOptions, theme, root: Path) -> 
     try:
         sound = voice
         if music is not None:
-            sound = voice + music_bed(music, voice.shape[1], cues, opts.music_db, opts.duck_db)
+            # Manim's narration ends at the last sound, before the picture does: the bed runs the video's whole
+            # length plus the end card and fades out at the very end, and the narration is padded to match.
+            card_n = round(opts.card_seconds * fps) if opts.end_card else 0
+            n = round((frame_count(src) + card_n) * RATE / fps)
+            sound = np.pad(voice[:, :n], ((0, 0), (0, max(0, n - voice.shape[1]))))
+            sound = sound + music_bed(music, n, cues, opts.music_db, opts.duck_db)
             done.append(f"music bed {opts.music.as_posix()} at {opts.music_db:g} dB, "
                         f"{opts.duck_db:g} dB more under narration")
         out.audio(limit(sound))
@@ -45,10 +52,11 @@ def finish(src: Path, dst: Path, cues, opts: PostOptions, theme, root: Path) -> 
                     k += 1
                 if k < len(cues) and cues[k].start <= t:
                     if k not in overlays:
-                        overlays[k] = caption_overlay(cues[k].text, w, h, theme)
+                        overlays = {k: caption_overlay(cues[k].text, w, h, theme)}  # only the current cue's plate is kept
                     overlays[k].blend(rgb)
             out.add(rgb)
-        out.sync()
+        if music is None:  # with a bed, the sound already runs through the card; otherwise the card is silent
+            out.sync()
         if opts.captions == "burn":
             done.append("captions burned in (the .srt ships too)")
         if opts.end_card:

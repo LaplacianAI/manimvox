@@ -50,11 +50,11 @@ def make_video(path: Path, seconds: float, fps: int = 10, size=(320, 180), audio
 
 
 def make_mp4(path: Path, seconds: float, fps: int = 10, size=(320, 180), audio=None, rate: int = 24000,
-             shade=None, layout: str = "mono") -> Path:
+             shade=None, layout: str = "mono", audio_seconds: float | None = None) -> Path:
     """An H.264/AAC MP4 like the ones manimvox renders. `audio` is mono float samples at `rate`
-    (default: a 220 Hz tone), copied to both channels if `layout` is "stereo"; `shade(i)` is frame i's grey level (default: a ramp)."""
+    (default: a 220 Hz tone; `audio_seconds` makes it shorter than the picture, as Manim's narration is), copied to both channels if `layout` is "stereo"; `shade(i)` is frame i's grey level (default: a ramp)."""
     if audio is None:
-        t = np.arange(int(seconds * rate)) / rate
+        t = np.arange(int((seconds if audio_seconds is None else audio_seconds) * rate)) / rate
         audio = 0.3 * np.sin(2 * np.pi * 220 * t)
     shade = shade or (lambda i: 20 * (i % 10))
     c = av.open(str(path), "w")

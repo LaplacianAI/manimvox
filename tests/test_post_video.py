@@ -74,6 +74,23 @@ def test_music_is_ducked_under_narration(tmp_path):
     assert lines and lines[0].startswith("music bed bed.wav")
 
 
+def test_music_bed_spans_the_whole_video_and_the_end_card(tmp_path):
+    # Manim's narration track ends before the picture does: 4 s of sound under 6 s of video
+    src = make_mp4(tmp_path / "s.mp4", 6.0, audio=np.zeros(4 * 24000))
+    t = np.arange(22050) / 22050
+    sf.write(str(tmp_path / "bed.wav"), (0.5 * np.sin(2 * np.pi * 440 * t)).astype(np.float32), 22050)
+    dst = tmp_path / "d.mp4"
+    finish(src, dst, [], PostOptions(music=Path("bed.wav"), music_db=-6, end_card=("Bye",), card_seconds=1), TH,
+           tmp_path)
+    a = read_audio(dst)[0]
+    level = 0.3536 * gain(-6)
+    assert len(a) / RATE == pytest.approx(duration(dst), abs=0.1) == pytest.approx(7.0, abs=0.15)
+    assert rms(a[int(4.5 * RATE):int(5.0 * RATE)]) == pytest.approx(level, rel=0.2)  # past the narration's end
+    under_card = rms(a[int(6.0 * RATE):int(6.5 * RATE)])
+    assert 0.2 * level < under_card < 0.9 * level  # audible, fading
+    assert rms(a[int(6.9 * RATE):]) < 0.15 * level  # the fade ends with the card
+
+
 def test_captions_are_burned_only_while_a_cue_speaks(tmp_path):
     src = make_mp4(tmp_path / "s.mp4", 3.0, shade=lambda i: 40)
     dst = tmp_path / "d.mp4"
@@ -125,6 +142,17 @@ def test_concat_joins_with_cards_and_reports_where_each_part_starts(tmp_path):
     assert duration(dst) == pytest.approx(5.0, abs=0.2)
     w, h, fps = video_info(dst)
     assert (w, h) == (320, 180) and fps == Fraction(10)
+
+
+def test_concat_starts_each_part_sound_where_the_part_starts(tmp_path):
+    a = make_mp4(tmp_path / "a.mp4", 2.0, audio=np.zeros(2 * 24000))
+    b = make_mp4(tmp_path / "b.mp4", 2.0)  # a 220 Hz tone, 0.3 peak
+    dst = tmp_path / "film.mp4"
+    starts = concat([a, b], dst, TH, title=["Series"], card_seconds=1.0)
+    s = read_audio(dst)[0]
+    assert starts == pytest.approx([1.0, 3.0], abs=0.11)
+    assert rms(s[:int((starts[1] - 0.1) * RATE)]) < 0.01
+    assert rms(s[int((starts[1] + 0.2) * RATE):int((starts[1] + 1.8) * RATE)]) == pytest.approx(0.3 / 2 ** 0.5, rel=0.2)
 
 
 def test_concat_refuses_mixed_frame_rates(tmp_path):

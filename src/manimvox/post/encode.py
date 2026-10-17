@@ -27,6 +27,18 @@ def video_info(path: Path) -> tuple[int, int, Fraction]:
         raise PostError(f"cannot read {Path(path).name}: {e}") from e
 
 
+def frame_count(path: Path) -> int:
+    """How many frames the first video stream holds, counted from its packets (one frame each), not estimated
+    from the container's duration."""
+    try:
+        with av.open(str(path)) as c:
+            if not c.streams.video:
+                raise PostError(f"{Path(path).name} has no video")
+            return sum(1 for p in c.demux(c.streams.video[0]) if p.size)
+    except (av.error.FFmpegError, OSError) as e:
+        raise PostError(f"cannot read {Path(path).name}: {e}") from e
+
+
 def frames(path: Path, size: tuple[int, int] | None = None) -> Iterator[tuple[float, np.ndarray]]:
     """(time in seconds, RGB frame) for every frame of `path`, scaled to `size` if it differs."""
     try:
