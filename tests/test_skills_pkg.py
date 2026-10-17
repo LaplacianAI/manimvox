@@ -87,6 +87,7 @@ def test_wheel_bundles_the_skills(tmp_path):
     with zipfile.ZipFile(wheel) as z:
         assert "manimvox/_skills/manimvox-voice/SKILL.md" in z.namelist()
         z.extractall(tmp_path / "unpacked")
+    assert (tmp_path / "unpacked" / "manimvox" / "_blocks" / "venn" / "block.json").is_file()
     have = sk.build_manifest(tmp_path / "unpacked" / "manimvox" / "_skills", manimvox.__version__)
     want = json.loads((ROOT / sk.MANIFEST_NAME).read_text(encoding="utf-8"))
     assert have == want

@@ -1,0 +1,17 @@
+{
+  "name": "venn",
+  "function": "venn",
+  "helpers": [],
+  "description": "Two overlapping circles with a count in each region: only A, both, only B.",
+  "tags": ["sets", "compare", "chart"],
+  "parameters": [
+    {"name": "left", "description": "label above the left circle"},
+    {"name": "right", "description": "label above the right circle"},
+    {"name": "counts", "description": "(only left, both, only right)"},
+    {"name": "colors", "description": "(left colour, right colour), theme colours; default (BLUE, TEAL)"},
+    {"name": "r", "description": "circle radius in scene units"},
+    {"name": "d", "description": "distance between the centres"},
+    {"name": "size", "description": "font size of the counts"}
+  ],
+  "returns": "VGroup with .A .B (circles), .la .lb (labels), .ta .tm .tb (counts) to reveal one by one"
+}

@@ -44,6 +44,7 @@ packages = ["src/manimvox"]
 
 [tool.hatch.build.targets.wheel.force-include]
 "skills" = "manimvox/_skills"
+"blocks" = "manimvox/_blocks"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -172,6 +172,29 @@ def _cmd_join(args) -> int:
     return 0
 
 
+def _cmd_add(args) -> int:
+    from .blocks import add_block, all_blocks, get_block
+
+    if args.list or not args.names:
+        for b in all_blocks():
+            print(f"{b.name:<18} {b.description}  [{', '.join(b.tags)}]")
+        if not args.list:
+            print("add one: manimvox add <block>")
+        return 0
+    blocks = [get_block(n) for n in args.names]  # every name checked before anything is copied
+    pr = _project()
+    if not args.force:
+        clash = [b.name for b in blocks if (pr.root / "blocks" / f"{b.module}.py").exists()]
+        if clash:
+            raise ValueError(f"already in this project: {', '.join(clash)} (they may hold your edits); "
+                             "pass --force to replace them")
+    for b in blocks:
+        dest = add_block(pr.root, b.name, force=args.force)
+        print(f"added {b.name}: {dest}")
+        print(f"  in an episode: {b.import_line}")
+    return 0
+
+
 def _cmd_voices(args) -> int:
     from pathlib import Path
 
@@ -478,6 +501,12 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("-o", "--output", help="the joined MP4 (default: out/<series>.mp4)")
     s.add_argument("--no-cards", action="store_true", help="no title card or end card")
     s.set_defaults(func=_cmd_join)
+
+    s = p._sub.add_parser("add", help="copy blocks (reusable scene components) into this project's blocks/")
+    s.add_argument("names", nargs="*", metavar="block")
+    s.add_argument("--list", action="store_true", help="list the blocks")
+    s.add_argument("--force", action="store_true", help="replace a block already in the project")
+    s.set_defaults(func=_cmd_add)
 
     s = p._sub.add_parser("voices", help="voice engines: ready or not, licence, voices")
     s.add_argument("engine", nargs="?", help="list this engine's voices")
