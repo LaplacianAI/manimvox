@@ -139,3 +139,82 @@ def test_lines_leave_time_to_look(tmp_path):
     gaps = [b.start - a.end for a, b in itertools.pairwise(cues)]
     assert len(cues) == 5 and min(gaps) >= PAD - 0.11  # a frame at 10 fps
     assert gaps[2] >= PAD + 1.0 - 0.11  # beat() after the steps line adds a second of silence
+
+
+STRUCTURE = '''from manimvox.kit import *
+
+
+class Ep02(Episode):
+    EP = 2
+    TITLE = "Structure"
+    TAGLINE = "Open, bridge, answer"
+    NCHAP = 2
+
+    def build(self):
+        a = node("Slow").move_to(ORIGIN)
+        self.add(a)
+        self.intro("Why is it slow?", question="Why is it slow?")
+        self.chapter("First", "The first chapter.")
+        b = node("B").move_to(LEFT * 2)
+        self.say("A picture to leave behind.", FadeIn(b))
+        self.chapter("Second", "The second chapter.", bridge="So we need another step.")
+        self.outro(["Two chapters"], "That is the end.", next_title="Next one",
+                   answer="It was the missing index.")
+'''
+
+
+def render_episode(p, stem, cls, voiced=True):
+    env = {k: v for k, v in os.environ.items() if not k.startswith("MANIMVOX_")}
+    env |= {"MANIMVOX_PROJECT": str(p), "MANIMVOX_STEM": stem}
+    env |= {"MANIMVOX_VOICE_RESOLVED": "fake:tone"} if voiced else {"MANIMVOX_NOTTS": "1"}
+    r = subprocess.run([sys.executable, "-m", "manim", "render", "-ql", "--fps", "10", "--disable_caching",
+                        "--progress_bar", "none", "--media_dir", str(p / "build" / "m"), "-o", stem,
+                        str(p / "episodes" / f"{stem}.py"), cls], check=False, capture_output=True, text=True,
+                       env=env, cwd=p)
+    assert r.returncode == 0, r.stderr[-2000:]
+    return json.loads((p / "build" / stem / "layout.json").read_text(encoding="utf-8"))
+
+
+def add_episode(p, stem, cls, title, source):
+    (p / "episodes" / f"{stem}.py").write_text(source, encoding="utf-8")
+    data = json.loads((p / "series.json").read_text(encoding="utf-8"))
+    data["episodes"].append({"n": 2, "stem": stem, "cls": cls, "title": title})
+    (p / "series.json").write_text(json.dumps(data), encoding="utf-8")
+
+
+@pytest.mark.slow
+def test_cold_open_bridge_and_answer(tmp_path):
+    from manimvox.checks.audio import read_cues
+
+    p = copy_fixture(tmp_path)
+    add_episode(p, "ep02_structure", "Ep02", "Structure", STRUCTURE)
+    layout = render_episode(p, "ep02_structure", "Ep02")
+    texts = [[t["text"] for t in fr["texts"]] for fr in layout["frames"]]
+    first = texts[0]  # the title card: the problem drawn before intro() is gone, the question replaces the tagline
+    assert "Slow" not in first and "Why is it slow?" in first and "Open, bridge, answer" not in first
+    said = [c.text for c in read_cues(p / "out" / "ep02_structure.srt")]
+    assert said.index("So we need another step.") < said.index("The second chapter.")
+    assert said.index("It was the missing index.") < said.index("That is the end.")
+    answer_frame = next(t for t in texts if "It was the missing index." in t)
+    assert "Why is it slow?" in answer_frame  # the question stays on screen under which the answer lands
+
+
+@pytest.mark.slow
+def test_single_video_title_card_has_no_episode_number(tmp_path):
+    p = copy_fixture(tmp_path)
+    one = [t["text"] for t in render_episode(p, "ep01_hello", "Ep01", voiced=False)["frames"][0]["texts"]]
+    assert not any("EPISODE" in t for t in one)
+    assert "Hello, Explained" in one  # the series differs from the title: its line stays
+    add_episode(p, "ep02_structure", "Ep02", "Structure", STRUCTURE)
+    two = [t["text"] for t in render_episode(p, "ep01_hello", "Ep01", voiced=False)["frames"][0]["texts"]]
+    assert "EPISODE 01" in two
+
+
+@pytest.mark.slow
+def test_single_video_drops_series_line_when_it_repeats_the_title(tmp_path):
+    p = copy_fixture(tmp_path)
+    data = json.loads((p / "series.json").read_text(encoding="utf-8"))
+    data["series"] = "Hello"
+    (p / "series.json").write_text(json.dumps(data), encoding="utf-8")
+    first = [t["text"] for t in render_episode(p, "ep01_hello", "Ep01", voiced=False)["frames"][0]["texts"]]
+    assert first.count("Hello") == 1

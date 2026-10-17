@@ -41,7 +41,7 @@ from ..voice import VoiceError, spoken_form, synth_cached
 from ._context import NOTTS, PROJECT, STEM, THEME, VOICE
 from .colours import ACCENT, BG, INK, LINE, MUTED, PANEL, TEAL
 from .components import box, bullets, heading
-from .text import STAGE_BOTTOM, STAGE_TOP, P, T
+from .text import STAGE_BOTTOM, STAGE_CENTER, STAGE_TOP, P, T
 
 config.background_color = BG
 WORDS_PER_SECOND = 2.6
@@ -74,6 +74,7 @@ class Episode(Scene):
     TAGLINE = ""
     NCHAP = 1
     SERIES = PROJECT.series if PROJECT else "Explained"  # as written: a brand may forbid capitals
+    question = None  # set by intro(question=...), answered on screen by outro(answer=...)
 
     def construct(self):
         self._subs = []
@@ -156,30 +157,45 @@ class Episode(Scene):
         if mobs:
             self.play(*[FadeOut(m, shift=shift) for m in mobs], run_time=run_time)
 
-    def intro(self, narration, tts=None):
-        """Title card, then it settles into the persistent header."""
+    def _single_video(self):
+        """True when the project lists exactly one episode: no episode numbers, no repeated series name."""
+        return PROJECT is not None and len(PROJECT.episodes) == 1
+
+    def intro(self, narration, tts=None, question=None):
+        """Title card, then it settles into the persistent header. Anything drawn before intro()
+        (a cold open) is swept away first. `question` replaces the tagline on the card and is
+        what outro(answer=...) answers."""
+        self.clear()
+        self.question = question
+        single = self._single_video()
         series = T(self.SERIES, 20, ACCENT, BOLD)
         epno = T(f"EPISODE {self.EP:02d}", 20, MUTED, BOLD)
-        top = VGroup(series, Dot(radius=0.04, color=MUTED), epno).arrange(RIGHT, buff=0.22)
+        if not single:
+            top = VGroup(series, Dot(radius=0.04, color=MUTED), epno).arrange(RIGHT, buff=0.22)
+        elif self.SERIES.strip() != self.TITLE.strip():
+            top = VGroup(series)
+        else:
+            top = None
         # With a mark on the right (left edge x≈2.8), the text block must stop short of it.
         wide = 8.4 if THEME.mark_svg else 11.5
         title = P(self.TITLE, 62, INK, max_w=wide, weight=BOLD)
         rule = Line(LEFT * 1.2, RIGHT * 1.2).set_stroke(ACCENT, 6)
-        tag = P(self.TAGLINE, 26, MUTED, max_w=min(wide, 10.5))
-        g = VGroup(top, title, rule, tag).arrange(DOWN, aligned_edge=LEFT, buff=0.38)
+        tag = P(question or self.TAGLINE, 26, MUTED, max_w=min(wide, 10.5))
+        g = VGroup(*([top] if top is not None else []), title, rule, tag).arrange(DOWN, aligned_edge=LEFT, buff=0.38)
         g.move_to(ORIGIN).set_x(-6.0 + g.width / 2)
         motif = self.motif()
         with self.narrate(narration, tts=tts):
-            self.play(Create(motif), FadeIn(top, shift=RIGHT * 0.4), run_time=0.8)
+            self.play(Create(motif), *([FadeIn(top, shift=RIGHT * 0.4)] if top is not None else []), run_time=0.8)
             self.play(FadeIn(title, shift=UP * 0.3), GrowFromEdge(rule, LEFT), run_time=0.9)
             self.play(FadeIn(tag, shift=UP * 0.2), run_time=0.6)
         # persistent chrome
-        label = T(f"EP {self.EP:02d}  ·  {self.TITLE}", 15, MUTED, BOLD, max_w=7.5)
+        label = T(self.TITLE if single else f"EP {self.EP:02d}  ·  {self.TITLE}", 15, MUTED, BOLD, max_w=7.5)
         label.move_to([-6.75 + label.width / 2, 3.72, 0])
         track = Line([-7.2, -3.93, 0], [7.2, -3.93, 0]).set_stroke(LINE, 5)
         bar = Line([-7.2, -3.93, 0], [-7.15, -3.93, 0]).set_stroke(ACCENT, 5)
+        to_label = ReplacementTransform(top, label) if top is not None else FadeIn(label)
         self.play(FadeOut(VGroup(title, rule, tag, motif), shift=LEFT * 0.6),
-                  ReplacementTransform(top, label), FadeIn(track), FadeIn(bar), run_time=0.8)
+                  to_label, FadeIn(track), FadeIn(bar), run_time=0.8)
         self._chrome = [label, track, bar]
         self._bar = bar
 
@@ -199,8 +215,12 @@ class Episode(Scene):
         ring2 = Circle(radius=2.2).set_stroke(TEAL, 2, 0.12).move_to([5.6, -2.2, 0])
         return VGroup(ring1, ring2)
 
-    def chapter(self, title, narration=None, tts=None):
-        """Transition into a new chapter: big title, then it docks top-right."""
+    def chapter(self, title, narration=None, tts=None, bridge=None, bridge_tts=None):
+        """Transition into a new chapter: big title, then it docks top-right. `bridge` is a
+        "So... / But..." line spoken over the finished picture before it is cleared."""
+        if bridge:
+            with self.narrate(bridge, tts=bridge_tts):
+                pass
         self.clear()
         self._chap_i += 1
         num = T(f"{self._chap_i:02d}", 150, ACCENT, BOLD).set_opacity(0.16)
@@ -213,7 +233,7 @@ class Episode(Scene):
             self.say(narration, *anims, run_time=0.8, tts=tts)
         else:
             self.play(*anims, run_time=0.8)
-            self.wait(0.7)
+            self.wait(1.0)
         dock = T(f"{self._chap_i:02d}  {title}", 15, ACCENT, BOLD, max_w=5.5)
         dock.move_to([6.75 - dock.width / 2, 3.72, 0])
         frac = min(1.0, self._chap_i / max(1, self.NCHAP))
@@ -228,10 +248,22 @@ class Episode(Scene):
         self._chap_label = dock
         self._chrome.append(dock)
 
-    def outro(self, recap, narration, next_title=None, tts=None, next_label="NEXT"):
+    def outro(self, recap, narration, next_title=None, tts=None, next_label="NEXT", answer=None, answer_tts=None):
         """Recap bullets and a pointer to the next episode. The last episode can
-        point elsewhere instead: next_label="READ", next_title="docs/design.md"."""
+        point elsewhere instead: next_label="READ", next_title="docs/design.md".
+        `answer` is spoken first, on screen under the question given to intro()."""
         self.clear()
+        if answer:
+            parts = []
+            if self.question:
+                parts.append(P(self.question, 30, MUTED, max_w=11.5, align="center"))
+            parts.append(P(answer, 40, INK, max_w=11.5, weight=BOLD, align="center"))
+            VGroup(*parts).arrange(DOWN, buff=0.45).move_to(STAGE_CENTER)
+            if len(parts) == 2:
+                self.play(FadeIn(parts[0]), run_time=0.6)
+            self.say(answer, FadeIn(parts[-1], shift=UP * 0.2), tts=answer_tts)
+            self.beat()
+            self.clear()
         h = heading("Recap")
         rows = bullets(recap, size=25, max_w=11.5)
         rows.next_to(h, DOWN, aligned_edge=LEFT, buff=0.5)
@@ -249,7 +281,7 @@ class Episode(Scene):
             top_left = rows.get_corner(UL)
             rows.scale(room / rows.height, about_point=top_left)
         self.steps(narration, group, tts=tts)
-        self.wait(0.8)
+        self.wait(1.5)
         self.play(*[FadeOut(m) for m in self.mobjects], run_time=0.8)
 
     # -- small helpers -----------------------------------------------------
