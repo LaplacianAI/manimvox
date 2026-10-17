@@ -138,6 +138,9 @@ def _episodes(f: Path, root: Path, raw: object) -> list[EpisodeRef]:
         stem = e["stem"]
         if not stem.startswith("ep"):
             raise ProjectError(f"{f}: episode stem '{stem}' must start with 'ep' (e.g. ep01_intro)")
+        if ".." in stem or not re.fullmatch(r"ep[A-Za-z0-9_.-]*", stem):
+            raise ProjectError(f"{f}: episode stem '{stem}' may only hold letters, digits, '_', '-' and '.' "
+                               f"(no '/', '\\', spaces or '..'), e.g. ep01_intro")
         refs.append(EpisodeRef(n, stem, e["cls"], str(e.get("title", "")), root / "episodes" / f"{stem}.py",
                         str(e.get("level", "")), str(e.get("blurb", ""))))
     return refs

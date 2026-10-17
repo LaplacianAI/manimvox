@@ -215,6 +215,18 @@ def test_bound_voice_ids_and_inside_paths_pass_the_check(project, name):
         assert "voice file must be inside" not in out.get("error", ""), voice
 
 
+def test_a_stem_with_dots_and_slashes_cannot_make_a_bound_tool_write_outside(project, tmp_path):
+    series = json.loads((project / "series.json").read_text(encoding="utf-8"))
+    series["episodes"][0]["stem"] = "ep/../../../elsewhere/clip"
+    (project / "series.json").write_text(json.dumps(series), encoding="utf-8")
+    (project / "out" / "ep").mkdir(parents=True)
+    (project / "sheets" / "ep").mkdir(parents=True)
+    before = {p.relative_to(tmp_path) for p in tmp_path.rglob("*")}
+    out = json.loads(by_name(common.json_tools(project))["contact_sheet"](episode="ep/../../../elsewhere/clip"))
+    assert out["ok"] is False and "episode stem" in out["error"]
+    assert {p.relative_to(tmp_path) for p in tmp_path.rglob("*")} == before
+
+
 def test_bound_new_project_refuses_a_voice_file_outside(tmp_path):
     new = by_name(common.json_tools(tmp_path / "video"))["new_project"]
     out = json.loads(new(series="S", voice="xtts: clone=/abs.wav"))
