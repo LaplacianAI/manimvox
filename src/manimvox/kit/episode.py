@@ -251,7 +251,8 @@ class Episode(Scene):
     def outro(self, recap, narration, next_title=None, tts=None, next_label="NEXT", answer=None, answer_tts=None):
         """Recap bullets and a pointer to the next episode. The last episode can
         point elsewhere instead: next_label="READ", next_title="docs/design.md".
-        `answer` is spoken first, on screen under the question given to intro()."""
+        `answer` is spoken first, on screen under the question given to intro().
+        An empty `recap` skips the Recap heading and bullets; `narration` is still spoken."""
         self.clear()
         if answer:
             parts = []
@@ -264,10 +265,12 @@ class Episode(Scene):
             self.say(answer, FadeIn(parts[-1], shift=UP * 0.2), tts=answer_tts)
             self.beat()
             self.clear()
-        h = heading("Recap")
-        rows = bullets(recap, size=25, max_w=11.5)
-        rows.next_to(h, DOWN, aligned_edge=LEFT, buff=0.5)
-        group = [FadeIn(h, shift=DOWN * 0.2)] + [FadeIn(r, shift=RIGHT * 0.3) for r in rows]
+        h = heading("Recap") if recap else None
+        rows = bullets(recap, size=25, max_w=11.5) if recap else None
+        group = []
+        if rows is not None:
+            rows.next_to(h, DOWN, aligned_edge=LEFT, buff=0.5)
+            group = [FadeIn(h, shift=DOWN * 0.2)] + [FadeIn(r, shift=RIGHT * 0.3) for r in rows]
         extra = None
         if next_title:
             extra = VGroup(T(next_label, 16, ACCENT, BOLD), T(next_title, 26, INK, BOLD, max_w=11)).arrange(RIGHT, buff=0.3)
@@ -275,11 +278,12 @@ class Episode(Scene):
             extra = VGroup(plate, extra.move_to(plate)).move_to([0, STAGE_BOTTOM + 0.55, 0])
             group.append(FadeIn(extra, shift=UP * 0.3))
         # Wrapped bullets can run into the plate: shrink them into the space above it.
-        floor = (extra.get_top()[1] if extra is not None else STAGE_BOTTOM) + 0.3
-        room = rows.get_top()[1] - floor
-        if rows.height > room:
-            top_left = rows.get_corner(UL)
-            rows.scale(room / rows.height, about_point=top_left)
+        if rows is not None:
+            floor = (extra.get_top()[1] if extra is not None else STAGE_BOTTOM) + 0.3
+            room = rows.get_top()[1] - floor
+            if rows.height > room:
+                top_left = rows.get_corner(UL)
+                rows.scale(room / rows.height, about_point=top_left)
         self.steps(narration, group, tts=tts)
         self.wait(1.5)
         self.play(*[FadeOut(m) for m in self.mobjects], run_time=0.8)

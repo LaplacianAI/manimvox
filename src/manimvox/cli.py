@@ -42,6 +42,18 @@ def _cmd_draft(args) -> int:
     return 0 if r.ok else 1
 
 
+def _cmd_sheets(args) -> int:
+    from .tools import contact_sheet
+
+    if not args.every > 0:
+        print("manimvox: --every must be greater than 0", file=sys.stderr)
+        return 2
+    r = contact_sheet(str(Path.cwd()), args.episode, args.every)
+    print(f"video: {r.video}")
+    print(f"sheets: {', '.join(r.sheets)}")
+    return 0
+
+
 def _cmd_render(args) -> int:
     from .tools import _render
 
@@ -327,6 +339,11 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--voice", default=None, help="engine:voice (overrides series.json)")
     s.add_argument("-y", "--yes", action="store_true", default=argparse.SUPPRESS, help="answer yes to confirmations")
     s.set_defaults(func=_cmd_render)
+
+    s = p._sub.add_parser("sheets", help="contact sheets of the finished video (else the last draft)")
+    s.add_argument("episode")
+    s.add_argument("--every", type=float, default=5.0, help="seconds between sampled frames")
+    s.set_defaults(func=_cmd_sheets)
 
     s = p._sub.add_parser("check", help="run one check")
     s.add_argument("what", choices=["theme", "layout", "audio"])

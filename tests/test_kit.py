@@ -218,3 +218,33 @@ def test_single_video_drops_series_line_when_it_repeats_the_title(tmp_path):
     (p / "series.json").write_text(json.dumps(data), encoding="utf-8")
     first = [t["text"] for t in render_episode(p, "ep01_hello", "Ep01", voiced=False)["frames"][0]["texts"]]
     assert first.count("Hello") == 1
+
+
+NO_RECAP = '''from manimvox.kit import *
+
+
+class Ep02(Episode):
+    EP = 2
+    TITLE = "Short"
+    TAGLINE = "No recap"
+    NCHAP = 1
+
+    def build(self):
+        self.intro("Why is it slow?", question="Why is it slow?")
+        self.chapter("First", "The first chapter.")
+        self.say("A picture.", FadeIn(node("B")))
+        self.outro([], "Next: the index.", next_title="Indexes", answer="It was the missing index.")
+'''
+
+
+@pytest.mark.slow
+def test_outro_without_a_recap_still_answers_and_speaks(tmp_path):
+    from manimvox.checks.audio import read_cues
+
+    p = copy_fixture(tmp_path)
+    add_episode(p, "ep02_short", "Ep02", "Short", NO_RECAP)
+    layout = render_episode(p, "ep02_short", "Ep02")
+    said = [c.text for c in read_cues(p / "out" / "ep02_short.srt")]
+    assert said.index("It was the missing index.") < said.index("Next: the index.")
+    shown = {t["text"] for fr in layout["frames"] for t in fr["texts"]}
+    assert "Recap" not in shown and "Indexes" in shown

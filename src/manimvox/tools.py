@@ -609,6 +609,6 @@ def doctor() -> DoctorResult:
 TOOLS = (new_project, draft, render, check, contact_sheet, voices, prepare_voice, list_blocks, add_block, join,
          index, package, doctor)
 # the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks
-COMMANDS = {"new": "new_project", "draft": "draft", "render": "render", "check": "check", "voices": "voices",
+COMMANDS = {"new": "new_project", "draft": "draft", "render": "render", "check": "check", "sheets": "contact_sheet", "voices": "voices",
             "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor"}
 SHELL_ONLY = frozenset({"skills"})  # installs skills into coding agents; a framework agent reads skills_path() instead
