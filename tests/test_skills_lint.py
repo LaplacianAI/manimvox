@@ -77,3 +77,28 @@ def test_router_links_every_workflow():
     text = (ROOT / "manimvox" / "SKILL.md").read_text(encoding="utf-8")
     for w in ("manimvox-paper", "manimvox-playlist", "manimvox-concept", "manimvox-pr"):
         assert f"../{w}/SKILL.md" in text
+
+
+@pytest.mark.parametrize("d", DIRS, ids=lambda d: d.name)
+def test_commands_named_have_a_tool(d):
+    from manimvox import tools
+
+    names = {f.__name__ for f in tools.TOOLS}
+    for p, text in _texts(d):
+        for cmd in re.findall(r"`manimvox ([a-z]+)", text):
+            if cmd not in tools.SHELL_ONLY:
+                assert tools.COMMANDS.get(cmd) in names, f"{p}: `manimvox {cmd}` has no tool function"
+
+
+def test_cli_skill_names_every_tool():
+    from manimvox import tools
+
+    text = (ROOT / "manimvox-cli" / "SKILL.md").read_text(encoding="utf-8")
+    for name in [f.__name__ for f in tools.TOOLS] + ["read_skill", "read_project_file", "write_project_file",
+                                                    "list_project_files"]:
+        assert f"`{name}`" in text, f"manimvox-cli does not name the tool {name}"
+
+
+def test_router_points_agents_without_a_shell_to_the_tools():
+    text = (ROOT / "manimvox" / "SKILL.md").read_text(encoding="utf-8")
+    assert "../manimvox-cli/SKILL.md#without-a-shell" in text

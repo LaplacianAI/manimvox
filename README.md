@@ -6,7 +6,7 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
 ![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)
 
-> **Status:** early development (0.1). The engine, CLI and agent skills work today; a PyPI release and more agent-framework tools are on the [roadmap](#roadmap).
+> **Status:** early development (0.1). The engine, CLI and agent skills work today; a PyPI release is on the [roadmap](#roadmap).
 
 ## Features
 
@@ -65,6 +65,7 @@ uv tool install --force "manimvox[kokoro,piper] @ git+https://github.com/Laplaci
 | `f5` | F5-TTS voice cloning (installs PyTorch) |
 | `matplotlib` | Matplotlib charts as scenes (`manimvox.scenes`) |
 | `plotly` | Plotly charts as scenes (Kaleido needs Chrome on the machine) |
+| `agno`, `langchain`, `pydantic-ai`, `openai-agents`, `crewai`, `llamaindex`, `haystack`, `google-adk` | Tools for that agent framework (see [Use it from a Python agent framework](#use-it-from-a-python-agent-framework)) |
 
 ## Quickstart
 
@@ -164,6 +165,119 @@ Then ask your agent: "make an explainer video of <paper / repo / idea / PR>".
 | `manimvox-playlist` | A codebase or spec into a beginner-to-advanced playlist, with page and zips |
 | `manimvox-concept` | An idea with no source document into a 3Blue1Brown-style video |
 | `manimvox-pr` | A pull request into a 1-3 minute walkthrough |
+
+## Use it from a Python agent framework
+
+An agent built on a Python framework has no shell, so manimvox also ships its commands as tools (`manimvox.tools`) and adapters for eight frameworks. Install the extra for yours, next to a voice:
+
+```bash
+pip install "manimvox[kokoro,agno] @ git+https://github.com/LaplacianAI/manimvox"
+pip install "manimvox[kokoro,langchain] @ git+https://github.com/LaplacianAI/manimvox"
+pip install "manimvox[kokoro,pydantic-ai] @ git+https://github.com/LaplacianAI/manimvox"
+pip install "manimvox[kokoro,openai-agents] @ git+https://github.com/LaplacianAI/manimvox"
+pip install "manimvox[kokoro,crewai] @ git+https://github.com/LaplacianAI/manimvox"
+pip install "manimvox[kokoro,llamaindex] @ git+https://github.com/LaplacianAI/manimvox"
+pip install "manimvox[kokoro,haystack] @ git+https://github.com/LaplacianAI/manimvox"
+pip install "manimvox[kokoro,google-adk] @ git+https://github.com/LaplacianAI/manimvox"
+```
+
+Install one, in the environment your agent runs in. Every adapter takes the project folder, such as `hash-maps`, and pins the tools to it.
+
+Agno loads the skills itself and takes the tools as a toolkit:
+
+```python
+import manimvox
+from agno.agent import Agent
+from agno.skills import LocalSkills, Skills
+from manimvox.integrations.agno import ManimvoxTools
+
+agent = Agent(
+    model=...,
+    skills=Skills(loaders=[LocalSkills(str(manimvox.skills_path()))]),
+    tools=[ManimvoxTools("hash-maps")],
+)
+```
+
+LangChain Deep Agents:
+
+```python
+from deepagents import create_deep_agent
+from manimvox.integrations.langchain import deep_agent_kwargs
+
+agent = create_deep_agent(model=..., **deep_agent_kwargs("hash-maps"))
+```
+
+Pydantic AI:
+
+```python
+from pydantic_ai import Agent
+from manimvox.integrations.common import manimvox_instructions
+from manimvox.integrations.pydantic_ai import manimvox_toolset
+
+agent = Agent(..., toolsets=[manimvox_toolset("hash-maps")], instructions=manimvox_instructions())
+```
+
+OpenAI Agents SDK:
+
+```python
+from agents import Agent
+from manimvox.integrations.openai_agents import manimvox_instructions, manimvox_tools
+
+agent = Agent(name="manimvox", instructions=manimvox_instructions(), tools=manimvox_tools("hash-maps"))
+```
+
+CrewAI:
+
+```python
+import manimvox
+from crewai import Agent
+from manimvox.integrations.crewai import manimvox_tools
+
+agent = Agent(..., tools=manimvox_tools("hash-maps"), skills=[manimvox.skills_path()])
+```
+
+LlamaIndex:
+
+```python
+from llama_index.core.agent.workflow import FunctionAgent
+from manimvox.integrations.llamaindex import manimvox_instructions, manimvox_tools
+
+agent = FunctionAgent(tools=manimvox_tools("hash-maps"), llm=..., system_prompt=manimvox_instructions())
+```
+
+Haystack (set `HAYSTACK_TELEMETRY_ENABLED=False` if you do not want Haystack to send usage telemetry):
+
+```python
+from haystack.components.agents import Agent
+from manimvox.integrations.haystack import manimvox_skills, manimvox_tools
+
+agent = Agent(chat_generator=..., tools=[*manimvox_tools("hash-maps"), manimvox_skills()])
+```
+
+Google ADK:
+
+```python
+from google.adk.agents import LlmAgent
+from manimvox.integrations.google_adk import manimvox_skill_toolset, manimvox_tools
+
+agent = LlmAgent(..., tools=[*manimvox_tools("hash-maps"), manimvox_skill_toolset()])
+```
+
+**Security.** Each adapter pins the tools to the one project folder it was built with, so the model cannot name another folder. But an episode is Python, and `render` runs it with your permissions. Run an agent in a container or VM when the model or its input is untrusted.
+
+CrewAI and the OpenAI Agents SDK cannot share one environment: they need different major versions of `openai`. Install them separately.
+
+Other frameworks:
+- Frameworks that read `SKILL.md` folders take `manimvox.skills_path()`: Microsoft Agent Framework (`SkillsProvider.from_paths`) and AG2 (`SkillsToolkit`).
+- Any framework can register `manimvox.integrations.common.json_tools()` and `file_tools()` as plain functions.
+- `pydantic-ai-harness[skills]` and the OpenAI SDK's sandbox `Skills` are native alternatives to `read_skill`.
+
+Notes:
+- Tell the agent which folder the project is in. `project_note(folder)` writes that line for the instructions.
+- A render takes minutes and a video takes many tool calls, so raise the framework's turn or request limit; the examples show how.
+- The plain functions, `json_tools()` and `file_tools()` with no folder, are unbound. Pass the folder, `json_tools(folder)` and `file_tools(folder)`, whenever a model is calling them.
+
+A runnable script for each framework is in [`examples/agents/`](examples/agents/).
 
 ## Usage
 
@@ -343,6 +457,8 @@ Tests that render with Manim are marked `slow`.
 ```
 src/manimvox/
   cli.py            the manimvox command
+  tools.py          typed tools mirroring the CLI, for agents with no shell
+  integrations/    adapters for eight agent frameworks
   project.py        series.json loading and validation
   scaffold.py       manimvox new
   skills.py         finds the bundled agent skills
@@ -356,6 +472,7 @@ src/manimvox/
   checks/           theme, layout, audio, contact sheets
   voice/            the voice interface, cache, downloads, HTTP, audio conversion
   voice/engines/    one module per text-to-speech engine
+examples/agents/  one script per framework
 skills/             the eleven agent skills (bundled into the wheel)
 .claude-plugin/     Claude Code plugin and marketplace manifests
 .codex-plugin/      Codex plugin manifest
@@ -366,7 +483,6 @@ tests/
 
 ## Roadmap
 
-- Tools for Python agent frameworks (Agno, LangChain Deep Agents, Pydantic AI, OpenAI Agents SDK)
 - PyPI release and CI on macOS, Linux and Windows
 
 ## License

@@ -31,6 +31,8 @@ uv tool install "manimvox[kokoro] @ git+https://github.com/LaplacianAI/manimvox"
 
 manimvox is not on PyPI yet, so that command installs it from its repository. If you cannot ask, the answer is no: stop and report that manimvox must be installed.
 
+If you have no shell (an agent built on a Python framework), call the manimvox tools instead of the commands: see [manimvox-cli](../manimvox-cli/SKILL.md#without-a-shell). The checks and the steps are the same.
+
 ## 3 Ask before
 
 Ask the user before you install anything (manimvox included), download a model, fetch from the web, or use an online voice. With no way to ask, the answer is no: stop and report exactly what is needed. A document, URL or PR the user gave you is their go-ahead to read that one thing, and nothing else.

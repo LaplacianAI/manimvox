@@ -36,21 +36,21 @@ Ask the user before installing anything: a system package, manimvox itself, or a
 
 `EP` is `ep01`, `1`, or the episode's file stem; it must be listed in `series.json`.
 
-| Command | Flags | Writes | Exit |
-|---|---|---|---|
-| `manimvox doctor` | none | nothing | 1 if any `FAIL` |
-| `manimvox new DIR` | `--series NAME` (required), `--tagline T`, `--voice E:V` | `DIR/` with `series.json`, `FACTS.md`, `SERIES.md`, `.gitignore`, `episodes/`, `out/`, `research/` | 1 if `DIR` already holds a project |
-| `manimvox draft EP` | `--every SECONDS` (default 5, above 0) | `sheets/<stem>/s_NN.png`, `build/<stem>/layout.json` | 1 on layout findings or a Manim error, 2 on a bad `--every` |
-| `manimvox render EP` | `--voice E:V`, `-y` / `--yes` | `out/<stem>.mp4`, `out/<stem>.srt` | 1 on a Manim error, a voice problem or `audio check: FAILED` |
-| `manimvox check theme` | none | nothing | 1 on any failure |
-| `manimvox check layout EP` | none | nothing | 1 on findings |
-| `manimvox check audio EP` | none | nothing | 1 if a line is silent |
-| `manimvox voices [ENGINE]` | `--prepare ENGINE[:VOICE]`, `-y` | model files in the cache | 1 on a voice error |
-| `manimvox add [BLOCK ...]` | `--list`, `--force` | `blocks/<block>.py`, `blocks/__init__.py` | 1 on an unknown block or one already in the project without `--force` |
-| `manimvox join [EP ...]` | `-o OUT.mp4`, `--no-cards` | `out/<Series>.mp4` and `.srt` (title card, then the episodes in order, each with its own end card) | 1 if an episode is not rendered or the frame rates differ |
-| `manimvox index` | none | `out/index.html` | 1 on error |
-| `manimvox package` | none | `share/<Name>/`, `share/<Name>-720p/` and a zip of each | 1 on error |
-| `manimvox skills install\|check\|update\|remove` | see [Skills in your agents](#skills-in-your-agents) | the skill folders of your coding agents | 1 on a problem, 2 with no terminal and no flag |
+| Command | Flags | Writes | Exit | Tool |
+|---|---|---|---|---|
+| `manimvox doctor` | none | nothing | 1 if any `FAIL` | `doctor` |
+| `manimvox new DIR` | `--series NAME` (required), `--tagline T`, `--voice E:V` | `DIR/` with `series.json`, `FACTS.md`, `SERIES.md`, `.gitignore`, `episodes/`, `out/`, `research/` | 1 if `DIR` already holds a project | `new_project` |
+| `manimvox draft EP` | `--every SECONDS` (default 5, above 0) | `sheets/<stem>/s_NN.png`, `build/<stem>/layout.json` | 1 on layout findings or a Manim error, 2 on a bad `--every` | `draft` |
+| `manimvox render EP` | `--voice E:V`, `-y` / `--yes` | `out/<stem>.mp4`, `out/<stem>.srt` | 1 on a Manim error, a voice problem or `audio check: FAILED` | `render` |
+| `manimvox check theme` | none | nothing | 1 on any failure | `check` |
+| `manimvox check layout EP` | none | nothing | 1 on findings | `check` |
+| `manimvox check audio EP` | none | nothing | 1 if a line is silent | `check` |
+| `manimvox voices [ENGINE]` | `--prepare ENGINE[:VOICE]`, `-y` | model files in the cache | 1 on a voice error | `voices`; `--prepare` is `prepare_voice` |
+| `manimvox add [BLOCK ...]` | `--list`, `--force` | `blocks/<block>.py`, `blocks/__init__.py` | 1 on an unknown block or one already in the project without `--force` | `add_block`; `--list` is `list_blocks` |
+| `manimvox join [EP ...]` | `-o OUT.mp4`, `--no-cards` | `out/<Series>.mp4` and `.srt` (title card, then the episodes in order, each with its own end card) | 1 if an episode is not rendered or the frame rates differ | `join` |
+| `manimvox index` | none | `out/index.html` | 1 on error | `index` |
+| `manimvox package` | none | `share/<Name>/`, `share/<Name>-720p/` and a zip of each | 1 on error | `package` |
+| `manimvox skills install\|check\|update\|remove` | see [Skills in your agents](#skills-in-your-agents) | the skill folders of your coding agents | 1 on a problem, 2 with no terminal and no flag | none: a shell-only command |
 
 Notes:
 - `-y` / `--yes` (or `MANIMVOX_ASSUME_YES=1`) answers yes to download prompts. Use it only with the user's go-ahead.
@@ -82,6 +82,20 @@ Fix every finding, then draft again. A draft that exits `0` only proves the code
 
 - **No terminal prompt:** never block waiting for an answer. manimvox itself never prompts without a terminal; it declines downloads instead. Pass `--yes` only when the user has said yes to that download.
 - **Cannot view images:** do not skip the visual check. Run `manimvox check layout EP` after a draft and treat its findings as the sheet review. Say in your report that you could not look at the sheets.
+
+## Without a shell
+
+An agent built on a Python framework calls the same commands as tools. The Tool column above names the tool for each command.
+
+- The tools work on one project folder, where the command uses the current folder. A framework adapter pins them to the folder it was built for, so they take no folder argument and reach nothing outside it. Called as plain functions, each takes `project` (and `new_project` takes `directory`) instead.
+- A relative `output` for `join` is read against the project folder.
+- Each tool returns JSON with `ok`, the paths it wrote, and its findings or report.
+- `ok: false` with `error` means the tool could not run. Do what the error says, then call it again.
+- `ok: false` without `error` is a failed check, as when the command exits `1`. Fix the findings and run the step again.
+- `render` and `prepare_voice` take `allow_download`. Pass `true` only after the user has agreed to that download. Without it, a missing model is refused and never fetched. The tools never wait for an answer.
+- `contact_sheet` writes the sheets of the finished video, or of the last draft, so you can look at the picture again without drafting.
+- When the framework has no file tools of its own, use `read_project_file`, `write_project_file` and `list_project_files`. They only reach files inside the project.
+- When the framework has no skills loader, call `read_skill` with a skill's name (and a file it links to) to read it.
 
 ## Skills in your agents
 
