@@ -1,0 +1,14 @@
+{
+  "name": "token-panel",
+  "function": "token_panel",
+  "helpers": ["mark"],
+  "description": "A monospace panel of short lines (token fields, config, a request); box rows as they are named.",
+  "tags": ["code", "token", "security"],
+  "parameters": [
+    {"name": "lines", "description": "the rows, as strings"},
+    {"name": "title", "description": "small label in the top-left corner"},
+    {"name": "size", "description": "font size of the rows"},
+    {"name": "pad", "description": "space inside the panel, in scene units"}
+  ],
+  "returns": "VGroup with .bg, .title, .rows; mark(panel, i, j, colour) boxes rows i..j"
+}

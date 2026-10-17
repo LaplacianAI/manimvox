@@ -1,0 +1,17 @@
+{
+  "name": "sequence-diagram",
+  "function": "sequence_diagram",
+  "helpers": [],
+  "description": "Actors as lifelines and the messages between them in order, replies dashed: who calls whom.",
+  "tags": ["sequence", "protocol", "api"],
+  "parameters": [
+    {"name": "actors", "description": "column names, left to right"},
+    {"name": "messages", "description": "list of (from, to, label) or (from, to, label, \"reply\")"},
+    {"name": "top", "description": "y of the actor boxes"},
+    {"name": "bottom", "description": "y where the lifelines end"},
+    {"name": "width", "description": "distance from the first actor to the last"},
+    {"name": "colors", "description": "one colour per actor; default BLUE"},
+    {"name": "size", "description": "font size of message labels"}
+  ],
+  "returns": "VGroup with .lifelines and .messages (in order)"
+}

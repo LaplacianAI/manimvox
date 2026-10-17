@@ -1,0 +1,16 @@
+{
+  "name": "bug-grid",
+  "function": "bug_grid",
+  "helpers": ["light"],
+  "description": "One square per item (bugs, tests, files) in a grid; light a slice of it as they are counted.",
+  "tags": ["count", "grid", "proportion"],
+  "parameters": [
+    {"name": "n", "description": "how many squares"},
+    {"name": "cols", "description": "squares per row"},
+    {"name": "size", "description": "square width in scene units"},
+    {"name": "gap", "description": "space between squares"},
+    {"name": "fill", "description": "fill colour before lighting; default PANEL"},
+    {"name": "stroke", "description": "outline colour before lighting; default LINE"}
+  ],
+  "returns": "VGroup of squares in reading order; light(grid[:k], colour) fills the first k"
+}

@@ -1,0 +1,16 @@
+{
+  "name": "code-diff",
+  "function": "code_diff",
+  "helpers": [],
+  "description": "Code before and after a change, side by side, with removed and added lines banded in colour.",
+  "tags": ["code", "diff", "change"],
+  "parameters": [
+    {"name": "before", "description": "source text before the change"},
+    {"name": "after", "description": "source text after the change"},
+    {"name": "title_before", "description": "label of the left panel"},
+    {"name": "title_after", "description": "label of the right panel"},
+    {"name": "size", "description": "font size of the code"},
+    {"name": "w", "description": "width of each panel in scene units"}
+  ],
+  "returns": "VGroup with .left and .right panels (.bg, .title, .rows) and .removed and .added bands"
+}

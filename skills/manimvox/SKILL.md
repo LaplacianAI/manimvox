@@ -52,6 +52,7 @@ The workflows read these; open one when you need it.
 - [manimvox-animation](../manimvox-animation/SKILL.md): motion patterns.
 - [manimvox-voice](../manimvox-voice/SKILL.md): engines, voices, pronunciation, cloning consent.
 - [manimvox-cli](../manimvox-cli/SKILL.md): the commands and how to read their output.
+- [manimvox-blocks](../manimvox-blocks/SKILL.md): ready-made charts and diagrams to copy into a project.
 
 ## 6 What done means
 

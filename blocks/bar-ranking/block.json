@@ -1,0 +1,18 @@
+{
+  "name": "bar-ranking",
+  "function": "bar_ranking",
+  "helpers": ["grow", "value_x"],
+  "description": "Horizontal bars ranked by value with labels and values; highlight the leaders, mark a threshold.",
+  "tags": ["chart", "ranking", "bars"],
+  "parameters": [
+    {"name": "rows", "description": "list of (label, value), top to bottom"},
+    {"name": "max_value", "description": "the value of a full-width bar; default the largest value"},
+    {"name": "width", "description": "full bar width in scene units"},
+    {"name": "row_h", "description": "row height in scene units"},
+    {"name": "colors", "description": "row index → colour; other rows are muted; default {0: ACCENT}"},
+    {"name": "size", "description": "font size"},
+    {"name": "fmt", "description": "format of the value text, e.g. \"{:.1f}\" or \"{:,.0f}\""},
+    {"name": "label_w", "description": "widest a label may be before it shrinks"}
+  ],
+  "returns": "VGroup with .rows (each VGroup(label, bar, value)); grow(chart) reveals them; value_x(chart, v) gives a value's x"
+}

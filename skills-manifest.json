@@ -2,15 +2,19 @@
   "version": "0.1.0",
   "skills": {
     "manimvox": {
-      "sha256": "f5ccf50375ba9adf117dfeae2783751ad454f2add0e8cf1df6010ae67364b3fb",
+      "sha256": "d8941eaa1a766558415daf231be48b0f58e7234bbff648a4430ac65a1a24c265",
       "files": 1
     },
     "manimvox-animation": {
-      "sha256": "8846a74f8aed24e5a84b8f60506f383a5d80774f26f7b22590ffd0a768d86e1b",
+      "sha256": "b44ef72b64204c8888e21de20b90e559dc86e06c260474e5043fed58d753cf15",
+      "files": 3
+    },
+    "manimvox-blocks": {
+      "sha256": "16359844a17d9397d82e6c578f35c138708293e146e8de2bd64f62cc02135f12",
       "files": 2
     },
     "manimvox-cli": {
-      "sha256": "18258d38da3f7ca1d61695035e6c5206cbeb670de0137cb49d8e859b1a95762c",
+      "sha256": "e7dc74f60d565ac0b70aa847abdc3675d85b08b731134012f8a19747f36e7202",
       "files": 1
     },
     "manimvox-concept": {
@@ -18,7 +22,7 @@
       "files": 1
     },
     "manimvox-core": {
-      "sha256": "0e2e39bd570929315ae26555eaef76b458f9ded82112e862f4f5cd786ef2a70e",
+      "sha256": "985865fddb811af7f8ccfe2942295bda39124e4613f4bbbe57f25a606bd52fb5",
       "files": 2
     },
     "manimvox-creative": {
@@ -30,7 +34,7 @@
       "files": 1
     },
     "manimvox-playlist": {
-      "sha256": "6721fc310661c744742b5c140f836885674999f780c31baef9f6ec50f8456302",
+      "sha256": "fd816f6d1d44a62811f165903af6d6588213cdc35c113af5be4897c735dfeb0e",
       "files": 3
     },
     "manimvox-pr": {
@@ -38,7 +42,7 @@
       "files": 1
     },
     "manimvox-voice": {
-      "sha256": "5f1ebc3df536eae35932ac4bf808d6c5ca375457f62af12f2f052bea7850882c",
+      "sha256": "14773f9ab33aa28b475f36d04af835116b51599812b6905c458eedbca047ede4",
       "files": 1
     }
   }

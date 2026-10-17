@@ -160,7 +160,7 @@ def transcode_720(src: Path, dst: Path) -> None:
                 out.mux(p)
 
 
-def _slug(series: str) -> str:
+def series_slug(series: str) -> str:
     return re.sub(r"[^A-Za-z0-9]+", "-", series).strip("-") or "playlist"
 
 
@@ -183,7 +183,7 @@ def package(project: Project) -> list[Path]:
     index, _, _ = build_index(project)
     share = project.root / "share"
     share.mkdir(exist_ok=True)
-    name = _slug(project.series)
+    name = series_slug(project.series)
     zips = []
     for label, small in ((name, False), (f"{name}-720p", True)):
         d = share / label

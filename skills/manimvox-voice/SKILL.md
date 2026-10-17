@@ -1,6 +1,6 @@
 ---
 name: manimvox-voice
-description: "Choosing and preparing the narration voice for a manimvox video: the eight engines (Kokoro default, Piper, macOS say, edge-tts, OpenAI, ElevenLabs, XTTS-v2, F5-TTS), their licences and privacy, listing voices, fixing pronunciation in series.json, voice-cloning consent, and subtitles. Use when the user asks for a different, online or cloned voice, or a word is mispronounced."
+description: "Choosing and preparing the narration voice for a manimvox video: the eight engines (Kokoro default, Piper, macOS say, edge-tts, OpenAI, ElevenLabs, XTTS-v2, F5-TTS), their licences and privacy, listing voices, fixing pronunciation in series.json, voice-cloning consent, a music bed under the narration, burned-in captions, and subtitles. Use when the user asks for a different, online or cloned voice, or a word is mispronounced."
 license: MIT
 ---
 
@@ -96,9 +96,23 @@ If a word is mispronounced, fix it in the voice, not in the text on screen.
 
 `speed` in `series.json` is a number above 0, `1.0` by default. ElevenLabs accepts only 0.7 to 1.2 and stops the render outside it.
 
-## Subtitles
+## Subtitles, captions and music
 
-Every render writes `out/<stem>.srt` from the on-screen text (the `text` of each line, not `tts`). Nothing to configure.
+**Subtitles.** Every render writes `out/<stem>.srt` from the on-screen text (the `text` of each line, not `tts`).
+
+**Configuration.** `series.json` may hold a `post` object, which `manimvox render` applies after the audio check:
+
+```json
+"post": {"music": "music/bed.mp3", "music_db": -16, "duck_db": -12, "captions": "burn", "end_card": ["Sources: FACTS.md"], "card_seconds": 3}
+```
+
+- `music` is a file in the project. It loops or is cut to the episode, fades in and out, and dips `duck_db` under every narration line. `music_db` (default -16) is its level; `duck_db` (default -12) is the extra cut while someone speaks. Both are numbers from -60 to 0.
+- `captions` is `"srt"` (the default, ship the `.srt` only) or `"burn"` (draw the subtitles into the picture as well). Burned captions cover the bottom of the stage, so keep notes clear of it or ship the `.srt` only. Burned captions are drawn without complex-script shaping; for Arabic, CJK or other complex scripts ship the `.srt` instead.
+- `end_card` adds up to 4 lines (80 characters each) on a closing card; a single string is accepted. `card_seconds` (default 3, from 1 to 10) is how long it shows.
+
+**Music rights.** manimvox ships no music and never downloads any. Use only a file the user provides and has the right to use; ask before fetching any music. With no way to ask, render without music.
+
+**The audio check** runs on the narration alone, so music never hides a silent line. With `post.music` set, `manimvox check audio` checks the narration-only render in `build/` and says so.
 
 ## When it fails
 

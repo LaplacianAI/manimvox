@@ -1,6 +1,6 @@
 ---
 name: manimvox-cli
-description: "The manimvox command line and how to read its output: doctor, new, draft, render, check theme|layout|audio, voices, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
+description: "The manimvox command line and how to read its output: doctor, new, draft, render, check theme|layout|audio, voices, add, join, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
 license: MIT
 ---
 
@@ -46,6 +46,8 @@ Ask the user before installing anything: a system package, manimvox itself, or a
 | `manimvox check layout EP` | none | nothing | 1 on findings |
 | `manimvox check audio EP` | none | nothing | 1 if a line is silent |
 | `manimvox voices [ENGINE]` | `--prepare ENGINE[:VOICE]`, `-y` | model files in the cache | 1 on a voice error |
+| `manimvox add [BLOCK ...]` | `--list`, `--force` | `blocks/<block>.py`, `blocks/__init__.py` | 1 on an unknown block or one already in the project without `--force` |
+| `manimvox join [EP ...]` | `-o OUT.mp4`, `--no-cards` | `out/<Series>.mp4` and `.srt` (title card, then the episodes in order, each with its own end card) | 1 if an episode is not rendered or the frame rates differ |
 | `manimvox index` | none | `out/index.html` | 1 on error |
 | `manimvox package` | none | `share/<Name>/`, `share/<Name>-720p/` and a zip of each | 1 on error |
 | `manimvox skills install\|check\|update\|remove` | see [Skills in your agents](#skills-in-your-agents) | the skill folders of your coding agents | 1 on a problem, 2 with no terminal and no flag |
@@ -55,6 +57,9 @@ Notes:
 - `draft` renders 480p at 10 fps with no voice. `render` renders 1080p at 30 fps with the voice and ends with the audio check.
 - `check layout` reads the report of the last `draft`; run `draft` first or it says so.
 - `index` and `package` use only episodes that have a finished `out/<stem>.mp4`. Render first.
+- `render` prints a `post:` line for each step of `series.json` `post` (music bed, burned captions, end card), or `post: skipped until the audio check passes`. See [manimvox-voice](../manimvox-voice/SKILL.md).
+- When `post.music` is set, `check audio` checks the narration-only render in `build/` and says so.
+- Blocks are in [manimvox-blocks](../manimvox-blocks/SKILL.md).
 - Voice choice, engines and pronunciation are in [manimvox-voice](../manimvox-voice/SKILL.md). Ask the user before using an online voice: the narration text leaves the machine.
 
 ## Reading the output
@@ -84,14 +89,14 @@ These skills reach a coding agent through `manimvox skills`. Run it only with th
 
 | Command | What it does |
 |---|---|
-| `manimvox skills install` | puts the ten skills in each agent's skills folder. With `npx` present it hands off to `npx skills`; `--native` forces manimvox's own installer |
+| `manimvox skills install` | puts the eleven skills in each agent's skills folder. With `npx` present it hands off to `npx skills`; `--native` forces manimvox's own installer |
 | `manimvox skills check` | prints `<folder>: ok`, or which skills are `outdated`, `missing` or `broken`; exits `1` on any of those |
 | `manimvox skills update` | installs again, in the mode (link or copy) each folder already uses |
 | `manimvox skills remove` | deletes only the manimvox skills, never another entry |
 
 Flags by subcommand: `install` takes `--agent ID` (repeatable), `--global` or `--project`, `--copy`, `--native`, `-y` / `--yes`; `check` takes `--global` or `--project`; `update` takes `--global` or `--project` and `-y` / `--yes` (nothing to ask, so it changes nothing); `remove` takes `--global` or `--project` and `-y` / `--yes`. `--global` works on every project, `--project` (the default) on this one.
 
-- `install`, `update` and `remove` touch only the ten manimvox skills. Anything else at one of those names is left untouched with a message ("exists and is not a manimvox skill; left untouched") and the command exits `1`, on the `npx` path too: it checks before handing off and does not run `npx` if anything would be overwritten.
+- `install`, `update` and `remove` touch only the eleven manimvox skills. Anything else at one of those names is left untouched with a message ("exists and is not a manimvox skill; left untouched") and the command exits `1`, on the `npx` path too: it checks before handing off and does not run `npx` if anything would be overwritten.
 - `check`, `update` and `remove` look in every known agent folder for the scope, not only the detected agents. `check` and `update` exit `1` and say so when nothing is installed.
 - With no terminal, `install` needs `--yes` on every path, native included (add `--agent ID` to choose agents; without it every detected agent gets the skills, or the shared `.agents/skills` folder when none is detected) and `remove` needs `--yes`; otherwise they exit `2`. An `npx` found in the current folder is ignored; the built-in installer runs instead. On a terminal, `--yes` skips the questions.
 - After upgrading manimvox, run `manimvox skills update`.
@@ -113,8 +118,9 @@ Flags by subcommand: `install` takes `--agent ID` (repeatable), `--global` or `-
 | `episodes/` | one `epNN_name.py` per episode |
 | `research/` | source material |
 | `out/` | finished `.mp4` and `.srt`, and `index.html` |
+| `blocks/` | blocks copied by `manimvox add`, owned by the project |
 | `sheets/` | contact sheets from drafts |
-| `build/` | Manim's working files and the layout report (safe to delete) |
+| `build/` | Manim's working files and the layout report (safe to delete; `check audio` needs it when `post.music` is set) |
 | `.manimvox/tts` | cached narration audio |
 | `share/` | packages from `manimvox package` |
 

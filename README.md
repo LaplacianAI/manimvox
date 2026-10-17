@@ -6,7 +6,7 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
 ![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)
 
-> **Status:** early development (0.1). The engine, CLI and agent skills work today; extra animation libraries and a PyPI release are on the [roadmap](#roadmap).
+> **Status:** early development (0.1). The engine, CLI and agent skills work today; a PyPI release and more agent-framework tools are on the [roadmap](#roadmap).
 
 ## Features
 
@@ -63,6 +63,8 @@ uv tool install --force "manimvox[kokoro,piper] @ git+https://github.com/Laplaci
 | `cloud` | OpenAI and ElevenLabs (standard library; needs an API key) |
 | `xtts` | XTTS-v2 voice cloning (installs PyTorch) |
 | `f5` | F5-TTS voice cloning (installs PyTorch) |
+| `matplotlib` | Matplotlib charts as scenes (`manimvox.scenes`) |
+| `plotly` | Plotly charts as scenes (Kaleido needs Chrome on the machine) |
 
 ## Quickstart
 
@@ -120,7 +122,7 @@ The result is `out/ep01_vectors.mp4` and `out/ep01_vectors.srt`. The render fini
 
 ## Use it from your coding agent
 
-manimvox ships ten agent skills, so your coding agent can plan, write, render and check a video for you. Install them into the agents you use:
+manimvox ships eleven agent skills, so your coding agent can plan, write, render and check a video for you. Install them into the agents you use:
 
 ```bash
 npx skills add LaplacianAI/manimvox                      # detects your agents and lets you pick
@@ -138,7 +140,7 @@ manimvox skills update
 manimvox skills remove
 ```
 
-Other flags: `--project` (the default) installs in the current project, `--copy` copies the skills instead of linking them, and `--native` skips npx even when it is present. Without a terminal, `install` and `remove` need `--yes` (with `--agent ID` to choose agents), npx or not. An `npx` in the current folder is ignored. Only the ten manimvox skills are ever touched.
+Other flags: `--project` (the default) installs in the current project, `--copy` copies the skills instead of linking them, and `--native` skips npx even when it is present. Without a terminal, `install` and `remove` need `--yes` (with `--agent ID` to choose agents), npx or not. An `npx` in the current folder is ignored. Only the eleven manimvox skills are ever touched.
 
 `npx skills add LaplacianAI/manimvox` fetches from GitHub, so it installs whatever is on the default branch. `manimvox skills install` installs the skills that match your installed manimvox version.
 
@@ -157,6 +159,7 @@ Then ask your agent: "make an explainer video of <paper / repo / idea / PR>".
 | `manimvox-creative` | Theme, story and narration, and the facts discipline |
 | `manimvox-voice` | Choosing and preparing the voice: engines, licences, pronunciation, cloning consent |
 | `manimvox-cli` | The command line and how to read its output |
+| `manimvox-blocks` | Ready-made charts and diagrams to copy into a project, and how to write one |
 | `manimvox-paper` | One document into a 5-10 minute explainer, every claim traced to the source |
 | `manimvox-playlist` | A codebase or spec into a beginner-to-advanced playlist, with page and zips |
 | `manimvox-concept` | An idea with no source document into a 3Blue1Brown-style video |
@@ -174,6 +177,8 @@ Then ask your agent: "make an explainer video of <paper / repo / idea / PR>".
 | `manimvox check audio EP` | Every narration line is audible in the final video |
 | `manimvox voices [ENGINE]` | Engines with status and licence, or the voices of one engine |
 | `manimvox voices --prepare ENGINE[:VOICE] [--yes]` | Download and check a voice ahead of a render |
+| `manimvox add [BLOCK ...] [--list] [--force]` | Copy a scene block into the project's `blocks/` folder |
+| `manimvox join [EP ...] [-o OUT.mp4] [--no-cards]` | Join rendered episodes into one video with a title card (each episode keeps its own end card) |
 | `manimvox doctor` | System libraries, fonts and voice engines |
 
 `EP` can be written `ep01`, `1`, or the episode's file stem. Commands exit non-zero on any failed check. Without a terminal, manimvox never prompts: pass `--yes` (or set `MANIMVOX_ASSUME_YES=1`) to allow downloads.
@@ -202,6 +207,47 @@ An episode is a class that subclasses `Episode` and implements `build()`. `from 
 - **Theme colours:** `BG PANEL LINE INK MUTED ACCENT OK WARN ERROR BLUE ORANGE VIOLET PINK TEAL`, plus any colour named in the theme (written in capitals).
 
 Keep content inside the safe stage: x from −6.6 to 6.6, y from −3.45 to 3.15. The header and the progress bar sit outside it.
+
+## Blocks, charts and finishing
+
+### Blocks
+
+A block is a ready-made scene component, copied into your project so you own it.
+
+```bash
+manimvox add --list          # every block, with what it draws
+manimvox add bar-ranking     # writes blocks/bar_ranking.py and prints the import line
+```
+
+```python
+from blocks.bar_ranking import bar_ranking, grow, value_x
+```
+
+The nine blocks: `venn`, `bar-ranking`, `line-by-level`, `log-scatter`, `bug-grid`, `token-panel`, `request-flow`, `sequence-diagram` and `code-diff`. `manimvox add` never replaces a block already in the project; `--force` does.
+
+### Charts
+
+`manimvox.scenes` turns frames from Pillow, Cairo, Matplotlib or Plotly into a clip you place and play like any mobject, in the theme's colours.
+
+```python
+import matplotlib.pyplot as plt
+from manimvox.scenes import from_matplotlib, mpl_style
+with plt.rc_context(mpl_style()):
+    fig, ax = plt.subplots(figsize=(9.6, 5.4)); ax.plot([1, 2, 3], [2, 5, 3])
+clip = from_matplotlib(fig)   # then clip.move_to(...), self.add(clip), self.play(clip.play(), ...)
+```
+
+Install the `matplotlib` or `plotly` extra for them (see the extras table). Plotly exports through Kaleido, which needs Chrome; manimvox never downloads it for you.
+
+### Finishing
+
+`series.json` may hold a `post` object that `manimvox render` applies after the audio check:
+
+```json
+"post": {"music": "music/bed.mp3", "music_db": -16, "duck_db": -12, "captions": "burn", "end_card": ["Sources: FACTS.md"], "card_seconds": 3}
+```
+
+`music` is a file you provide; it loops under the narration and dips by `duck_db` while someone speaks. `captions` is `"srt"` (default) or `"burn"`. `end_card` is up to 4 lines. `manimvox join` then makes one video of the rendered episodes: a title card, then each episode with its own end card.
 
 ## Configuration
 
@@ -304,10 +350,13 @@ src/manimvox/
   playlist.py       manimvox index and package
   runner.py         runs Manim in a subprocess
   kit/              Episode, components, theme, text (what episodes import)
+  scenes/           clips from Pillow, Cairo, Matplotlib and Plotly
+  post/             music bed, captions, cards, join
+  blocks.py         block registry, manimvox add, the preview tool
   checks/           theme, layout, audio, contact sheets
   voice/            the voice interface, cache, downloads, HTTP, audio conversion
   voice/engines/    one module per text-to-speech engine
-skills/             the ten agent skills (bundled into the wheel)
+skills/             the eleven agent skills (bundled into the wheel)
 .claude-plugin/     Claude Code plugin and marketplace manifests
 .codex-plugin/      Codex plugin manifest
 .cursor-plugin/     Cursor plugin manifest
@@ -317,7 +366,6 @@ tests/
 
 ## Roadmap
 
-- Scene adapters for Matplotlib, Plotly and Pillow/Cairo; MoviePy finishing; reusable scene blocks
 - Tools for Python agent frameworks (Agno, LangChain Deep Agents, Pydantic AI, OpenAI Agents SDK)
 - PyPI release and CI on macOS, Linux and Windows
 

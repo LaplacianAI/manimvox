@@ -8,6 +8,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .post.options import PostOptions, parse_post
+
 SERIES_FILE = "series.json"
 
 
@@ -35,6 +37,7 @@ class Project:
     speed: float = 1.0
     pron: list[tuple[str, str]] = field(default_factory=list)
     theme: dict = field(default_factory=dict)
+    post: PostOptions = field(default_factory=PostOptions)
     episodes: list[EpisodeRef] = field(default_factory=list)
 
     @property
@@ -101,6 +104,10 @@ def load_project(root: Path) -> Project:
     theme = data.get("theme", {})
     if not isinstance(theme, dict):
         raise ProjectError(f"{f}: 'theme' must be an object, got {theme!r}")
+    try:
+        post = parse_post(data.get("post"))
+    except ValueError as e:
+        raise ProjectError(f"{f}: {e}") from e
     return Project(
         root=root,
         series=data["series"],
@@ -109,6 +116,7 @@ def load_project(root: Path) -> Project:
         speed=float(speed),
         pron=_pron(f, data.get("pron", [])),
         theme=dict(theme),
+        post=post,
         episodes=_episodes(f, root, data.get("episodes", [])),
     )
 
