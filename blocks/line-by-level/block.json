@@ -1,0 +1,17 @@
+{
+  "name": "line-by-level",
+  "function": "line_by_level",
+  "helpers": ["point"],
+  "description": "A line chart over named steps (effort levels, versions, weeks), one labelled line per series.",
+  "tags": ["chart", "line", "trend"],
+  "parameters": [
+    {"name": "levels", "description": "names of the x steps, left to right"},
+    {"name": "series", "description": "list of (name, values, colour), one value per level"},
+    {"name": "y_max", "description": "top of the y axis"},
+    {"name": "y_ticks", "description": "values that get a gridline; default quarters of y_max"},
+    {"name": "width", "description": "plot width in scene units"},
+    {"name": "height", "description": "plot height in scene units"},
+    {"name": "size", "description": "font size"}
+  ],
+  "returns": "VGroup with .grid, .xlabels, .lines (VGroup(line, dots, labels) per series), .legend; point(chart, i, v) gives a position"
+}

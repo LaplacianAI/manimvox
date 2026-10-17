@@ -169,3 +169,31 @@ def test_demo_renders_cleanly_and_matches_its_preview(b, tmp_path):
     assert findings == []
     with Image.open(b.path / "preview.png") as want:
         assert difference(last_frame(mp4), want) <= PREVIEW_TOLERANCE
+
+
+def _import_block(tmp_path, monkeypatch, name):
+    import importlib
+
+    add_block(tmp_path, name, root=REG)
+    monkeypatch.syspath_prepend(str(tmp_path))
+    for mod in [m for m in sys.modules if m == "blocks" or m.startswith("blocks.")]:
+        monkeypatch.delitem(sys.modules, mod)
+    return importlib.import_module(f"blocks.{get_block(name, REG).module}")
+
+
+def test_value_x_follows_the_chart_when_it_moves_and_scales(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "bar-ranking")
+    chart = m.bar_ranking([("a", 50.0), ("b", 100.0)], width=4.0)
+    before = m.value_x(chart, 50)
+    chart.shift([1.0, 0, 0]).scale(2.0, about_point=[0.0, 0.0, 0.0])
+    assert m.value_x(chart, 50) == pytest.approx((before + 1.0) * 2.0, abs=1e-6)
+
+
+def test_point_and_place_follow_the_chart(tmp_path, monkeypatch):
+    lv = _import_block(tmp_path, monkeypatch, "line-by-level")
+    c = lv.line_by_level(["a", "b", "c"], [("s", [0, 5, 10], "#ffffff")], y_max=10, width=4.0, height=2.0)
+    c.shift([0.5, -1.0, 0])
+    assert lv.point(c, 2, 10) == pytest.approx(c.frame[1].get_center())
+    ls = _import_block(tmp_path, monkeypatch, "log-scatter")
+    s = ls.log_scatter([("p", 1.0, 50, "#ffffff")], x_range=(0.1, 10), width=4.0, height=2.0)
+    assert ls.place(s, 1.0, 50) == pytest.approx(s.marks[0][0].get_center())
