@@ -139,12 +139,11 @@ def test_from_plotly_without_chrome_names_the_fix_and_stops_the_server(fake_kale
     assert not fake_kaleido.state["running"]
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def kaleido_loggers():
+    """from_plotly leaves Kaleido's loggers at WARNING for the rest of the process; each test gets them back."""
     loggers = [logging.getLogger("kaleido"), logging.getLogger("choreographer")]
     saved = [lg.level for lg in loggers]
-    for lg in loggers:
-        lg.setLevel(logging.INFO)
     yield loggers
     for lg, level in zip(loggers, saved):
         lg.setLevel(level)
@@ -161,21 +160,25 @@ def _chatty(original):
 
 def test_kaleido_info_logs_stay_out_of_the_render(fake_kaleido, kaleido_loggers, caplog):
     go = pytest.importorskip("plotly.graph_objects")
+    for lg in kaleido_loggers:
+        lg.setLevel(logging.INFO)
     fake_kaleido.calc_fig_sync = _chatty(fake_kaleido.calc_fig_sync)
     with caplog.at_level(logging.INFO):
         from_plotly(go.Figure(), size=(64, 36))
     assert not [r for r in caplog.records if r.getMessage() == "noise"]
-    assert [lg.level for lg in kaleido_loggers] == [logging.INFO, logging.INFO]
+    assert [lg.level for lg in kaleido_loggers] == [logging.WARNING, logging.WARNING]
 
 
-def test_kaleido_levels_come_back_after_a_missing_chrome(fake_kaleido, kaleido_loggers, caplog):
+def test_kaleido_loggers_stay_at_warning_after_a_missing_chrome(fake_kaleido, kaleido_loggers, caplog):
     go = pytest.importorskip("plotly.graph_objects")
+    for lg in kaleido_loggers:
+        lg.setLevel(logging.INFO)
     fake_kaleido.calc_fig_sync = _chatty(fake_kaleido.calc_fig_sync)
     fake_kaleido.state["fail"] = True
     with caplog.at_level(logging.INFO), pytest.raises(SceneError, match="plotly_get_chrome"):
         from_plotly(go.Figure())
     assert not [r for r in caplog.records if r.getMessage() == "noise"]
-    assert [lg.level for lg in kaleido_loggers] == [logging.INFO, logging.INFO]
+    assert [lg.level for lg in kaleido_loggers] == [logging.WARNING, logging.WARNING]
 
 
 def test_doctor_reports_the_chart_extras(capsys):
