@@ -1,6 +1,7 @@
 """A Clip: frames from another library, placed on the stage and played against narration."""
 from __future__ import annotations
 
+import hashlib
 import io
 from collections.abc import Sequence
 
@@ -52,6 +53,9 @@ class Clip(ImageMobject):
             raise SceneError(f"every frame must be the same size, got {sorted(sizes)}")
         self.frames = frames
         self.fps = float(fps)
+        # Manim's play cache writes each bytes value as its type name, so frames 1..n would never reach the
+        # key; this digest does, and a changed frame re-renders instead of reusing a stale partial movie.
+        self.frames_digest = hashlib.sha256(b"".join(hashlib.sha256(f).digest() for f in frames)).hexdigest()
         self._shown = 0
         super().__init__(self._decode(0), **kwargs)
         self.scale_to_fit_width(width)  # an ImageMobject's own size depends on the render's resolution

@@ -105,3 +105,24 @@ def test_a_clip_plays_in_a_rendered_episode(tmp_path):
     with av.open(str(mp4)) as c:
         grey = [int(f.to_ndarray(format="gray")[200, 300]) for f in c.decode(video=0)]
     assert grey[0] < 40 and max(grey) > 200 and len({g // 40 for g in grey}) >= 3
+
+
+def _play_key(clip):
+    """The text Manim hashes for a clip in a play call (include_pixel_array, as for animations)."""
+    from manim.utils.hashing import _get_json, _Memoizer
+
+    return _get_json(clip, _Memoizer(), include_pixel_array=True)
+
+
+def test_cache_key_changes_when_a_later_frame_changes():
+    a = from_frames(lambda t: solid(0 if t < 1 else 50), seconds=3, fps=1)
+    b = from_frames(lambda t: solid(0 if t < 1 else 200), seconds=3, fps=1)  # same first frame
+    same = from_frames(lambda t: solid(0 if t < 1 else 50), seconds=3, fps=1)
+    assert _play_key(a) != _play_key(b)
+    assert _play_key(a) == _play_key(same)
+
+
+def test_cache_key_changes_with_fps():
+    a = from_frames(lambda t: solid(5), seconds=2, fps=1)
+    b = from_frames(lambda t: solid(5), seconds=1, fps=2)
+    assert _play_key(a) != _play_key(b)
