@@ -74,13 +74,24 @@ def _cmd_render(args) -> int:
     if eng.noncommercial:
         print(f"note: {spec.engine} is for non-commercial use only: {eng.licence}")
     out = pr.out_dir / f"{ep.stem}.mp4"
+    srt = pr.out_dir / f"{ep.stem}.srt"
     out.unlink(missing_ok=True)
-    (pr.out_dir / f"{ep.stem}.srt").unlink(missing_ok=True)
+    srt.unlink(missing_ok=True)
     built = render_episode(pr, ep, "final", spec)
     pr.out_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(built, out)
+    rep = check_audio(built, srt)  # the narration alone: a music bed would hide a silent line
+    if pr.post.active and rep.ok:
+        from .checks.audio import read_cues
+        from .kit.theme import Theme
+        from .post.finish import finish
+
+        for line in finish(built, out, read_cues(srt), pr.post, Theme.from_dict(pr.theme), pr.root):
+            print(f"post: {line}")
+    else:
+        shutil.copy2(built, out)
+        if pr.post.active:
+            print("post: skipped until the audio check passes")
     print(f"final: {out}  (voice {spec})")
-    rep = check_audio(out, pr.out_dir / f"{ep.stem}.srt")
     print(rep)
     return 0 if rep.ok else 1
 
@@ -111,9 +122,54 @@ def _cmd_check(args) -> int:
             print(f)
         print("layout check: ok" if not found else f"layout check: {len(found)} finding(s)")
         return 1 if found else 0
-    rep = check_audio(pr.out_dir / f"{ep.stem}.mp4", pr.out_dir / f"{ep.stem}.srt")
+    srt = pr.out_dir / f"{ep.stem}.srt"
+    video = pr.out_dir / f"{ep.stem}.mp4"
+    if pr.post.music is not None:
+        from .runner import built_path
+
+        video = built_path(pr, ep, "final")
+        print(f"note: checking the narration-only render {video}; out/{ep.stem}.mp4 has the music mixed in")
+    rep = check_audio(video, srt)
     print(rep)
     return 0 if rep.ok else 1
+
+
+def _cmd_join(args) -> int:
+    from .checks.audio import Cue, read_cues
+    from .kit.theme import Theme
+    from .playlist import duration, series_slug
+    from .post.finish import concat, srt_text
+    from .project import ProjectError
+
+    pr = _project()
+    if args.episodes:
+        eps = [pr.episode(e) for e in args.episodes]
+        missing = [e.stem for e in eps if not (pr.out_dir / f"{e.stem}.mp4").is_file()]
+        if missing:
+            raise ProjectError(f"not rendered yet: {', '.join(missing)}; run manimvox render first")
+    else:
+        eps = [e for e in pr.episodes if (pr.out_dir / f"{e.stem}.mp4").is_file()]
+        if not eps:
+            raise ProjectError("no rendered episodes in out/: run `manimvox render <episode>` first")
+    dst = Path(args.output) if args.output else pr.out_dir / f"{series_slug(pr.series)}.mp4"
+    if dst.suffix.lower() != ".mp4":
+        raise ValueError(f"--output must end in .mp4, got {dst.name}")
+    parts = [pr.out_dir / f"{e.stem}.mp4" for e in eps]
+    if dst.resolve() in {p.resolve() for p in parts}:
+        raise ValueError(f"{dst} is one of the episodes being joined; choose another --output")
+    dst.parent.mkdir(parents=True, exist_ok=True)
+    title = None if args.no_cards else [pr.series] + ([pr.tagline] if pr.tagline else [])
+    end = () if args.no_cards else pr.post.end_card
+    starts = concat(parts, dst, Theme.from_dict(pr.theme), title=title, end=end, card_seconds=pr.post.card_seconds)
+    cues = []
+    for e, s in zip(eps, starts):
+        srt = pr.out_dir / f"{e.stem}.srt"
+        if srt.is_file():
+            cues += [Cue(c.start + s, c.end + s, c.text) for c in read_cues(srt)]
+    dst.with_suffix(".srt").write_text(srt_text(cues), encoding="utf-8")
+    secs = round(duration(dst))
+    print(f"joined {len(eps)} episode{'s' if len(eps) != 1 else ''}: {dst} ({secs // 60}:{secs % 60:02d})")
+    return 0
 
 
 def _cmd_voices(args) -> int:
@@ -417,6 +473,12 @@ def build_parser() -> argparse.ArgumentParser:
     s = p._sub.add_parser("package", help="share/<Name> and share/<Name>-720p folders and zips")
     s.set_defaults(func=_cmd_package)
 
+    s = p._sub.add_parser("join", help="join rendered episodes into one video, with a title card and an end card")
+    s.add_argument("episodes", nargs="*", help="episodes in order (default: every rendered episode)")
+    s.add_argument("-o", "--output", help="the joined MP4 (default: out/<series>.mp4)")
+    s.add_argument("--no-cards", action="store_true", help="no title card or end card")
+    s.set_defaults(func=_cmd_join)
+
     s = p._sub.add_parser("voices", help="voice engines: ready or not, licence, voices")
     s.add_argument("engine", nargs="?", help="list this engine's voices")
     s.add_argument(
@@ -466,12 +528,13 @@ def main(argv: list[str] | None = None) -> int:
     if func is None:
         p.print_help()
         return 2
+    from .post.options import PostError
     from .project import ProjectError
     from .runner import RenderError
     from .voice import VoiceError
 
     try:
         return func(args)
-    except (ProjectError, VoiceError, RenderError, ValueError, OSError) as e:
+    except (ProjectError, VoiceError, RenderError, PostError, ValueError, OSError) as e:
         print(f"manimvox: {e}", file=sys.stderr)
         return 1
