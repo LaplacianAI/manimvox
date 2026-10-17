@@ -2491,6 +2491,7 @@ dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
     { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pillow" },
+    { name = "pycairo" },
     { name = "soundfile" },
 ]
 
@@ -2526,6 +2527,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=1.26" },
     { name = "pillow", specifier = ">=10" },
     { name = "piper-tts", marker = "extra == 'piper'", specifier = ">=1.8,<2" },
+    { name = "pycairo", specifier = ">=1.14,<2" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
     { name = "soundfile", specifier = ">=0.12" },

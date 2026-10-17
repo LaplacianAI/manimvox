@@ -15,6 +15,7 @@ dependencies = [
   "soundfile>=0.12",
   "av>=12",
   "pillow>=10",
+  "pycairo>=1.14,<2",
 ]
 
 [project.optional-dependencies]
