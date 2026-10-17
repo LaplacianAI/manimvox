@@ -6,11 +6,11 @@
       "files": 1
     },
     "manimvox-animation": {
-      "sha256": "c3ac50f4b60f8d94cc4d84b9098cabd2ec0f358fa904edd1bfec356b0508f62d",
+      "sha256": "b44ef72b64204c8888e21de20b90e559dc86e06c260474e5043fed58d753cf15",
       "files": 3
     },
     "manimvox-blocks": {
-      "sha256": "66a42d81ec6e127417c4959d23de6a08e8ab3e291eaade2bc4f4bd8c04db8fed",
+      "sha256": "b0b1ddee2126b85c74d7205328c7db364127f90f8b3eb60a4b6ec9d111e4ded3",
       "files": 2
     },
     "manimvox-cli": {
@@ -34,7 +34,7 @@
       "files": 1
     },
     "manimvox-playlist": {
-      "sha256": "9aa7001f8803f6fcb52d4cf9627b2481ec10a3056f02172e73dc2411edb23a72",
+      "sha256": "fd816f6d1d44a62811f165903af6d6588213cdc35c113af5be4897c735dfeb0e",
       "files": 3
     },
     "manimvox-pr": {

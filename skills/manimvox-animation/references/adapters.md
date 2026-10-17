@@ -24,6 +24,7 @@
 
 ```python
 from PIL import Image, ImageDraw
+from manimvox.scenes import from_frames, palette
 def image_at(t):
     im = Image.new("RGB", (1280, 720), palette()["bg"])
     ImageDraw.Draw(im).ellipse([100 + 200 * t, 200, 300 + 200 * t, 400], fill=palette()["accent"])
@@ -53,7 +54,7 @@ plt.close(fig)
 
 ## Plotly
 
-- The extra is `manimvox[kokoro,plotly]`.
+- The extra is `manimvox[kokoro,plotly]`. Ask the user before installing it; with no way to ask, use kit shapes or a block instead.
 - Kaleido needs Chrome. If it is missing, the error names `plotly_get_chrome`, which downloads Chrome. Ask the user first. With no way to ask, use Matplotlib instead.
 - Use `fig.update_layout(template=plotly_template())`. `from_plotly(fig)` gives a still. `from_plotly(lambda t: make_fig(t), seconds=3, fps=10)` gives an animation, one export per frame, so keep `seconds * fps` small.
 

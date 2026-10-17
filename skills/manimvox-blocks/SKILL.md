@@ -39,7 +39,7 @@ Put that line under `from manimvox.kit import *` in the episode. Episodes run fr
 ## Use and adapt it
 
 - Read the copied file. The function's docstring lists the parameters, what it returns, and which parts to reveal one by one.
-- A block rejects input it cannot draw (an empty list, a negative value) with a `ValueError`; its docstring ends with a `Limits:` or `Raises` line saying which.
+- Most blocks reject input they cannot draw (an empty list, a negative value) with a `ValueError`; the docstring says which, so read it before passing odd data.
 - Blocks draw in the theme's colours (`ACCENT`, `OK`, a named colour), so they need no theming step.
 - Place the result like any kit component (`.move_to(...)`), and reveal its parts with `say` and `steps` as the narration names them; see [manimvox-animation](../manimvox-animation/SKILL.md).
 - Helpers that give positions (`value_x`, `point`, `place`) stay right after you move or scale the block.

@@ -48,6 +48,8 @@ Fill `SERIES.md` and the `episodes` list in `series.json` as [series design](ref
 
 ## 4 Episodes
 
+Before the authors start, you own `blocks/`: run `manimvox add --list`, copy the blocks the series needs with `manimvox add <block>`, and list them, with their import lines, in each author's brief. Authors never run `manimvox add`, so parallel authors do not race on `blocks/`.
+
 Write one episode per author, each given the brief in [episode-author](sub-agents/episode-author.md) with every bracket filled. If your environment can run helpers in parallel, run one author per episode at once; otherwise write the episodes one after another yourself, each against that brief. Authors draft only (`manimvox draft`, no voice, no download) and read every contact sheet.
 
 Afterwards:
