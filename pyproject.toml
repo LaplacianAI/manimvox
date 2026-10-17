@@ -28,6 +28,11 @@ f5 = ["f5-tts>=1.1,<2"]
 cloud = []
 matplotlib = ["matplotlib>=3.8,<4"]
 plotly = ["plotly>=6.1,<8", "kaleido>=1.1,<2"]
+# agent frameworks: manimvox.integrations.<name>
+agno = ["agno>=3.1,<4"]
+langchain = ["langchain-core>=1.6,<2", "deepagents>=0.7,<0.8"]
+pydantic-ai = ["pydantic-ai-slim>=2.57,<3"]
+openai-agents = ["openai-agents>=0.24,<0.25"]
 dev = ["pytest>=8", "ruff>=0.6", "matplotlib>=3.8,<4", "plotly>=6.1,<8"]
 
 [project.scripts]
