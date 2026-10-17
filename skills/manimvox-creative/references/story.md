@@ -52,7 +52,7 @@ Tests for the ladder:
 - An outside idea that the project borrows (another product, a paper) gets its own episode or chapter before the project's version, so there is something to compare against.
 - The last episode leaves the viewer able to read the source document themselves.
 
-Each episode in `series.json` has `n`, `stem`, `cls`, `title`, and optionally `level` and `blurb` (one sentence for the playlist page). The stem starts `epNN_` and the class is `EpNN`. Write `SERIES.md` with the ladder and the beats of every episode before any episode is drafted.
+Each episode in `series.json` has `n`, `stem`, `cls`, `title`, and optionally `level` and `blurb` (one sentence for the playlist page). The stem starts `epNN_` (letters, digits, `_`, `-` and `.` only) and the class is `EpNN`. Write `SERIES.md` with the ladder and the beats of every episode before any episode is drafted.
 
 ## Code change
 

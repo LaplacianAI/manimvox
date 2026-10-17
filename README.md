@@ -181,9 +181,9 @@ pip install "manimvox[kokoro,haystack] @ git+https://github.com/LaplacianAI/mani
 pip install "manimvox[kokoro,google-adk] @ git+https://github.com/LaplacianAI/manimvox"
 ```
 
-Install one, in the environment your agent runs in. Every adapter takes the project folder, such as `hash-maps`, and pins the tools to it.
+Install one, in the environment your agent runs in. Each tool builder (`manimvox_tools`, `ManimvoxTools`, `manimvox_toolset`) takes the project folder, such as `hash-maps`, and pins the tools to it.
 
-Agno loads the skills itself and takes the tools as a toolkit:
+Agno (set `AGNO_TELEMETRY=false` if you do not want Agno to send usage telemetry) loads the skills itself and takes the tools as a toolkit:
 
 ```python
 import manimvox
@@ -265,11 +265,11 @@ agent = LlmAgent(..., tools=[*manimvox_tools("hash-maps"), manimvox_skill_toolse
 
 **Security.** Each adapter pins the tools to the one project folder it was built with, so the model cannot name another folder. But an episode is Python, and `render` runs it with your permissions. Run an agent in a container or VM when the model or its input is untrusted.
 
-CrewAI and the OpenAI Agents SDK cannot share one environment: they need different major versions of `openai`. Install them separately.
+CrewAI cannot share an environment with the OpenAI Agents SDK (they need different major versions of `openai`) or with the `f5` voice extra (CrewAI needs `rich>=14.2`, F5-TTS needs `rich<14`). Install them separately. CrewAI also needs Python below 3.14, and sends usage telemetry unless you set `CREWAI_DISABLE_TELEMETRY=true`.
 
 Other frameworks:
 - Frameworks that read `SKILL.md` folders take `manimvox.skills_path()`: Microsoft Agent Framework (`SkillsProvider.from_paths`) and AG2 (`SkillsToolkit`).
-- Any framework can register `manimvox.integrations.common.json_tools()` and `file_tools()` as plain functions.
+- Any framework can register `manimvox.integrations.common.json_tools(folder)` and `file_tools(folder)` as plain functions.
 - `pydantic-ai-harness[skills]` and the OpenAI SDK's sandbox `Skills` are native alternatives to `read_skill`.
 
 Notes:
@@ -458,7 +458,7 @@ Tests that render with Manim are marked `slow`.
 src/manimvox/
   cli.py            the manimvox command
   tools.py          typed tools mirroring the CLI, for agents with no shell
-  integrations/    adapters for eight agent frameworks
+  integrations/     adapters for eight agent frameworks
   project.py        series.json loading and validation
   scaffold.py       manimvox new
   skills.py         finds the bundled agent skills
@@ -472,7 +472,7 @@ src/manimvox/
   checks/           theme, layout, audio, contact sheets
   voice/            the voice interface, cache, downloads, HTTP, audio conversion
   voice/engines/    one module per text-to-speech engine
-examples/agents/  one script per framework
+examples/agents/   one script per framework
 skills/             the eleven agent skills (bundled into the wheel)
 .claude-plugin/     Claude Code plugin and marketplace manifests
 .codex-plugin/      Codex plugin manifest

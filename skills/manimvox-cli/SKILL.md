@@ -87,9 +87,9 @@ Fix every finding, then draft again. A draft that exits `0` only proves the code
 
 An agent built on a Python framework calls the same commands as tools. The Tool column above names the tool for each command.
 
-- The tools work on one project folder, where the command uses the current folder. A framework adapter pins them to the folder it was built for, so they take no folder argument and reach nothing outside it. Called as plain functions, each takes `project` (and `new_project` takes `directory`) instead.
+- The tools work on one project folder, where the command uses the current folder. A framework adapter pins them to the folder it was built for, so they take no folder argument and reach nothing outside it. Called as plain functions, each tool that works on a project takes `project` (and `new_project` takes `directory`) instead.
 - A relative `output` for `join` is read against the project folder.
-- Each tool returns JSON with `ok`, the paths it wrote, and its findings or report.
+- Each manimvox tool returns JSON with `ok`, the paths it wrote, and its findings or report. The file tools and `read_skill` return plain text instead, and `error: ...` when they fail.
 - `ok: false` with `error` means the tool could not run. Do what the error says, then call it again.
 - `ok: false` without `error` is a failed check, as when the command exits `1`. Fix the findings and run the step again.
 - `render` and `prepare_voice` take `allow_download`. Pass `true` only after the user has agreed to that download. Without it, a missing model is refused and never fetched. The tools never wait for an answer.

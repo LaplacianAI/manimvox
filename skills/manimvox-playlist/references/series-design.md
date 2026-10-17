@@ -41,7 +41,7 @@ One concrete scenario threaded through every episode, named identically each tim
 
 ## 5 · In series.json
 
-Each episode: `{"n", "stem", "cls", "title", "level", "blurb"}`. `stem` is the file name without `.py` and must start `epNN_`; `cls` is `EpNN`. The blurb is one sentence for the playlist page. The general story rules are in [story](../../manimvox-creative/references/story.md).
+Each episode: `{"n", "stem", "cls", "title", "level", "blurb"}`. `stem` is the file name without `.py` and must start `epNN_` and hold only letters, digits, `_`, `-` and `.`; `cls` is `EpNN`. The blurb is one sentence for the playlist page. The general story rules are in [story](../../manimvox-creative/references/story.md).
 
 ## 6 · Show the user
 

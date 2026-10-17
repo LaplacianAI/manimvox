@@ -45,7 +45,7 @@ class Ep01(Episode):
 "episodes": [{"n": 1, "stem": "ep01_vectors", "cls": "Ep01", "title": "What is a vector?"}]
 ```
 
-`NCHAP` must equal the number of `self.chapter(...)` calls. `stem` is the file name without `.py`; `cls` is the class name.
+`NCHAP` must equal the number of `self.chapter(...)` calls. `stem` is the file name without `.py`, starts `ep`, and holds only letters, digits, `_`, `-` and `.` (no `/`, spaces or `..`); `cls` is the class name.
 
 ## Rules that matter most
 
