@@ -175,8 +175,40 @@ def test_bound_tools_refuse_a_folder_that_is_not_itself_a_project(project):
     assert not (inner / "x.md").exists() and not (project / "x.md").exists()
 
 
-def test_bound_join_output_stays_inside(project):
+def test_bound_join_output_stays_inside(project, tmp_path, monkeypatch):
+    home = tmp_path / "home"
+    home.mkdir()
+    (home / "film.srt").write_text("keep", encoding="utf-8")
+    monkeypatch.setenv("HOME", str(home))
+    monkeypatch.setenv("USERPROFILE", str(home))
     join = by_name(common.json_tools(project))["join"]
-    for out in ("../film.mp4", str(project.parent / "film.mp4")):
+    for out in ("../film.mp4", str(project.parent / "film.mp4"), "~/film.mp4"):
         res = json.loads(join(output=out))
-        assert res["ok"] is False and "inside the project" in res["error"]
+        assert res["ok"] is False and "inside the project" in res["error"], out
+    assert sorted(p.name for p in home.iterdir()) == ["film.srt"]
+    assert (home / "film.srt").read_text(encoding="utf-8") == "keep"
+
+
+def test_bound_prepare_voice_does_not_walk_up_to_an_enclosing_project(project):
+    inner = project / "episodes"
+    out = json.loads(by_name(common.json_tools(inner))["prepare_voice"]("fake:tone"))
+    assert out["ok"] is False and "series.json" in out["error"] and "new_project" in out["error"]
+
+
+@pytest.mark.parametrize("name", ["render", "prepare_voice"])
+@pytest.mark.parametrize("voice", ["xtts:clone=/etc/hosts.wav", "xtts:clone=../x.wav", "xtts:clone=~/x.wav",
+                                   "piper:/etc/model.onnx"])
+def test_bound_voice_paths_must_be_inside(project, name, voice):
+    fn = by_name(common.json_tools(project))[name]
+    args = {"episode": "ep01"} if name == "render" else {}
+    out = json.loads(fn(voice=voice, **args))
+    assert out["ok"] is False and "voice file must be inside" in out["error"]
+
+
+@pytest.mark.parametrize("name", ["render", "prepare_voice"])
+def test_bound_voice_ids_and_inside_paths_pass_the_check(project, name):
+    fn = by_name(common.json_tools(project))[name]
+    args = {"episode": "ep01"} if name == "render" else {}
+    for voice in ("fake:tone", "kokoro:af_heart", "piper:en_US-amy-medium", "xtts:clone=refs/me.wav"):
+        out = json.loads(fn(voice=voice, **args))
+        assert "voice file must be inside" not in out.get("error", ""), voice

@@ -59,16 +59,37 @@ def json_tool(fn: Callable) -> Callable[..., str]:
 
 
 PINNED = ("project", "directory")  # the folder argument: `directory` for new_project, `project` for the rest
-NO_PROJECT_YET = {"new_project", "prepare_voice"}  # tools that may run before series.json exists
+NO_PROJECT_YET = {"new_project"}  # the only tool that may run before series.json exists
+PATH_SUFFIXES = (".wav", ".onnx")
+
+
+def _confined(ref: str, root: Path) -> Path | None:
+    """The absolute path ref names, resolved as the tools do (~ expanded, relative to root), or None if outside root."""
+    p = Path(ref).expanduser()
+    p = (p if p.is_absolute() else root / p).resolve()
+    return p if p.is_relative_to(root) else None
+
+
+def _voice_path(voice: str) -> str | None:
+    """The file a voice spec points at (xtts:clone=<path>, a piper .onnx), or None for a plain voice id."""
+    ref = voice.split(":", 1)[1] if ":" in voice else ""
+    ref = ref.removeprefix("clone=").strip()
+    looks_like_path = ("/" in ref or "\\" in ref or ref.startswith("~") or Path(ref).is_absolute()
+                       or ref.lower().endswith(PATH_SUFFIXES))
+    return ref if ref and looks_like_path else None
 
 
 def bound(fn: Callable, root: str | Path) -> Callable:
     """fn pinned to one folder: its `project` (or new_project's `directory`) is removed and always set to root.
 
-    A model given bound tools reaches nothing outside root: it cannot name another folder, create a project
-    elsewhere, or join a film to a path outside. A tool that takes a project, other than new_project and
-    prepare_voice, needs root itself to hold series.json, so a folder inside another project cannot reach that project. A refusal is a ToolError, or an
-    "error: ..." string from a function that returns text.
+    What is confined: the folder argument (a model cannot name another folder or create a project elsewhere), the
+    file tools' paths, join's output, and voice file paths (xtts clone=, piper .onnx), which must resolve inside
+    root. A tool that takes a project, other than new_project, needs root itself to hold series.json, so a folder
+    inside another project cannot reach that project. A refusal is a ToolError, or an "error: ..." string from a
+    function that returns text.
+
+    What is not confined: paths written inside series.json (episode files, post.music) and the episode Python that
+    render and draft run. That is the project's own content, and it runs with the user's permissions.
     """
     root = Path(root).expanduser().resolve()
     hints = typing.get_type_hints(fn)
@@ -85,8 +106,15 @@ def bound(fn: Callable, root: str | Path) -> Callable:
         given = new_sig.bind(*args, **kwargs).arguments
         if "project" in pinned and fn.__name__ not in NO_PROJECT_YET and not (root / SERIES_FILE).is_file():
             return refuse(f"no project in {root} yet (no {SERIES_FILE}): create it with new_project")
-        if given.get("output") is not None and not (root / given["output"]).resolve().is_relative_to(root):
-            return refuse(f"the output must be inside the project folder {root}")
+        if given.get("output") is not None:
+            out = _confined(given["output"], root)
+            if out is None:
+                return refuse(f"the output must be inside the project folder {root}")
+            given["output"] = str(out)  # the checked path, so the tool cannot read it any other way
+        if given.get("voice"):
+            ref = _voice_path(given["voice"])
+            if ref is not None and _confined(ref, root) is None:
+                return refuse(f"the voice file must be inside the project folder {root}")
         return fn(**given, **{n: str(root) for n in pinned})
 
     run.__name__ = run.__qualname__ = fn.__name__
