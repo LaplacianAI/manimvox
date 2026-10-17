@@ -10,17 +10,19 @@ For each video, write 5 to 7 chapters, each as one idea and the picture that car
 |---|---|---|
 | 3 | Cosine similarity: two texts are near when their vectors point the same way | two arrows from the origin; the angle between them closes as the texts get closer in meaning; the number 1 minus distance beside it |
 
+Above the table, write the question the video answers and the situation that shows it. Below it, write the exit: the takeaway the video ends on, and what comes next (the next episode's opening question, or where the idea shows up). The opening, bridges and ending are written in the [script](script.md).
+
 One idea per chapter. If a chapter needs "and", split it. Show the table to the user before writing scenes if you can ask; if you cannot, state the outline you chose and continue.
 
 ## Paper
 
 Hook, claim, evidence, limits, takeaway, in 5 to 7 chapters.
 
-1. **Hook:** the problem the paper's field has, in terms a newcomer feels.
+1. **Hook:** the problem the paper's field has, in terms a newcomer feels, and the question the video will answer.
 2. **Claim:** what the paper says it did, in one sentence the viewer could repeat.
 3. **Evidence:** the method in one or two chapters, then the results, drawn as the paper's own figures where they can be redrawn.
 4. **Limits:** what the paper says it does not show, and what it assumes.
-5. **Takeaway:** what the viewer can now do or read next.
+5. **Takeaway:** return to the hook and answer it, then what the viewer can now do or read next.
 
 Anything from outside the paper (another paper, a later result) is `[EXTERNAL]` and labelled as such on screen. See [facts](facts.md).
 
@@ -28,11 +30,12 @@ Anything from outside the paper (another paper, a later result) is `[EXTERNAL]` 
 
 A question that hooks, intuition built visually, the name, the formula last, where it shows up.
 
-1. **A question** the viewer wants answered, before any term appears.
+1. **A question, with its problem on screen:** the obvious way, drawn, and where it is slow or wrong, before any term appears.
 2. **Build the intuition visually:** one example, moved step by step, until the viewer could guess the rule.
 3. **Name it:** only now give the term, defined in a phrase.
 4. **The formula last:** it should read as a summary of what the viewer already saw, written with Unicode in `T` or `code()`, never LaTeX.
-5. **Where it shows up:** two or three places, so the idea is not left as a puzzle.
+5. **Back to the question:** solve the opening situation with the idea, on screen.
+6. **Where it shows up:** two or three places, so the idea is not left as a puzzle.
 
 ## Playlist
 
@@ -58,11 +61,11 @@ Each episode in `series.json` has `n`, `stem`, `cls`, `title`, and optionally `l
 
 For explaining a pull request or a diff.
 
-1. **What changed:** the shape of the change in one picture, such as the files or components touched.
-2. **Why:** the problem it fixes or the need behind it, in the reader's terms.
+1. **Why:** the bug or need, shown on the old path.
+2. **What changed:** the shape of the change in one picture, such as the files or components touched.
 3. **Before and after:** the same input through the old path and the new path, side by side.
 4. **Risk:** what could break, what was tested, and what was not.
-5. **How to try it:** the commands or steps a reviewer can run.
+5. **How to try it:** the commands or steps a reviewer can run, ending on the opening case passing on the new path.
 
 Keep it short: reviewers watch these between other work.
 
@@ -72,4 +75,4 @@ Thread one concrete scenario through the whole video or series, named identicall
 
 ## Chapters and pacing
 
-A video of 5 to 8 minutes has 5 to 7 chapters. Open each chapter with its idea, not the previous recap. Vary the kind of scene: a flow, a hub and spokes, a table lit row by row, a before and after, a zoom into one box, a sequence diagram, a graph drawn node by node. Carry an object from one scene into the next where it helps the viewer keep their place. How to build each scene is in [manimvox-core](../../manimvox-core/SKILL.md).
+A video of 5 to 8 minutes has 5 to 7 chapters. Open each chapter on something concrete, not a recap, and end it on a takeaway and a bridge to the next (see [script](script.md)). Vary the kind of scene: a flow, a hub and spokes, a table lit row by row, a before and after, a zoom into one box, a sequence diagram, a graph drawn node by node. Carry an object from one scene into the next where it helps the viewer keep their place. How to build each scene is in [manimvox-core](../../manimvox-core/SKILL.md).

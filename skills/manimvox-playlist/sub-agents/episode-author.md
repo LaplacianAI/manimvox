@@ -9,13 +9,18 @@ Read first, in this order (the skill files are in the manimvox skills folder: ru
 1. manimvox-core's SKILL.md, then its references/author-guide.md   the rules, the kit API, the lessons
 2. [series dir]/SERIES.md    the viewer, the ladder, your beats, the running example
 3. [series dir]/FACTS.md     the only claims you may make
-4. [earlier finished episode path, if one exists]   pacing and scene variety
+4. manimvox-creative's references/script.md   the opening, bridges, ending, pace, and the worked example
+5. [earlier finished episode, if one exists]   pacing and scene variety
 
 Your episode: [NN] · [title] · [level]
 File: episodes/[stem].py, class [cls], NCHAP = [n]
 Beats: the entry for episode [NN] under "Episode beats" in SERIES.md. Episodes before yours taught: [one line
 each]. Do not re-teach them; a one-sentence reminder is fine. Episodes after
 yours will teach: [one line each]. Do not take their material.
+
+Your opening question: [previous episode's exit question, or the series' question]. Your exit: [this episode's exit from SERIES.md].
+
+First write episodes/[stem].md: the script, then its critique, every answer yes. Only then write the code.
 
 Commands: manimvox draft [stem] --every 5 only. Never run manimvox render; the
 orchestrator renders finals. Read every sheet image in sheets/, fix what is

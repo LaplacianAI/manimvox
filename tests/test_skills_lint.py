@@ -108,3 +108,10 @@ def test_cli_skill_names_every_tool():
 def test_router_points_agents_without_a_shell_to_the_tools():
     text = (ROOT / "manimvox" / "SKILL.md").read_text(encoding="utf-8")
     assert "../manimvox-cli/SKILL.md#without-a-shell" in text
+
+
+def test_script_guide_exists_and_workflows_link_it():
+    assert (ROOT / "manimvox-creative" / "references" / "script.md").is_file()
+    for w in ("manimvox-concept", "manimvox-paper", "manimvox-pr", "manimvox-playlist"):
+        text = (ROOT / w / "SKILL.md").read_text(encoding="utf-8")
+        assert "../manimvox-creative/references/script.md" in text, f"{w} does not link the script guide"

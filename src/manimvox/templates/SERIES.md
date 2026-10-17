@@ -32,7 +32,9 @@ carries it:
 
 1. **<!-- chapter -->**: <!-- idea --> / <!-- picture -->
 
-Ends by pointing at episode 2.
+Opens on: <!-- the question, and the situation that shows it -->
+
+Exit: <!-- the takeaway it ends on, and the question episode 2 opens on -->
 
 ## Running examples
 

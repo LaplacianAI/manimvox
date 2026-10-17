@@ -16,9 +16,10 @@ Copy this checklist and keep it current:
 - [ ] 2 Facts      FACTS.md: one claim per line, page or URL, labelled
 - [ ] 3 Theme      series.json theme (manimvox-creative); manimvox check theme passes
 - [ ] 4 Outline    5–7 chapters, idea + picture each; show the user
-- [ ] 5 Episode    episodes/ep01_*.py (manimvox-core); draft until every sheet is clean
-- [ ] 6 Final      manimvox render ep01; audio check ok; look at 4–6 frames
-- [ ] 7 Report     path, duration, chapters, unverifiable claims and their labels
+- [ ] 5 Script     episodes/ep01_*.md: every line, critique answered; show the user
+- [ ] 6 Episode    episodes/ep01_*.py (manimvox-core); draft until every sheet is clean
+- [ ] 7 Final      manimvox render ep01; audio check ok; look at 4–6 frames
+- [ ] 8 Report     path, duration, chapters, script file and what was cut, unverifiable claims and their labels
 ```
 
 ## Consent, before anything else
@@ -65,26 +66,31 @@ The audience is a beginner unless the user says otherwise. Choose the theme as [
 
 ## 4 Outline
 
-Follow the paper shape in [story](../manimvox-creative/references/story.md): a hook, the claim, the evidence, the limits, the takeaway. Plan 5 to 7 chapters, each one idea with the picture that carries it. Write the outline into `SERIES.md`, with the facts each chapter uses.
+Follow the paper shape in [story](../manimvox-creative/references/story.md): a hook, the claim, the evidence, the limits, the takeaway. Plan 5 to 7 chapters, each one idea with the picture that carries it. Write the outline into `SERIES.md`, with the facts each chapter uses. The opening is the field's problem the paper answers; the ending returns to it with the paper's result.
 
 Show the outline to the user and wait for approval. If the user cannot be asked, state the outline in your reply and continue.
 
-## 5 Episode
+## 5 Script
 
-Register one episode in `series.json` and write `episodes/ep01_<name>.py` as [manimvox-core](../manimvox-core/SKILL.md) and its author guide say. Motion patterns are in [manimvox-animation](../manimvox-animation/SKILL.md). The narration for a 5 to 10 minute video is about 800 to 1,500 words (see [narration](../manimvox-creative/references/narration.md)).
+Write the narration in `episodes/ep01_<name>.md` before any code, as [script](../manimvox-creative/references/script.md) says: an opening that shows the problem and asks the one question, chapters that end on a takeaway and a bridge, an ending that answers the question and says what is next. Answer its critique checklist in writing until every answer is yes. If the requested length is short, keep the opening and the ending and cut ideas; say what you cut. Show the script to the user with the outline if you can ask; if you cannot, state it and continue.
+
+## 6 Episode
+
+Register one episode in `series.json` and write `episodes/ep01_<name>.py` as [manimvox-core](../manimvox-core/SKILL.md) and its author guide say. Motion patterns are in [manimvox-animation](../manimvox-animation/SKILL.md). The narration for a 5 to 8 minute video is about 750 to 1,150 words (see [narration](../manimvox-creative/references/narration.md)).
 
 Then loop: `manimvox draft ep01 --every 5`, read every contact sheet in `sheets/`, fix, repeat until it prints `layout check: ok` and the sheets read well. If you cannot view images, run `manimvox check layout ep01` and say so in the report. The draft uses no voice and downloads nothing.
 
-## 6 Final
+## 7 Final
 
 Run `manimvox render ep01`. This needs the narration voice. A model download needs the user's go-ahead (pass `--yes` or `-y` only after they have said yes to it), and so does an online voice. If the user cannot be asked, a needed download counts as the voice being unusable: use [manimvox-voice](../manimvox-voice/SKILL.md)'s local fallback (a local voice `manimvox voices` shows ready, named in the report), else stop and report. The render is done only when it prints `audio check: ok`. If a line is silent, reword it and render again.
 
 If you can view video or images, look at 4 to 6 moments of `out/ep01_<name>.mp4`, one from each stage of the story. Otherwise the draft's sheets and `manimvox check layout ep01` (which reads the last draft, not the final) are the check, and the report says the final's frames were not viewed.
 
-## 7 Report
+## 8 Report
 
 Give the user:
 - the path of `out/ep01_<name>.mp4` and its `.srt`, the length, and the chapter titles;
+- the script file (`episodes/ep01_<name>.md`), any critique answer that is still not yes, and what you cut for length and where it went;
 - the voice used, and why if it is not the default;
 - every claim that could not be verified against the document, with its label;
 - any `[EXTERNAL]` material and its source;

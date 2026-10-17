@@ -94,6 +94,8 @@ If a word is mispronounced, fix it in the voice, not in the text on screen.
 
 ## Speed
 
+System voices often speak faster than the default (about 190 words a minute against about 170). When you fall back to one, set `speed` to 0.9 in `series.json` and check the pace after the render.
+
 `speed` in `series.json` is a number above 0, `1.0` by default. ElevenLabs accepts only 0.7 to 1.2 and stops the render outside it.
 
 ## Subtitles, captions and music

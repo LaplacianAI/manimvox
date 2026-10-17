@@ -27,7 +27,7 @@ Tests for the ladder:
 
 ## 3 · Beats
 
-For each episode, 5 to 7 chapters, each a line: the one idea and the picture that carries it. Naming the pictures here keeps authors from defaulting to bullet lists:
+For each episode, 5 to 7 chapters, each a line: the one idea and the picture that carries it. Naming the pictures here keeps authors from defaulting to bullet lists. Each episode's beats start with its opening question and end with its exit: the takeaway, and the question the next episode opens on. "Exit: the nearest match is a skill, not an agent; how do we find who holds it? → episode 4." The last episode's exit is what to read next.
 
 ```text
 3. **Cosine similarity**: two texts are near when their vectors point the same
