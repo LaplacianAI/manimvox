@@ -11,12 +11,13 @@ from __future__ import annotations
 import dataclasses
 import inspect
 import json
+import re
 import typing
 from collections.abc import Callable
 from pathlib import Path
 
 from .. import tools
-from ..project import ProjectError, find_project
+from ..project import SERIES_FILE, ProjectError, find_project
 from ..skills import SKILL_NAMES, read_frontmatter, skill_dirs, skills_path
 
 REPO = "git+https://github.com/LaplacianAI/manimvox"
@@ -24,7 +25,7 @@ MAX_READ = 200_000  # characters a read returns; the rest is cut, with a note
 SKIP = {"build", "media", ".manimvox", "__pycache__", ".git"}  # renders, caches and history, never worth listing
 INSTRUCTIONS = (
     "The manimvox tools make narrated explainer videos. Where a skill says to run `manimvox <command>`, call the "
-    "tool the manimvox-cli skill names for that command, passing the project folder as `project`. Every tool "
+    "tool the manimvox-cli skill names for that command. Every tool "
     "returns JSON with `ok`. `ok: false` with `error` means the tool could not run: do what the error says, then "
     "call it again. `ok: false` without `error` is a failed check: fix its findings and run that step again. "
     "Pass allow_download=true only after the user has agreed to that download."
@@ -57,9 +58,49 @@ def json_tool(fn: Callable) -> Callable[..., str]:
     return run
 
 
-def json_tools() -> list[Callable[..., str]]:
-    """Every manimvox tool, returning JSON text."""
-    return [json_tool(f) for f in tools.TOOLS]
+PINNED = ("project", "directory")  # the folder argument: `directory` for new_project, `project` for the rest
+NO_PROJECT_YET = {"new_project", "prepare_voice"}  # tools that may run before series.json exists
+
+
+def bound(fn: Callable, root: str | Path) -> Callable:
+    """fn pinned to one folder: its `project` (or new_project's `directory`) is removed and always set to root.
+
+    A model given bound tools reaches nothing outside root: it cannot name another folder, create a project
+    elsewhere, or join a film to a path outside. A tool that takes a project, other than new_project and
+    prepare_voice, needs root itself to hold series.json, so a folder inside another project cannot reach that project. A refusal is a ToolError, or an
+    "error: ..." string from a function that returns text.
+    """
+    root = Path(root).expanduser().resolve()
+    hints = typing.get_type_hints(fn)
+    sig = inspect.signature(fn, eval_str=True)
+    pinned = [n for n in PINNED if n in sig.parameters]
+    new_sig = sig.replace(parameters=[p for p in sig.parameters.values() if p.name not in pinned])
+
+    def refuse(message: str):
+        if hints.get("return") is str:
+            return f"error: {message}"
+        raise tools.ToolError(message)
+
+    def run(*args, **kwargs):
+        given = new_sig.bind(*args, **kwargs).arguments
+        if "project" in pinned and fn.__name__ not in NO_PROJECT_YET and not (root / SERIES_FILE).is_file():
+            return refuse(f"no project in {root} yet (no {SERIES_FILE}): create it with new_project")
+        if given.get("output") is not None and not (root / given["output"]).resolve().is_relative_to(root):
+            return refuse(f"the output must be inside the project folder {root}")
+        return fn(**given, **{n: str(root) for n in pinned})
+
+    run.__name__ = run.__qualname__ = fn.__name__
+    run.__module__ = fn.__module__
+    drop = re.compile(rf"^\s+({'|'.join(pinned)}): ") if pinned else None
+    run.__doc__ = "\n".join(line for line in (fn.__doc__ or "").splitlines() if not (drop and drop.match(line)))
+    run.__annotations__ = {n: hints[n] for n in new_sig.parameters} | {"return": hints["return"]}
+    run.__signature__ = new_sig
+    return run
+
+
+def json_tools(project: str | Path | None = None) -> list[Callable[..., str]]:
+    """Every manimvox tool, returning JSON text; pinned to `project` when given (what an agent should get)."""
+    return [json_tool(bound(f, project) if project is not None else f) for f in tools.TOOLS]
 
 
 def _inside(project: str, path: str) -> tuple[Path, Path]:
@@ -120,8 +161,10 @@ def list_project_files(project: str, folder: str = ".") -> str:
     return "\n".join(rows) or "(no files)"
 
 
-def file_tools() -> list[Callable[..., str]]:
-    return [read_project_file, write_project_file, list_project_files]
+def file_tools(project: str | Path | None = None) -> list[Callable[..., str]]:
+    """Read, write and list text files in a project; pinned to `project` when given (what an agent should get)."""
+    fns = [read_project_file, write_project_file, list_project_files]
+    return [bound(f, project) for f in fns] if project is not None else fns
 
 
 def read_skill(skill: str, path: str = "SKILL.md") -> str:
@@ -158,5 +201,5 @@ def manimvox_instructions() -> str:
 def project_note(project: str | Path) -> str:
     """One line telling the model where the project is, to add to an agent's instructions."""
     root = Path(project).expanduser().resolve()
-    return (f"The project folder is {root}. Pass it as `project` to every manimvox tool; if it holds no "
-            f"series.json yet, create the project there with new_project.")
+    return (f"The project folder is {root}. The manimvox tools and file tools work only in that "
+            f"folder; if it holds no series.json yet, create the project there with new_project.")

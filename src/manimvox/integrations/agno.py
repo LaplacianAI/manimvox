@@ -5,10 +5,12 @@
     import manimvox
     from manimvox.integrations.agno import ManimvoxTools
 
-    agent = Agent(skills=Skills(loaders=[LocalSkills(str(manimvox.skills_path()))]), tools=[ManimvoxTools()])
+    agent = Agent(skills=Skills(loaders=[LocalSkills(str(manimvox.skills_path()))]), tools=[ManimvoxTools("hash-maps")])
 """
 
 from __future__ import annotations
+
+from pathlib import Path
 
 from .common import INSTRUCTIONS, file_tools, json_tools, missing
 
@@ -19,10 +21,10 @@ except ImportError as e:
 
 
 class ManimvoxTools(Toolkit):
-    """Every manimvox tool, plus read, write and list for project files unless files=False."""
+    """Every manimvox tool, plus read, write and list for project files unless files=False, pinned to `project`."""
 
-    def __init__(self, files: bool = True, **kwargs):
+    def __init__(self, project: str | Path, files: bool = True, **kwargs):
         kwargs.setdefault("name", "manimvox")
         kwargs.setdefault("instructions", INSTRUCTIONS)
         kwargs.setdefault("add_instructions", True)
-        super().__init__(tools=json_tools() + (file_tools() if files else []), **kwargs)
+        super().__init__(tools=json_tools(project) + (file_tools(project) if files else []), **kwargs)

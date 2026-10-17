@@ -43,9 +43,9 @@ def test_agno_toolkit(tmp_path):
 
     from manimvox.integrations.agno import ManimvoxTools
 
-    tk = ManimvoxTools()
+    tk = ManimvoxTools(tmp_path)
     assert tk.name == "manimvox" and set(tk.functions) == TOOL_NAMES | FILE_NAMES
-    assert set(ManimvoxTools(files=False).functions) == TOOL_NAMES
+    assert set(ManimvoxTools(tmp_path, files=False).functions) == TOOL_NAMES
 
     def call(name, **args):
         f = tk.functions[name]
@@ -53,21 +53,21 @@ def test_agno_toolkit(tmp_path):
         return json.loads(FunctionCall(function=f, arguments=args).execute().result)
 
     assert any(b["name"] == "bar-ranking" for b in call("list_blocks")["blocks"])
-    err = call("check", project=str(tmp_path), what="theme")
+    err = call("check", what="theme")
     assert err["ok"] is False and "series.json" in err["error"]
     tk.functions["draft"].process_entrypoint()  # the schema is built here; to_dict() is empty before
     params = tk.functions["draft"].to_dict()["parameters"]
-    assert set(params["required"]) == {"project", "episode"} and params["properties"]["every"]["description"]
+    assert set(params["required"]) == {"episode"} and params["properties"]["every"]["description"]
 
 
 def test_langchain_tools(tmp_path):
     pytest.importorskip("langchain_core")
     from manimvox.integrations.langchain import manimvox_tools
 
-    ts = {t.name: t for t in manimvox_tools()}
+    ts = {t.name: t for t in manimvox_tools(tmp_path)}
     assert set(ts) == TOOL_NAMES
     assert ts["draft"].args["every"]["description"]
-    msg = ts["check"].invoke({"name": "check", "args": {"project": str(tmp_path), "what": "theme"},
+    msg = ts["check"].invoke({"name": "check", "args": {"what": "theme"},
                               "id": "1", "type": "tool_call"})
     out = json.loads(msg.content)
     assert out["ok"] is False and "series.json" in out["error"]
@@ -81,6 +81,7 @@ def test_deep_agent_kwargs(tmp_path):
     assert (tmp_path / "video").is_dir() and kw["skills"] == [SKILLS_ROUTE]
     assert str((tmp_path / "video").resolve()) in kw["system_prompt"]
     assert {t.name for t in kw["tools"]} == TOOL_NAMES
+    assert all("project" not in t.args for t in kw["tools"])
     (rule,) = kw["permissions"]
     assert (rule.operations, rule.paths, rule.mode) == (["write"], [f"{SKILLS_ROUTE}**"], "deny")
     assert rule.paths == ["/skills/**"]
@@ -96,9 +97,9 @@ def test_pydantic_ai_toolset(tmp_path):
 
     from manimvox.integrations.pydantic_ai import manimvox_instructions, manimvox_toolset
 
-    ts = manimvox_toolset()
+    ts = manimvox_toolset(tmp_path)
     assert set(ts.tools) == TOOL_NAMES | FILE_NAMES | {"read_skill"}
-    assert set(manimvox_toolset(files=False).tools) == TOOL_NAMES | {"read_skill"}
+    assert set(manimvox_toolset(tmp_path, files=False).tools) == TOOL_NAMES | {"read_skill"}
     agent = Agent(TestModel(call_tools=["list_blocks"]), toolsets=[ts], instructions=manimvox_instructions())
     assert "bar-ranking" in agent.run_sync("list the blocks").output
 
@@ -106,7 +107,7 @@ def test_pydantic_ai_toolset(tmp_path):
         last = messages[-1].parts[-1]
         if isinstance(last, ToolReturnPart):
             return ModelResponse(parts=[TextPart(last.content)])
-        return ModelResponse(parts=[ToolCallPart("check", {"project": str(tmp_path), "what": "theme"})])
+        return ModelResponse(parts=[ToolCallPart("check", {"what": "theme"})])
 
     out = Agent(FunctionModel(call_check_then_echo), toolsets=[ts]).run_sync("check it").output
     err = json.loads(out)
@@ -120,14 +121,14 @@ def test_openai_agents_tools(tmp_path):
 
     from manimvox.integrations.openai_agents import manimvox_instructions, manimvox_tools
 
-    ts = {t.name: t for t in manimvox_tools()}
+    ts = {t.name: t for t in manimvox_tools(tmp_path)}
     assert set(ts) == TOOL_NAMES | FILE_NAMES | {"read_skill"}
-    assert set(ts["draft"].params_json_schema["required"]) == {"project", "episode"}
+    assert set(ts["draft"].params_json_schema["required"]) == {"episode"}
     Agent(name="manimvox", instructions=manimvox_instructions(), tools=list(ts.values()))
     args = json.dumps({"skill": "manimvox-cli"})
     ctx = ToolContext(context=None, tool_name="read_skill", tool_call_id="1", tool_arguments=args)
     assert asyncio.run(ts["read_skill"].on_invoke_tool(ctx, args)).startswith("---\nname: manimvox-cli")
-    cargs = json.dumps({"project": str(tmp_path), "what": "theme"})
+    cargs = json.dumps({"what": "theme"})
     cctx = ToolContext(context=None, tool_name="check", tool_call_id="2", tool_arguments=cargs)
     err = json.loads(asyncio.run(ts["check"].on_invoke_tool(cctx, cargs)))
     assert err["ok"] is False and "series.json" in err["error"]

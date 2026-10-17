@@ -121,3 +121,62 @@ def test_instructions_list_every_skill_and_the_project(tmp_path):
 def test_missing_names_the_extra():
     e = common.missing("agno", "agno")
     assert isinstance(e, ImportError) and 'manimvox[agno] @ git+https://github.com/LaplacianAI/manimvox' in str(e)
+
+
+def by_name(fns):
+    return {f.__name__: f for f in fns}
+
+
+def test_bound_tools_have_no_project_parameter(project):
+    for f in [*common.json_tools(project), *common.file_tools(project)]:
+        params = inspect.signature(f).parameters
+        assert "project" not in params and "directory" not in params, f.__name__
+        doc = inspect.getdoc(f) or ""
+        assert "\n    project: " not in doc and "\n    directory: " not in doc, f.__name__
+
+
+@pytest.mark.parametrize("fn", [*common.json_tools(FIXTURE), *common.file_tools(FIXTURE)], ids=lambda f: f.__name__)
+def test_bound_functions_keep_schema_friendly_types_and_documented_args(fn):
+    hints = typing.get_type_hints(fn)
+    doc = inspect.getdoc(fn) or ""
+    for name in inspect.signature(fn).parameters:
+        assert hints[name] in ALLOWED and f"\n    {name}: " in doc, f"{fn.__name__}({name})"
+
+
+def test_bound_tools_work_in_their_folder(project):
+    t = by_name(common.json_tools(project))
+    assert json.loads(t["check"](what="theme"))["ok"] is True
+    assert json.loads(t["check"]("theme"))["ok"] is True  # positional arguments too
+    f = by_name(common.file_tools(project))
+    assert f["write_project_file"](path="notes.md", text="x").startswith("wrote ")
+    assert f["read_project_file"]("notes.md") == "x"
+
+
+def test_bound_file_tools_cannot_leave_the_folder(project, tmp_path):
+    f = by_name(common.file_tools(project))
+    assert f["write_project_file"](path="../evil.txt", text="x").startswith("error:")
+    assert f["write_project_file"](path=str(tmp_path / "evil.txt"), text="x").startswith("error:")
+    assert not (tmp_path / "evil.txt").exists()
+
+
+def test_a_bound_new_project_can_only_create_its_own_folder(tmp_path):
+    root = tmp_path / "video"
+    t = by_name(common.json_tools(root))
+    assert "directory" not in inspect.signature(t["new_project"]).parameters
+    out = json.loads(t["new_project"](series="Hash Maps, Explained"))
+    assert out["ok"] and Path(out["project"]) == root.resolve() and (root / "series.json").is_file()
+
+
+def test_bound_tools_refuse_a_folder_that_is_not_itself_a_project(project):
+    inner = project / "episodes"  # inside a project: unbound tools would walk up to it
+    out = json.loads(by_name(common.json_tools(inner))["check"](what="theme"))
+    assert out["ok"] is False and "new_project" in out["error"] and "series.json" in out["error"]
+    assert by_name(common.file_tools(inner))["write_project_file"](path="x.md", text="x").startswith("error:")
+    assert not (inner / "x.md").exists() and not (project / "x.md").exists()
+
+
+def test_bound_join_output_stays_inside(project):
+    join = by_name(common.json_tools(project))["join"]
+    for out in ("../film.mp4", str(project.parent / "film.mp4")):
+        res = json.loads(join(output=out))
+        assert res["ok"] is False and "inside the project" in res["error"]
