@@ -252,7 +252,8 @@ class Episode(Scene):
         """Recap bullets and a pointer to the next episode. The last episode can
         point elsewhere instead: next_label="READ", next_title="docs/design.md".
         `answer` is spoken first, on screen under the question given to intro().
-        An empty `recap` skips the Recap heading and bullets; `narration` is still spoken."""
+        An empty `recap` skips the Recap heading and bullets, keeps the answer on screen,
+        and `narration` is still spoken over it."""
         self.clear()
         if answer:
             parts = []
@@ -264,7 +265,8 @@ class Episode(Scene):
                 self.play(FadeIn(parts[0]), run_time=0.6)
             self.say(answer, FadeIn(parts[-1], shift=UP * 0.2), tts=answer_tts)
             self.beat()
-            self.clear()
+            if recap:
+                self.clear()
         h = heading("Recap") if recap else None
         rows = bullets(recap, size=25, max_w=11.5) if recap else None
         group = []

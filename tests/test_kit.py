@@ -248,3 +248,5 @@ def test_outro_without_a_recap_still_answers_and_speaks(tmp_path):
     assert said.index("It was the missing index.") < said.index("Next: the index.")
     shown = {t["text"] for fr in layout["frames"] for t in fr["texts"]}
     assert "Recap" not in shown and "Indexes" in shown
+    last = {t["text"] for t in layout["frames"][-1]["texts"]}  # the "Next" line is spoken over the answer, not an empty stage
+    assert "It was the missing index." in last and "Indexes" in last
