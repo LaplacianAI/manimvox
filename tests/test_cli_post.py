@@ -93,6 +93,25 @@ def test_render_reports_a_missing_music_file(project, fake_render, capsys):
     assert not (project / "out" / "ep01_hello.mp4").exists()
 
 
+def test_a_missing_music_file_is_reported_before_the_render(project, monkeypatch, capsys):
+    set_post(project, {"music": "nope.wav"})
+
+    def render(*a):
+        raise AssertionError("rendered before post.music was checked")
+
+    monkeypatch.setattr("manimvox.runner.render_episode", render)
+    assert main(["render", "ep01", "--voice", "fake:tone"]) == 1
+    assert "post.music: no file at" in capsys.readouterr().err
+
+
+def test_render_says_what_the_finish_step_will_do(project, fake_render, capsys):
+    set_post(project, {"music": "bed.wav", "end_card": ["x"]})
+    assert main(["render", "ep01", "--voice", "fake:tone"]) == 0
+    out = capsys.readouterr().out
+    assert "post: finishing (music, end card)" in out
+    assert out.index("post: finishing") < out.index("post: music bed")
+
+
 def two_rendered(d):
     set_post(d, {"end_card": ["The end"]}, episodes=[
         {"n": 1, "stem": "ep01_hello", "cls": "Ep01", "title": "Hello"},
@@ -107,10 +126,34 @@ def test_join_makes_one_film_with_shifted_subtitles(project, capsys):
     two_rendered(project)
     assert main(["join"]) == 0
     film = project / "out" / "Hello-Explained.mp4"
-    assert duration(film) == pytest.approx(3 + 1 + 2 + 3, abs=0.25)
+    assert duration(film) == pytest.approx(3 + 1 + 2, abs=0.25)  # title card + parts: the parts carry their own end card
     srt = film.with_suffix(".srt").read_text(encoding="utf-8")
     assert "00:00:03,500 --> 00:00:05,500" in srt and "00:00:04,500 --> 00:00:06,500" in srt
     assert "joined 2 episodes" in capsys.readouterr().out
+
+
+def test_join_does_not_append_a_second_end_card(project):
+    from manimvox.kit.theme import Theme
+    from manimvox.post.finish import finish
+    from manimvox.post.options import PostOptions
+
+    two_rendered(project)
+    post = PostOptions(end_card=("The end",), card_seconds=3)
+    parts = []
+    for stem, secs in (("ep01_hello", 1.0), ("ep02_more", 2.0)):
+        raw = make_mp4(project / f"raw_{stem}.mp4", secs)
+        finish(raw, project / "out" / f"{stem}.mp4", [], post, Theme.from_dict({"source": "test"}), project)
+        parts.append(duration(project / "out" / f"{stem}.mp4"))
+    assert main(["join"]) == 0
+    assert duration(project / "out" / "Hello-Explained.mp4") == pytest.approx(3 + sum(parts), abs=0.3)
+
+
+def test_failed_join_leaves_no_stale_subtitles(project):
+    two_rendered(project)
+    make_mp4(project / "out" / "ep02_more.mp4", 2.0, fps=15)
+    (project / "film.srt").write_text("stale", encoding="utf-8")
+    assert main(["join", "-o", "film.mp4"]) == 1
+    assert not (project / "film.srt").exists() and not (project / "film.mp4").exists()
 
 
 def test_join_without_cards(project):

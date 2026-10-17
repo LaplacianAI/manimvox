@@ -75,6 +75,10 @@ def _cmd_render(args) -> int:
         print(f"note: {spec.engine} is for non-commercial use only: {eng.licence}")
     out = pr.out_dir / f"{ep.stem}.mp4"
     srt = pr.out_dir / f"{ep.stem}.srt"
+    if pr.post.music is not None and not (pr.root / pr.post.music).is_file():
+        from .post.options import PostError
+
+        raise PostError(f"post.music: no file at {pr.root / pr.post.music}")  # before a long render, not after
     out.unlink(missing_ok=True)
     srt.unlink(missing_ok=True)
     built = render_episode(pr, ep, "final", spec)
@@ -85,6 +89,9 @@ def _cmd_render(args) -> int:
         from .kit.theme import Theme
         from .post.finish import finish
 
+        steps = [n for n, on in (("music", pr.post.music is not None), ("captions", pr.post.captions == "burn"),
+                                 ("end card", bool(pr.post.end_card))) if on]
+        print(f"post: finishing ({', '.join(steps)}) ...")  # the re-encode takes minutes on a long episode
         for line in finish(built, out, read_cues(srt), pr.post, Theme.from_dict(pr.theme), pr.root):
             print(f"post: {line}")
     else:
@@ -159,8 +166,9 @@ def _cmd_join(args) -> int:
         raise ValueError(f"{dst} is one of the episodes being joined; choose another --output")
     dst.parent.mkdir(parents=True, exist_ok=True)
     title = None if args.no_cards else [pr.series] + ([pr.tagline] if pr.tagline else [])
-    end = () if args.no_cards else pr.post.end_card
-    starts = concat(parts, dst, Theme.from_dict(pr.theme), title=title, end=end, card_seconds=pr.post.card_seconds)
+    dst.with_suffix(".srt").unlink(missing_ok=True)  # a failed join must not leave subtitles for another film
+    # no end card here: render already put post.end_card at the end of every episode
+    starts = concat(parts, dst, Theme.from_dict(pr.theme), title=title, card_seconds=pr.post.card_seconds)
     cues = []
     for e, s in zip(eps, starts):
         srt = pr.out_dir / f"{e.stem}.srt"
