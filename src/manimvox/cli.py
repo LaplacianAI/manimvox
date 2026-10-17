@@ -11,11 +11,11 @@ from . import __version__
 
 
 def _cmd_new(args) -> int:
-    from .scaffold import new_project
+    from .tools import new_project
 
-    d = new_project(args.dir, args.series, args.tagline, args.voice)
-    print(f"project ready: {d}")
-    print("next: facts into FACTS.md, outline into SERIES.md, episodes into series.json and episodes/")
+    r = new_project(args.dir, args.series, args.tagline, args.voice)
+    print(f"project ready: {r.project}")
+    print(f"next: {r.next}")
     return 0
 
 
@@ -36,24 +36,18 @@ def _confirm(args):
 
 
 def _cmd_draft(args) -> int:
-    from .checks.layout import check_layout, load_layout
-    from .checks.sheets import contact_sheets
-    from .runner import render_episode
+    from .tools import draft
 
     if not args.every > 0:
         print("manimvox: --every must be greater than 0", file=sys.stderr)
         return 2
-    pr = _project()
-    ep = pr.episode(args.episode)
-    mp4 = render_episode(pr, ep, "draft", None)
-    sheets = contact_sheets(mp4, pr.sheets_dir / ep.stem, every=args.every)
-    print(f"draft: {mp4}")
-    print(f"sheets: {', '.join(str(s) for s in sheets)}")
-    findings = check_layout(load_layout(pr.build_dir / ep.stem / "layout.json"))
-    for f in findings:
+    r = draft(str(Path.cwd()), args.episode, args.every)
+    print(f"draft: {r.video}")
+    print(f"sheets: {', '.join(r.sheets)}")
+    for f in r.findings:
         print(f)
-    print("layout check: ok" if not findings else f"layout check: {len(findings)} finding(s)")
-    return 1 if findings else 0
+    print(r.summary)
+    return 0 if r.ok else 1
 
 
 def _cmd_render(args) -> int:
@@ -104,41 +98,19 @@ def _cmd_render(args) -> int:
 
 
 def _cmd_check(args) -> int:
-    from .checks.audio import check_audio
-    from .checks.layout import check_layout, load_layout
-    from .checks.theme import check_theme
-    from .kit.theme import Theme
+    from .tools import check
 
-    pr = _project()
-    if args.what == "theme":
-        theme = Theme.from_dict(pr.theme)
-        found = check_theme(theme, pr.root)
-        for f in found:
-            print(f)
-        if theme.defaulted:
-            print(f"note: roles from the kit's neutral default: {', '.join(theme.defaulted)}")
-        print("theme check: ok" if not found else f"theme check: {len(found)} failure(s)")
-        return 1 if found else 0
-    if not args.episode:
+    if args.what != "theme" and not args.episode:
         print(f"manimvox: check {args.what} needs an episode", file=sys.stderr)
         return 2
-    ep = pr.episode(args.episode)
-    if args.what == "layout":
-        found = check_layout(load_layout(pr.build_dir / ep.stem / "layout.json"))
-        for f in found:
-            print(f)
-        print("layout check: ok" if not found else f"layout check: {len(found)} finding(s)")
-        return 1 if found else 0
-    srt = pr.out_dir / f"{ep.stem}.srt"
-    video = pr.out_dir / f"{ep.stem}.mp4"
-    if pr.post.music is not None:
-        from .runner import built_path
-
-        video = built_path(pr, ep, "final")
-        print(f"note: checking the narration-only render {video}; out/{ep.stem}.mp4 has the music mixed in")
-    rep = check_audio(video, srt)
-    print(rep)
-    return 0 if rep.ok else 1
+    r = check(str(Path.cwd()), args.what, args.episode)
+    if r.check == "audio":
+        lines = [*r.notes, r.summary, *(f"    {f}" for f in r.findings)]
+    else:
+        lines = [*r.findings, *r.notes, r.summary]
+    for line in lines:
+        print(line)
+    return 0 if r.ok else 1
 
 
 def _cmd_join(args) -> int:
@@ -568,10 +540,11 @@ def main(argv: list[str] | None = None) -> int:
     from .post.options import PostError
     from .project import ProjectError
     from .runner import RenderError
+    from .tools import ToolError
     from .voice import VoiceError
 
     try:
         return func(args)
-    except (ProjectError, VoiceError, RenderError, PostError, ValueError, OSError) as e:
+    except (ToolError, ProjectError, VoiceError, RenderError, PostError, ValueError, OSError) as e:
         print(f"manimvox: {e}", file=sys.stderr)
         return 1
