@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import functools
 import os
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -25,9 +26,11 @@ class ToolError(Exception):
 def _for_a_model(message: str) -> str:
     """A voice error as a tool caller should read it: no CLI flags, and a download is the user's decision."""
     if "--yes" in message:
-        what = message.split(": rerun with --yes")[0].rstrip(".")
-        return (f"{what}. Ask the user whether to download it; with their go-ahead, call this tool again with "
-                "allow_download=true, or pass another voice.")
+        what, _, rest = message.partition(": rerun with --yes")
+        limit = re.search(r"\(([^)]*)\)", rest)  # a licence limit the user must hear before agreeing
+        note = f" Tell them it is for {limit.group(1)}." if limit else ""
+        return (f"{what.rstrip('.')}. Ask the user whether to download it.{note} With their go-ahead, call this "
+                "tool again with allow_download=true, or pass another voice.")
     return message.replace("with --voice", "with the voice argument")
 
 

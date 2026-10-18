@@ -155,3 +155,17 @@ def test_prepare_voice(project):
     assert tools.prepare_voice("fake", str(project)).voice.startswith("fake:")
     with pytest.raises(ToolError, match="fake voice 'nope' unknown"):
         tools.prepare_voice("fake:nope", str(project))
+
+
+@pytest.mark.parametrize("message", [
+    ("XTTS-v2 needs its model and licence: rerun with --yes to accept (non-commercial use only), "
+     "or choose another voice with --voice"),
+    ("F5-TTS needs its model: rerun with --yes to download it (non-commercial use only), "
+     "or choose another voice with --voice"),
+])
+def test_a_declined_download_keeps_the_licence_limit(message):
+    from manimvox.tools import _for_a_model
+
+    msg = _for_a_model(message)
+    assert "non-commercial use only" in msg and "allow_download" in msg, msg
+    assert "--yes" not in msg and "--voice" not in msg, msg
