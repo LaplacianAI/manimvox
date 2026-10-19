@@ -9,7 +9,8 @@ Read first, in this order (the skill files are in the manimvox skills folder: ru
 1. manimvox-core's SKILL.md, then its references/author-guide.md   the rules, the kit API, the lessons
 2. [series dir]/SERIES.md    the viewer, the ladder, your beats, the running example
 3. [series dir]/FACTS.md     the only claims you may make
-4. [earlier finished episode path, if one exists]   pacing and scene variety
+4. manimvox-creative's references/script.md   the opening, bridges, ending, pace, and the worked example
+5. [earlier finished episode, if one exists]   pacing and scene variety
 
 Your episode: [NN] · [title] · [level]
 File: episodes/[stem].py, class [cls], NCHAP = [n]
@@ -17,7 +18,13 @@ Beats: the entry for episode [NN] under "Episode beats" in SERIES.md. Episodes b
 each]. Do not re-teach them; a one-sentence reminder is fine. Episodes after
 yours will teach: [one line each]. Do not take their material.
 
-Commands: manimvox draft [stem] --every 5 only. Never run manimvox render; the
+Your opening question: [previous episode's exit question, or the series' question]. Your exit: [this episode's exit from SERIES.md].
+
+Phase 1, the script. Write episodes/[stem].md: the script, then its critique, every answer yes. Then STOP and report: the script path, its word count and the critique. Do not write code yet; the orchestrator reads every script, checks that your opening answers the previous episode's exit question and that your ending hands over to the next, and sends fixes.
+
+Phase 2, the episode. Start only when the orchestrator tells you to draft. Apply any fixes to the script, then write the code.
+
+Commands (phase 2): manimvox draft [stem] --every 5 only. Never run manimvox render; the
 orchestrator renders finals. Read every sheet image in sheets/, fix what is
 wrong, draft again, until every sheet is clean and the draft prints
 "layout check: ok". If you cannot view images, run manimvox check layout [stem]

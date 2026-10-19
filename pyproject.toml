@@ -28,6 +28,15 @@ f5 = ["f5-tts>=1.1,<2"]
 cloud = []
 matplotlib = ["matplotlib>=3.8,<4"]
 plotly = ["plotly>=6.1,<8", "kaleido>=1.1,<2"]
+# agent frameworks: manimvox.integrations.<name>
+agno = ["agno>=3.1,<4"]
+langchain = ["langchain-core>=1.6,<2", "deepagents>=0.7,<0.8"]
+pydantic-ai = ["pydantic-ai-slim>=2.57,<3"]
+openai-agents = ["openai-agents>=0.24,<0.25"]
+crewai = ["crewai>=1.15.28,<1.16; python_version < '3.14'"]
+llamaindex = ["llama-index-core>=0.14.25,<0.15"]
+haystack = ["haystack-ai>=3.4,<3.5"]
+google-adk = ["google-adk>=2.12,<2.13"]
 dev = ["pytest>=8", "ruff>=0.6", "matplotlib>=3.8,<4", "plotly>=6.1,<8"]
 
 [project.scripts]
@@ -57,3 +66,7 @@ addopts = "-m 'not kokoro and not piper'"
 
 [tool.ruff]
 line-length = 120
+
+[tool.uv]
+# crewai needs openai<3 (openai-agents needs >=3) and rich>=14.2 (f5-tts's cached-path needs rich<14)
+conflicts = [[{ extra = "crewai" }, { extra = "openai-agents" }], [{ extra = "crewai" }, { extra = "f5" }]]

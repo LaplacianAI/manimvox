@@ -2,7 +2,7 @@
   "version": "0.1.0",
   "skills": {
     "manimvox": {
-      "sha256": "d8941eaa1a766558415daf231be48b0f58e7234bbff648a4430ac65a1a24c265",
+      "sha256": "ba17319690e9403d26ce589cf9464086cd24f6ee685917d9779d28611b0f7e4c",
       "files": 1
     },
     "manimvox-animation": {
@@ -14,35 +14,35 @@
       "files": 2
     },
     "manimvox-cli": {
-      "sha256": "e7dc74f60d565ac0b70aa847abdc3675d85b08b731134012f8a19747f36e7202",
+      "sha256": "72916fd6a15e0eca5c81ecca137b8e2a455430104017e47dce72fdb895f5f7d5",
       "files": 1
     },
     "manimvox-concept": {
-      "sha256": "31f5e4b7ce639e2f199690d4dfa7209131395d3a63f94889a3bee5eb03cc7bc8",
+      "sha256": "d96e5bd40fc9694527338d554ad061e676756b8382542ffbdcec802daf137eff",
       "files": 1
     },
     "manimvox-core": {
-      "sha256": "985865fddb811af7f8ccfe2942295bda39124e4613f4bbbe57f25a606bd52fb5",
+      "sha256": "fc7bcb0d19905e59d49c26d16b2091a95df4468f63a17eb4883cbfa826701e76",
       "files": 2
     },
     "manimvox-creative": {
-      "sha256": "5160dc36599089f879c2a481db2a6543219d702cc41cd3e09984cd1ccad86f41",
-      "files": 5
+      "sha256": "55ec332709746f66aa3a5c7d0fd9b923df0ad5eb83455894b02a542e9db5df7a",
+      "files": 6
     },
     "manimvox-paper": {
-      "sha256": "39348537d9de34ec202e90bcc0a7de2686598065c4aef418bb1c78cf76f6e28c",
+      "sha256": "b08794a1ad4d781be29134ccbb12db0cb9815f649b22c55e4455480e36fb9ee8",
       "files": 1
     },
     "manimvox-playlist": {
-      "sha256": "fd816f6d1d44a62811f165903af6d6588213cdc35c113af5be4897c735dfeb0e",
+      "sha256": "33de24f8d2bf8b1190668744c533362dc6efd47520f0d65ec1fcb64e00f7f5fc",
       "files": 3
     },
     "manimvox-pr": {
-      "sha256": "dca02b5d4ea91d716a113aea8dff81fd190288f53dda9194a8233dc2c926e93e",
+      "sha256": "e8dfd726308a4d6d2b0ca14296afddb6dacc1264f26598c07f7758706ee805fe",
       "files": 1
     },
     "manimvox-voice": {
-      "sha256": "14773f9ab33aa28b475f36d04af835116b51599812b6905c458eedbca047ede4",
+      "sha256": "7b6e0b1e40b2df7594ca4412994c2cbf9ad7b780c06ca8a61dfaf8fc1978f596",
       "files": 1
     }
   }

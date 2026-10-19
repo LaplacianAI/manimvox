@@ -94,11 +94,16 @@ class VoiceEngine:
         return voice
 
 
+def clone_path(voice: str) -> str | None:
+    """The speaker path in a parsed `clone=<path>` voice (stripped, may be empty), or None for any other voice."""
+    return voice[len("clone="):].strip() if voice.startswith("clone=") else None
+
+
 def clone_reference(voice: str, root: Path | None = None) -> Path:
     """`clone=path/to/speaker.wav` -> that file. A relative path is taken from `root` (default: the working directory)."""
-    if not voice.startswith("clone="):
+    raw = clone_path(voice)
+    if raw is None:
         raise VoiceError(f"a cloning voice is written clone=<speaker.wav>, got '{voice}'")
-    raw = voice[len("clone="):].strip()
     if not raw:
         raise VoiceError("clone= needs a path to a short recording of the speaker (6-30 s WAV)")
     p = Path(raw).expanduser()

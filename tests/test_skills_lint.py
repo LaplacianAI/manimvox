@@ -69,6 +69,12 @@ def test_commands_named_exist(d):
             assert cmd in known, f"{p}: names `manimvox {cmd}`, which the CLI does not have"
 
 
+@pytest.mark.parametrize("d", DIRS, ids=lambda d: d.name)
+def test_no_skill_ships_scripts(d):
+    # Agno's skills tools can execute a skill's scripts/; none ship any, and that must not change unnoticed
+    assert not (d / "scripts").exists(), f"{d.name} has a scripts/ folder"
+
+
 def test_exactly_the_eleven_skills():
     assert sorted(d.name for d in DIRS) == sorted(sk.SKILL_NAMES)
 
@@ -77,3 +83,35 @@ def test_router_links_every_workflow():
     text = (ROOT / "manimvox" / "SKILL.md").read_text(encoding="utf-8")
     for w in ("manimvox-paper", "manimvox-playlist", "manimvox-concept", "manimvox-pr"):
         assert f"../{w}/SKILL.md" in text
+
+
+@pytest.mark.parametrize("d", DIRS, ids=lambda d: d.name)
+def test_commands_named_have_a_tool(d):
+    from manimvox import tools
+
+    names = {f.__name__ for f in tools.TOOLS}
+    for p, text in _texts(d):
+        for cmd in re.findall(r"`manimvox ([a-z]+)", text):
+            if cmd not in tools.SHELL_ONLY:
+                assert tools.COMMANDS.get(cmd) in names, f"{p}: `manimvox {cmd}` has no tool function"
+
+
+def test_cli_skill_names_every_tool():
+    from manimvox import tools
+
+    text = (ROOT / "manimvox-cli" / "SKILL.md").read_text(encoding="utf-8")
+    for name in [f.__name__ for f in tools.TOOLS] + ["read_skill", "read_project_file", "write_project_file",
+                                                    "list_project_files"]:
+        assert f"`{name}`" in text, f"manimvox-cli does not name the tool {name}"
+
+
+def test_router_points_agents_without_a_shell_to_the_tools():
+    text = (ROOT / "manimvox" / "SKILL.md").read_text(encoding="utf-8")
+    assert "../manimvox-cli/SKILL.md#without-a-shell" in text
+
+
+def test_script_guide_exists_and_workflows_link_it():
+    assert (ROOT / "manimvox-creative" / "references" / "script.md").is_file()
+    for w in ("manimvox-concept", "manimvox-paper", "manimvox-pr", "manimvox-playlist"):
+        text = (ROOT / w / "SKILL.md").read_text(encoding="utf-8")
+        assert "../manimvox-creative/references/script.md" in text, f"{w} does not link the script guide"

@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from manimvox.cli import main
+from tests.media import make_mp4
 
 FIXTURE = Path(__file__).parent / "fixtures" / "hello"
 
@@ -209,3 +210,16 @@ def test_voices_table_runs_offline_for_every_engine(project, capsys, monkeypatch
     for name in ["edge", "elevenlabs", "f5", "kokoro", "openai", "piper", "say", "xtts"]:
         assert name in out
     assert out.count("non-commercial use only") >= 3  # say, xtts, f5
+
+
+def test_sheets_samples_the_finished_video(project, capsys):
+    (project / "out").mkdir(exist_ok=True)
+    make_mp4(project / "out" / "ep01_hello.mp4", 3.0)
+    assert main(["sheets", "ep01", "--every", "1"]) == 0
+    assert (project / "sheets" / "ep01_hello" / "s_01.png").is_file()
+    assert "s_01.png" in capsys.readouterr().out
+
+
+def test_sheets_refuses_a_bad_interval(project, capsys):
+    assert main(["sheets", "ep01", "--every", "0"]) == 2
+    assert "--every" in capsys.readouterr().err

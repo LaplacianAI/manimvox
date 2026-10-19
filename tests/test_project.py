@@ -67,6 +67,19 @@ def test_episode_stem_must_start_with_ep(tmp_path):
         load_project(tmp_path)
 
 
+@pytest.mark.parametrize("stem", ["ep/../../elsewhere/clip", "ep\\..\\x", "ep..x", "ep01/sub", "ep01 x", "ep01\\x", "../ep01"])
+def test_episode_stem_cannot_leave_the_project(tmp_path, stem):
+    write_series(tmp_path, episodes=[{"n": 1, "stem": stem, "cls": "Ep01", "title": "x"}])
+    with pytest.raises(ProjectError, match="episode stem"):
+        load_project(tmp_path)
+
+
+def test_ordinary_episode_stems_still_load(tmp_path):
+    stems = ["ep01_hello", "ep02", "ep03-more.v2", "episode_one"]
+    write_series(tmp_path, episodes=[{"n": i, "stem": s, "cls": f"Ep0{i}", "title": "x"} for i, s in enumerate(stems, 1)])
+    assert [e.stem for e in load_project(tmp_path).episodes] == stems
+
+
 def test_find_project_walks_up(tmp_path):
     write_series(tmp_path)
     deep = tmp_path / "episodes" / "a"

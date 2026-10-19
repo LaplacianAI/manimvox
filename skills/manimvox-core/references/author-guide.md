@@ -1,6 +1,6 @@
 # Writing one episode
 
-The contract for an episode author. Before writing, read the project's `SERIES.md` (the outline) and `FACTS.md` (what may be said), and skim `src/manimvox/kit/` or this guide's cheat sheet for what the kit offers. If the project already has finished episodes, read one for pacing and scene variety.
+The contract for an episode author. Before writing, read the project's `SERIES.md` (the outline) and `FACTS.md` (what may be said), skim `src/manimvox/kit/` or this guide's cheat sheet for what the kit offers, read the episode's script (`episodes/epNN_name.md`) and the worked example in [script](../../manimvox-creative/references/script.md). If the project has finished episodes, read one for pacing and scene variety.
 
 ## Contents
 
@@ -15,7 +15,7 @@ The loop (write, `manimvox draft epNN --every 5`, read every sheet, fix, `manimv
 
 A contact sheet is a 3 by 3 grid of frames. Code that runs is not a video that reads. Check that nothing leaves the frame, nothing overlaps the heading or footer, no text collides, no scene is an empty void, and arrows point the way the narration says.
 
-Draft timing is estimated at 2.6 words a second; the final uses the real audio length. Never hard-code a wait to match speech; use `say`, `steps` or `narrate`.
+Draft timing is estimated at 2.6 words a second; the final uses the real audio length. The kit leaves 0.7 s after every line and `beat()` adds more, so a draft runs longer than the words alone. Never hard-code a wait to match speech; use `say`, `steps` or `narrate`.
 
 Write your episode file `episodes/epNN_*.py` and register it in `series.json`. When you are an episode author briefed by an orchestrator, do not edit the kit, `series.json` or other episodes; report what they need. If the kit has a bug, work around it in your file and report it.
 
@@ -52,11 +52,14 @@ Narration (methods on `Episode`)
 - `self.say(text, *anims, run_time=1.0)`: the voice and the animations start together; waits for the voice to finish.
 - `self.steps(text, [anim | [anims], ...], lead=0.0)`: spreads the animations across the line. Use it when the line lists things.
 - `with self.narrate(text) as dur:`: free-form block; `dur` is the line's length in seconds.
+- `self.beat(seconds=1.0)`: a silent hold after a key reveal, a chapter's takeaway, the opening question, and before the recap; at most twice a chapter. The kit already leaves 0.7 s after every line.
 - `tts="..."` on any of these overrides what is spoken; the written `text` still shows in the subtitles. Series-wide respellings go in `series.json` under `pron` (ask whoever owns the project); snake_case is already read as words. Pronunciation is covered in [manimvox-voice](../../manimvox-voice/SKILL.md).
 
 Structure
-- `self.intro(narration)` first; `self.chapter(title, narration=None)` for each chapter; `NCHAP` must equal the number of `chapter()` calls.
-- `self.clear()` between scenes; `self.outro(recap_list, narration, next_title=None)` last. The last episode can point elsewhere with `next_label="READ", next_title="docs/design.md"`.
+- `self.intro(narration, tts=None, question=None)` first: `question` goes on the title card in place of the tagline and is what the outro answers. Anything drawn before `intro()` is a cold open; `intro` clears it.
+- `self.chapter(title, narration=None, tts=None, bridge=None, bridge_tts=None)` for each chapter: `bridge` is a "So…" or "But…" line spoken over the finished picture before the card; a card with no narration is a 1 s breath. A bridge animates nothing: for one that needs a picture, `self.say(line, anims…)` then `self.chapter(...)` with no bridge.
+- `NCHAP` must equal the number of `chapter()` calls. No bridge on the first chapter: end the intro narration on the route instead (a bridge there plays over an empty stage). A single video is one episode in `series.json`; re-render ep01 if you add another (its title card has no episode number).
+- `self.clear()` between scenes; `self.outro(recap_list, narration, next_title=None, answer=None)` last: `answer` puts the opening question back on screen, then speaks and shows the answer, before the recap; an empty `recap` skips the recap and still speaks `narration`. The last episode can point elsewhere with `next_label="READ", next_title="docs/design.md"`.
 - `self.pulse([mob, ...])` sends a dot along a chain; `self.swap(old, new)` cross-fades; `self.dim(*mobs)` dims the mobjects you pass.
 
 Before drawing a chart or diagram by hand, run `manimvox add --list`: a block may already draw it (see the manimvox-blocks skill).
@@ -81,7 +84,8 @@ Narration
 - No hype, no "let's dive in", no strings of rhetorical questions. Say the thing.
 - The picture shows what the voice says at that moment. Reveal items as they are named.
 - Define every term the first time it is spoken, in a phrase.
-- Target 5 to 8 minutes, 5 to 7 chapters, about 750 to 1,150 spoken words, unless the brief says otherwise.
+- Follow the script. Every chapter ends on a takeaway and a bridge; the outro answers the opening question. One `heading()` per scene, stating its claim.
+- Length, chapters and spoken words come from the brief, else from the [length table](../../manimvox-creative/references/script.md#when-the-time-is-short) (a playlist episode: 5 to 8 minutes, 5 to 7 chapters, about 750 to 1,080 words).
 
 Visuals
 - One idea per scene. Prefer a diagram that moves over a bullet list. Real identifiers on screen (`code()`, mono), plain words in the voice.
@@ -105,6 +109,7 @@ When you finish an episode, report:
 2. Every statement not in `FACTS.md`, its source, and the label you gave it.
 3. Any kit bug or limitation you worked around.
 4. Pronunciations that need adding to `series.json` under `pron`.
+5. The script file, its word count, and any critique answer that is still not yes, with the reason.
 
 ## 6 · Recipes
 

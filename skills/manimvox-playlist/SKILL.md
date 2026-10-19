@@ -15,7 +15,7 @@ Copy this checklist and keep it current:
 - [ ] 1 Facts      FACTS.md, every claim sourced and labelled
 - [ ] 2 Theme      the project's own theme (manimvox-creative); manimvox check theme passes
 - [ ] 3 Ladder     SERIES.md and series.json episodes (with level and blurb); show the user
-- [ ] 4 Episodes   one author per episode (sub-agents/episode-author.md); drafts only; every sheet read
+- [ ] 4 Episodes   one author per episode: all scripts first and reviewed, then drafts; every sheet read
 - [ ] 5 Finals     manimvox render epNN, two at a time at most; audio check ok on each
 - [ ] 6 Ship       manimvox index; manimvox package; report
 ```
@@ -50,19 +50,20 @@ Fill `SERIES.md` and the `episodes` list in `series.json` as [series design](ref
 
 Before the authors start, you own `blocks/`: run `manimvox add --list`, copy the blocks the series needs with `manimvox add <block>`, and list them, with their import lines, in each author's brief. Authors never run `manimvox add`, so parallel authors do not race on `blocks/`.
 
-Write one episode per author, each given the brief in [episode-author](sub-agents/episode-author.md) with every bracket filled. If your environment can run helpers in parallel, run one author per episode at once; otherwise write the episodes one after another yourself, each against that brief. Authors draft only (`manimvox draft`, no voice, no download) and read every contact sheet.
+Write one episode per author, each given the brief in [episode-author](sub-agents/episode-author.md) with every bracket filled. If your environment can run helpers in parallel, run one author per episode at once; otherwise write the episodes one after another yourself, each against that brief. Authors draft only (`manimvox draft`, no voice, no download) and read every contact sheet. The work runs in two phases. First, each author writes and critiques the episode's script as [script](../manimvox-creative/references/script.md) says, then stops and reports it (script path, word count, critique). You read every script and check that each opens on the previous episode's exit question and ends on the next one's, and send back fixes. Only then tell each author to draft. Where authors run one after another, the order is the same: all scripts, your review, then the drafts.
 
 Afterwards:
 - read each author's report;
 - add the confirmed new facts to `FACTS.md` and the respellings to `series.json` under `pron`, before the finals;
 - look at two sheets per episode yourself, because authors miss their own overlaps;
+- check that each episode's opening answers the previous episode's exit question;
 - check continuity: the running example's names, each entity's colour, and that each episode's last line points at the next episode's real title.
 
 ## 5 Finals
 
 Run `manimvox render epNN` for each episode, never more than two at once: renders are CPU-bound. Rendering needs the narration voice. A model download needs the user's go-ahead (pass `--yes` or `-y` only after they have said yes to it), and so does an online voice. If the user cannot be asked, a needed download counts as the voice being unusable: use [manimvox-voice](../manimvox-voice/SKILL.md)'s local fallback (a local voice `manimvox voices` shows ready, named in the report), else stop and report. A render is done only when it prints `audio check: ok`. A silent line is a failure frames cannot show: reword it and render again.
 
-If you can view video or images, look at 4 to 6 moments of each `out/epNN_*.mp4`. Otherwise the sheets and `manimvox check layout epNN` (which reads the last draft, not the final) are the check, and the report says the finals' frames were not viewed.
+If you can view images, run `manimvox sheets epNN` and read 4 to 6 moments of each final in `sheets/`. Otherwise the sheets and `manimvox check layout epNN` (which reads the last draft, not the final) are the check, and the report says the finals' frames were not viewed.
 
 ## 6 Ship
 
