@@ -250,3 +250,59 @@ def test_outro_without_a_recap_still_answers_and_speaks(tmp_path):
     assert "Recap" not in shown and "Indexes" in shown
     last = {t["text"] for t in layout["frames"][-1]["texts"]}  # the "Next" line is spoken over the answer, not an empty stage
     assert "It was the missing index." in last and "Indexes" in last
+
+
+THREE_D = '''import json
+from pathlib import Path
+
+from manimvox.kit import *
+
+
+class Ep02(Episode3D):
+    EP = 2
+    TITLE = "Depth"
+    TAGLINE = "A tilted camera"
+    NCHAP = 2
+
+    def build(self):
+        cam = self.renderer.camera
+        rec = {}
+        self.intro("Why tilt?", question="Why tilt?")
+        self.chapter("Tilted")
+        pinned = T("pinned", 24, INK).move_to([-4, 2, 0])
+        self.pin(pinned)
+        floating = T("floating", 24, INK).move_to([2, 1, 0])
+        self.say("Flat first.", FadeIn(pinned), FadeIn(floating), Create(Cube(side_length=1.5)))
+        self.move_camera(phi=70 * DEGREES, theta=-30 * DEGREES, run_time=0.5)
+        self.begin_ambient_camera_rotation(rate=0.5)
+        self.say("Now tilted.")
+        self.chapter("Back", bridge="So back to flat.")
+        rec["phi_after_chapter"] = float(cam.get_phi())
+        theta = cam.get_theta()
+        self.wait(0.5)
+        rec["orbit_stopped"] = bool(cam.get_theta() == theta)
+        self.move_camera(phi=60 * DEGREES, run_time=0.3)
+        self.outro(["Depth"], "The end.")
+        rec["phi_after_outro"] = float(cam.get_phi())
+        rec["chrome_pinned"] = bool(all(m in cam.fixed_in_frame_mobjects for c in self._chrome for m in c.get_family()))
+        Path("probe.json").write_text(json.dumps(rec), encoding="utf-8")
+'''
+
+
+@pytest.mark.slow
+def test_episode_3d_keeps_the_chrome_flat_and_returns_home_for_cards(tmp_path):
+    p = copy_fixture(tmp_path)
+    add_episode(p, "ep02_depth", "Ep02", "Depth", THREE_D)
+    layout = render_episode(p, "ep02_depth", "Ep02", voiced=False)
+    rec = json.loads((p / "probe.json").read_text(encoding="utf-8"))
+    assert rec == {"phi_after_chapter": 0, "orbit_stopped": True, "phi_after_outro": 0, "chrome_pinned": True}
+    boxes = {}
+    for fr in layout["frames"]:
+        for t in fr["texts"]:
+            boxes.setdefault(t["text"], []).append(t["box"])
+    flat, tilted = boxes["floating"][0], boxes["floating"][1]
+    centre = [(flat[0] + flat[2]) / 2, (flat[1] + flat[3]) / 2]
+    assert centre == pytest.approx([2, 1], abs=0.02)  # where it was put, on a flat camera
+    assert tilted != pytest.approx(flat, abs=0.05)  # the layout check sees where the tilted camera shows it
+    assert boxes["pinned"][0] == boxes["pinned"][1]  # pinned to the screen: the camera does not move it
+    assert "Why tilt?" in [t["text"] for t in layout["frames"][0]["texts"]]

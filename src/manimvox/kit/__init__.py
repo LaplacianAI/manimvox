@@ -38,7 +38,7 @@ from .components import (  # noqa: F401
                       stat,
                       table,
 )
-from .episode import Episode  # noqa: F401
+from .episode import Episode, Episode3D  # noqa: F401
 from .icons import (  # noqa: F401
                       icon_bot,
                       icon_box,
