@@ -1,6 +1,6 @@
 ---
 name: manimvox-blocks
-description: "Reusable scene components for manimvox episodes: finding a block (Venn diagram, ranked bars, a line chart over levels, a log-scale scatter, a grid of items, a token or config panel, a value flowing through stages, a sequence diagram, a code diff), copying it into the project with manimvox add, using and adapting it, and writing a new one. Use before drawing a chart or diagram by hand, or when the user asks for a block."
+description: "Reusable scene components for manimvox episodes: finding a block (Venn diagram, ranked bars, a line chart over levels, a log-scale scatter, a grid of items, a token or config panel, a value flowing through stages, a sequence diagram, a code diff, a 3D surface), copying it into the project with manimvox add, using and adapting it, and writing a new one. Use before drawing a chart or diagram by hand, or when the user asks for a block."
 license: MIT
 ---
 
@@ -23,6 +23,7 @@ Run `manimvox add --list`. Each line is a block's name, what it draws, and its t
 | `request-flow` | a value hopping through a chain of stages |
 | `sequence-diagram` | actors as lifelines and the messages between them |
 | `code-diff` | code before and after, removed and added lines banded |
+| `surface-plot` | a 3D surface z = f(x, y) shaded by height, for an `Episode3D`; `downhill` gives a ball's route |
 
 ## Copy it into the project
 

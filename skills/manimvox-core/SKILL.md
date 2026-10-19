@@ -6,7 +6,7 @@ license: MIT
 
 # Writing a manimvox episode
 
-An episode is one Python file in `episodes/`: a class that subclasses `Episode` and implements `build()`. Narration and picture are written together, so the video stays in step with the voice. For command flags and output, see [manimvox-cli](../manimvox-cli/SKILL.md). For the voice, see [manimvox-voice](../manimvox-voice/SKILL.md).
+An episode is one Python file in `episodes/`: a class that subclasses `Episode` (or `Episode3D`, for a camera that tilts) and implements `build()`. Narration and picture are written together, so the video stays in step with the voice. For command flags and output, see [manimvox-cli](../manimvox-cli/SKILL.md). For the voice, see [manimvox-voice](../manimvox-voice/SKILL.md).
 
 **Read [references/author-guide.md](references/author-guide.md) before writing.** It holds the kit cheat sheet, the lessons already paid for, the writing and accuracy rules, and the report you owe.
 

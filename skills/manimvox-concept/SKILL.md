@@ -58,7 +58,7 @@ Follow the concept shape in [story](../manimvox-creative/references/story.md):
 4. **The formula last** (for maths). It should read as a summary of what the viewer saw. Write it with `T()` or `code()` in Unicode (for example `a² + b² = c²`); the kit uses no LaTeX. A non-maths idea gets a one-line summary on screen instead (for example `bucket = hash(key)`), which may be shown without being spoken.
 5. **Back to the question**, answered on screen, then where it shows up: two or three real places.
 
-Plan the chapters the requested length allows (the [length table](../manimvox-creative/references/script.md#when-the-time-is-short): 1 or 2 at about a minute, 3 at three minutes, 5 to 7 at 5 to 8), one idea each, and for each the picture that carries it. Draw them with the patterns in [manimvox-animation](../manimvox-animation/SKILL.md). Write the question and the situation that shows it at the top of `SERIES.md`, then the shape, with the facts each chapter uses.
+Plan the chapters the requested length allows (the [length table](../manimvox-creative/references/script.md#when-the-time-is-short): 1 or 2 at about a minute, 3 at three minutes, 5 to 7 at 5 to 8), one idea each, and for each the picture that carries it. Draw them with the patterns in [manimvox-animation](../manimvox-animation/SKILL.md). Where depth is the idea (a surface, vectors in space, a shape turned to show another side), draw that scene in 3D with `Episode3D` ([3D scenes](../manimvox-animation/references/three-d.md)); keep the rest flat. Write the question and the situation that shows it at the top of `SERIES.md`, then the shape, with the facts each chapter uses.
 
 Show the shape to the user and wait for approval. If the user cannot be asked, state the shape in your reply and continue.
 

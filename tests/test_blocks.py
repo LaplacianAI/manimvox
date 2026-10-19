@@ -35,7 +35,7 @@ def test_blocks_path_finds_the_repo_blocks_in_a_dev_install():
 
 def test_registry_is_the_starter_set():
     assert {b.name for b in BLOCKS} == {"venn", "bar-ranking", "bug-grid", "line-by-level", "log-scatter",
-                                        "token-panel", "request-flow", "sequence-diagram", "code-diff"}
+                                        "token-panel", "request-flow", "sequence-diagram", "code-diff", "surface-plot"}
 
 
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
@@ -65,7 +65,8 @@ def test_block_imports_only_what_every_project_has(b):
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
 def test_demo_uses_the_block_as_an_author_would(b):
     demo = (b.path / "demo.py").read_text(encoding="utf-8")
-    assert f"from blocks.{b.module} import" in demo and "class Demo(Episode)" in demo
+    assert f"from blocks.{b.module} import" in demo
+    assert "class Demo(Episode)" in demo or "class Demo(Episode3D)" in demo
 
 
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
@@ -297,3 +298,39 @@ def test_code_diff_rejects_two_empty_sides(tmp_path, monkeypatch):
     m = _import_block(tmp_path, monkeypatch, "code-diff")
     with pytest.raises(ValueError):
         m.code_diff("", "\n")
+
+
+def test_surface_point_follows_the_plot_and_downhill_goes_down(tmp_path, monkeypatch):
+    sp = _import_block(tmp_path, monkeypatch, "surface-plot")
+
+    def bowl(x, y):
+        return x * x + y * y
+
+    plot = sp.surface_plot(bowl, resolution=4)
+    before = plot.axes.c2p(1, 1, 2)
+    assert sp.surface_point(plot, 1, 1) == pytest.approx(before)
+    _move_and_scale(plot)
+    assert sp.surface_point(plot, 1, 1) == pytest.approx(plot.axes.c2p(1, 1, 2))
+    assert sp.surface_point(plot, 1, 1, lift=0.5) == pytest.approx(plot.axes.c2p(1, 1, 2) + [0, 0, 0.5])
+    route = sp.downhill(plot, 2.5, -2.0)
+    heights = [bowl(x, y) for x, y in route]
+    assert heights == sorted(heights, reverse=True) and heights[-1] < 0.01
+    assert len(sp.surface_path(plot, route).points) > 0
+
+
+@pytest.mark.parametrize("kwargs, match", [
+    ({"x_range": (1, 1)}, "x_range"),
+    ({"z_range": (2, 0)}, "z_range"),
+    ({"resolution": 3}, "resolution"),
+    ({"resolution": 65}, "resolution"),
+])
+def test_surface_plot_rejects_what_it_cannot_draw(tmp_path, monkeypatch, kwargs, match):
+    sp = _import_block(tmp_path, monkeypatch, "surface-plot")
+    with pytest.raises(ValueError, match=match):
+        sp.surface_plot(lambda x, y: x, **kwargs)
+
+
+def test_surface_plot_rejects_an_f_that_is_not_finite(tmp_path, monkeypatch):
+    sp = _import_block(tmp_path, monkeypatch, "surface-plot")
+    with pytest.raises(ValueError, match="finite"):
+        sp.surface_plot(lambda x, y: 1 / x if x else float("inf"), x_range=(-1, 1))

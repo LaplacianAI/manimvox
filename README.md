@@ -19,6 +19,7 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
   - contact sheets for a quick look.
 
   Every failed check exits non-zero.
+- **3D when depth is the idea:** `Episode3D` adds Manim's tilting, orbiting camera to an episode, with the header and progress bar kept flat on screen.
 - **A theme per video:** colours and fonts come from the project's `series.json`, never from a fixed preset.
 - **Built for agents as well as people:**
   - no prompts without a terminal;
@@ -318,6 +319,7 @@ An episode is a class that subclasses `Episode` and implements `build()`. `from 
   - connections: `arrow`, `flow`, `gnode`, `gedge`, `lifeline`, `message`;
   - content: `bullets`, `table`, `code`;
   - icons: `icon_*`.
+- **3D:** subclass `Episode3D` instead of `Episode` to tilt and turn the camera (`move_camera`, `begin_ambient_camera_rotation`). `pin(*mobs)` keeps a label flat on screen, and `camera_home()` turns back to the flat view. Title, chapter and recap cards are always drawn flat.
 - **Theme colours:** `BG PANEL LINE INK MUTED ACCENT OK WARN ERROR BLUE ORANGE VIOLET PINK TEAL`, plus any colour named in the theme (written in capitals).
 
 Keep content inside the safe stage: x from −6.6 to 6.6, y from −3.45 to 3.15. The header and the progress bar sit outside it.
@@ -337,7 +339,7 @@ manimvox add bar-ranking     # writes blocks/bar_ranking.py and prints the impor
 from blocks.bar_ranking import bar_ranking, grow, value_x
 ```
 
-The nine blocks: `venn`, `bar-ranking`, `line-by-level`, `log-scatter`, `bug-grid`, `token-panel`, `request-flow`, `sequence-diagram` and `code-diff`. `manimvox add` never replaces a block already in the project; `--force` does.
+The ten blocks: `venn`, `bar-ranking`, `line-by-level`, `log-scatter`, `bug-grid`, `token-panel`, `request-flow`, `sequence-diagram`, `code-diff` and `surface-plot` (a 3D surface, for an `Episode3D`). `manimvox add` never replaces a block already in the project; `--force` does.
 
 ### Charts
 
