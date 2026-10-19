@@ -19,7 +19,7 @@ A block in a project is any module in `blocks/` with a function that returns a `
 A block lives in `blocks/<name>/` (the name uses `a-z`, `0-9` and single hyphens) with four files:
 
 - **`block.py`:** the code. `manimvox add` copies it to `blocks/<name_with_underscores>.py`.
-- **`demo.py`:** `class Demo(Episode)`. It imports the block exactly as an author would, `from blocks.<module> import ...`, and builds one scene with `say` and `steps`, with no intro and no outro. It ends with `self.wait(1)` on the finished picture, because the last frame is the preview. Use generic data ("Model A", "Reviewer B").
+- **`demo.py`:** `class Demo(Episode)`, or `class Demo(Episode3D)` for a 3D block. It imports the block exactly as an author would, `from blocks.<module> import ...`, and builds one scene with `say` and `steps`, with no intro and no outro. It ends with `self.wait(1)` on the finished picture, because the last frame is the preview. Use generic data ("Model A", "Reviewer B").
 - **`block.json`:**
   - `name` (equal to the folder name) and `function`;
   - `helpers` (a list);

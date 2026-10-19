@@ -5,8 +5,10 @@ import json
 from contextlib import contextmanager
 from pathlib import Path
 
+import numpy as np
 from manim import (
     BOLD,
+    DEGREES,
     DOWN,
     LEFT,
     ORIGIN,
@@ -30,6 +32,7 @@ from manim import (
     Scene,
     SVGMobject,
     Text,
+    ThreeDScene,
     Transform,
     VGroup,
     config,
@@ -166,6 +169,7 @@ class Episode(Scene):
         (a cold open) is swept away first. `question` replaces the tagline on the card and is
         what outro(answer=...) answers."""
         self.clear()
+        self._flat()
         self.question = question
         single = self._single_video()
         series = T(self.SERIES, 20, ACCENT, BOLD)
@@ -198,6 +202,7 @@ class Episode(Scene):
                   to_label, FadeIn(track), FadeIn(bar), run_time=0.8)
         self._chrome = [label, track, bar]
         self._bar = bar
+        self._pin(label, track, bar)
 
     def motif(self):
         """The title card's decoration, bottom right. The project's own mark when
@@ -222,6 +227,7 @@ class Episode(Scene):
             with self.narrate(bridge, tts=bridge_tts):
                 pass
         self.clear()
+        self._flat()
         self._chap_i += 1
         num = T(f"{self._chap_i:02d}", 150, ACCENT, BOLD).set_opacity(0.16)
         ttl = P(title, 52, INK, max_w=10.5, weight=BOLD, align="center")
@@ -247,6 +253,7 @@ class Episode(Scene):
         self.play(*outs, run_time=0.7)
         self._chap_label = dock
         self._chrome.append(dock)
+        self._pin(dock)
 
     def outro(self, recap, narration, next_title=None, tts=None, next_label="NEXT", answer=None, answer_tts=None):
         """Recap bullets and a pointer to the next episode. The last episode can
@@ -255,6 +262,7 @@ class Episode(Scene):
         An empty `recap` skips the Recap heading and bullets, keeps the answer on screen,
         and `narration` is still spoken over it."""
         self.clear()
+        self._flat()
         if answer:
             parts = []
             if self.question:
@@ -312,6 +320,17 @@ class Episode(Scene):
         halo.clear_updaters()
         self.play(FadeOut(dot), FadeOut(halo), run_time=0.25)
 
+    # -- hooks Episode3D fills in: a flat camera needs none of them --------
+    def _flat(self):
+        """Return the camera to the flat view before a title, chapter or recap card."""
+
+    def _pin(self, *mobs):
+        """Keep the header, chapter label and progress bar where they are on screen."""
+
+    def _screen_box(self, m):
+        """Where `m` shows on screen: (left, bottom, right, top) in scene units."""
+        return (m.get_left()[0], m.get_bottom()[1], m.get_right()[0], m.get_top()[1])
+
     def _stem(self) -> str:
         return STEM or f"ep{self.EP:02d}"
 
@@ -341,7 +360,7 @@ class Episode(Scene):
                 else:
                     raw = getattr(m, "original_text", None) or m.text
                 label = " ".join(raw.split())
-                box = (m.get_left()[0], m.get_bottom()[1], m.get_right()[0], m.get_top()[1])
+                box = self._screen_box(m)
                 texts.append({"text": label, "box": [round(float(v), 3) for v in box]})
         self._frames.append({"t": round(self.time, 2), "texts": texts})
 
@@ -351,3 +370,42 @@ class Episode(Scene):
         d = PROJECT.build_dir / self._stem()
         d.mkdir(parents=True, exist_ok=True)
         (d / "layout.json").write_text(json.dumps({"stage": STAGE, "frames": self._frames}), encoding="utf-8")
+
+
+class Episode3D(Episode, ThreeDScene):
+    """An Episode with Manim's 3D camera: tilt and turn it with move_camera(), set_camera_orientation()
+    and begin_ambient_camera_rotation(). The header, chapter label and progress bar stay put on screen.
+    intro(), chapter() and outro() clear the stage, then put the camera back to the flat view, so their
+    cards are never tilted. Text placed in the 3D scene turns with it; pin() a label to keep it flat."""
+
+    def pin(self, *mobs):
+        """Keep `mobs` where they are on screen while the camera moves. Call it before revealing them."""
+        self.renderer.camera.add_fixed_in_frame_mobjects(*mobs)
+
+    def camera_home(self, run_time=1.0):
+        """Turn the camera back to the flat view, as an animation (to end a 3D scene on a flat picture)."""
+        self._stop_orbit()
+        self.move_camera(phi=0, theta=-90 * DEGREES, gamma=0, zoom=1, frame_center=ORIGIN, run_time=run_time)
+
+    def stage(self):
+        trackers = set(map(id, self.renderer.camera.get_value_trackers()))  # an orbit adds one to the scene
+        return [m for m in super().stage() if id(m) not in trackers]
+
+    def _stop_orbit(self):
+        for about in ("theta", "phi", "gamma"):
+            self.stop_ambient_camera_rotation(about)
+
+    def _flat(self):
+        self._stop_orbit()
+        self.set_camera_orientation(phi=0, theta=-90 * DEGREES, gamma=0, zoom=1, frame_center=ORIGIN)
+
+    def _pin(self, *mobs):
+        self.pin(*mobs)
+
+    def _screen_box(self, m):
+        cam = self.renderer.camera
+        if m in cam.fixed_in_frame_mobjects:
+            return super()._screen_box(m)
+        cam.reset_rotation_matrix()
+        pts = cam.project_points(np.concatenate([part.points for part in m.family_members_with_points()]))
+        return (pts[:, 0].min(), pts[:, 1].min(), pts[:, 0].max(), pts[:, 1].max())

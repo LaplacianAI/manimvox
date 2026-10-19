@@ -1,0 +1,18 @@
+{
+  "name": "surface-plot",
+  "function": "surface_plot",
+  "helpers": ["surface_point", "surface_path", "downhill"],
+  "description": "A 3D surface z = f(x, y) over axes, shaded by height: a loss landscape, a density, a field. Use in an Episode3D.",
+  "tags": ["3d", "surface", "chart", "landscape"],
+  "parameters": [
+    {"name": "f", "description": "the height function f(x, y), finite over the ranges"},
+    {"name": "x_range", "description": "(low, high) of x"},
+    {"name": "y_range", "description": "(low, high) of y"},
+    {"name": "z_range", "description": "(low, high) of the z axis; default fits the surface"},
+    {"name": "size", "description": "width and depth of the axes in scene units"},
+    {"name": "height", "description": "height of the z axis in scene units"},
+    {"name": "colors", "description": "theme colours shading the surface from low to high"},
+    {"name": "resolution", "description": "patches along each side, 4 to 64; more is smoother and slower"}
+  ],
+  "returns": "VGroup with .axes, .surface and .f; surface_point(plot, x, y), surface_path(plot, points) and downhill(plot, x, y) place things on it"
+}
