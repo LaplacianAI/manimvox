@@ -23,7 +23,7 @@ Write your episode file `episodes/epNN_*.py` and register it in `series.json`. W
 
 The import brings in all of Manim plus the kit. The stage is 14.2 by 8 units. Keep content inside **x in [-6.6, 6.6], y in [-3.45, 3.15]**. The header (y about 3.7) and the progress bar (y about -3.9) belong to the kit.
 
-**Colours are theme roles**, never hex in an episode: `BG PANEL PANEL2 LINE INK MUTED ACCENT OK WARN ERROR CODE_BG`, the categorical `BLUE ORANGE VIOLET PINK TEAL`, and any colour the theme names, in capitals (for example `VECTOR_I`). `ACCENT` means "new" or "the point"; `ERROR` means wrong or refused. An entity keeps its colour in every episode, the one the product uses when the theme names it. Use `UP`, `DOWN`, `LEFT`, `RIGHT` and `ORIGIN` from Manim for positions.
+**Colours are theme roles**, never hex in an episode: `BG PANEL PANEL2 LINE INK MUTED ACCENT OK WARN ERROR CODE_BG`, the categorical `BLUE ORANGE VIOLET PINK TEAL`, and any colour the theme names, in capitals (for example `VECTOR_I`). `ACCENT` means "new" or "the point"; `ERROR` means wrong or refused. An entity keeps its colour in every episode, the one the product uses when the theme names it. For a shade between two roles use `interpolate_color(ERROR, BG, 0.35)` (a darker red); the kit's version takes the roles as they are. Use `UP`, `DOWN`, `LEFT`, `RIGHT` and `ORIGIN` from Manim for positions.
 
 Text
 - `T(s, size=28, color=INK, weight=NORMAL, max_w=None)`: one line; `max_w` shrinks it to fit, never grows it.

@@ -1,6 +1,6 @@
 ---
 name: manimvox-animation
-description: "Motion patterns for manimvox episodes in Manim: carrying an object from one scene into the next, revealing items as they are named, tables lit row by row, graphs drawn node by node, before and after, zooming into a part, sequence diagrams, 3D scenes with a camera that tilts and orbits (Episode3D), and recipes for what the kit lacks (coloured words, a plane without LaTeX, live numbers). Use when designing or improving the visuals of an episode."
+description: "Motion patterns for manimvox episodes in Manim: carrying an object from one scene into the next, revealing items as they are named, tables lit row by row, graphs drawn node by node, before and after, zooming into a part, sequence diagrams, 3D scenes with a camera that tilts and orbits (Episode3D) and 3D models from glTF, OBJ or STL files, and recipes for what the kit lacks (coloured words, a plane without LaTeX, live numbers). Use when designing or improving the visuals of an episode."
 license: MIT
 ---
 
@@ -24,7 +24,7 @@ How things move in an episode. A scene is picture and voice together, so each pa
 
 ## 3D
 
-When depth is the idea (a surface, a landscape, vectors in space, stacked layers), subclass `Episode3D` and tilt the camera while a line is spoken. Pin labels to the screen with `pin()`; the kit keeps its header flat and draws every card flat. Use it for one or two scenes, not the whole video. [references/three-d.md](references/three-d.md) has the camera calls, the limits and a drafted pattern.
+When depth is the idea (a surface, a landscape, vectors in space, stacked layers), subclass `Episode3D` and tilt the camera while a line is spoken. Pin labels to the screen with `pin()`; the kit keeps its header flat and draws every card flat. Use it for one or two scenes, not the whole video. [references/three-d.md](references/three-d.md) has the camera calls, the limits and a drafted pattern. For a real object (an organ, a machine, a building), load a 3D model file (glTF from Blender, OBJ, STL): the `mesh-model` block when Manim's camera should orbit it and the narration points at its parts, or `from_model` for a lit, realistic clip; the same file has both routes.
 
 ## Rules for motion
 
@@ -37,4 +37,4 @@ When depth is the idea (a surface, a landscape, vectors in space, stacked layers
 
 ## Charts and frames from other libraries
 
-`manimvox.scenes` turns frames from Matplotlib, Plotly, Pillow or Cairo into a clip you place and play like any mobject, in the theme's colours: see [references/adapters.md](references/adapters.md). For a simple chart prefer a block (`manimvox add --list`, see [manimvox-blocks](../manimvox-blocks/SKILL.md)) or kit shapes, which reveal part by part as the narration speaks. Use an adapter for what Manim draws badly: dense data, real plots, heatmaps, image processing.
+`manimvox.scenes` turns frames from Matplotlib, Plotly, Pillow, Cairo or a 3D model into a clip you place and play like any mobject, in the theme's colours: see [references/adapters.md](references/adapters.md). For a simple chart prefer a block (`manimvox add --list`, see [manimvox-blocks](../manimvox-blocks/SKILL.md)) or kit shapes, which reveal part by part as the narration speaks. Use an adapter for what Manim draws badly: dense data, real plots, heatmaps, image processing.

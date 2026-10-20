@@ -1,6 +1,6 @@
 # Charts and frames from other libraries
 
-`manimvox.scenes` turns frames from Pillow, numpy, Cairo, Matplotlib or Plotly into a `Clip`, an image mobject that plays its frames. Import from `manimvox.scenes`.
+`manimvox.scenes` turns frames from Pillow, numpy, Cairo, Matplotlib, Plotly or a 3D model into a `Clip`, an image mobject that plays its frames. Import from `manimvox.scenes`.
 
 ## Clips
 
@@ -17,6 +17,8 @@
 - Fade it in before playing it, because playing resets its opacity.
 - A clip holds its frames in memory, at most 3600. Lower `fps` for long clips. Every frame must be one size.
 - A one-frame clip is a still image: `still(image)`.
+- `clip.loop()` keeps the frames playing under whatever the scene plays or waits next, such as a model turning while several lines are spoken. `clip.clear_updaters()` stops it.
+- `clip.at(x, y)` is the scene point over pixel (x, y) of the frames, from the top left. Use it to put a label, an arrow tip or a path on what the clip shows; it follows the clip when it moves or scales.
 
 ## Pillow or numpy
 
@@ -57,6 +59,26 @@ plt.close(fig)
 - The extra is `manimvox[kokoro,plotly]`. Ask the user before installing it; with no way to ask, use kit shapes or a block instead.
 - Kaleido needs Chrome. If it is missing, the error names `plotly_get_chrome`, which downloads Chrome. Ask the user first. With no way to ask, use Matplotlib instead.
 - Use `fig.update_layout(template=plotly_template())`. `from_plotly(fig)` gives a still. `from_plotly(lambda t: make_fig(t), seconds=3, fps=10)` gives an animation, one export per frame, so keep `seconds * fps` small.
+
+## 3D models
+
+`from_model(path, seconds=4, orbit=60)` renders a .glb, .gltf, .obj, .stl or .ply file with lighting on a transparent background, the camera turning round it, glTF animations playing. The extra is `manimvox[kokoro,pyvista]`; ask the user before installing it. See [three-d.md](three-d.md) for its options and for the `mesh-model` block, which Manim's own 3D camera can orbit.
+
+## Any 3D scene: PyVista
+
+`from_pyvista(draw, seconds, fps=15, size=(1280, 720), setup=None)` renders any PyVista scene: a medical scan, a simulation, a model cut open. `setup(plotter)` runs once (add meshes); `draw(plotter, t)` runs before each frame (set the camera's position, focal point and up, swap a clipped mesh). Inside `draw`, `screen_xy(plotter, point)` gives a 3D point's pixel, for `clip.at(...)`:
+
+```python
+from manimvox.scenes import from_pyvista, screen_xy
+marks = {}
+def draw(pl, t):
+    pl.camera.position, pl.camera.focal_point, pl.camera.up = (0, -300, 0), centre, (0, 0, 1)
+    marks["valve"] = screen_xy(pl, valve_point)
+clip = from_pyvista(draw, 1 / 15, setup=lambda pl: pl.add_mesh(mesh.clip(normal="y"), color=palette()["error"]))
+dot = Dot(clip.at(*marks["valve"]))
+```
+
+Cutting a solid mesh with `mesh.clip(normal=..., origin=...)` shows the inside; animate `origin` over `t` to slice it open on screen. A surface-only model (most downloads) is hollow when cut: use a volume mesh, such as one from a scan.
 
 ## Theme colours
 
