@@ -43,6 +43,9 @@ f5 = ["f5-tts>=1.1,<2"]
 cloud = []
 matplotlib = ["matplotlib>=3.8,<4"]
 plotly = ["plotly>=6.1,<8", "kaleido>=1.1,<2"]
+# 3D models: trimesh reads them for the mesh-model block, PyVista renders them with lighting as clips
+trimesh = ["trimesh>=4.5,<6", "fast-simplification>=0.1.9,<1"]
+pyvista = ["pyvista>=0.45,<1", "vtk>=9.4,<10"]
 # agent frameworks: manimvox.integrations.<name>
 agno = ["agno>=3.1,<4"]
 langchain = ["langchain-core>=1.6,<2", "deepagents>=0.7,<0.8"]
@@ -52,7 +55,7 @@ crewai = ["crewai>=1.15.28,<1.16; python_version < '3.14'"]
 llamaindex = ["llama-index-core>=0.14.25,<0.15"]
 haystack = ["haystack-ai>=3.4,<3.5"]
 google-adk = ["google-adk>=2.12,<2.13"]
-dev = ["pytest>=8", "ruff>=0.6", "matplotlib>=3.8,<4", "plotly>=6.1,<8"]
+dev = ["pytest>=8", "ruff>=0.6", "matplotlib>=3.8,<4", "plotly>=6.1,<8", "trimesh>=4.5,<6", "fast-simplification>=0.1.9,<1"]
 
 [project.urls]
 Homepage = "https://github.com/LaplacianAI/manimvox"

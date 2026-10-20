@@ -19,6 +19,8 @@ from .colours import (  # noqa: F401
                       TEAL,
                       VIOLET,
                       WARN,
+                      interpolate_color,
+                      invert_color,
 )
 from .components import (  # noqa: F401
                       arrow,
@@ -51,6 +53,7 @@ from .icons import (  # noqa: F401
                       icon_shop,
                       icon_till,
 )
+from .mesh import Mesh, load_mesh  # noqa: F401
 from .text import AR, ARABIC, FONT, MONO, SAFE_H, SAFE_W, STAGE_BOTTOM, STAGE_CENTER, STAGE_TOP, P, T, fit  # noqa: F401
 
 globals().update(_colours.NAMED)
