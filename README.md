@@ -20,6 +20,7 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 
   Every failed check exits non-zero.
 - **3D when depth is the idea:** `Episode3D` adds Manim's tilting, orbiting camera to an episode, with the header and progress bar kept flat on screen.
+- **3D models from files:** a glTF (Blender's export), OBJ or STL model drawn by Manim so its camera orbits it and parts can be picked out (the `mesh-model` block), or rendered with real lighting and animations as a clip (`from_model`).
 - **A theme per video:** colours and fonts come from the project's `series.json`, never from a fixed preset.
 - **Built for agents as well as people:**
   - no prompts without a terminal;
@@ -66,6 +67,8 @@ uv tool install --force "manimvox[kokoro,piper] @ git+https://github.com/Laplaci
 | `f5` | F5-TTS voice cloning (installs PyTorch) |
 | `matplotlib` | Matplotlib charts as scenes (`manimvox.scenes`) |
 | `plotly` | Plotly charts as scenes (Kaleido needs Chrome on the machine) |
+| `trimesh` | 3D model files for the `mesh-model` block |
+| `pyvista` | 3D models rendered with lighting as clips (`from_model`; needs OpenGL) |
 | `agno`, `langchain`, `pydantic-ai`, `openai-agents`, `crewai`, `llamaindex`, `haystack`, `google-adk` | Tools for that agent framework (see [Use it from a Python agent framework](#use-it-from-a-python-agent-framework)) |
 
 ## Quickstart
@@ -339,11 +342,11 @@ manimvox add bar-ranking     # writes blocks/bar_ranking.py and prints the impor
 from blocks.bar_ranking import bar_ranking, grow, value_x
 ```
 
-The ten blocks: `venn`, `bar-ranking`, `line-by-level`, `log-scatter`, `bug-grid`, `token-panel`, `request-flow`, `sequence-diagram`, `code-diff` and `surface-plot` (a 3D surface, for an `Episode3D`). `manimvox add` never replaces a block already in the project; `--force` does.
+The eleven blocks: `venn`, `bar-ranking`, `line-by-level`, `log-scatter`, `bug-grid`, `token-panel`, `request-flow`, `sequence-diagram`, `code-diff`, `surface-plot` (a 3D surface) and `mesh-model` (a 3D model from a file), the last two for an `Episode3D`. `manimvox add` never replaces a block already in the project; `--force` does.
 
 ### Charts
 
-`manimvox.scenes` turns frames from Pillow, Cairo, Matplotlib or Plotly into a clip you place and play like any mobject, in the theme's colours.
+`manimvox.scenes` turns frames from Pillow, Cairo, Matplotlib, Plotly or a 3D model into a clip you place and play like any mobject, in the theme's colours.
 
 ```python
 import matplotlib.pyplot as plt
