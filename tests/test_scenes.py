@@ -5,7 +5,7 @@ from pathlib import Path
 import av
 import numpy as np
 import pytest
-from manim import tempconfig
+from manim import RIGHT, tempconfig
 from PIL import Image
 
 from manimvox.scenes import SceneError, from_cairo, from_frames, png, still
@@ -126,3 +126,23 @@ def test_cache_key_changes_with_fps():
     a = from_frames(lambda t: solid(5), seconds=2, fps=1)
     b = from_frames(lambda t: solid(5), seconds=1, fps=2)
     assert _play_key(a) != _play_key(b)
+
+
+def test_at_maps_pixels_to_the_scene_and_follows_the_clip():
+    c = still(solid(10, (160, 90)), width=8.0)  # 8 x 4.5 scene units
+    assert c.at(80, 45) == pytest.approx(c.get_center())
+    assert c.at(0, 0) == pytest.approx([-4.0, 2.25, 0])
+    c.shift(RIGHT * 2).scale(0.5)
+    assert c.at(160, 90) == pytest.approx([2 + 2.0, -1.125, 0])
+
+
+def test_loop_keeps_playing_and_wraps_round():
+    c = from_frames(lambda t: solid(int(t * 100)), seconds=3, fps=1).loop()  # frames of 0, 100, 200
+    seen = []
+    for _ in range(5):
+        c.update(1.0)
+        seen.append(int(c.pixel_array[0, 0, 0]))
+    assert seen == [100, 200, 0, 100, 200]
+    c.clear_updaters()
+    c.update(1.0)
+    assert int(c.pixel_array[0, 0, 0]) == 200
