@@ -52,6 +52,7 @@ class Clip(ImageMobject):
         if len(sizes) > 1:
             raise SceneError(f"every frame must be the same size, got {sorted(sizes)}")
         self.frames = frames
+        self.pixels = sizes.pop()  # (width, height) of every frame
         self.fps = float(fps)
         # Manim's play cache writes each bytes value as its type name, so frames 1..n would never reach the
         # key; this digest does, and a changed frame re-renders instead of reusing a stale partial movie.
@@ -73,6 +74,24 @@ class Clip(ImageMobject):
         if i != self._shown:
             self.pixel_array = self._decode(i)
             self._shown = i
+        return self
+
+    def at(self, x: float, y: float) -> np.ndarray:
+        """The scene point over pixel (x, y) of the frames, counted from the top left: where to put a label
+        or an arrow tip on what the clip shows. It follows the clip when it moves or scales."""
+        w, h = self.pixels
+        return self.get_center() + np.array([(x / w - 0.5) * self.width, (0.5 - y / h) * self.height, 0.0])
+
+    def loop(self) -> Clip:
+        """Keep playing the frames, over and over, under whatever the scene plays or waits next (a model
+        turning while the narration goes on). `clip.clear_updaters()` stops it on the frame it shows."""
+        self._looped = 0.0
+
+        def step(m, dt):
+            m._looped += dt
+            m.show(int(m._looped * m.fps) % len(m.frames))
+
+        self.add_updater(step)
         return self
 
     def play(self, run_time: float | None = None, **kwargs) -> PlayClip:
