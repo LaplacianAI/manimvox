@@ -5,7 +5,9 @@ import shutil
 import sys
 from pathlib import Path
 
+import numpy as np
 import pytest
+from manim import RIGHT
 from PIL import Image
 
 from manimvox.blocks import (
@@ -35,7 +37,8 @@ def test_blocks_path_finds_the_repo_blocks_in_a_dev_install():
 
 def test_registry_is_the_starter_set():
     assert {b.name for b in BLOCKS} == {"venn", "bar-ranking", "bug-grid", "line-by-level", "log-scatter",
-                                        "token-panel", "request-flow", "sequence-diagram", "code-diff", "surface-plot"}
+                                        "token-panel", "request-flow", "sequence-diagram", "code-diff", "surface-plot",
+                                        "mesh-model"}
 
 
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
@@ -334,3 +337,35 @@ def test_surface_plot_rejects_an_f_that_is_not_finite(tmp_path, monkeypatch):
     sp = _import_block(tmp_path, monkeypatch, "surface-plot")
     with pytest.raises(ValueError, match="finite"):
         sp.surface_plot(lambda x, y: 1 / x if x else float("inf"), x_range=(-1, 1))
+
+
+def _tetra():
+    v = np.array([[0, 0, 0], [2, 0, 0], [0, 2, 0], [0, 0, 2]], float)
+    return v, np.array([[0, 2, 1], [0, 1, 3], [0, 3, 2], [1, 2, 3]])
+
+
+def test_mesh_model_is_centred_sized_and_coloured(tmp_path, monkeypatch):
+    mm = _import_block(tmp_path, monkeypatch, "mesh-model")
+    v, f = _tetra()
+    model = mm.mesh_model((v, f, ["#ff0000", None, None, None]), size=3.0, color="#00ff00", up="z")
+    assert len(model) == 4 and all(face.shade_in_3d for face in model)
+    assert model.get_center() == pytest.approx([0, 0, 0])
+    assert max(model.width, model.height, model.depth) == pytest.approx(3.0)
+    assert model[0].get_fill_color().to_hex().lower() == "#ff0000"
+    assert model[1].get_fill_color().to_hex().lower() == "#00ff00"
+
+
+def test_mesh_part_picks_faces_by_place_and_by_name(tmp_path, monkeypatch):
+    mm = _import_block(tmp_path, monkeypatch, "mesh-model")
+    model = mm.mesh_model(_tetra(), size=2.0, up="z").shift(RIGHT * 5)
+    low = mm.mesh_part(model, inside=lambda x, y, z: z < -0.5)  # the bottom face, before the shift
+    assert len(low) == 1 and low[0] is model[0]
+    assert len(mm.mesh_part(model, name="MESH")) == 4
+    with pytest.raises(ValueError, match="the parts are mesh"):
+        mm.mesh_part(model, name="wing")
+
+
+def test_mesh_model_refuses_a_model_with_no_size(tmp_path, monkeypatch):
+    mm = _import_block(tmp_path, monkeypatch, "mesh-model")
+    with pytest.raises(ValueError, match="no size"):
+        mm.mesh_model((np.zeros((3, 3)), np.array([[0, 1, 2]])))

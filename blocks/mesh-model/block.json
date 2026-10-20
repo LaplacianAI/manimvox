@@ -1,0 +1,16 @@
+{
+  "name": "mesh-model",
+  "function": "mesh_model",
+  "helpers": ["mesh_part"],
+  "description": "A 3D model from a glTF, OBJ or STL file (Blender exports glTF) as shaded faces the 3D camera orbits. Use in an Episode3D.",
+  "tags": ["3d", "model", "mesh", "gltf", "blender"],
+  "parameters": [
+    {"name": "source", "description": "a .glb, .gltf, .obj, .stl or .ply file, or (vertices, faces) arrays"},
+    {"name": "size", "description": "the model's largest side in scene units"},
+    {"name": "color", "description": "theme colour for faces the model gives no colour"},
+    {"name": "max_faces", "description": "simplify to at most this many triangles, 4 to 5000; fewer renders faster"},
+    {"name": "up", "description": "the source's up axis: \"y\" for glTF and OBJ, \"z\" for STL and CAD"},
+    {"name": "wire", "description": "draw face edges in the background colour, for a low-poly look"}
+  ],
+  "returns": "VGroup of faces with .mesh, .parts and .centres; mesh_part(model, name, inside) picks the faces of one part"
+}
