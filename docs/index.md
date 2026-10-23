@@ -12,6 +12,7 @@ Ask Claude Code, Codex, Cursor or Gemini CLI for "an explainer video of" a paper
 
 ```bash
 uv tool install "manimvox[kokoro]"     # 1. install manimvox with the default offline voice
+                                       #    (or: pip install "manimvox[kokoro]")
 manimvox skills install                # 2. give your coding agent the manimvox skills
 ```
 

@@ -35,7 +35,7 @@ While making it, the agent also extended manimvox: `from_pyvista`, `screen_xy`, 
 The whole project is in [`examples/gallery/heart`](https://github.com/LaplacianAI/manimvox/tree/main/examples/gallery/heart): the episode, its script, the facts, and the script that prepares the CT data. To render it yourself:
 
 ```bash
-uv tool install "manimvox[kokoro,pyvista]"
+uv tool install "manimvox[kokoro,pyvista]"     # or: pip install "manimvox[kokoro,pyvista]"
 python prep_ct.py path/to/18.vtk research/ct
 manimvox render ep01
 ```

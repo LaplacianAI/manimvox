@@ -10,7 +10,7 @@ An 80-second explainer: a real human heart, rebuilt from a CT scan, is sliced op
 
 ## Make it
 
-1. Install manimvox with a voice and the 3D extra: `uv tool install "manimvox[kokoro,pyvista]"`.
+1. Install manimvox with a voice and the 3D extra: `uv tool install "manimvox[kokoro,pyvista]"` (or `pip install "manimvox[kokoro,pyvista]"`).
 2. Download case 18 of the CT heart cohort (CC BY 4.0, about 54 MB) from [Zenodo](https://zenodo.org/records/4590294) and unpack it: `tar -xzf 18.tar.gz` gives `18.vtk`.
 3. In this folder, prepare it: `python prep_ct.py path/to/18.vtk research/ct`.
 4. Draft, look at the contact sheets in `sheets/`, then render:

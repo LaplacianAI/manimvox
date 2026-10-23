@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sys
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -14,10 +15,18 @@ class VoiceError(Exception):
     """A voice cannot be used as asked. Never answered by switching voices silently."""
 
 
-def install_hint(extra: str) -> str:
-    """How to add an extra: --force reinstalls with it, and naming kokoro keeps the default voice."""
+def installed_by_uv_tool(prefix: str | None = None) -> bool:
+    """True when this manimvox runs from a `uv tool install` environment: uv leaves a receipt in it."""
+    return (Path(prefix or sys.prefix) / "uv-receipt.toml").is_file()
+
+
+def install_hint(extra: str, prefix: str | None = None) -> str:
+    """How to add an extra, with the installer manimvox came from: uv's --force reinstalls with it (pip adds it
+    in place), and naming kokoro keeps the default voice."""
     wanted = "kokoro" if extra == "kokoro" else f"kokoro,{extra}"
-    return f'uv tool install --force "manimvox[{wanted}]"'
+    if installed_by_uv_tool(prefix):
+        return f'uv tool install --force "manimvox[{wanted}]"'
+    return f'pip install "manimvox[{wanted}]"'
 
 
 class EngineNotInstalled(VoiceError):

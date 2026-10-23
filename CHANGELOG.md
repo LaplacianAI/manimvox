@@ -12,6 +12,7 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 - Benchmarks: every cost is in US dollars. Rupee costs are converted at the mid-market rate on the day of the run, and ElevenLabs' credits at its cheapest commercial plan's rate.
 - README: the status line is gone. The alpha status is still in the PyPI classifiers and the roadmap.
+- Install with pip or uv: the README, docs and skills give both commands, and a missing extra's error names the installer manimvox came from (`uv tool install --force` in a uv tool environment, `pip install` otherwise).
 
 ## [0.2.0] - 2026-10-23
 

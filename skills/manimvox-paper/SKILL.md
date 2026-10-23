@@ -24,7 +24,7 @@ Copy this checklist and keep it current:
 
 ## Consent, before anything else
 
-Ask the user before you install anything (a system package, `uv tool install`, `uv run --with pypdf`), download a model, fetch from the web, or use an online voice. If you cannot ask, the answer is no: stop and report exactly what is needed. One exception: a URL the user gave you is already their go-ahead to fetch that URL, and nothing else.
+Ask the user before you install anything (a system package, `uv tool install` or `pip install`, `uv run --with pypdf`), download a model, fetch from the web, or use an online voice. If you cannot ask, the answer is no: stop and report exactly what is needed. One exception: a URL the user gave you is already their go-ahead to fetch that URL, and nothing else.
 
 ## 0 Setup
 

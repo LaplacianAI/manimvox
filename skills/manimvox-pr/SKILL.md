@@ -24,7 +24,7 @@ Copy this checklist and keep it current:
 
 ## Consent, before anything else
 
-Ask the user before you install anything (a system package, `uv tool install`, the `gh` tool), download a model, fetch from the web, or use an online voice. If you cannot ask, the answer is no: stop and report exactly what is needed. A PR URL or `owner/repo#N` the user gave you is their go-ahead to read that PR with `gh`, and nothing else.
+Ask the user before you install anything (a system package, `uv tool install` or `pip install`, the `gh` tool), download a model, fetch from the web, or use an online voice. If you cannot ask, the answer is no: stop and report exactly what is needed. A PR URL or `owner/repo#N` the user gave you is their go-ahead to read that PR with `gh`, and nothing else.
 
 ## 0 Setup
 
