@@ -30,7 +30,9 @@ dependencies = [
   "numpy>=1.26",
   "soundfile>=0.12",
   "av>=12",
-  "pillow>=10",
+  # Pillow 13 refuses the blank RGBA canvas Manim 0.22 asks for (Image.fromarray of a 2-D array with mode="RGBA"),
+  # so every image, clip, chart and screenshot fails to draw. Lift the cap with a Manim release that fixes it.
+  "pillow>=10,<13",
   "pycairo>=1.14,<2",
 ]
 
