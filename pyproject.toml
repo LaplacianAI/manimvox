@@ -8,6 +8,7 @@ dynamic = ["version"]
 description = "Narrated, animated explainer videos with Manim and pluggable voices, driven by agent skills."
 readme = "README.md"
 license = "MIT"
+authors = [{ name = "LaplacianAI" }]
 requires-python = ">=3.11"
 keywords = ["manim", "explainer", "video", "animation", "text-to-speech", "agent-skills", "education"]
 classifiers = [
