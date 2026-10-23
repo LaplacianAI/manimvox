@@ -41,6 +41,7 @@ from manim import (
 )
 
 from ..voice import VoiceError, spoken_form, synth_cached
+from ..voice.loudness import DEFAULT_LOUDNESS
 from ._context import NOTTS, PROJECT, STEM, THEME, VOICE
 from .colours import ACCENT, BG, INK, LINE, MUTED, PANEL, TEAL
 from .components import box, bullets, heading
@@ -105,7 +106,8 @@ class Episode(Scene):
         else:
             speed = PROJECT.speed if PROJECT else 1.0
             cache = PROJECT.cache_dir if PROJECT else Path(".manimvox/tts")
-            path, dur = synth_cached(VOICE, spoken, speed, cache)
+            loudness = PROJECT.loudness if PROJECT else DEFAULT_LOUDNESS
+            path, dur = synth_cached(VOICE, spoken, speed, cache, loudness)
         t0 = self.time
         if path is not None:
             # Not self.add_sound(): Manim silently drops a sound added right after an animation it

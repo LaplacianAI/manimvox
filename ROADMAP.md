@@ -19,7 +19,7 @@ People should see what manimvox makes before they install it, and be able to com
 
 ## Next
 
-- [ ] **Even loudness across voices.** Normalise the narration to one level (for example −16 LUFS), so changing the voice doesn't change the volume. The first voice benchmark measured up to an 8 dB gap between voices.
+- [x] **Even loudness across voices.** Every narration line is levelled to one loudness (−16 LUFS by default), so changing the voice doesn't change the volume. The voice benchmark's 7.9 LU spread is now 0.1.
 - [ ] **More gallery videos:** a paper video next, then a concept video and a PR walkthrough.
 - [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
 

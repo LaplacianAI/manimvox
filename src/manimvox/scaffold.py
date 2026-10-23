@@ -9,6 +9,7 @@ from pathlib import Path
 from . import __version__
 from .project import SERIES_FILE, ProjectError
 from .voice import DEFAULT_VOICE, parse_voice
+from .voice.loudness import DEFAULT_LOUDNESS
 
 
 def _template(name: str) -> str:
@@ -46,6 +47,7 @@ def new_project(directory: Path, series: str, tagline: str = "", voice: str = DE
         "tagline": tagline,
         "voice": voice,
         "speed": 1.0,
+        "loudness": DEFAULT_LOUDNESS,
         "pron": [],
         "theme": {"source": "kit neutral default; replace with the subject's own theme (see manimvox-creative)"},
         "episodes": [],

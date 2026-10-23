@@ -9,6 +9,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from .post.options import PostOptions, parse_post
+from .voice.loudness import DEFAULT_LOUDNESS, LOUDNESS_RANGE
 
 SERIES_FILE = "series.json"
 
@@ -35,6 +36,7 @@ class Project:
     tagline: str = ""
     voice: str | None = None
     speed: float = 1.0
+    loudness: float | None = DEFAULT_LOUDNESS  # LUFS every narration line is levelled to; None keeps the voice's
     pron: list[tuple[str, str]] = field(default_factory=list)
     theme: dict = field(default_factory=dict)
     post: PostOptions = field(default_factory=PostOptions)
@@ -98,6 +100,7 @@ def load_project(root: Path) -> Project:
         raise ProjectError(f"{f}: 'speed' must be a number, got {raw_speed!r}")
     if speed <= 0:
         raise ProjectError(f"{f}: 'speed' must be greater than 0, got {raw_speed!r}")
+    loudness = _loudness(f, data.get("loudness", DEFAULT_LOUDNESS))
     voice = data.get("voice")
     if voice is not None and not isinstance(voice, str):
         raise ProjectError(f"{f}: 'voice' must be a string like 'kokoro:af_heart', got {voice!r}")
@@ -114,6 +117,7 @@ def load_project(root: Path) -> Project:
         tagline=data.get("tagline", ""),
         voice=voice,
         speed=float(speed),
+        loudness=loudness,
         pron=_pron(f, data.get("pron", [])),
         theme=dict(theme),
         post=post,
@@ -144,6 +148,16 @@ def _episodes(f: Path, root: Path, raw: object) -> list[EpisodeRef]:
         refs.append(EpisodeRef(n, stem, e["cls"], str(e.get("title", "")), root / "episodes" / f"{stem}.py",
                         str(e.get("level", "")), str(e.get("blurb", ""))))
     return refs
+
+
+def _loudness(f: Path, raw: object) -> float | None:
+    if raw is None:
+        return None
+    lo, hi = LOUDNESS_RANGE
+    if isinstance(raw, bool) or not isinstance(raw, (int, float)) or not math.isfinite(raw) or not lo <= raw <= hi:
+        raise ProjectError(f"{f}: 'loudness' must be a level in LUFS from {lo:g} to {hi:g} "
+                           f"(default {DEFAULT_LOUDNESS:g}), or null to keep each voice's own, got {raw!r}")
+    return float(raw)
 
 
 def _pron(f: Path, raw: object) -> list[tuple[str, str]]:

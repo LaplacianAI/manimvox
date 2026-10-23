@@ -2,29 +2,29 @@
 
 **Date:** 2026-10-23 · **Agent:** Claude Code 2.1.294 with Sonnet 5.5 · **Voices:** `sarvam:shubh`, `gnani:timbre-v3.0/Avinash@en-IN` and `elevenlabs:eleven_v3/nPczCjzI2devNBz1zQrb` (Brian)
 
-One prompt made one episode. That episode was rendered three times, once with each voice, and nothing else changed. The [methodology](index.md#methodology) explains how each number is measured.
+One prompt made one episode. That episode was rendered three times, once with each voice, and nothing else changed. The [methodology](index.md#methodology) explains how each number is measured. The videos play at even loudness ([see below](#what-the-numbers-show)), so switching voices doesn't change the volume.
 
 ## The videos
 
 === "Sarvam AI · Bulbul v3 · shubh"
 
     <video controls preload="metadata" width="100%" poster="../../assets/bench-upi-poster.jpg">
-      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-sarvam.mp4" type="video/mp4">
-      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-sarvam.mp4">Download the video</a>.
+      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-sarvam-levelled.mp4" type="video/mp4">
+      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-sarvam-levelled.mp4">Download the video</a>.
     </video>
 
 === "Gnani.ai · Timbre v3.0 · Avinash"
 
     <video controls preload="metadata" width="100%" poster="../../assets/bench-upi-poster.jpg">
-      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani.mp4" type="video/mp4">
-      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani.mp4">Download the video</a>.
+      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani-levelled.mp4" type="video/mp4">
+      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani-levelled.mp4">Download the video</a>.
     </video>
 
 === "ElevenLabs · v3 · Brian"
 
     <video controls preload="metadata" width="100%" poster="../../assets/bench-upi-poster.jpg">
-      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-elevenlabs.mp4" type="video/mp4">
-      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-elevenlabs.mp4">Download the video</a>.
+      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-elevenlabs-levelled.mp4" type="video/mp4">
+      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-elevenlabs-levelled.mp4">Download the video</a>.
     </video>
 
 ## How the episode was made
@@ -97,7 +97,17 @@ The voices are matched on gender and on each provider's newest general model. Sa
     The recogniser is trained mostly on American and British English, so it may favour ElevenLabs' American voice. That is one reason the listening notes matter.
 - **The listener heard background noise in Sarvam's voice. The likeliest cause is heavy compression, not a noisy background.** The gaps between Sarvam's words are actually the quietest of the three: its speech sits 52 dB above them. But its crest factor is only 13.5 dB (Gnani 20.2, ElevenLabs 18.0), with 0.2% of samples within 1 dB of full scale. Speech squeezed that hard against the top of the range sounds harsh and distorted, and that can come across as noise. It comes from Sarvam's audio, not from manimvox: the final videos peak at −3.1 to −4.3 dBFS and never clip.
 - **Energy above 7 kHz and the flatness of quiet parts describe the sound; they don't measure noise.** ElevenLabs has the most of both, from crisp consonants and audible breaths. A bright, clean voice and a hissy one both score high, so these two numbers aren't used to rank.
-- **The voices differ in loudness by up to 8 dB.** manimvox doesn't yet normalise loudness, so this reaches the viewer: Sarvam's video plays loudest, ElevenLabs' in the middle and Gnani's quietest.
+- **The voices differ in loudness by up to 8 dB, so manimvox now levels them.** The loudness numbers above are the audio as each service returned it. Since [#24](https://github.com/LaplacianAI/manimvox/issues/24), every narration line is brought to the same loudness (−16 LUFS by default). Re-rendered from the same cached lines, with no new calls to any voice service, the four videos measure:
+
+    | Finished video | Before | After |
+    |---|---|---|
+    | Sarvam `shubh` | −14.4 LUFS | −16.2 LUFS |
+    | ElevenLabs `Brian` | −18.6 LUFS | −16.3 LUFS |
+    | Gnani `Avinash` | −21.9 LUFS | −16.2 LUFS |
+    | Kokoro `af_heart` (the agent's own render) | −22.3 LUFS | −16.2 LUFS |
+    | **Spread** | **7.9 LU** | **0.1 LU** |
+
+    True peaks stay at −1.2 dBTP or below after AAC encoding. The videos above are the levelled renders. The measurements and the listening notes are from the audio as each service returned it, before levelling; those originals are kept for comparison: [Sarvam](https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-sarvam.mp4), [Gnani](https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani.mp4), [ElevenLabs](https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-elevenlabs.mp4).
 
 ### Listening
 
