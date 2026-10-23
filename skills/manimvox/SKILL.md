@@ -23,10 +23,11 @@ Open the workflow skill and follow it to the end. If the input is unclear, ask a
 
 ## 2 Check the setup
 
-Run `manimvox doctor`. A `FAIL` line names its fix; see [manimvox-cli](../manimvox-cli/SKILL.md). If `manimvox` is not installed, tell the user the install command and ask before running it:
+Run `manimvox doctor`. A `FAIL` line names its fix; see [manimvox-cli](../manimvox-cli/SKILL.md). If `manimvox` is not installed, tell the user the install command and ask before running it. Use uv if the user has it, pip otherwise:
 
 ```text
 uv tool install "manimvox[kokoro]"
+pip install "manimvox[kokoro]"
 ```
 
 If you cannot ask, the answer is no: stop and report that manimvox must be installed.

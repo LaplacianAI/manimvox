@@ -6,7 +6,7 @@ A short introduction to manimvox, made with manimvox: what it is, why the agent 
 
 ## Make it
 
-1. Install manimvox: `uv tool install "manimvox[kokoro]"`.
+1. Install manimvox: `uv tool install "manimvox[kokoro]"` (or `pip install "manimvox[kokoro]"`).
 2. The last chapter plays a few seconds of *Inside the heart*. Download it into `research/`:
 
    ```bash

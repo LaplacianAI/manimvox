@@ -52,7 +52,7 @@ The agent asks before it installs anything, downloads a model, fetches from the 
 <!-- --8<-- [start:requirements] -->
 ## Requirements
 
-- Python 3.11 or newer and [uv](https://docs.astral.sh/uv/)
+- Python 3.11 or newer, and [uv](https://docs.astral.sh/uv/) or pip
 - System libraries for Manim's text rendering:
 
 | OS | Command |
@@ -66,22 +66,24 @@ The agent asks before it installs anything, downloads a model, fetches from the 
 <!-- --8<-- [start:installation] -->
 ## Installation
 
-Install it from PyPI, with the default Kokoro voice:
+Install it from PyPI, with the default Kokoro voice, using either uv or pip:
 
 ```bash
-uv tool install "manimvox[kokoro]"
+uv tool install "manimvox[kokoro]"     # with uv: its own environment, on your PATH
+pip install "manimvox[kokoro]"         # with pip: best inside a virtual environment
 manimvox doctor
 ```
 
 `manimvox doctor` checks the system libraries, fonts and voice engines, and names the command that fixes anything missing. The first run can take a few minutes while Pango builds its font cache.
 
-Add more voices by reinstalling with the extras you want, keeping `kokoro`:
+Add more voices by installing again with the extras you want, keeping `kokoro`:
 
 ```bash
-uv tool install --force "manimvox[kokoro,piper]"
+uv tool install --force "manimvox[kokoro,piper]"     # with uv
+pip install "manimvox[kokoro,piper]"                 # with pip
 ```
 
-The development version installs from GitHub: `uv tool install "manimvox[kokoro] @ git+https://github.com/LaplacianAI/manimvox"`.
+The development version installs from GitHub: `uv tool install "manimvox[kokoro] @ git+https://github.com/LaplacianAI/manimvox"`, or the same with `pip install`.
 
 | Extra | Adds |
 |---|---|

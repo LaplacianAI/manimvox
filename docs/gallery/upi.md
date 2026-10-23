@@ -23,7 +23,7 @@ The same episode was then rendered with three voices (Sarvam AI, Gnani.ai and El
 The project is in [`benchmarks/runs/2026-10-23-upi-voices/project`](https://github.com/LaplacianAI/manimvox/tree/main/benchmarks/runs/2026-10-23-upi-voices/project): the episode, its script, the facts and the subtitles. To render it yourself with this voice:
 
 ```bash
-uv tool install "manimvox[kokoro,cloud]"
+uv tool install "manimvox[kokoro,cloud]"     # or: pip install "manimvox[kokoro,cloud]"
 export GNANI_API_KEY=...
 manimvox render ep01_upi --voice gnani:timbre-v3.0/Avinash@en-IN
 ```

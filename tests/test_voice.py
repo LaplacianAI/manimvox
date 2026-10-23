@@ -16,6 +16,7 @@ from manimvox.voice import (
     resolve_voice,
     synth_cached,
 )
+from manimvox.voice.base import install_hint
 
 
 def test_parse_voice_engine_and_voice():
@@ -51,7 +52,14 @@ def test_unknown_engine_lists_known():
 
 def test_engine_not_installed_message_names_extra():
     e = EngineNotInstalled("piper", "piper")
-    assert 'uv tool install --force "manimvox[kokoro,piper]"' in str(e)
+    assert '"manimvox[kokoro,piper]"' in str(e)
+
+
+def test_install_hint_follows_the_installer(tmp_path):
+    assert install_hint("piper", str(tmp_path)) == 'pip install "manimvox[kokoro,piper]"'
+    (tmp_path / "uv-receipt.toml").write_text("[tool]\n", encoding="utf-8")
+    assert install_hint("piper", str(tmp_path)) == 'uv tool install --force "manimvox[kokoro,piper]"'
+    assert install_hint("kokoro", str(tmp_path)) == 'uv tool install --force "manimvox[kokoro]"'
 
 
 def test_fake_tone_is_cached_and_timed(tmp_path):

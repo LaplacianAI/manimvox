@@ -40,7 +40,7 @@ Default to Kokoro unless the user asks for something else.
 | XTTS-v2 | `xtts:clone=voice.wav` | a voice the user owns and consents to clone | extra `xtts`, ~1.9 GB plus PyTorch | non-commercial |
 | F5-TTS | `f5:clone=voice.wav` | the same, with a transcript | extra `f5`, ~1.3 GB plus PyTorch | non-commercial |
 
-Add an extra with `uv tool install --force "manimvox[kokoro,<extra>]"` (name every extra wanted, and keep kokoro). Licences were summarised, not legally reviewed: tell the user to verify upstream before commercial use.
+Add an extra with the command `manimvox doctor` names: `uv tool install --force "manimvox[kokoro,<extra>]"` for a uv install, `pip install "manimvox[kokoro,<extra>]"` for pip (name every extra wanted, and keep kokoro). Licences were summarised, not legally reviewed: tell the user to verify upstream before commercial use.
 
 ## Ask before anything leaves the machine or downloads
 
@@ -128,7 +128,7 @@ Each failure is one line. What to do:
 
 | The line says | Do |
 |---|---|
-| not installed: `uv tool install --force "manimvox[kokoro,X]"` | ask, then install that extra (keep every extra already wanted) |
+| not installed: `uv tool install --force "manimvox[kokoro,X]"` (or `pip install "manimvox[kokoro,X]"`) | ask, then install that extra (keep every extra already wanted) |
 | set `OPENAI_API_KEY` / `ELEVENLABS_API_KEY` / `SARVAM_API_KEY` / `GNANI_API_KEY` | the user sets the variable; never write a key into a file in the project |
 | rejected the key (HTTP 401) | the key is wrong or expired; the user fixes it |
 | rerun with `--yes` / model files are missing | ask about the download, then `manimvox voices --prepare ENGINE --yes` |

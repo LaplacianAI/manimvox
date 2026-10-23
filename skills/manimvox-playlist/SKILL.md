@@ -22,7 +22,7 @@ Copy this checklist and keep it current:
 
 ## Consent, before anything else
 
-Ask the user before you install anything (a system package, `uv tool install`), download a model, fetch from the web, or use an online voice. If you cannot ask, the answer is no: stop and report exactly what is needed. A URL the user gave you is their go-ahead to fetch that URL, and nothing else. Pass `--yes` (or `-y`) to a command only after the user has said yes to what it would do.
+Ask the user before you install anything (a system package, `uv tool install` or `pip install`), download a model, fetch from the web, or use an online voice. If you cannot ask, the answer is no: stop and report exactly what is needed. A URL the user gave you is their go-ahead to fetch that URL, and nothing else. Pass `--yes` (or `-y`) to a command only after the user has said yes to what it would do.
 
 ## 0 Setup
 
