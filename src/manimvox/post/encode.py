@@ -76,7 +76,7 @@ class Writer:
     def add(self, rgb: np.ndarray) -> None:
         f = av.VideoFrame.from_ndarray(np.ascontiguousarray(rgb), format="rgb24")
         f.pts = self.frames  # count frames: the source's time base and pts gaps never reach the encoder
-        f.time_base = self.v.codec_context.time_base
+        f.time_base = 1 / self.fps  # one tick a frame; PyAV 18 has no codec time base before the first encode
         self.frames += 1
         for p in self.v.encode(f):
             self.c.mux(p)

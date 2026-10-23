@@ -6,6 +6,7 @@ import html
 import json
 import re
 import shutil
+from fractions import Fraction
 from pathlib import Path
 
 import av
@@ -125,7 +126,8 @@ def transcode_720(src: Path, dst: Path) -> None:
         ain = inp.streams.audio[0] if inp.streams.audio else None
         h = 720
         w = round(vin.width * h / vin.height / 2) * 2
-        vout = out.add_stream("libx264", rate=vin.average_rate or 30)
+        fps = Fraction(vin.average_rate or 30).limit_denominator(1001)
+        vout = out.add_stream("libx264", rate=fps)
         vout.width, vout.height, vout.pix_fmt = w, h, "yuv420p"
         vout.options = {"crf": "26", "preset": "medium"}
         aout = out.add_stream("aac", rate=ain.rate, layout=ain.layout.name) if ain else None
@@ -145,7 +147,7 @@ def transcode_720(src: Path, dst: Path) -> None:
                 if packet.stream.type == "video":
                     f = frame.reformat(width=w, height=h, format="yuv420p")
                     f.pts = vcount  # count frames: the source's time_base and pts gaps never reach the encoder
-                    f.time_base = vout.codec_context.time_base
+                    f.time_base = 1 / fps  # one tick a frame; PyAV 18 has no codec time base before encoding
                     vcount += 1
                     for p in vout.encode(f):
                         out.mux(p)
