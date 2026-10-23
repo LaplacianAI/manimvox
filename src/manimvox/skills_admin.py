@@ -14,6 +14,7 @@ from typing import Literal
 from .skills import SKILL_NAMES, content_hash, read_frontmatter, skills_path
 
 SKILLS_CLI = "skills@1.7.2"  # bump deliberately: npx runs this package
+NODE_MIN = (22, 20, 0)  # SKILLS_CLI's engines.node; older Node crashes inside it
 
 
 @dataclass(frozen=True)
@@ -235,6 +236,29 @@ def npx_path() -> str | None:
 
 def has_npx() -> bool:
     return npx_path() is not None
+
+
+def node_version(npx: str) -> tuple[int, ...] | None:
+    """The version of the Node.js beside `npx` (the one npx will run), or None if it can't be read."""
+    base = Path(npx).parent
+    node = next((base / n for n in ("node.exe", "node") if (base / n).is_file()), None)
+    if node is None:
+        return None
+    try:
+        out = subprocess.run([str(node), "--version"], capture_output=True, text=True, timeout=10, check=False).stdout or ""
+    except (OSError, subprocess.SubprocessError):
+        return None
+    parts = out.strip().lstrip("v").split(".")
+    return tuple(int(p) for p in parts) if parts and all(p.isdigit() for p in parts) else None
+
+
+def node_too_old(npx: str) -> str | None:
+    """Why npx can't run SKILLS_CLI here, or None. An unreadable version is given the benefit of the doubt."""
+    have = node_version(npx)
+    if have is not None and have < NODE_MIN:
+        need = ".".join(map(str, NODE_MIN))
+        return f"Node.js {'.'.join(map(str, have))} is older than the {need} that {SKILLS_CLI} needs"
+    return None
 
 
 def known_targets(scope: Literal["project", "global"], root: Path, home: Path) -> list[Path]:

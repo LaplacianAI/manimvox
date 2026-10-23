@@ -74,6 +74,8 @@ def test_cache_root_per_os(tmp_path):
 def test_status_reports_missing_models(fake_models):
     st = get_engine("kokoro").status()
     assert not st.ready and ("model" in st.detail or "manimvox[kokoro]" in st.detail)
+    if "model files" in st.detail:  # a whole sentence, ending on the command that fixes it
+        assert st.detail.endswith("run `manimvox voices --prepare kokoro`")
 
 
 @pytest.mark.kokoro

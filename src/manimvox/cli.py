@@ -242,6 +242,10 @@ def _skills_install(args, home) -> int:
     npx, ignored = (None, False) if args.native else sa.find_npx()
     if ignored and not npx:
         print("manimvox: ignored npx in the current folder; using the built-in installer", file=sys.stderr)
+    old = sa.node_too_old(npx) if npx else None
+    if old:
+        print(f"manimvox: {old}; using the built-in installer", file=sys.stderr)
+        npx = None
     if npx:
         real = [a.id for a in found if a.id != "universal"]  # npx maps "universal" to another folder
         ids = list(args.agent) if args.agent else (real if args.yes else None)

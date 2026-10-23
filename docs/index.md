@@ -4,9 +4,9 @@
 
 Ask Claude Code, Codex, Cursor or Gemini CLI for "an explainer video of" a paper, a codebase, an idea or a pull request. manimvox gives the agent what it needs to research the topic, write a cited script, animate it with [Manim](https://www.manim.community/), narrate it with a text-to-speech voice, and check the result before it ships. You direct; the agent does the work.
 
-![A CT-derived heart turns, is sliced open to its four chambers, and blood streams through it](assets/demo.gif)
+![The manimvox logo draws itself, then four things manimvox animates: a ball rolling down a 3D loss surface, a request flow, a bar ranking and a code diff](assets/demo.gif)
 
-*[Inside the heart](gallery/heart.md): made by Claude Code with manimvox from a few prompts, using a real CT scan.*
+*Made with manimvox: four of its [blocks](blocks.md). Finished videos made by AI agents are in the [gallery](gallery/index.md).*
 
 ## Get started
 

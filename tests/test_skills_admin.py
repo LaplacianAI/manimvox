@@ -135,6 +135,7 @@ def test_npx_command(tmp_path):
 def test_cli_install_hands_off_to_npx(home, proj, monkeypatch, no_tty):
     seen = {}
     monkeypatch.setattr(sa, "find_npx", lambda: ("/usr/bin/npx", False))
+    monkeypatch.setattr(sa, "node_version", lambda npx: None)  # never the runner's own Node
     monkeypatch.setattr(sa.subprocess, "run",
                         lambda cmd, **kw: seen.update(cmd=cmd, env=kw.get("env")) or subprocess.CompletedProcess(cmd, 0))
     assert main(["skills", "install", "--yes"]) == 0
@@ -178,6 +179,7 @@ def test_cli_update_keeps_links(home, proj, no_npx, no_tty):
 def with_npx(monkeypatch):
     calls = []
     monkeypatch.setattr(sa, "find_npx", lambda: ("/usr/bin/npx", False))
+    monkeypatch.setattr(sa, "node_version", lambda npx: None)  # never the runner's own Node
     monkeypatch.setattr(sa.subprocess, "run",
                         lambda cmd, **kw: calls.append(cmd) or subprocess.CompletedProcess(cmd, 0))
     return calls
@@ -410,6 +412,7 @@ def test_npx_path_refuses_a_target_that_resolves_into_the_skills_source(home, pr
 
 def test_npx_failure_points_at_native(home, proj, no_tty, monkeypatch, capsys):
     monkeypatch.setattr(sa, "find_npx", lambda: ("/usr/bin/npx", False))
+    monkeypatch.setattr(sa, "node_version", lambda npx: None)  # never the runner's own Node
     monkeypatch.setattr(sa.subprocess, "run", lambda cmd, **kw: subprocess.CompletedProcess(cmd, 3))
     assert main(["skills", "install", "--yes"]) == 3
     assert "`manimvox skills install --native` installs without it" in capsys.readouterr().err
@@ -499,3 +502,29 @@ def test_dotfiles_are_not_hashed_or_installed(home, proj, tmp_path):
     sa.install([t], "copy", src)
     assert not (t / "manimvox" / ".DS_Store").exists()
     assert set(sa.status(t, src).values()) == {"ok"}
+
+
+@pytest.mark.parametrize("version, too_old", [((20, 18, 0), True), ((22, 19, 9), True), ((22, 20, 0), False),
+                                             ((24, 1, 0), False), (None, False)])
+def test_node_too_old(monkeypatch, version, too_old):
+    monkeypatch.setattr(sa, "node_version", lambda npx: version)
+    msg = sa.node_too_old("/usr/bin/npx")
+    assert bool(msg) == too_old
+    if too_old:
+        assert "22.20.0" in msg and sa.SKILLS_CLI in msg
+
+
+def test_node_version_reads_the_node_beside_npx(tmp_path, monkeypatch):
+    (tmp_path / "node").write_text("")
+    monkeypatch.setattr(sa.subprocess, "run", lambda cmd, **kw: subprocess.CompletedProcess(cmd, 0, "v20.18.0\n"))
+    assert sa.node_version(str(tmp_path / "npx")) == (20, 18, 0)
+    assert sa.node_version(str(tmp_path / "sub" / "npx")) is None  # no node beside it
+
+
+def test_old_node_falls_back_to_the_built_in_installer(home, proj, monkeypatch, no_tty, capsys):
+    calls = []
+    monkeypatch.setattr(sa, "find_npx", lambda: ("/usr/bin/npx", False))
+    monkeypatch.setattr(sa, "node_version", lambda npx: (20, 18, 0))
+    monkeypatch.setattr(sa.subprocess, "run", lambda cmd, **kw: calls.append(cmd) or subprocess.CompletedProcess(cmd, 0))
+    assert main(["skills", "install", "--yes", "--agent", "claude-code"]) == 0
+    assert not calls and "Node.js 20.18.0 is older" in capsys.readouterr().err
