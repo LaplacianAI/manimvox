@@ -369,3 +369,14 @@ def test_mesh_model_refuses_a_model_with_no_size(tmp_path, monkeypatch):
     mm = _import_block(tmp_path, monkeypatch, "mesh-model")
     with pytest.raises(ValueError, match="no size"):
         mm.mesh_model((np.zeros((3, 3)), np.array([[0, 1, 2]])))
+
+
+def test_docs_gallery_lists_every_block_with_its_preview(tmp_path):
+    from manimvox.blocks import write_docs
+
+    blocks = write_docs(tmp_path, REG)
+    page = (tmp_path / "blocks-gallery.md").read_text(encoding="utf-8")
+    assert len(blocks) == len(BLOCKS)
+    for b in BLOCKS:
+        assert f"### `{b.name}`" in page and f"manimvox add {b.name}" in page and b.import_line in page
+        assert (tmp_path / "assets" / "blocks" / f"{b.name}.png").read_bytes() == (b.path / "preview.png").read_bytes()

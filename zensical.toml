@@ -1,0 +1,102 @@
+# The documentation site: `zensical serve` previews it, `zensical build` writes site/.
+# Run `python -m manimvox.blocks docs` first: it writes the block gallery from blocks/*/block.json and preview.png.
+
+[project]
+site_name = "manimvox"
+site_description = "Explainer videos made by your AI agent: research, a cited script, Manim animation, narration and checks."
+site_url = "https://laplacianai.github.io/manimvox/"
+repo_url = "https://github.com/LaplacianAI/manimvox"
+repo_name = "LaplacianAI/manimvox"
+edit_uri = "edit/main/docs/"
+copyright = "MIT licensed. Voice engines, models and gallery sources carry their own licences."
+nav = [
+  { "Home" = "index.md" },
+  { "Get started" = [
+    { "How it works" = "how-it-works.md" },
+    { "Install" = "install.md" },
+    { "Make a video with an agent" = "agents.md" },
+    { "Write an episode by hand" = "quickstart.md" },
+  ] },
+  { "Guides" = [
+    { "Writing episodes" = "usage.md" },
+    { "Blocks, charts and finishing" = "blocks.md" },
+    { "3D models and data" = "3d.md" },
+    { "Voices" = "voices.md" },
+  ] },
+  { "Gallery" = [
+    { "Gallery" = "gallery/index.md" },
+    { "Inside the heart" = "gallery/heart.md" },
+  ] },
+  { "Reference" = [
+    { "Configuration" = "configuration.md" },
+    { "Python API" = "api.md" },
+  ] },
+  { "Project" = [
+    { "Roadmap" = "roadmap.md" },
+    { "Changelog" = "changelog.md" },
+    { "Contributing" = "contributing.md" },
+    { "Development" = "development.md" },
+    { "Security" = "security.md" },
+    { "Code of conduct" = "code-of-conduct.md" },
+  ] },
+]
+
+[project.theme]
+language = "en"
+features = [
+  "content.action.edit",
+  "content.code.annotate",
+  "content.code.copy",
+  "content.tabs.link",
+  "navigation.footer",
+  "navigation.indexes",
+  "navigation.instant",
+  "navigation.path",
+  "navigation.sections",
+  "navigation.tabs",
+  "navigation.top",
+  "navigation.tracking",
+  "search.highlight",
+]
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: dark)"
+scheme = "slate"
+toggle.icon = "lucide/sun"
+toggle.name = "Switch to light mode"
+
+[[project.theme.palette]]
+media = "(prefers-color-scheme: light)"
+scheme = "default"
+toggle.icon = "lucide/moon"
+toggle.name = "Switch to dark mode"
+
+[project.markdown_extensions]
+abbr = {}
+admonition = {}
+attr_list = {}
+def_list = {}
+footnotes = {}
+md_in_html = {}
+tables = {}
+toc.permalink = true
+pymdownx.details = {}
+pymdownx.highlight.anchor_linenums = true
+pymdownx.highlight.pygments_lang_class = true
+pymdownx.inlinehilite = {}
+pymdownx.superfences = {}
+pymdownx.tabbed.alternate_style = true
+# README sections are pulled in by name (`--8<-- "README.md:quickstart"`), so the README stays the one source
+pymdownx.snippets.check_paths = true
+
+[project.plugins.mkdocstrings.handlers.python]
+paths = ["src"]
+
+[project.plugins.mkdocstrings.handlers.python.options]
+docstring_style = "google"
+show_root_heading = true
+show_source = false
+members_order = "source"
+show_signature_annotations = true
+separate_signature = true
+filters = ["!^_"]

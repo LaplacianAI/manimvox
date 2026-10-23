@@ -1,7 +1,8 @@
 """The block registry: reusable scene components that `manimvox add` copies into a project's blocks/ folder.
 
 Contributors: `python -m manimvox.blocks preview --write NAME` renders a block's demo and writes its
-preview.png; `--check` compares instead (see skills/manimvox-blocks/references/writing-a-block.md)."""
+preview.png; `--check` compares instead (see skills/manimvox-blocks/references/writing-a-block.md).
+`python -m manimvox.blocks docs` writes the documentation site's block gallery."""
 from __future__ import annotations
 
 import argparse
@@ -151,6 +152,31 @@ def difference(a, b) -> float:
     return float(np.abs(thumb(a) - thumb(b)).mean())
 
 
+def gallery_markdown(blocks: list[Block], images: str) -> str:
+    """The block gallery as Markdown: each block's preview, what it draws, how to add it, and its parameters.
+    `images` is the folder of the copied previews, relative to the page that includes this."""
+    out = []
+    for b in blocks:
+        rows = "\n".join(f"| `{p['name']}` | {p['description']} |" for p in b.parameters)
+        out.append(f"### `{b.name}`\n\n![{b.name}]({images}/{b.name}.png)\n\n{b.description}\n\n"
+                   f"```bash\nmanimvox add {b.name}\n```\n\n```python\n{b.import_line}\n```\n\n"
+                   f"| Parameter | What it is |\n|---|---|\n{rows}\n\n**Returns:** {b.returns}\n")
+    return "\n".join(out)
+
+
+def write_docs(docs: Path, root: Path | None = None) -> list[Block]:
+    """Copy every block's preview into docs/assets/blocks and write docs/blocks-gallery.md."""
+    import shutil
+
+    blocks = all_blocks(root)
+    img = Path(docs) / "assets" / "blocks"
+    img.mkdir(parents=True, exist_ok=True)
+    for b in blocks:
+        shutil.copyfile(b.path / "preview.png", img / f"{b.name}.png")
+    (Path(docs) / "blocks-gallery.md").write_text(gallery_markdown(blocks, "assets/blocks"), encoding="utf-8")
+    return blocks
+
+
 def _main(argv: list[str]) -> int:
     from PIL import Image
 
@@ -162,7 +188,14 @@ def _main(argv: list[str]) -> int:
     g.add_argument("--check", action="store_true")
     pv.add_argument("names", nargs="*")
     pv.add_argument("--root", type=Path, default=None, help="the registry folder (default: the bundled one)")
+    dv = sub.add_parser("docs", help="write the documentation site's block gallery into docs/")
+    dv.add_argument("--out", type=Path, default=Path("docs"), help="the docs folder (default: docs)")
+    dv.add_argument("--root", type=Path, default=None, help="the registry folder (default: the bundled one)")
     a = ap.parse_args(argv)
+    if a.cmd == "docs":
+        n = len(write_docs(a.out, a.root))
+        print(f"wrote {a.out / 'blocks-gallery.md'} ({n} blocks)")
+        return 0
     blocks = [get_block(n, a.root) for n in a.names] if a.names else all_blocks(a.root)
     bad = 0
     with tempfile.TemporaryDirectory() as tmp:
