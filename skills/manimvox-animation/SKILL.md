@@ -38,3 +38,7 @@ When depth is the idea (a surface, a landscape, vectors in space, stacked layers
 ## Charts and frames from other libraries
 
 `manimvox.scenes` turns frames from Matplotlib, Plotly, Pillow, Cairo or a 3D model into a clip you place and play like any mobject, in the theme's colours: see [references/adapters.md](references/adapters.md). For a simple chart prefer a block (`manimvox add --list`, see [manimvox-blocks](../manimvox-blocks/SKILL.md)) or kit shapes, which reveal part by part as the narration speaks. Use an adapter for what Manim draws badly: dense data, real plots, heatmaps, image processing.
+
+## Screenshots and screen recordings
+
+For a product demo or a UI change, capture the screen with your own tools (a browser tool, computer use), then present it with `screenshot`, `from_video`, zoom, spotlight, callout and cursor: see [references/screens.md](references/screens.md).

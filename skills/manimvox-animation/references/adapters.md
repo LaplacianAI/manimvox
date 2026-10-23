@@ -18,7 +18,8 @@
 - A clip holds its frames in memory, at most 3600. Lower `fps` for long clips. Every frame must be one size.
 - A one-frame clip is a still image: `still(image)`.
 - `clip.loop()` keeps the frames playing under whatever the scene plays or waits next, such as a model turning while several lines are spoken. `clip.clear_updaters()` stops it.
-- `clip.at(x, y)` is the scene point over pixel (x, y) of the frames, from the top left. Use it to put a label, an arrow tip or a path on what the clip shows; it follows the clip when it moves or scales.
+- `clip.at(x, y)` is the scene point over pixel (x, y) of the frames, from the top left. Use it to put a label, an arrow tip or a path on what the clip shows; it follows the clip when it moves, scales or zooms.
+- `clip.zoom(x, y, w, h)` zooms into a region inside the clip's own frame, and `clip.zoom_out()` returns. Screenshots and screen recordings (`screenshot`, `from_video`) and their overlays are in [screens.md](screens.md).
 
 ## Pillow or numpy
 

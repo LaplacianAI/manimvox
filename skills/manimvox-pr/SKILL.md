@@ -77,6 +77,7 @@ Register one episode in `series.json` and write `episodes/ep01_<name>.py` as [ma
 
 - **Code on screen:** `code()` with the changed lines coloured through `colors={…}`, at most 12 lines per panel. Show only the lines that carry the idea, each copied exactly from the diff, with its file path as the panel title.
 - **Before and after:** two panels, the old code on one side and the new on the other, with the same lines aligned.
+- **A change you can see in the UI:** if the PR changes what a page or app shows and you have a way to capture it, show the screen before and after as [screens](../manimvox-animation/references/screens.md) says. Ask the user before running the app; with no way to ask, show the code only.
 
 Then loop: `manimvox draft ep01 --every 5`, read every contact sheet in `sheets/`, fix, repeat until it prints `layout check: ok` and the sheets read well. If you cannot view images, run `manimvox check layout ep01` and say so in the report. The draft uses no voice and downloads nothing.
 

@@ -43,6 +43,7 @@ The agent asks before it installs anything, downloads a model, fetches from the 
 
   Every failed check exits non-zero.
 - **3D when depth is the idea:** `Episode3D` adds Manim's tilting, orbiting camera to an episode, with the header and progress bar kept flat on screen.
+- **Screenshots and screen recordings:** for product demos and UI changes. The agent captures with its own browser or computer-use tools; manimvox zooms into a region, spotlights it, adds callouts and an animated cursor, all timed to the narration.
 - **3D models from files:** a glTF (Blender's export), OBJ or STL model drawn by Manim so its camera orbits it and parts can be picked out (the `mesh-model` block), or rendered with real lighting and animations as a clip (`from_model`).
 - **A theme per video:** colours and fonts come from the project's `series.json`, never from a fixed preset.
 - **Cross-platform:** macOS, Linux and Windows, with no system ffmpeg (audio and video are decoded with PyAV).
@@ -419,7 +420,7 @@ Install the `matplotlib` or `plotly` extra for them (see the extras table). Plot
 
 ```json
 {
-  "manimvox": "0.3.1",
+  "manimvox": "0.4.0",
   "series": "Vectors, Explained",
   "tagline": "What a vector really is",
   "voice": "kokoro:af_heart",

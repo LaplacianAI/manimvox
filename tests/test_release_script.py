@@ -45,6 +45,18 @@ def test_every_file_the_script_changes_holds_the_current_version():
     assert f"[Unreleased]: {rel.REPO}/compare/v" in (ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
 
 
+def test_a_changelog_it_cannot_date_changes_nothing(tmp_path, monkeypatch):
+    init = tmp_path / "__init__.py"
+    init.write_text('__version__ = "0.1.0"\n', encoding="utf-8")
+    (tmp_path / "CHANGELOG.md").write_text(LOG.replace("compare/v0.1.0...HEAD", "compare/v0.0.9...HEAD"),
+                                           encoding="utf-8")
+    monkeypatch.setattr(rel, "ROOT", tmp_path)
+    monkeypatch.setattr(rel, "INIT", init)
+    with pytest.raises(SystemExit, match="no link line"):
+        rel.main(["0.2.0"])
+    assert init.read_text(encoding="utf-8") == '__version__ = "0.1.0"\n'
+
+
 @pytest.mark.parametrize("args", [[], ["1.0"], ["v1.0.0"], ["0.0.1"]])
 def test_bad_or_older_versions_are_refused(args):
     with pytest.raises(SystemExit):

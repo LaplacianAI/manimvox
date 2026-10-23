@@ -11,9 +11,9 @@ Ask Claude Code, Codex, Cursor or Gemini CLI for "an explainer video of" a paper
 ## Get started
 
 ```bash
-uv tool install "manimvox[kokoro]"     # 1. install manimvox with the default offline voice
-                                       #    (or: pip install "manimvox[kokoro]")
-manimvox skills install                # 2. give your coding agent the manimvox skills
+uv tool install "manimvox[kokoro]"   # 1. install, with the offline voice
+                                     #    (or: pip install "manimvox[kokoro]")
+manimvox skills install              # 2. give your agent the skills
 ```
 
 Then ask your agent: *"make an explainer video of &lt;paper / repo / idea / PR&gt;"*.

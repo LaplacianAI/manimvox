@@ -1,6 +1,6 @@
 """manimvox: narrated, animated explainer videos with Manim and pluggable voices."""
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 
 def __getattr__(name):

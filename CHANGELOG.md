@@ -4,10 +4,15 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
-## [0.3.1] - 2026-10-23
+## [0.4.0] - 2026-10-23
+
+### Added
+
+- Screenshots and screen recordings for demo videos: `screenshot(path)` and `from_video(path)` in `manimvox.scenes`, `clip.zoom(x, y, w, h)` and `clip.zoom_out()` inside the clip's own frame, and overlays placed by pixel: `spotlight`, `callout`, `cursor` with `point` and `click`, and `window` chrome. Capture stays with the agent's own tools (a browser tool, computer use); the animation skill says how to capture, save and cite them.
 
 ### Fixed
 
+- A `pron` pattern written `"\bword\b"` in `series.json` is refused with a hint: JSON reads `\b` as a backspace, so the rule silently never matched (write `"\\bword\\b"`). A pattern that is not a valid regex is refused too.
 - A fresh install drew no images: Pillow 13, released after 0.3.0, refuses the blank canvas Manim 0.22 asks for, so every clip, chart, 3D model render and screenshot failed with `ValueError: Invalid mode for data type`. Pillow is capped below 13 until Manim fixes it. Found by an agent installing manimvox in a fresh environment.
 
 ## [0.3.0] - 2026-10-23
@@ -58,8 +63,8 @@ The first release.
 - **For agents:** eleven agent skills, the CLI as typed tools, adapters for eight Python agent frameworks, and plugin manifests for Claude Code, Codex, Cursor and Gemini CLI.
 - CI on Linux, macOS and Windows; releases published to PyPI with trusted publishing.
 
-[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.3.1...HEAD
-[0.3.1]: https://github.com/LaplacianAI/manimvox/compare/v0.3.0...v0.3.1
+[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/LaplacianAI/manimvox/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/LaplacianAI/manimvox/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/LaplacianAI/manimvox/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/LaplacianAI/manimvox/releases/tag/v0.1.0
