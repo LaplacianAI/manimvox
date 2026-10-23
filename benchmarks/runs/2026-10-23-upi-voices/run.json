@@ -10,21 +10,24 @@
       "name": "Sarvam AI, Bulbul v3, shubh",
       "score": "sarvam.score.json",
       "cost": "₹2.76",
-      "listener": "not clear, background noise; good pace for a short video"
+      "listener": "sounds AI-generated; not clear, background noise; good pace for a short video",
+      "listener_rank": 3
     },
     {
       "voice": "gnani:timbre-v3.0/Avinash@en-IN",
       "name": "Gnani.ai, Timbre v3.0, Avinash",
       "score": "gnani.score.json",
       "cost": "₹2.78",
-      "listener": "clear, but slow"
+      "listener": "the most realistic; clear, but slow",
+      "listener_rank": 1
     },
     {
       "voice": "elevenlabs:eleven_v3/nPczCjzI2devNBz1zQrb",
       "name": "ElevenLabs, Eleven v3, Brian",
       "score": "elevenlabs.score.json",
       "cost": "free plan",
-      "listener": "to be added"
+      "listener": "sounds AI-generated",
+      "listener_rank": 2
     }
   ]
 }

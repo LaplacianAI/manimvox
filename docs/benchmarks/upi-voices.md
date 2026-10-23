@@ -76,7 +76,7 @@ The voices are matched on gender and on each provider's newest general model. Sa
 | Spectral flatness of quiet parts | 0.13 | 0.07 | 0.24 | (descriptive) |
 | Pitch variation | 3.55 semitones | **4.30 semitones** | 4.21 semitones | Gnani |
 | Picture follows the voice | yes | yes | yes | tie |
-| **Listening** (one listener) | pace good for a short video; **not clear, with background noise** | **clear**, but slow | *to be added* | Gnani, so far |
+| **Listening** (one listener) | sounds AI-generated; **not clear, with background noise**; pace good for a short video | **the most realistic; clear**, but slow | sounds AI-generated | **Gnani** |
 
 ### What the numbers show
 
@@ -98,15 +98,23 @@ The voices are matched on gender and on each provider's newest general model. Sa
 
 ### Listening
 
-One listener watched the Sarvam and Gnani videos on 2026-10-23:
+One listener watched all three videos on 2026-10-23:
 
-- **Gnani:** clear, but slow.
-- **Sarvam:** not clear; there seemed to be background noise. Its pace was better for a short video.
-- **ElevenLabs:** to be added.
+- **Gnani:** a bit realistic, the only one of the three that was; clear, but slow.
+- **Sarvam:** sounds AI-generated; not clear, and there seemed to be background noise. Its pace was better for a short video.
+- **ElevenLabs:** sounds AI-generated.
+
+**The measurements missed what mattered most to the listener.** ElevenLabs had the best numbers (no misheard words, an explainer's pace, even loudness), but it still sounded synthetic, while Gnani sounded human. Word error rate, pace and loudness show whether a voice can be understood; they don't show whether it sounds like a person. Naturalness needs a listener, so a listening note is part of every run.
 
 ## Verdict
 
-So far, **Gnani's Avinash is the best Indian-English narrator here**: it sounds clean, only one word was misheard, and its pace suits an explainer. If a short video needs to move faster, raise `speed` toward Gnani's limit of 1.15. **Sarvam's shubh is the fastest to generate**, at about the same cost as Gnani, but its over-compressed audio is a serious fault for an explainer, and it needs `speed` lowered to about 0.8. **ElevenLabs' Brian has the best numbers**: no misheard words, an explainer's pace, even loudness and natural dynamics. But it is an American voice, and it hasn't been heard yet. The verdict will be updated once it has. All three rendered without a single failed line.
+**Gnani's Avinash is the best narrator for this video.** It was the only voice that sounded like a person, it is clear, only one word was misheard, and its pace suits an explainer. If a short video needs to move faster, raise `speed` toward Gnani's limit of 1.15.
+
+**ElevenLabs' Brian is the easiest to understand, but it sounds synthetic.** It had the best measurements of the three, and it is an American voice: on the free plan, ElevenLabs offers no Indian voice through the API.
+
+**Sarvam's shubh is the fastest to generate**, at about the same cost as Gnani. But it sounds synthetic and over-compressed, and at speed `1.0` it is too fast for an explainer.
+
+All three rendered without a single failed line.
 
 ## Files
 

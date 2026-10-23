@@ -22,6 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 RUNS = ROOT / "benchmarks" / "runs"
 REPO = "https://github.com/LaplacianAI/manimvox/tree/main/benchmarks/runs"
+UNRANKED = 1_000  # a voice no listener has ranked sorts after every ranked one
 
 
 @dataclass
@@ -63,10 +64,11 @@ def run_link(run: Run, up: str) -> str:
 
 
 def voice_rows(runs: list[Run], up: str) -> list[str]:
-    """Ranked by word error rate (the share of words a speech recogniser heard wrongly), then by crest factor
-    (higher is cleaner, less compressed audio)."""
+    """Ranked by the listener's order within its run (`listener_rank`, 1 is best) where there is one, since
+    measurements can't tell a natural voice from a synthetic one; then by word error rate (the share of words a
+    speech recogniser heard wrongly); then by crest factor (higher is cleaner, less compressed audio)."""
     rows = [(v, r) for r in runs for v in r.voices]
-    rows.sort(key=lambda vr: (vr[0]["wer"], -vr[0]["crest_db"]))
+    rows.sort(key=lambda vr: (vr[0].get("listener_rank", UNRANKED), vr[0]["wer"], -vr[0]["crest_db"]))
     head = ["| # | Voice | Word errors | Words a minute | Crest factor | Time per line | Cost | Listener | Run |",
             "|---|---|---|---|---|---|---|---|---|"]
     return head + [
@@ -112,7 +114,8 @@ def model_rows(runs: list[Run]) -> list[str]:
 def tables(runs: list[Run], up: str, level: str = "###") -> list[str]:
     out: list[str] = []
     if any(r.voices for r in runs):
-        out += [f"{level} Voice", "", ("Ranked by word error rate, then crest factor (higher is less compressed, cleaner audio). "
+        out += [f"{level} Voice", "", ("Ranked by the listener's order within each run, then word error rate, then crest factor (higher is less "
+                 "compressed, cleaner audio). "
                 "Each voice read the same lines as the others in its run."), "", *voice_rows(runs, up), ""]
     if any(r.agent for r in runs):
         out += [f"{level} Harness", "", "Ranked by result, then cost, then time.", "", *agent_rows(runs, up), ""]
