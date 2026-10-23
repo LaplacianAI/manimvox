@@ -11,6 +11,7 @@ Small fixes found while building the 0.1.0 showcase.
 - [ ] **Kokoro status line.** `manimvox doctor` cuts off mid-sentence ("a render will offer to"). It should end "…to download them, or run `manimvox voices --prepare kokoro`".
 - [ ] **`skills install` on older Node.** The pinned `skills` CLI needs Node 22.20 or newer; on older Node, npx crashes. Check the version first and use the built-in installer instead.
 - [ ] **Release helper.** One command bumps `__version__` and every manifest version together, so a release can't miss one.
+- [ ] **Even loudness across voices.** Normalise the narration to one level (for example −16 LUFS), so changing the voice doesn't change the volume. The first voice benchmark measured an 8 dB gap between Sarvam and Gnani.
 
 ## Next: docs site and gallery
 
@@ -21,6 +22,8 @@ People should see what manimvox makes before they install it.
 - [ ] **More gallery videos:** a paper video next, then a concept video and a PR walkthrough.
 - [x] **Block gallery**, generated from each block's preview and demo.
 - [x] **A short demo** (GIF or video) at the top of the README.
+- [x] **Benchmarks** of harnesses, models and voices, with the method and every record published: first, Sarvam and Gnani on an episode made by Claude Code with Sonnet 5.5.
+- [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration.
 
 ## 0.2: professor-quality visuals
 

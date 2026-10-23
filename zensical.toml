@@ -28,6 +28,10 @@ nav = [
     { "Made by your agent" = "gallery/made-by-your-agent.md" },
     { "Inside the heart" = "gallery/heart.md" },
   ] },
+  { "Benchmarks" = [
+    { "Benchmarks" = "benchmarks/index.md" },
+    { "UPI payments: Sarvam vs Gnani" = "benchmarks/upi-voices.md" },
+  ] },
   { "Reference" = [
     { "Configuration" = "configuration.md" },
     { "Python API" = "api.md" },

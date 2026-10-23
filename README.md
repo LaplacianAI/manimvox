@@ -11,7 +11,7 @@
 
 ![A CT-derived heart turns, is sliced open to its four chambers, and blood streams through it](https://raw.githubusercontent.com/LaplacianAI/manimvox/main/docs/assets/demo.gif)
 
-*[Inside the heart](https://laplacianai.github.io/manimvox/gallery/heart/): made by Claude Code with manimvox from a few prompts, using a real CT scan. More in the [gallery](https://laplacianai.github.io/manimvox/gallery/). Documentation: [laplacianai.github.io/manimvox](https://laplacianai.github.io/manimvox/).*
+*[Inside the heart](https://laplacianai.github.io/manimvox/gallery/heart/): made by Claude Code with manimvox from a few prompts, using a real CT scan. More in the [gallery](https://laplacianai.github.io/manimvox/gallery/), and how agents and voices compare in the [benchmarks](https://laplacianai.github.io/manimvox/benchmarks/). Documentation: [laplacianai.github.io/manimvox](https://laplacianai.github.io/manimvox/).*
 
 > **Status:** alpha (0.1). Usable today and tested on Linux, macOS and Windows; expect breaking changes before 1.0.
 

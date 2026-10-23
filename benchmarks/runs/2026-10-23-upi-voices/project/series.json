@@ -1,0 +1,19 @@
+{
+  "manimvox": "0.1.0",
+  "series": "How UPI Payments Work",
+  "tagline": "",
+  "voice": "kokoro:af_heart",
+  "speed": 1.0,
+  "pron": [],
+  "theme": {
+    "source": "kit neutral default; replace with the subject's own theme (see manimvox-creative)"
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_upi",
+      "cls": "Ep01",
+      "title": "How UPI payments work"
+    }
+  ]
+}

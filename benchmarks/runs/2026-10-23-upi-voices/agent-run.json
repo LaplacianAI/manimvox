@@ -1,0 +1,34 @@
+{
+  "harness": "Claude Code",
+  "harness_version": "2.1.294",
+  "model": "claude-sonnet-5-5",
+  "permission_mode": "bypassPermissions",
+  "prompt": "Make a short video, about a minute, explaining how UPI payments work. You may search and fetch the web for sources. Use the default voice.",
+  "started": "2026-10-23T08:50:57Z",
+  "finished": "2026-10-23T08:54:03Z",
+  "duration_s": 182.9,
+  "api_duration_s": 81.3,
+  "turns": 21,
+  "cost_usd": 0.396,
+  "cost_by_model": {
+    "claude-sonnet-5-5": 0.378,
+    "claude-haiku-5-5": 0.018
+  },
+  "tokens": {
+    "input": 26,
+    "cache_write": 47476,
+    "cache_read": 619490,
+    "output": 6397
+  },
+  "tool_calls": {
+    "Bash": 8,
+    "Read": 5,
+    "WebFetch": 2,
+    "Skill:manimvox": 1,
+    "ToolSearch": 1,
+    "WebSearch": 1,
+    "Glob": 1
+  },
+  "result": "success",
+  "final_message": "The video is rendered and runs 1:19, a bit over the minute you asked for. The render finished with `audio check: ok` (11 lines, all audible) in the default voice, `kokoro:af_heart`.\n\nThe files are in `D:\\Personal\\manimvox-bench\\upi\\upi-video`:\n- **Video:** `out\\ep01_upi.mp4`\n- **Subtitles:** `out\\ep01_upi.srt`\n- **Script:** `episodes\\ep01_upi.md`\n\nIt opens with a phone scanning a code at a shop, then asks \"How does money cross two banks in seconds?\" Two chapters follow, then a short answer:\n1. **Four parties:** your app, a central switch run by NPCI (the National Payments Corporation of India), your bank, and the shop's bank. A UPI ID, such as `shop@bank`, stands in for the account number.\n2. **One payment:** you enter the amount and PIN, and the app sends the request to the switch. The switch finds the shop's bank and asks yours. Your bank checks the PIN and balance and debits you. The shop's bank credits the shop, and a confirmation goes back to both of you.\n\nI checked the layout on the draft's contact sheets, which looked clean. I didn't look at frames from the final render. I cut limits, collect requests, and security detail to keep it short.\n\n**Sources:** I used [Wikipedia on UPI](https://en.wikipedia.org/wiki/Unified_Payments_Interface) and two explainer blogs, [m2pfintech](https://m2pfintech.com/blog/npci-mapper-switch-and-psp-decoding-the-upi-transaction-journey/) and [aswinmohan.me](https://aswinmohan.me/how-upi-works). The NPCI product page returned no content, so no NPCI documentation backs the payment steps. The blogs agree with each other but are simplified, and the \"within seconds\" claim comes from them. The \"about twenty billion payments in August 2025\" figure is from Wikipedia and I haven't checked it against NPCI's own numbers. I only read the first 100,000 of the 261,446 characters on the Wikipedia page.\n\nThe \"₹\" arrow and the diagram layout are illustrative, not sourced. I added no pronunciation fixes. \"NPCI\" is spelled out as letters for the voice.\n\n**Not available:** several connectors (Gmail, Google Calendar, Slack, and others) need authorizing in your claude.ai connector settings or with `/mcp`. This task didn't use them."
+}

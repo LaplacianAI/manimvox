@@ -1,0 +1,43 @@
+1
+00:00:00,000 --> 00:00:04,629
+You scan a code and type a PIN. A second later, the shop has your money.
+
+2
+00:00:05,867 --> 00:00:12,075
+How does money cross two banks that fast? By the end, you will follow one payment from your phone to the shop.
+
+3
+00:00:16,633 --> 00:00:21,284
+N P C I, the National Payments Corporation of India, built UPI.
+
+4
+00:00:22,533 --> 00:00:27,376
+There is your app, a central switch run by N P C I, your bank, and the shop's bank.
+
+5
+00:00:28,067 --> 00:00:33,037
+You do not need the shop's account number. A UPI ID, like this one, stands in for it.
+
+6
+00:00:37,800 --> 00:00:43,197
+You pick the payee, enter the amount, and your PIN. The app sends the request to the switch.
+
+7
+00:00:43,867 --> 00:00:48,176
+The switch finds the shop's bank from the UPI ID, and asks yours.
+
+8
+00:00:48,867 --> 00:00:52,664
+Your bank checks the PIN and your balance, then takes the money out.
+
+9
+00:00:53,333 --> 00:00:57,301
+The shop's bank adds it, and a confirmation travels back to both of you.
+
+10
+00:01:00,167 --> 00:01:04,135
+A central switch links the two banks, so one request moves the money.
+
+11
+00:01:05,833 --> 00:01:15,839
+One switch joins two banks, so a single request debits you and credits the shop. In August 2025, UPI handled about twenty billion payments.
