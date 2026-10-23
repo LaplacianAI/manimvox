@@ -21,7 +21,6 @@ from ..project import SERIES_FILE, ProjectError, find_project
 from ..skills import SKILL_NAMES, read_frontmatter, skill_dirs, skills_path
 from ..voice.base import VoiceError, clone_path, parse_voice
 
-REPO = "git+https://github.com/LaplacianAI/manimvox"
 MAX_READ = 200_000  # characters a read returns; the rest is cut, with a note
 SKIP = {"build", "media", ".manimvox", "__pycache__", ".git"}  # renders, caches and history, never worth listing
 INSTRUCTIONS = (
@@ -35,7 +34,7 @@ INSTRUCTIONS = (
 
 def missing(extra: str, module: str) -> ImportError:
     """The error a framework adapter raises when its framework is not installed."""
-    return ImportError(f'manimvox.integrations.{module} needs the {extra} extra: pip install "manimvox[{extra}] @ {REPO}"')
+    return ImportError(f'manimvox.integrations.{module} needs the {extra} extra: pip install "manimvox[{extra}]"')
 
 
 def json_tool(fn: Callable) -> Callable[..., str]:

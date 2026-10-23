@@ -6,7 +6,7 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/LaplacianAI/manimvox/blob/main/pyproject.toml)
 ![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)
 
-> **Status:** early development (0.1). The engine, CLI and agent skills work today; a PyPI release is on the [roadmap](#roadmap).
+> **Status:** early development (0.1). The engine, CLI and agent skills work today, tested on Linux, macOS and Windows.
 
 ## Features
 
@@ -41,10 +41,10 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 
 ## Installation
 
-manimvox is not on PyPI yet. Install it from GitHub, with the default Kokoro voice:
+Install it from PyPI, with the default Kokoro voice:
 
 ```bash
-uv tool install "manimvox[kokoro] @ git+https://github.com/LaplacianAI/manimvox"
+uv tool install "manimvox[kokoro]"
 manimvox doctor
 ```
 
@@ -53,8 +53,10 @@ manimvox doctor
 Add more voices by reinstalling with the extras you want, keeping `kokoro`:
 
 ```bash
-uv tool install --force "manimvox[kokoro,piper] @ git+https://github.com/LaplacianAI/manimvox"
+uv tool install --force "manimvox[kokoro,piper]"
 ```
+
+The development version installs from GitHub: `uv tool install "manimvox[kokoro] @ git+https://github.com/LaplacianAI/manimvox"`.
 
 
 | Extra | Adds |
@@ -175,14 +177,14 @@ Then ask your agent: "make an explainer video of <paper / repo / idea / PR>".
 An agent built on a Python framework has no shell, so manimvox also ships its commands as tools (`manimvox.tools`) and adapters for eight frameworks. Install the extra for yours, next to a voice:
 
 ```bash
-pip install "manimvox[kokoro,agno] @ git+https://github.com/LaplacianAI/manimvox"
-pip install "manimvox[kokoro,langchain] @ git+https://github.com/LaplacianAI/manimvox"
-pip install "manimvox[kokoro,pydantic-ai] @ git+https://github.com/LaplacianAI/manimvox"
-pip install "manimvox[kokoro,openai-agents] @ git+https://github.com/LaplacianAI/manimvox"
-pip install "manimvox[kokoro,crewai] @ git+https://github.com/LaplacianAI/manimvox"
-pip install "manimvox[kokoro,llamaindex] @ git+https://github.com/LaplacianAI/manimvox"
-pip install "manimvox[kokoro,haystack] @ git+https://github.com/LaplacianAI/manimvox"
-pip install "manimvox[kokoro,google-adk] @ git+https://github.com/LaplacianAI/manimvox"
+pip install "manimvox[kokoro,agno]"
+pip install "manimvox[kokoro,langchain]"
+pip install "manimvox[kokoro,pydantic-ai]"
+pip install "manimvox[kokoro,openai-agents]"
+pip install "manimvox[kokoro,crewai]"
+pip install "manimvox[kokoro,llamaindex]"
+pip install "manimvox[kokoro,haystack]"
+pip install "manimvox[kokoro,google-adk]"
 ```
 
 Install one, in the environment your agent runs in. Each tool builder (`manimvox_tools`, `ManimvoxTools`, `manimvox_toolset`) takes the project folder, such as `hash-maps`, and pins the tools to it.
@@ -485,10 +487,6 @@ skills/             the eleven agent skills (bundled into the wheel)
 gemini-extension.json, plugin.json   Gemini CLI and agent-plugins manifests
 tests/
 ```
-
-## Roadmap
-
-- PyPI release and CI on macOS, Linux and Windows
 
 ## License
 

@@ -1,6 +1,6 @@
 """manimvox on Google ADK: the skills through ADK's own SkillToolset, the tools as function tools.
 
-    pip install "manimvox[kokoro,google-adk] @ git+https://github.com/LaplacianAI/manimvox"
+    pip install "manimvox[kokoro,google-adk]"
     export GOOGLE_API_KEY=...
     python adk_agent.py ./hash-maps "Explain how a hash map works, for beginners"
 """

@@ -1,6 +1,6 @@
 """manimvox on Pydantic AI: the tools as a toolset, the skills read with the read_skill tool.
 
-    pip install "manimvox[kokoro,pydantic-ai] @ git+https://github.com/LaplacianAI/manimvox" "pydantic-ai-slim[anthropic]"
+    pip install "manimvox[kokoro,pydantic-ai]" "pydantic-ai-slim[anthropic]"
     export ANTHROPIC_API_KEY=...
     python pydantic_ai_agent.py ./hash-maps "Explain how a hash map works, for beginners"
 """

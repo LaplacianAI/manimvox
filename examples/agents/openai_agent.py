@@ -1,6 +1,6 @@
 """manimvox on the OpenAI Agents SDK: the tools as function tools, the skills read with the read_skill tool.
 
-    pip install "manimvox[kokoro,openai-agents] @ git+https://github.com/LaplacianAI/manimvox"
+    pip install "manimvox[kokoro,openai-agents]"
     export OPENAI_API_KEY=...
     python openai_agent.py ./hash-maps "Explain how a hash map works, for beginners"
 """

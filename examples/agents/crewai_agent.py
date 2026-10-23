@@ -1,6 +1,6 @@
 """manimvox on CrewAI: the skills through CrewAI's own loader, the tools as CrewAI tools.
 
-    pip install "manimvox[kokoro,crewai] @ git+https://github.com/LaplacianAI/manimvox"
+    pip install "manimvox[kokoro,crewai]"
     export OPENAI_API_KEY=...
     python crewai_agent.py ./hash-maps "Explain how a hash map works, for beginners"
 """

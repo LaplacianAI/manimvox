@@ -1,6 +1,6 @@
 """manimvox on LlamaIndex: the tools as function tools, the skills read with the read_skill tool.
 
-    pip install "manimvox[kokoro,llamaindex] @ git+https://github.com/LaplacianAI/manimvox" llama-index-llms-anthropic
+    pip install "manimvox[kokoro,llamaindex]" llama-index-llms-anthropic
     export ANTHROPIC_API_KEY=...
     python llamaindex_agent.py ./hash-maps "Explain how a hash map works, for beginners"
 """

@@ -120,7 +120,7 @@ def test_instructions_list_every_skill_and_the_project(tmp_path):
 
 def test_missing_names_the_extra():
     e = common.missing("agno", "agno")
-    assert isinstance(e, ImportError) and 'manimvox[agno] @ git+https://github.com/LaplacianAI/manimvox' in str(e)
+    assert isinstance(e, ImportError) and 'pip install "manimvox[agno]"' in str(e)
 
 
 def by_name(fns):
