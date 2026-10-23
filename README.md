@@ -15,8 +15,6 @@
 
 *Made with manimvox: four of its [blocks](https://laplacianai.github.io/manimvox/blocks/). Finished videos made by AI agents are in the [gallery](https://laplacianai.github.io/manimvox/gallery/), and how agents and voices compare is in the [benchmarks](https://laplacianai.github.io/manimvox/benchmarks/). Documentation: [laplacianai.github.io/manimvox](https://laplacianai.github.io/manimvox/).*
 
-> **Status:** alpha (0.1). Usable today and tested on Linux, macOS and Windows; expect breaking changes before 1.0.
-
 <!-- --8<-- [start:how-it-works] -->
 ## How it works
 
