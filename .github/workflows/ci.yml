@@ -44,6 +44,9 @@ jobs:
       - name: System libraries (macOS)
         if: runner.os == 'macOS'
         run: brew install cairo pkg-config
+      - name: Software OpenGL (Windows runners have no GPU; Windows' own OpenGL is too old for VTK)
+        if: runner.os == 'Windows'
+        uses: pyvista/setup-headless-display-action@v4
       - run: bash .github/scripts/report.sh uv sync --extra dev --extra kokoro --extra pyvista
         shell: bash
       - run: bash .github/scripts/report.sh uv run pytest -m "$FAST" -q -rs

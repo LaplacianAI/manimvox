@@ -5,6 +5,7 @@ the frame is rendered. Nothing runs on a clock, so a draft and a final render sh
 from __future__ import annotations
 
 import math
+import sys
 from pathlib import Path
 
 from .charts import _need, _theme
@@ -67,6 +68,21 @@ def screen_xy(plotter, point) -> tuple[float, float]:
     return x, plotter.window_size[1] - y
 
 
+NO_OPENGL = {
+    "win32": "install Mesa's software OpenGL (opengl32.dll from mesa-dist-win, next to python.exe) or use a "
+             "machine with a graphics driver",
+    "darwin": "use a Mac with a graphics driver (a remote session without one cannot render 3D)",
+}
+
+
+def _check_opengl(render_window) -> None:
+    """Fail with the fix instead of letting VTK crash Python on a machine without OpenGL 3.2 (a Windows
+    server with no GPU, a Linux box with neither a display nor EGL or OSMesa)."""
+    if not render_window.SupportsOpenGL():
+        fix = NO_OPENGL.get(sys.platform, "sudo apt install libegl1 libosmesa6 (or your distro's EGL and OSMesa)")
+        raise SceneError(f"this machine cannot render 3D: VTK found no OpenGL 3.2; {fix}")
+
+
 def from_pyvista(draw, seconds: float, fps: float = 15, size: tuple[int, int] = (1280, 720),
                  width: float = DEFAULT_WIDTH, setup=None) -> Clip:
     """Frames of a PyVista scene on a transparent background: `setup(plotter)` once (add meshes, lights),
@@ -77,6 +93,7 @@ def from_pyvista(draw, seconds: float, fps: float = 15, size: tuple[int, int] = 
     pv = _need("pyvista", "pyvista")
     pl = pv.Plotter(off_screen=True, window_size=list(size))
     try:
+        _check_opengl(pl.render_window)
         pl.set_background(_theme(None)["bg"])  # under any antialiased edge; the screenshot's background is clear
         if setup:
             setup(pl)
