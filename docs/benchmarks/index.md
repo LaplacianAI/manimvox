@@ -8,7 +8,7 @@ Every run's records are in [`benchmarks/runs/`](https://github.com/LaplacianAI/m
 
 | Run | Date | What it compares |
 |---|---|---|
-| [UPI payments: Sarvam vs Gnani](upi-voices.md) | 2026-10-23 | Two Indian-English voices, on one episode made by Claude Code with Sonnet 5.5 |
+| [UPI payments: three voices](upi-voices.md) | 2026-10-23 | Sarvam AI, Gnani.ai and ElevenLabs, on one episode made by Claude Code with Sonnet 5.5 |
 
 ## Leaderboard
 
@@ -43,9 +43,9 @@ Every score comes from the returned audio or the log, computed by [`benchmarks/v
 | **Pace** | Words divided by speaking time (each line's audio minus its leading and trailing silence). manimvox's skills aim for 150 to 175 words a minute. |
 | **Pauses** | Silences of 0.35 s or more inside a line, where silence is a 20 ms frame below −40 dBFS. |
 | **Loudness** | RMS level over all lines, its spread between lines, the peak level, and clipped samples. manimvox doesn't normalise loudness, so these levels reach the viewer unchanged. |
-| **Noise and distortion** | The crest factor (peak over RMS; a low value means heavy compression), the share of energy above 7 kHz (hiss), and the spectral flatness of each line's quietest frames (closer to 1 is more noise-like). The final video's audio is checked for clipping too, to tell the service's audio from manimvox's mix. |
+| **Noise and distortion** | The noise floor (each line's 10th-percentile frame level) and how far the speech sits above it; the crest factor (peak over RMS; a low value means heavy compression, which sounds harsh); and the final video's peak and clipping, to tell the service's audio from manimvox's mix. Two more numbers describe the sound without ranking it: the energy above 7 kHz (brightness, from consonants, breath or hiss) and the spectral flatness of each line's quietest frames. Both are high for a crisp, breathy voice as well as for a hissy one. |
 | **Intonation** | Median pitch and its spread in semitones over voiced frames (librosa pYIN). This is a rough measure of how much the pitch varies, not of whether it sounds right. |
-| **Listening** | Notes by a person who watched both videos: clarity, noise, pace, accent and pronunciation. Measurements can't replace this. Here, the listener heard noise that the word error rate missed. |
+| **Listening** | Notes by a person who watched every video, and their order of the voices, which the leaderboard ranks on first: clarity, noise, pace, accent and pronunciation. Measurements can't replace this. In the first run, the listener heard noise the word error rate missed, and found the voice with the best measurements synthetic. |
 | **Picture** | Frames taken at the same narration line in each video are compared, to check that the animation still follows the voice. |
 
 ### Limitations

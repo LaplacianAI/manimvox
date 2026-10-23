@@ -21,7 +21,9 @@
     "rms_db": -13.7,
     "crest_db": 13.5,
     "near_full_scale_pct": 0.215,
-    "hiss_db": -23.5,
+    "high_db": -23.5,
+    "floor_db": -65.6,
+    "speech_above_floor_db": 52.5,
     "quiet_flatness": 0.13,
     "video_peak_db": -3.13,
     "video_clipped_samples": 0,
@@ -58,7 +60,8 @@
       "rms_db": -14.1,
       "peak_db": -0.2,
       "clipped": 0,
-      "hiss_db": -23.3,
+      "high_db": -23.3,
+      "floor_db": -67.4,
       "quiet_flatness": 0.138,
       "ok": true
     },
@@ -81,7 +84,8 @@
       "rms_db": -12.7,
       "peak_db": -0.3,
       "clipped": 0,
-      "hiss_db": -27.1,
+      "high_db": -27.1,
+      "floor_db": -65.3,
       "quiet_flatness": 0.294,
       "ok": true
     },
@@ -107,7 +111,8 @@
       "rms_db": -13.7,
       "peak_db": -0.3,
       "clipped": 0,
-      "hiss_db": -26.9,
+      "high_db": -26.9,
+      "floor_db": -82.2,
       "quiet_flatness": 0.061,
       "ok": true
     },
@@ -135,7 +140,8 @@
       "rms_db": -14.7,
       "peak_db": -0.2,
       "clipped": 0,
-      "hiss_db": -20.6,
+      "high_db": -20.6,
+      "floor_db": -89.5,
       "quiet_flatness": 0.134,
       "ok": true
     },
@@ -156,7 +162,8 @@
       "rms_db": -13.4,
       "peak_db": -0.2,
       "clipped": 0,
-      "hiss_db": -26.1,
+      "high_db": -26.1,
+      "floor_db": -65.6,
       "quiet_flatness": 0.093,
       "ok": true
     },
@@ -182,7 +189,8 @@
       "rms_db": -14.1,
       "peak_db": -0.2,
       "clipped": 0,
-      "hiss_db": -23.0,
+      "high_db": -23.0,
+      "floor_db": -72.0,
       "quiet_flatness": 0.044,
       "ok": true
     },
@@ -205,7 +213,8 @@
       "rms_db": -14.2,
       "peak_db": -0.3,
       "clipped": 0,
-      "hiss_db": -21.4,
+      "high_db": -21.4,
+      "floor_db": -55.4,
       "quiet_flatness": 0.136,
       "ok": true
     },
@@ -226,7 +235,8 @@
       "rms_db": -14.0,
       "peak_db": -0.2,
       "clipped": 0,
-      "hiss_db": -24.9,
+      "high_db": -24.9,
+      "floor_db": -44.8,
       "quiet_flatness": 0.558,
       "ok": true
     },
@@ -247,7 +257,8 @@
       "rms_db": -14.3,
       "peak_db": -0.2,
       "clipped": 0,
-      "hiss_db": -25.5,
+      "high_db": -25.5,
+      "floor_db": -54.4,
       "quiet_flatness": 0.027,
       "ok": true
     },
@@ -268,7 +279,8 @@
       "rms_db": -13.3,
       "peak_db": -0.3,
       "clipped": 0,
-      "hiss_db": -21.6,
+      "high_db": -21.6,
+      "floor_db": -65.8,
       "quiet_flatness": 0.073,
       "ok": true
     },
@@ -291,7 +303,8 @@
       "rms_db": -13.2,
       "peak_db": -0.5,
       "clipped": 0,
-      "hiss_db": -23.5,
+      "high_db": -23.5,
+      "floor_db": -57.1,
       "quiet_flatness": 0.148,
       "ok": true
     }

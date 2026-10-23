@@ -22,7 +22,7 @@ FRAME = 0.02  # seconds per analysis frame
 SILENT_DB = -40.0  # a frame quieter than this (dBFS RMS) is silence
 PAUSE = 0.35  # a silence this long inside a line counts as a pause
 CLIP = 0.999  # a sample at or above this (full scale 1.0) is clipped
-HISS_HZ = 7000  # energy above this is mostly hiss and sibilance, little of the voice itself
+HIGH_HZ = 7000  # above this: sibilants, breath and air, or hiss. A bright clean voice and a hissy one both score high
 ASR_MODEL = "small.en"
 
 
@@ -108,16 +108,17 @@ def pitch(x: np.ndarray, rate: int) -> tuple[float, float]:
 
 
 def noise(x: np.ndarray, rate: int, db: np.ndarray) -> tuple[float, float]:
-    """(share of energy above 7 kHz in dB, spectral flatness of the quietest 15% of frames). Hiss raises the
-    first; noise between and under words pushes the second toward 1."""
+    """(share of energy above 7 kHz in dB, spectral flatness of the quietest 15% of frames, noise floor in dBFS).
+    The first two describe the sound (brightness; how breathy or noise-like the quiet parts are) and can't tell
+    a crisp voice from a noisy one. The floor, the 10th percentile frame level, is the background itself."""
     from scipy.signal import welch
 
     f, p = welch(x, rate, nperseg=2048)
-    hiss = 10 * np.log10(p[f > HISS_HZ].sum() / p.sum())
+    high = 10 * np.log10(p[f > HIGH_HZ].sum() / p.sum())
     n = int(rate * FRAME)
     quiet = x[: len(db) * n].reshape(len(db), n)[db <= np.percentile(db, 15)].ravel()
     _, q = welch(quiet, rate, nperseg=512)
-    return float(hiss), float(np.exp(np.mean(np.log(q + 1e-20))) / np.mean(q))
+    return float(high), float(np.exp(np.mean(np.log(q + 1e-20))) / np.mean(q)), float(np.percentile(db, 10))
 
 
 def video_audio(path: Path) -> tuple[float, float, int]:
@@ -152,14 +153,14 @@ def main(log_path: str, video: str, out: str) -> None:
         ref, hyp = words(r["text"]), words(heard)
         dist, diff = edits(ref, hyp)
         dur = len(x) / rate
-        hiss, flat = noise(x, rate, db)
+        high, flat, floor = noise(x, rate, db)
         lines.append({"i": r["i"], "text": r["text"], "heard": heard, "seconds": r["seconds"],
                       "http_attempts": r["http_attempts"], "audio_seconds": round(dur, 2),
                       "rtf": round(r["seconds"] / dur, 3), "words": len(ref), "word_errors": dist, "diff": diff,
                       "lead": round(lead, 2), "trail": round(trail, 2), "pauses": pauses,
                       "rms_db": round(float(20 * np.log10(np.sqrt(np.mean(x ** 2)) + 1e-9)), 1),
                       "peak_db": round(float(20 * np.log10(np.max(np.abs(x)) + 1e-9)), 1),
-                      "clipped": int(np.sum(np.abs(x) >= CLIP)), "hiss_db": round(hiss, 1),
+                      "clipped": int(np.sum(np.abs(x) >= CLIP)), "high_db": round(high, 1), "floor_db": round(floor, 1),
                       "quiet_flatness": round(flat, 3), "ok": True})
         audio.append(x)
     good = [ln for ln in lines if ln["ok"]]
@@ -188,7 +189,9 @@ def main(log_path: str, video: str, out: str) -> None:
         "rms_db": round(rms_all, 1),
         "crest_db": round(peak_all - rms_all, 1),
         "near_full_scale_pct": round(float(np.mean(np.abs(allx) > 10 ** (-1 / 20)) * 100), 3),
-        "hiss_db": round(statistics.median(ln["hiss_db"] for ln in good), 1),
+        "high_db": round(statistics.median(ln["high_db"] for ln in good), 1),
+        "floor_db": round(statistics.median(ln["floor_db"] for ln in good), 1),
+        "speech_above_floor_db": round(statistics.median(ln["rms_db"] - ln["floor_db"] for ln in good), 1),
         "quiet_flatness": round(statistics.median(ln["quiet_flatness"] for ln in good), 2),
         "video_peak_db": round(video_peak, 2), "video_clipped_samples": video_clipped,
         "rms_db_spread": round(statistics.pstdev(ln["rms_db"] for ln in good), 2),

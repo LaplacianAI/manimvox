@@ -14,7 +14,7 @@ A short explainer: how one UPI payment moves money from your bank to a shop's ba
 
 *"Make a short video, about a minute, explaining how UPI payments work. You may search and fetch the web for sources. Use the default voice."*
 
-The same episode was then rendered with two Indian-English voices, Sarvam AI and Gnani.ai, to compare them. The leaderboard below shows the results, and the [benchmark report](../benchmarks/upi-voices.md) has both videos and the full review.
+The same episode was then rendered with three voices (Sarvam AI, Gnani.ai and ElevenLabs) to compare them. The leaderboard below shows the results, and the [benchmark report](../benchmarks/upi-voices.md) has all three videos and the full review.
 
 --8<-- "docs/.generated/leaderboard-upi.md"
 

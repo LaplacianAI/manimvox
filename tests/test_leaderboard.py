@@ -13,7 +13,7 @@ _spec.loader.exec_module(lb)
 
 
 def _summary(voice, wer, crest):
-    return {"summary": {"voice": voice, "wer": wer, "crest_db": crest, "wpm": 170, "hiss_db": -25.0,
+    return {"summary": {"voice": voice, "wer": wer, "crest_db": crest, "wpm": 170,
                         "latency_mean": 1.0}}
 
 
@@ -65,6 +65,18 @@ def test_voices_tied_on_errors_rank_by_cleaner_audio(tmp_path, docs):
     lb.write_docs(docs, lb.load_runs(runs))
     upi = (docs / ".generated" / "leaderboard-upi.md").read_text(encoding="utf-8")
     assert upi.index("y:clean") < upi.index("x:noisy") and "### Harness" not in upi
+
+
+def test_a_listeners_order_outranks_the_measurements(tmp_path, docs):
+    runs = tmp_path / "runs"
+    _run(runs, "a", "upi", voices=[("x:clearest", 0.0, 18.0), ("y:natural", 0.01, 20.0)])
+    manifest = runs / "a" / "run.json"
+    d = json.loads(manifest.read_text(encoding="utf-8"))
+    d["voices"][1]["listener_rank"], d["voices"][0]["listener_rank"] = 1, 2
+    manifest.write_text(json.dumps(d), encoding="utf-8")
+    lb.write_docs(docs, lb.load_runs(runs))
+    upi = (docs / ".generated" / "leaderboard-upi.md").read_text(encoding="utf-8")
+    assert upi.index("y:natural") < upi.index("x:clearest")
 
 
 def test_models_and_harnesses_rank_finished_videos_first_then_cost(tmp_path, docs):
