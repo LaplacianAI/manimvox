@@ -67,10 +67,10 @@ def voice_rows(runs: list[Run], up: str) -> list[str]:
     (higher is cleaner, less compressed audio)."""
     rows = [(v, r) for r in runs for v in r.voices]
     rows.sort(key=lambda vr: (vr[0]["wer"], -vr[0]["crest_db"]))
-    head = ["| # | Voice | Word errors | Words a minute | Crest factor | Hiss | Time per line | Cost | Listener | Run |",
-            "|---|---|---|---|---|---|---|---|---|---|"]
+    head = ["| # | Voice | Word errors | Words a minute | Crest factor | Time per line | Cost | Listener | Run |",
+            "|---|---|---|---|---|---|---|---|---|"]
     return head + [
-        f"| {i} | `{v['voice']}` | {v['wer']:.1%} | {v['wpm']:.0f} | {v['crest_db']} dB | {v['hiss_db']} dB "
+        f"| {i} | {(v['name'] + '<br>') if v.get('name') else ''}`{v['voice']}` | {v['wer']:.1%} | {v['wpm']:.0f} | {v['crest_db']} dB "
         f"| {v['latency_mean']} s | {v.get('cost', '')} | {v.get('listener', '')} | {run_link(r, up)} |"
         for i, (v, r) in enumerate(rows, 1)]
 
@@ -112,7 +112,7 @@ def model_rows(runs: list[Run]) -> list[str]:
 def tables(runs: list[Run], up: str, level: str = "###") -> list[str]:
     out: list[str] = []
     if any(r.voices for r in runs):
-        out += [f"{level} Voice", "", ("Ranked by word error rate, then crest factor (higher is cleaner audio). "
+        out += [f"{level} Voice", "", ("Ranked by word error rate, then crest factor (higher is less compressed, cleaner audio). "
                 "Each voice read the same lines as the others in its run."), "", *voice_rows(runs, up), ""]
     if any(r.agent for r in runs):
         out += [f"{level} Harness", "", "Ranked by result, then cost, then time.", "", *agent_rows(runs, up), ""]

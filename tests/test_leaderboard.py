@@ -13,7 +13,7 @@ _spec.loader.exec_module(lb)
 
 
 def _summary(voice, wer, crest):
-    return {"summary": {"voice": voice, "wer": wer, "crest_db": crest, "wpm": 170, "hiss_db": -25.0,
+    return {"summary": {"voice": voice, "wer": wer, "crest_db": crest, "wpm": 170,
                         "latency_mean": 1.0}}
 
 

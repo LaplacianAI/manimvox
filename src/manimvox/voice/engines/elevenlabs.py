@@ -24,6 +24,13 @@ UNREADABLE_VOICE_LIST = "ElevenLabs returned an unreadable voice list"
 ENDLESS_VOICE_LIST = "ElevenLabs kept paging the voice list; try again later"
 
 
+MISSING_PERMISSION = "missing the permission "  # ElevenLabs' wording for a restricted key
+
+
+class MissingPermission(VoiceError):
+    """The key is valid but restricted, and this call needs a permission it lacks."""
+
+
 def split_voice(voice: str) -> tuple[str, str]:
     model, sep, vid = voice.rpartition("/")
     return (model if sep else DEFAULT_MODEL), vid
@@ -74,6 +81,11 @@ class ElevenLabsEngine(VoiceEngine):
             return request("ElevenLabs", method, url, headers=headers, body=body, sleep=self._sleep, secrets=[key],
                            resumable=resumable)
         except VoiceError as e:
+            if "HTTP 401" in str(e) and MISSING_PERMISSION in str(e):
+                # a restricted key: it works, but not for this call. Name the permission, not a bad key.
+                perm = (str(e).partition(MISSING_PERMISSION)[2].split() or ["needed"])[0]
+                raise MissingPermission(f"the key in {KEY_VAR} lacks the ElevenLabs permission {perm}; "
+                                        "give it that permission in the ElevenLabs API key settings") from None
             if "HTTP 401" in str(e):
                 raise VoiceError(f"ElevenLabs rejected the key in {KEY_VAR} (HTTP 401)") from None
             raise
@@ -117,6 +129,8 @@ class ElevenLabsEngine(VoiceEngine):
                              "see `manimvox voices elevenlabs`")
         try:
             self._call("GET", VOICE_URL.format(voice_id=urllib.parse.quote(vid, safe="")), resumable=False)
+        except MissingPermission:
+            return  # a key restricted to speech can't look the voice up; the first line will show if it's wrong
         except VoiceError as e:
             if "HTTP 404" in str(e):
                 raise VoiceError(f"no ElevenLabs voice '{vid}'; see `manimvox voices elevenlabs`") from None

@@ -150,3 +150,20 @@ def test_listing_failures_do_not_claim_lines_were_cached(server):
     with pytest.raises(VoiceError) as e:
         el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).describe_voices()
     assert "failed after 4 tries" in str(e.value) and "lines already spoken" not in str(e.value)
+
+
+RESTRICTED = (b'{"detail":{"type":"authentication_error","code":"unauthorized","message":"The API key you used is '
+              b'missing the permission voices_read to execute this operation.","status":"missing_permissions"}}')
+
+
+def test_a_key_restricted_to_speech_skips_the_voice_check(server):
+    s = server(401, error_body=RESTRICTED)
+    el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).prepare("abc", lambda p: True, None)
+    assert len(s.requests) == 1
+
+
+def test_a_missing_permission_is_named_not_called_a_bad_key(server):
+    server(401, error_body=RESTRICTED)
+    with pytest.raises(VoiceError, match="lacks the ElevenLabs permission voices_read") as e:
+        el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).describe_voices()
+    assert "rejected" not in str(e.value)

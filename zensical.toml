@@ -31,7 +31,7 @@ nav = [
   ] },
   { "Benchmarks" = [
     { "Benchmarks" = "benchmarks/index.md" },
-    { "UPI payments: Sarvam vs Gnani" = "benchmarks/upi-voices.md" },
+    { "UPI payments: three voices" = "benchmarks/upi-voices.md" },
   ] },
   { "Reference" = [
     { "Configuration" = "configuration.md" },

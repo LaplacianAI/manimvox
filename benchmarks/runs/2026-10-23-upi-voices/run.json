@@ -1,5 +1,5 @@
 {
-  "title": "UPI payments: Sarvam vs Gnani",
+  "title": "UPI payments: three voices",
   "date": "2026-10-23",
   "example": "upi",
   "report": "benchmarks/upi-voices.md",
@@ -18,6 +18,13 @@
       "score": "gnani.score.json",
       "cost": "₹2.78",
       "listener": "clear, but slow"
+    },
+    {
+      "voice": "elevenlabs:eleven_v3/nPczCjzI2devNBz1zQrb",
+      "name": "ElevenLabs, Eleven v3, Brian",
+      "score": "elevenlabs.score.json",
+      "cost": "free plan",
+      "listener": "to be added"
     }
   ]
 }
