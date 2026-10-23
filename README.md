@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/LaplacianAI/manimvox/main/docs/assets/logo.svg" alt="" width="72">
+
 # manimvox
 
 **Explainer videos made by your AI agent.** Ask Claude Code, Codex, Cursor or Gemini CLI for "an explainer video of" a paper, a codebase, an idea or a pull request. manimvox gives the agent what it needs to research the topic, write a cited script, animate it with [Manim](https://www.manim.community/), narrate it with a text-to-speech voice, and check the result before it ships. You direct; the agent does the work.
@@ -9,9 +11,9 @@
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/LaplacianAI/manimvox/blob/main/pyproject.toml)
 ![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)
 
-![A CT-derived heart turns, is sliced open to its four chambers, and blood streams through it](https://raw.githubusercontent.com/LaplacianAI/manimvox/main/docs/assets/demo.gif)
+![The manimvox logo draws itself, then four things manimvox animates: a ball rolling down a 3D loss surface, a request flow, a bar ranking and a code diff](https://raw.githubusercontent.com/LaplacianAI/manimvox/main/docs/assets/demo.gif)
 
-*[Inside the heart](https://laplacianai.github.io/manimvox/gallery/heart/): made by Claude Code with manimvox from a few prompts, using a real CT scan. More in the [gallery](https://laplacianai.github.io/manimvox/gallery/), and how agents and voices compare in the [benchmarks](https://laplacianai.github.io/manimvox/benchmarks/). Documentation: [laplacianai.github.io/manimvox](https://laplacianai.github.io/manimvox/).*
+*Made with manimvox: four of its [blocks](https://laplacianai.github.io/manimvox/blocks/). Finished videos made by AI agents are in the [gallery](https://laplacianai.github.io/manimvox/gallery/), and how agents and voices compare is in the [benchmarks](https://laplacianai.github.io/manimvox/benchmarks/). Documentation: [laplacianai.github.io/manimvox](https://laplacianai.github.io/manimvox/).*
 
 > **Status:** alpha (0.1). Usable today and tested on Linux, macOS and Windows; expect breaking changes before 1.0.
 
