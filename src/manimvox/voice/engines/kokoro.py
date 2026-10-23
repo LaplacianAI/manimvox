@@ -51,7 +51,8 @@ class KokoroEngine(VoiceEngine):
         except ImportError:
             return EngineStatus(False, f"not installed: {install_hint('kokoro')}")
         if not self._models_ready():
-            return EngineStatus(False, f"model files not downloaded ({model_dir()}); a render will offer to")
+            return EngineStatus(False, f"model files not downloaded ({model_dir()}); a render will offer to download "
+                                       "them, or run `manimvox voices --prepare kokoro`")
         return EngineStatus(True, f"models in {model_dir()}")
 
     def prepare(self, voice: str, confirm: Callable[[str], bool], root: Path) -> None:

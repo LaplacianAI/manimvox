@@ -3,6 +3,7 @@ from importlib import resources
 
 import pytest
 
+import manimvox
 from manimvox.cli import main
 from manimvox.project import ProjectError, load_project
 from manimvox.scaffold import new_project
@@ -17,7 +18,7 @@ def test_new_project_layout(tmp_path):
     for p in ("series.json", "FACTS.md", "SERIES.md", ".gitignore", "episodes", "out", "research"):
         assert (d / p).exists(), p
     data = json.loads((d / "series.json").read_text(encoding="utf-8"))
-    assert data["manimvox"] == "0.1.0" and data["voice"] == "kokoro:af_heart" and data["theme"]["source"]
+    assert data["manimvox"] == manimvox.__version__ and data["voice"] == "kokoro:af_heart" and data["theme"]["source"]
     assert "Demo, Explained" in (d / "SERIES.md").read_text(encoding="utf-8")
     assert load_project(d).series == "Demo, Explained"
 

@@ -57,3 +57,12 @@ uv run --extra docs zensical serve
 ## Licence
 
 By contributing, you agree that your contribution is licensed under the [MIT licence](https://github.com/LaplacianAI/manimvox/blob/main/LICENSE), like the rest of manimvox.
+
+## Releasing
+
+For maintainers:
+
+1. On a branch, run `uv run python scripts/release.py X.Y.Z`. It sets the version everywhere and turns the changelog's **Unreleased** section into the new version's.
+2. Review the diff, open a pull request and merge it once CI passes.
+3. Tag the merge commit and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`. The release workflow checks that the tag matches the version, builds, and publishes to PyPI after a maintainer approves the `pypi` environment.
+4. Create a GitHub release from the tag, with the changelog section as its notes.
