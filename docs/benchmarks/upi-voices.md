@@ -62,7 +62,7 @@ The voices are matched on gender and on each provider's newest general model. Sa
 | Mean time per line | **1.36 s** | 3.97 s | 2.96 s | Sarvam |
 | Slowest line | **2.27 s** | 11.33 s | 4.57 s | Sarvam |
 | Real-time factor (mean) | **0.30** | 0.66 | 0.52 | Sarvam |
-| Cost for these 920 characters | ₹2.76 (published price: ₹30 per 10,000) | ₹2.78 (account dashboard; no published price) | free plan (monthly free credits; attribution required) | |
+| Cost for these 920 characters | ₹2.76 (published price: ₹30 per 10,000) | ₹2.78 (account dashboard; no published price) | $0.18: 920 credits at the Starter plan's rate ($6 for 30,000); the run used free-plan credits | |
 | Word errors (ASR) | 4 of 178 (2.2%) | 1 of 178 (0.6%) | **0 of 178** | ElevenLabs |
 | Pace | 215 words a minute | **171 words a minute** | **169 words a minute** | Gnani, ElevenLabs |
 | Video length | 1:14 | 1:27 | 1:27 | (follows pace) |
@@ -80,6 +80,7 @@ The voices are matched on gender and on each provider's newest general model. Sa
 
 ### What the numbers show
 
+- **ElevenLabs costs the most.** Sarvam's ₹2.76 and Gnani's ₹2.78 are each about 3 US cents; ElevenLabs' $0.18 is about six times as much. ElevenLabs charged 1 credit per character for these lines. At its larger plans' rates, the same lines cost $0.15 to $0.17.
 - **Sarvam is the fastest to generate.** Every line came back in about 1.4 seconds, under a third of the time it takes to say. ElevenLabs took about 3 seconds a line, steadily. Gnani's first five lines took 2.7 to 11.3 seconds, and the rest about 1.3 seconds. One run can't tell a slow start from a busy moment. The ElevenLabs render ran on its own, while the other two ran at the same time.
 - **Gnani and ElevenLabs speak at an explainer's pace; Sarvam doesn't.** At speed `1.0`, Sarvam speaks 215 words a minute, well above the 150 to 175 manimvox aims for. The voice skill lowers `speed` in `series.json` when a voice is above 175 (0.9 first); this one needs about 0.8.
 - **ElevenLabs was the easiest to transcribe.** The recogniser heard every word as written. It is also the most even in loudness from line to line. These are the words the recogniser heard differently from the script:
