@@ -1,9 +1,9 @@
 name: CI
 
 on:
-  push:
-    branches: [main]
+  push:  # every branch, so a branch is checked before its pull request exists
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
