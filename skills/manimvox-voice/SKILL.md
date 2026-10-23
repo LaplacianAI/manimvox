@@ -98,6 +98,8 @@ If a word is mispronounced, fix it in the voice, not in the text on screen.
 
 System voices often speak faster than the default (about 190 words a minute against about 170). Whenever you use one, chosen or as a fallback, check the speech rate after the render (words in the `.srt` divided by the sum of its cue durations; the check is in [narration](../manimvox-creative/references/narration.md#length)) and lower `speed` in `series.json` only if it is above 175 words a minute (0.9 first).
 
+Every narration line is levelled to `loudness` in `series.json` (LUFS, −16 by default), so voices sound equally loud; leave it unless the user asks for a different level, and never set it to `null` to fix a quiet voice.
+
 `speed` in `series.json` is a number above 0, `1.0` by default. ElevenLabs accepts only 0.7 to 1.2, Sarvam 0.5 to 2.0 (0.3 to 3.0 on `bulbul:v2`) and Gnani 0.85 to 1.15; each stops the render outside its range.
 
 Sarvam and Gnani voices are `[model/]voice[@language]`: the language goes after `@` (`sarvam:priya@ta-IN`, `gnani:Avinash@hi-IN`). Write the narration in the script of that language. Sarvam defaults to `en-IN`; Gnani detects the language when none is given.

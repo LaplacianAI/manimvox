@@ -97,7 +97,17 @@ The voices are matched on gender and on each provider's newest general model. Sa
     The recogniser is trained mostly on American and British English, so it may favour ElevenLabs' American voice. That is one reason the listening notes matter.
 - **The listener heard background noise in Sarvam's voice. The likeliest cause is heavy compression, not a noisy background.** The gaps between Sarvam's words are actually the quietest of the three: its speech sits 52 dB above them. But its crest factor is only 13.5 dB (Gnani 20.2, ElevenLabs 18.0), with 0.2% of samples within 1 dB of full scale. Speech squeezed that hard against the top of the range sounds harsh and distorted, and that can come across as noise. It comes from Sarvam's audio, not from manimvox: the final videos peak at −3.1 to −4.3 dBFS and never clip.
 - **Energy above 7 kHz and the flatness of quiet parts describe the sound; they don't measure noise.** ElevenLabs has the most of both, from crisp consonants and audible breaths. A bright, clean voice and a hissy one both score high, so these two numbers aren't used to rank.
-- **The voices differ in loudness by up to 8 dB.** manimvox doesn't yet normalise loudness, so this reaches the viewer: Sarvam's video plays loudest, ElevenLabs' in the middle and Gnani's quietest.
+- **The voices differ in loudness by up to 8 dB, so manimvox now levels them.** The loudness numbers above are the audio as each service returned it. Since [#24](https://github.com/LaplacianAI/manimvox/issues/24), every narration line is brought to the same loudness (−16 LUFS by default). Re-rendered from the same cached lines, with no new calls to any voice service, the four videos measure:
+
+    | Finished video | Before | After |
+    |---|---|---|
+    | Sarvam `shubh` | −14.4 LUFS | −16.2 LUFS |
+    | ElevenLabs `Brian` | −18.6 LUFS | −16.3 LUFS |
+    | Gnani `Avinash` | −21.9 LUFS | −16.2 LUFS |
+    | Kokoro `af_heart` (the agent's own render) | −22.3 LUFS | −16.2 LUFS |
+    | **Spread** | **7.9 LU** | **0.1 LU** |
+
+    True peaks stay at −1.2 dBTP or below after AAC encoding. The videos above are the original renders, from before levelling.
 
 ### Listening
 

@@ -159,7 +159,7 @@ This creates:
 
 ```
 demo/
-  series.json   series name, voice, speed, pronunciations, theme, episode list
+  series.json   series name, voice, speed, loudness, pronunciations, theme, episode list
   FACTS.md      every claim the video makes, with its source
   SERIES.md     the outline every episode is written against
   episodes/     one Python file per episode
@@ -422,11 +422,14 @@ Install the `matplotlib` or `plotly` extra for them (see the extras table). Plot
   "tagline": "What a vector really is",
   "voice": "kokoro:af_heart",
   "speed": 1.0,
+  "loudness": -16,
   "pron": [["\\bNumPy\\b", "num pie"]],
   "theme": { "source": "..." },
   "episodes": [{ "n": 1, "stem": "ep01_vectors", "cls": "Ep01", "title": "What is a vector?" }]
 }
 ```
+
+`loudness` is the level every narration line is brought to, in LUFS (−40 to −5; default −16, a common level for speech online). Voices return audio at very different levels, so without it, changing the voice changes the volume. Each line is measured as ITU-R BS.1770 integrated loudness, brought to the target, and kept under −1.5 dBTP. `null` keeps each voice's own level. The line as the voice returned it stays cached, so a new target never pays for synthesis again.
 
 `pron` holds pairs of regex and spoken form, applied to what the voice says and never to the subtitles. Common terms such as API, JSON and SQL are already handled.
 
@@ -488,6 +491,7 @@ Notes on particular engines:
 - **Voice cloning:** the engines clone from a 6–30 second recording of the speaker. F5-TTS also needs a transcript of that recording: `voice.txt`, beside `voice.wav`, holding exactly what is said in it.
 - **Paths:** `clone=` recordings and local Piper `.onnx` voices are resolved from the project root.
 - **Indian languages:** Sarvam AI and Gnani.ai voices are written `[model/]voice[@language]`. With no model, the one that has the voice is used. With no language, Sarvam uses `en-IN` and Gnani detects it. For example, `sarvam:bulbul:v4-flash/simran_en_customer` or `gnani:timbre-v3.0/Avinash@hi-IN`. `manimvox voices sarvam` and `manimvox voices gnani` list the voices and languages. Sarvam takes speed 0.5 to 2.0 (0.3 to 3.0 on `bulbul:v2`), and Gnani takes 0.85 to 1.15.
+- **Even loudness:** every voice is levelled to the same loudness (`loudness` in `series.json`, −16 LUFS by default), so switching voices doesn't change the volume.
 - **Online engines** receive only the narration text. `manimvox voices edge` and `manimvox voices elevenlabs` go online to list their voices.
 - **Downloads** happen only after you confirm (or pass `--yes`). Kokoro and Piper files are verified by hash.
 

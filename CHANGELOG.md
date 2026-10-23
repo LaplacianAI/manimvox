@@ -4,6 +4,10 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+
+- Even loudness across voices: every narration line is levelled to `loudness` in `series.json` (−16 LUFS by default, ITU-R BS.1770), with true peaks kept under −1.5 dBTP. The UPI benchmark episode, rendered with Sarvam, Gnani, ElevenLabs and Kokoro, went from a 7.9 LU spread to 0.1. The line as the voice returned it stays cached, so changing the target never pays for synthesis again. `null` keeps each voice's own level.
+
 ### Changed
 
 - Benchmarks: every cost is in US dollars. Rupee costs are converted at the mid-market rate on the day of the run, and ElevenLabs' credits at its cheapest commercial plan's rate.
