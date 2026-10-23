@@ -2,29 +2,29 @@
 
 **Date:** 2026-10-23 · **Agent:** Claude Code 2.1.294 with Sonnet 5.5 · **Voices:** `sarvam:shubh`, `gnani:timbre-v3.0/Avinash@en-IN` and `elevenlabs:eleven_v3/nPczCjzI2devNBz1zQrb` (Brian)
 
-One prompt made one episode. That episode was rendered three times, once with each voice, and nothing else changed. The [methodology](index.md#methodology) explains how each number is measured.
+One prompt made one episode. That episode was rendered three times, once with each voice, and nothing else changed. The [methodology](index.md#methodology) explains how each number is measured. The videos play at even loudness ([see below](#what-the-numbers-show)), so switching voices doesn't change the volume.
 
 ## The videos
 
 === "Sarvam AI · Bulbul v3 · shubh"
 
     <video controls preload="metadata" width="100%" poster="../../assets/bench-upi-poster.jpg">
-      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-sarvam.mp4" type="video/mp4">
-      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-sarvam.mp4">Download the video</a>.
+      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-sarvam-levelled.mp4" type="video/mp4">
+      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-sarvam-levelled.mp4">Download the video</a>.
     </video>
 
 === "Gnani.ai · Timbre v3.0 · Avinash"
 
     <video controls preload="metadata" width="100%" poster="../../assets/bench-upi-poster.jpg">
-      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani.mp4" type="video/mp4">
-      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani.mp4">Download the video</a>.
+      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani-levelled.mp4" type="video/mp4">
+      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani-levelled.mp4">Download the video</a>.
     </video>
 
 === "ElevenLabs · v3 · Brian"
 
     <video controls preload="metadata" width="100%" poster="../../assets/bench-upi-poster.jpg">
-      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-elevenlabs.mp4" type="video/mp4">
-      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-elevenlabs.mp4">Download the video</a>.
+      <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-elevenlabs-levelled.mp4" type="video/mp4">
+      <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-elevenlabs-levelled.mp4">Download the video</a>.
     </video>
 
 ## How the episode was made
@@ -107,7 +107,7 @@ The voices are matched on gender and on each provider's newest general model. Sa
     | Kokoro `af_heart` (the agent's own render) | −22.3 LUFS | −16.2 LUFS |
     | **Spread** | **7.9 LU** | **0.1 LU** |
 
-    True peaks stay at −1.2 dBTP or below after AAC encoding. The videos above are the original renders, from before levelling.
+    True peaks stay at −1.2 dBTP or below after AAC encoding. The videos above are the levelled renders. The measurements and the listening notes are from the audio as each service returned it, before levelling; those originals are kept for comparison: [Sarvam](https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-sarvam.mp4), [Gnani](https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani.mp4), [ElevenLabs](https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-elevenlabs.mp4).
 
 ### Listening
 

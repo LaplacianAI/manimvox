@@ -1,8 +1,8 @@
 # How UPI payments work
 
 <video controls preload="metadata" width="100%" poster="../../assets/bench-upi-poster.jpg">
-  <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani.mp4" type="video/mp4">
-  <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani.mp4">Download the video</a>.
+  <source src="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani-levelled.mp4" type="video/mp4">
+  <a href="https://github.com/LaplacianAI/manimvox/releases/download/gallery/bench-upi-gnani-levelled.mp4">Download the video</a>.
 </video>
 
 A short explainer: how one UPI payment moves money from your bank to a shop's bank in seconds, through four parties and five steps. The narration is by Gnani.ai's Avinash voice.
