@@ -11,8 +11,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
       - name: The tag matches the version
         run: |
           version=$(sed -n 's/^__version__ = "\(.*\)"/\1/p' src/manimvox/__init__.py)

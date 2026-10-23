@@ -19,9 +19,9 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
-      - run: uv run --no-project --with "ruff>=0.6" ruff check src tests examples
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+      - run: bash .github/scripts/report.sh uv run --no-project --with "ruff>=0.6" ruff check src tests examples
 
   test:
     name: test (${{ matrix.os }}, py${{ matrix.python }})
@@ -32,8 +32,8 @@ jobs:
         python: ["3.11", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python }}
       - name: System libraries (Linux)
@@ -42,11 +42,13 @@ jobs:
       - name: System libraries (macOS)
         if: runner.os == 'macOS'
         run: brew install cairo pkg-config
-      - run: uv sync --extra dev --extra kokoro
-      - run: uv run pytest -m "$FAST" -q -rs
+      - run: bash .github/scripts/report.sh uv sync --extra dev --extra kokoro
+        shell: bash
+      - run: bash .github/scripts/report.sh uv run pytest -m "$FAST" -q -rs
         shell: bash
       - name: Manifests are current
-        run: uv run python -m manimvox.skills manifest --check
+        run: bash .github/scripts/report.sh uv run python -m manimvox.skills manifest --check
+        shell: bash
 
   render:
     name: render (${{ matrix.os }})
@@ -56,8 +58,8 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.12"
       - name: System libraries (Linux)
@@ -66,24 +68,26 @@ jobs:
       - name: System libraries (macOS)
         if: runner.os == 'macOS'
         run: brew install cairo pkg-config
-      - run: uv sync --extra dev --extra kokoro
+      - run: bash .github/scripts/report.sh uv sync --extra dev --extra kokoro
+        shell: bash
       - name: Render tests (include every block's demo against its preview)
-        run: uv run pytest -m slow -q -rs
+        run: bash .github/scripts/report.sh uv run pytest -m slow -q -rs
+        shell: bash
 
   integrations:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: astral-sh/setup-uv@v6
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.12"
       - run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config python3-dev
       - name: Framework adapters
         run: >-
-          uv run --extra dev --extra agno --extra langchain --extra pydantic-ai --extra openai-agents
+          bash .github/scripts/report.sh uv run --extra dev --extra agno --extra langchain --extra pydantic-ai --extra openai-agents
           --extra llamaindex --extra haystack --extra google-adk
           pytest tests/test_integrations.py tests/test_integrations_common.py tests/test_frameworks.py -q -rs
       - name: CrewAI (conflicts with the OpenAI Agents SDK, so in its own environment)
         run: >-
-          uv run --extra dev --extra crewai
+          bash .github/scripts/report.sh uv run --extra dev --extra crewai
           pytest tests/test_integrations.py tests/test_frameworks.py -q -rs -k "crewai or missing or every_framework"
