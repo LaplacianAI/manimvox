@@ -36,13 +36,15 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           python-version: ${{ matrix.python }}
-      - name: System libraries (Linux)
+      - name: System libraries (Linux; EGL and OSMesa let VTK render with no display)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
+        run: >-
+          sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
+          libegl1 libosmesa6
       - name: System libraries (macOS)
         if: runner.os == 'macOS'
         run: brew install cairo pkg-config
-      - run: bash .github/scripts/report.sh uv sync --extra dev --extra kokoro
+      - run: bash .github/scripts/report.sh uv sync --extra dev --extra kokoro --extra pyvista
         shell: bash
       - run: bash .github/scripts/report.sh uv run pytest -m "$FAST" -q -rs
         shell: bash
