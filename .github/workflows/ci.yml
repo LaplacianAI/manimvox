@@ -38,7 +38,7 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: System libraries (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config python3-dev
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
       - name: System libraries (macOS)
         if: runner.os == 'macOS'
         run: brew install cairo pkg-config
@@ -64,7 +64,7 @@ jobs:
           python-version: "3.12"
       - name: System libraries (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config python3-dev
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
       - name: System libraries (macOS)
         if: runner.os == 'macOS'
         run: brew install cairo pkg-config
@@ -81,7 +81,7 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.12"
-      - run: sudo apt-get update && sudo apt-get install -y libcairo2-dev pkg-config python3-dev
+      - run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
       - name: Framework adapters
         run: >-
           bash .github/scripts/report.sh uv run --extra dev --extra agno --extra langchain --extra pydantic-ai --extra openai-agents

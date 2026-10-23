@@ -35,7 +35,7 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 | OS | Command |
 |---|---|
 | macOS | `brew install cairo pkg-config` |
-| Debian / Ubuntu | `sudo apt install libcairo2-dev pkg-config python3-dev` |
+| Debian / Ubuntu | `sudo apt install libcairo2-dev libpango1.0-dev pkg-config python3-dev` |
 | Windows | nothing extra (wheels are provided) |
 
 ## Installation

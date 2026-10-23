@@ -582,9 +582,11 @@ def doctor() -> DoctorResult:
     cairo_hint = {
         "darwin": "brew install cairo pkg-config, then reinstall manimvox",
         "win32": "reinstall manimvox (pycairo ships Windows wheels; check your Python is 64-bit)",
-    }.get(sys.platform, "sudo apt install libcairo2-dev pkg-config python3-dev (or your distro's cairo dev "
-                        "package), then reinstall manimvox")
-    for mod, hint in (("cairo", cairo_hint), ("manimpango", "reinstall manimvox"), ("av", "reinstall manimvox"),
+    }.get(sys.platform, "sudo apt install libcairo2-dev libpango1.0-dev pkg-config python3-dev (or your distro's "
+                        "cairo and pango dev packages), then reinstall manimvox")
+    # manimpango builds from source where it has no wheel (some Linux and Python pairs), which needs Pango's headers
+    pango_hint = cairo_hint if sys.platform not in ("darwin", "win32") else "reinstall manimvox"
+    for mod, hint in (("cairo", cairo_hint), ("manimpango", pango_hint), ("av", "reinstall manimvox"),
                       ("manim", "reinstall manimvox")):
         try:
             m = __import__(mod)
