@@ -6,7 +6,7 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/LaplacianAI/manimvox/blob/main/pyproject.toml)
 ![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)
 
-> **Status:** early development (0.1). The engine, CLI and agent skills work today, tested on Linux, macOS and Windows.
+> **Status:** alpha (0.1). Usable today and tested on Linux, macOS and Windows; expect breaking changes before 1.0.
 
 ## Features
 
