@@ -2,6 +2,8 @@
 
 Narrated, animated explainer videos from Python: [Manim](https://www.manim.community/) for the picture, a pluggable text-to-speech engine for the voice, and checks that fail loudly before a broken video ships.
 
+[![PyPI](https://img.shields.io/pypi/v/manimvox.svg)](https://pypi.org/project/manimvox/)
+[![CI](https://github.com/LaplacianAI/manimvox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/LaplacianAI/manimvox/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/LaplacianAI/manimvox/blob/main/LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/LaplacianAI/manimvox/blob/main/pyproject.toml)
 ![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)
