@@ -2,7 +2,9 @@
 
 Guide for agents working on this repository. To use manimvox, load the `manimvox` skill instead.
 
-manimvox renders narrated, animated explainer videos with Manim and a text-to-speech voice. It is a Python package (MIT) with a `manimvox` command, and it ships agent skills in `skills/`.
+manimvox makes explainer videos with an AI agent doing the work: a person asks for a video, and an agent researches, scripts, animates (Manim), narrates (text-to-speech) and checks it. Agents are the primary users, so keep everything usable without a person present: no prompts without a terminal, one-line errors, consent asked for before any download. It is a Python package (MIT) with a `manimvox` command, and it ships agent skills in `skills/`.
+
+For people contributing, [CONTRIBUTING.md](CONTRIBUTING.md) has the same rules; the documentation site is built from `docs/` and `zensical.toml`.
 
 ## Layout
 
@@ -46,6 +48,7 @@ uv run --extra dev --extra crewai pytest tests/test_integrations.py tests/test_f
 uv run python -m manimvox.skills manifest --write   # after any skill edit
 uv run manimvox skills install|check|update|remove  # skills in your coding agents
 uv run python -m manimvox.blocks preview --write|--check [NAME]   # after any block edit
+uv run python -m manimvox.blocks docs && uv run --extra docs zensical build --strict   # the docs site
 ```
 
 Tests that render with Manim are marked `slow`; tests needing real engines are opt-in markers.

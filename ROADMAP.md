@@ -1,6 +1,6 @@
 # Roadmap
 
-manimvox makes high-quality educational videos at low cost. Each release below moves one step closer to that goal. Items are planned, not promised; order and scope may change. Discuss any of them in [GitHub issues](https://github.com/LaplacianAI/manimvox/issues).
+manimvox lets an AI agent make high-quality educational videos at low cost, with a person directing. Each release below moves one step closer to that goal. Items are planned, not promised; order and scope may change. Discuss any of them in [GitHub issues](https://github.com/LaplacianAI/manimvox/issues).
 
 **Released:** 0.1.0 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows.
 
@@ -16,10 +16,11 @@ Small fixes found while building the 0.1.0 showcase.
 
 People should see what manimvox makes before they install it.
 
-- [ ] **Documentation site**, published from this repository with GitHub Pages: install, quickstart, authoring, voices, blocks, 3D, agent skills, and the Python API from docstrings.
-- [ ] **Gallery** of finished videos, each with its source project and the command that made it: the heart explainer (a CT heart cut open, blood flow), a concept video, a paper video and a PR walkthrough.
-- [ ] **Block gallery**, generated from each block's preview and demo.
-- [ ] **A short demo** (GIF or video) at the top of the README.
+- [x] **Documentation site**, published from this repository with GitHub Pages: install, quickstart, authoring, voices, blocks, 3D, agent skills, and the Python API from docstrings.
+- [x] **Gallery** of finished videos, each with its source project and the command that made it, opening with the heart explainer (a CT heart cut open, blood flow).
+- [ ] **More gallery videos:** a paper video next, then a concept video and a PR walkthrough.
+- [x] **Block gallery**, generated from each block's preview and demo.
+- [x] **A short demo** (GIF or video) at the top of the README.
 
 ## 0.2: professor-quality visuals
 
