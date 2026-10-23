@@ -1,0 +1,93 @@
+name: CI
+
+on:
+  push:  # every branch, so a branch is checked before its pull request exists
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # tests that need real voice engines or downloaded models are opt-in markers; see pyproject.toml
+  FAST: "not slow and not kokoro and not piper"
+  PYTHONUTF8: "1"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+      - run: bash .github/scripts/report.sh uv run --no-project --with "ruff>=0.6" ruff check src tests examples
+
+  test:
+    name: test (${{ matrix.os }}, py${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ["3.11", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: System libraries (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
+      - name: System libraries (macOS)
+        if: runner.os == 'macOS'
+        run: brew install cairo pkg-config
+      - run: bash .github/scripts/report.sh uv sync --extra dev --extra kokoro
+        shell: bash
+      - run: bash .github/scripts/report.sh uv run pytest -m "$FAST" -q -rs
+        shell: bash
+      - name: Manifests are current
+        run: bash .github/scripts/report.sh uv run python -m manimvox.skills manifest --check
+        shell: bash
+
+  render:
+    name: render (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+      - name: System libraries (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
+      - name: System libraries (macOS)
+        if: runner.os == 'macOS'
+        run: brew install cairo pkg-config
+      - run: bash .github/scripts/report.sh uv sync --extra dev --extra kokoro
+        shell: bash
+      - name: Render tests (include every block's demo against its preview)
+        run: bash .github/scripts/report.sh uv run pytest -m slow -q -rs
+        shell: bash
+
+  integrations:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.12"
+      - run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
+      - name: Framework adapters
+        run: >-
+          bash .github/scripts/report.sh uv run --extra dev --extra agno --extra langchain --extra pydantic-ai --extra openai-agents
+          --extra llamaindex --extra haystack --extra google-adk
+          pytest tests/test_integrations.py tests/test_integrations_common.py tests/test_frameworks.py -q -rs
+      - name: CrewAI (conflicts with the OpenAI Agents SDK, so in its own environment)
+        run: >-
+          bash .github/scripts/report.sh uv run --extra dev --extra crewai
+          pytest tests/test_integrations.py tests/test_frameworks.py -q -rs -k "crewai or missing or every_framework"

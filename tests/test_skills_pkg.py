@@ -140,3 +140,18 @@ def test_module_cli_runs_without_a_runtime_warning():
     assert "RuntimeWarning" not in r.stderr
     assert r.returncode == 0, r.stderr
     assert "ok" in r.stdout
+
+
+def test_content_hash_orders_files_the_same_on_every_system(tmp_path):
+    import hashlib
+
+    from manimvox.skills import content_hash
+
+    d = tmp_path / "s"
+    (d / "references").mkdir(parents=True)
+    (d / "SKILL.md").write_bytes(b"top\r\n")
+    (d / "references" / "a.md").write_bytes(b"ref\n")
+    want = hashlib.sha256()
+    for rel, body in (("SKILL.md", b"top\n"), ("references/a.md", b"ref\n")):  # upper case sorts first, as on POSIX
+        want.update(rel.encode() + b"\0" + body + b"\0")
+    assert content_hash(d) == (want.hexdigest(), 2)

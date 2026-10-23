@@ -94,9 +94,10 @@ def content_hash(skill_dir: Path) -> tuple[str, int]:
     """sha256 over each file's relative path and bytes (CRLF read as LF), in sorted order; and the file count."""
     h = hashlib.sha256()
     files = sorted(
-        p for p in Path(skill_dir).rglob("*")
-        if p.is_file() and "__pycache__" not in p.parts
-        and not any(part.startswith(".") for part in p.relative_to(skill_dir).parts)
+        (p for p in Path(skill_dir).rglob("*")
+         if p.is_file() and "__pycache__" not in p.parts
+         and not any(part.startswith(".") for part in p.relative_to(skill_dir).parts)),
+        key=lambda p: p.relative_to(skill_dir).parts,  # Windows paths sort without case; the hash must not
     )
     for p in files:
         h.update(p.relative_to(skill_dir).as_posix().encode("utf-8") + b"\0")

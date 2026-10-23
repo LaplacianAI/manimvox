@@ -1,5 +1,6 @@
 import os
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -75,6 +76,7 @@ def test_install_then_check_ok(home, proj, mode):
     assert set(sa.status(t).values()) == {"ok"}
 
 
+@needs_symlinks
 def test_reinstall_replaces_only_ours(home, proj):
     t = proj / ".agents" / "skills"
     (t / "my-own-skill").mkdir(parents=True)
@@ -310,7 +312,9 @@ def test_eof_at_the_agent_prompt_is_no(home, proj, no_npx, monkeypatch):
 # --- F1: an npx in the current folder is never run ---------------------------------------------------------------
 
 
-def _fake_npx(folder, name="npx"):
+def _fake_npx(folder, name=None):
+    """An npx that would run if found: on Windows only a name with a PATHEXT extension is runnable."""
+    name = name or ("npx.cmd" if sys.platform == "win32" else "npx")
     folder.mkdir(parents=True, exist_ok=True)
     f = folder / name
     f.write_text("#!/bin/sh\necho pwned\n", encoding="utf-8")
