@@ -56,13 +56,13 @@ def main(argv: list[str]) -> None:
     new, old = argv[0], current()
     if tuple(map(int, new.split("."))) <= tuple(map(int, old.split("."))):
         raise SystemExit(f"{new} is not newer than {old}")
-    replace(INIT, f'__version__ = "{old}"', f'__version__ = "{new}"', 1)
+    log = ROOT / "CHANGELOG.md"
+    dated = changelog(log.read_text(encoding="utf-8"), old, new, datetime.date.today().isoformat())  # checked first:
+    replace(INIT, f'__version__ = "{old}"', f'__version__ = "{new}"', 1)  # a bad changelog changes nothing
     for m in MANIFESTS:
         replace(ROOT / m, f'"version": "{old}"', f'"version": "{new}"', 1)
     replace(ROOT / "README.md", f'"manimvox": "{old}"', f'"manimvox": "{new}"')
-    log = ROOT / "CHANGELOG.md"
-    log.write_text(changelog(log.read_text(encoding="utf-8"), old, new, datetime.date.today().isoformat()),
-                   encoding="utf-8")
+    log.write_text(dated, encoding="utf-8")
     # a fresh interpreter, so the manifest is stamped with the new __version__
     subprocess.run([sys.executable, "-m", "manimvox.skills", "manifest", "--write"], check=True, cwd=ROOT)
     print(f"{old} -> {new}. Review the diff, merge it, then: git tag v{new} && git push origin v{new}")
