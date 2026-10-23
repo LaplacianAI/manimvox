@@ -1,0 +1,39 @@
+{
+  "manimvox": "0.1.0",
+  "series": "The Human Heart",
+  "tagline": "Its parts, and what each one does",
+  "voice": "kokoro:af_heart",
+  "speed": 1.0,
+  "pron": [],
+  "theme": {
+    "source": "anatomy on a near-black stage: heart red as the accent; textbook blue for oxygen-poor blood and red for oxygen-rich",
+    "bg": "#0F1115",
+    "panel": "#1B1F26",
+    "panel2": "#262B33",
+    "line": "#3A414B",
+    "ink": "#EDEDED",
+    "muted": "#A6ADB5",
+    "accent": "#FF6B6B",
+    "ok": "#7BC47F",
+    "warn": "#FFD166",
+    "error": "#EF476F",
+    "blue": "#5DADE2",
+    "orange": "#F4A261",
+    "violet": "#B39DDB",
+    "pink": "#F48FB1",
+    "teal": "#4DD0C1",
+    "named": {
+      "oxygen_poor": "#5DADE2",
+      "oxygen_rich": "#FF6B6B",
+      "heart_muscle": "#C8504A"
+    }
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_heart",
+      "cls": "Ep01",
+      "title": "The Parts of the Heart"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "manimvox": "0.1.0",
+  "series": "manimvox",
+  "tagline": "Explainer videos made by your AI agent",
+  "voice": "kokoro:af_heart",
+  "speed": 1.0,
+  "pron": [],
+  "theme": {
+    "source": "a developer-tool look: near-black stage, teal accent for manimvox, violet for the agent, warm amber for sources and citations",
+    "bg": "#0E1116",
+    "panel": "#171C23",
+    "panel2": "#222831",
+    "line": "#343C47",
+    "ink": "#ECEFF3",
+    "muted": "#9AA4B1",
+    "accent": "#3DD6C6",
+    "ok": "#7BD88F",
+    "warn": "#FFC66D",
+    "error": "#FF6B6B",
+    "blue": "#6CB6FF",
+    "orange": "#F0A35E",
+    "violet": "#B392F0",
+    "pink": "#F38BC2",
+    "teal": "#3DD6C6",
+    "named": {
+      "agent": "#B392F0",
+      "source": "#FFC66D"
+    }
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_made_by_your_agent",
+      "cls": "Ep01",
+      "title": "Made by your agent"
+    }
+  ]
+}

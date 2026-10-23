@@ -1,0 +1,34 @@
+name: Add a video to the gallery
+description: Share a video made with manimvox.
+labels: ["gallery"]
+body:
+  - type: markdown
+    attributes:
+      value: Gallery videos come with their source project, so others can learn from them and render them again. Every claim in the video needs a source in the project's FACTS.md.
+  - type: input
+    id: video
+    attributes:
+      label: Link to the video
+    validations:
+      required: true
+  - type: input
+    id: source
+    attributes:
+      label: Link to the source project
+      description: The episode files, series.json and FACTS.md.
+    validations:
+      required: true
+  - type: textarea
+    id: how
+    attributes:
+      label: How it was made
+      description: The agent and the prompts you used, if any, and anything you changed by hand.
+    validations:
+      required: true
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Rights
+      options:
+        - label: I may share this video, and every model, image, dataset and voice in it allows this use; their credits are in the video and the project.
+          required: true

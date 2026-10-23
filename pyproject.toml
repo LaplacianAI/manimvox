@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "manimvox"
 dynamic = ["version"]
-description = "Narrated, animated explainer videos with Manim and pluggable voices, driven by agent skills."
+description = "Explainer videos made by your AI agent: research, a cited script, Manim animation, narration and checks."
 readme = "README.md"
 license = "MIT"
 authors = [{ name = "LaplacianAI" }]
@@ -56,10 +56,13 @@ crewai = ["crewai>=1.15.28,<1.16; python_version < '3.14'"]
 llamaindex = ["llama-index-core>=0.14.25,<0.15"]
 haystack = ["haystack-ai>=3.4,<3.5"]
 google-adk = ["google-adk>=2.12,<2.13"]
+# the documentation site: `uv run --extra docs zensical serve`
+docs = ["zensical>=0.0.71,<0.1", "mkdocstrings-python>=1.18,<3"]
 dev = ["pytest>=8", "ruff>=0.6", "matplotlib>=3.8,<4", "plotly>=6.1,<8", "trimesh>=4.5,<6", "fast-simplification>=0.1.9,<1"]
 
 [project.urls]
 Homepage = "https://github.com/LaplacianAI/manimvox"
+Documentation = "https://laplacianai.github.io/manimvox/"
 Source = "https://github.com/LaplacianAI/manimvox"
 Issues = "https://github.com/LaplacianAI/manimvox/issues"
 
@@ -92,5 +95,7 @@ addopts = "-m 'not kokoro and not piper'"
 line-length = 120
 
 [tool.uv]
-# crewai needs openai<3 (openai-agents needs >=3) and rich>=14.2 (f5-tts's cached-path needs rich<14)
-conflicts = [[{ extra = "crewai" }, { extra = "openai-agents" }], [{ extra = "crewai" }, { extra = "f5" }]]
+# crewai needs openai<3 (openai-agents needs >=3) and rich>=14.2 (f5-tts's cached-path needs rich<14);
+# the docs extra cannot share an environment with crewai either
+conflicts = [[{ extra = "crewai" }, { extra = "openai-agents" }], [{ extra = "crewai" }, { extra = "f5" }],
+             [{ extra = "crewai" }, { extra = "docs" }]]

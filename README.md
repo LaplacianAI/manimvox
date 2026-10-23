@@ -1,6 +1,6 @@
 # manimvox
 
-Narrated, animated explainer videos from Python: [Manim](https://www.manim.community/) for the picture, a pluggable text-to-speech engine for the voice, and checks that fail loudly before a broken video ships.
+**Explainer videos made by your AI agent.** Ask Claude Code, Codex, Cursor or Gemini CLI for "an explainer video of" a paper, a codebase, an idea or a pull request. manimvox gives the agent what it needs to research the topic, write a cited script, animate it with [Manim](https://www.manim.community/), narrate it with a text-to-speech voice, and check the result before it ships. You direct; the agent does the work.
 
 [![PyPI](https://img.shields.io/pypi/v/manimvox.svg)](https://pypi.org/project/manimvox/)
 [![CI](https://github.com/LaplacianAI/manimvox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/LaplacianAI/manimvox/actions/workflows/ci.yml)
@@ -8,10 +8,30 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/LaplacianAI/manimvox/blob/main/pyproject.toml)
 ![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)
 
+![A CT-derived heart turns, is sliced open to its four chambers, and blood streams through it](https://raw.githubusercontent.com/LaplacianAI/manimvox/main/docs/assets/demo.gif)
+
+*[Inside the heart](https://laplacianai.github.io/manimvox/gallery/heart/): made by Claude Code with manimvox from a few prompts, using a real CT scan. More in the [gallery](https://laplacianai.github.io/manimvox/gallery/). Documentation: [laplacianai.github.io/manimvox](https://laplacianai.github.io/manimvox/).*
+
 > **Status:** alpha (0.1). Usable today and tested on Linux, macOS and Windows; expect breaking changes before 1.0.
 
+<!-- --8<-- [start:how-it-works] -->
+## How it works
+
+1. **Install manimvox and its skills** into the coding agent you use ([below](#make-a-video-with-your-coding-agent)).
+2. **Ask for a video:** "make an explainer video of this paper", "explain hash maps", "turn this repo into a playlist", "walk through PR #42".
+3. **The agent follows a workflow** for that kind of video. It gathers sources with your permission, writes every claim into `FACTS.md` with its source, writes the script, and builds the episodes from manimvox's components and blocks.
+4. **It checks its own work.** It drafts, reads the contact sheets and the layout check, fixes what's wrong, and renders the final MP4 with subtitles only when every check passes.
+
+The agent makes the video by **writing code**, a Python file per episode, not by calling a long list of tools. Studies by [Anthropic](https://www.anthropic.com/engineering/code-execution-with-mcp), [Cloudflare](https://blog.cloudflare.com/code-mode/) and the [CodeAct authors](https://arxiv.org/abs/2402.01030) found that agents work better and more efficiently that way; [How it works](https://laplacianai.github.io/manimvox/how-it-works/) has the details.
+
+The agent asks before it installs anything, downloads a model, fetches from the web or uses an online voice. Everything it uses is a normal Python library and command line, so you can also [write episodes by hand](#write-an-episode-by-hand).
+
+<!-- --8<-- [end:how-it-works] -->
+
+<!-- --8<-- [start:features] -->
 ## Features
 
+- **Made for AI agents.** Eleven agent skills cover four workflows (a document, a concept, a codebase playlist, a pull request), and every command is also a typed tool for Python agent frameworks. It never prompts without a terminal, its errors are one line, and downloads need `--yes`.
 - **One episode file in, one finished MP4 out.** It comes with subtitles (`.srt`), and narration and picture stay in step.
 - **Eight voice engines behind one interface.** Kokoro is the default, and it runs offline with no key. Piper, macOS `say`, edge-tts, OpenAI, ElevenLabs, and the XTTS-v2 and F5-TTS voice cloners are also supported.
 - **Checks that gate a render:**
@@ -24,12 +44,11 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 - **3D when depth is the idea:** `Episode3D` adds Manim's tilting, orbiting camera to an episode, with the header and progress bar kept flat on screen.
 - **3D models from files:** a glTF (Blender's export), OBJ or STL model drawn by Manim so its camera orbits it and parts can be picked out (the `mesh-model` block), or rendered with real lighting and animations as a clip (`from_model`).
 - **A theme per video:** colours and fonts come from the project's `series.json`, never from a fixed preset.
-- **Built for agents as well as people:**
-  - no prompts without a terminal;
-  - one-line errors;
-  - `--yes` for downloads.
 - **Cross-platform:** macOS, Linux and Windows, with no system ffmpeg (audio and video are decoded with PyAV).
 
+<!-- --8<-- [end:features] -->
+
+<!-- --8<-- [start:requirements] -->
 ## Requirements
 
 - Python 3.11 or newer and [uv](https://docs.astral.sh/uv/)
@@ -41,6 +60,9 @@ Narrated, animated explainer videos from Python: [Manim](https://www.manim.commu
 | Debian / Ubuntu | `sudo apt install libcairo2-dev libpango1.0-dev pkg-config python3-dev` |
 | Windows | nothing extra (wheels are provided) |
 
+<!-- --8<-- [end:requirements] -->
+
+<!-- --8<-- [start:installation] -->
 ## Installation
 
 Install it from PyPI, with the default Kokoro voice:
@@ -60,7 +82,6 @@ uv tool install --force "manimvox[kokoro,piper]"
 
 The development version installs from GitHub: `uv tool install "manimvox[kokoro] @ git+https://github.com/LaplacianAI/manimvox"`.
 
-
 | Extra | Adds |
 |---|---|
 | `kokoro` | Kokoro (default voice) |
@@ -73,63 +94,12 @@ The development version installs from GitHub: `uv tool install "manimvox[kokoro]
 | `plotly` | Plotly charts as scenes (Kaleido needs Chrome on the machine) |
 | `trimesh` | 3D model files for the `mesh-model` block |
 | `pyvista` | 3D models and scans rendered with lighting as clips (`from_model`, `from_pyvista`; needs OpenGL 3.2: a graphics driver, or on a Linux server `sudo apt install libegl1 libosmesa6`, or on a Windows server Mesa's `opengl32.dll`) |
-| `agno`, `langchain`, `pydantic-ai`, `openai-agents`, `crewai`, `llamaindex`, `haystack`, `google-adk` | Tools for that agent framework (see [Use it from a Python agent framework](#use-it-from-a-python-agent-framework)) |
+| `agno`, `langchain`, `pydantic-ai`, `openai-agents`, `crewai`, `llamaindex`, `haystack`, `google-adk` | Tools for that agent framework (see [Use it from a Python agent framework](https://laplacianai.github.io/manimvox/agents/#use-it-from-a-python-agent-framework)) |
 
-## Quickstart
+<!-- --8<-- [end:installation] -->
 
-```bash
-manimvox new demo --series "Vectors, Explained" --tagline "What a vector really is"
-cd demo
-```
-
-This creates:
-
-```
-demo/
-  series.json   series name, voice, speed, pronunciations, theme, episode list
-  FACTS.md      every claim the video makes, with its source
-  SERIES.md     the outline every episode is written against
-  episodes/     one Python file per episode
-  out/          finished videos and subtitles
-  research/     source material
-```
-
-Write `episodes/ep01_vectors.py`:
-
-```python
-from manimvox.kit import *
-
-
-class Ep01(Episode):
-    EP = 1
-    TITLE = "What is a vector?"
-    TAGLINE = "An arrow, a list of numbers, and why they are the same thing"
-    NCHAP = 1
-
-    def build(self):
-        self.intro("A vector is an arrow with a length and a direction.")
-        self.chapter("Arrows", "Start with an arrow from the origin.")
-        v = arrow(ORIGIN, RIGHT * 3 + UP * 2, color=ACCENT, label="v")
-        self.say("This arrow goes three right and two up.", Create(v))
-        self.outro(["A vector has a length and a direction"], "That is all a vector is.")
-```
-
-Register it in `series.json`:
-
-```json
-"episodes": [{"n": 1, "stem": "ep01_vectors", "cls": "Ep01", "title": "What is a vector?"}]
-```
-
-Then draft, look, and render:
-
-```bash
-manimvox draft ep01          # 480p, no voice: contact sheets in sheets/ep01_vectors/ and a layout report
-manimvox render ep01 --yes   # 1080p with the voice; --yes allows the one-time 354 MB Kokoro download
-```
-
-The result is `out/ep01_vectors.mp4` and `out/ep01_vectors.srt`. The render finishes with `audio check: ok` or exits 1.
-
-## Use it from your coding agent
+<!-- --8<-- [start:coding-agents] -->
+## Make a video with your coding agent
 
 manimvox ships eleven agent skills, so your coding agent can plan, write, render and check a video for you. Install them into the agents you use:
 
@@ -174,6 +144,65 @@ Then ask your agent: "make an explainer video of <paper / repo / idea / PR>".
 | `manimvox-concept` | An idea with no source document into a 3Blue1Brown-style video |
 | `manimvox-pr` | A pull request into a 1-3 minute walkthrough |
 
+<!-- --8<-- [end:coding-agents] -->
+
+<!-- --8<-- [start:quickstart] -->
+## Write an episode by hand
+
+```bash
+manimvox new demo --series "Vectors, Explained" --tagline "What a vector really is"
+cd demo
+```
+
+This creates:
+
+```
+demo/
+  series.json   series name, voice, speed, pronunciations, theme, episode list
+  FACTS.md      every claim the video makes, with its source
+  SERIES.md     the outline every episode is written against
+  episodes/     one Python file per episode
+  out/          finished videos and subtitles
+  research/     source material
+```
+
+Write `episodes/ep01_vectors.py`:
+
+```python
+from manimvox.kit import *
+
+class Ep01(Episode):
+    EP = 1
+    TITLE = "What is a vector?"
+    TAGLINE = "An arrow, a list of numbers, and why they are the same thing"
+    NCHAP = 1
+
+    def build(self):
+        self.intro("A vector is an arrow with a length and a direction.")
+        self.chapter("Arrows", "Start with an arrow from the origin.")
+        v = arrow(ORIGIN, RIGHT * 3 + UP * 2, color=ACCENT, label="v")
+        self.say("This arrow goes three right and two up.", Create(v))
+        self.outro(["A vector has a length and a direction"], "That is all a vector is.")
+```
+
+Register it in `series.json`:
+
+```json
+"episodes": [{"n": 1, "stem": "ep01_vectors", "cls": "Ep01", "title": "What is a vector?"}]
+```
+
+Then draft, look, and render:
+
+```bash
+manimvox draft ep01          # 480p, no voice: contact sheets in sheets/ep01_vectors/ and a layout report
+manimvox render ep01 --yes   # 1080p with the voice; --yes allows the one-time 354 MB Kokoro download
+```
+
+The result is `out/ep01_vectors.mp4` and `out/ep01_vectors.srt`. The render finishes with `audio check: ok` or exits 1.
+
+<!-- --8<-- [end:quickstart] -->
+
+<!-- --8<-- [start:frameworks] -->
 ## Use it from a Python agent framework
 
 An agent built on a Python framework has no shell, so manimvox also ships its commands as tools (`manimvox.tools`) and adapters for eight frameworks. Install the extra for yours, next to a voice:
@@ -287,6 +316,9 @@ Notes:
 
 A runnable script for each framework is in [`examples/agents/`](https://github.com/LaplacianAI/manimvox/tree/main/examples/agents).
 
+<!-- --8<-- [end:frameworks] -->
+
+<!-- --8<-- [start:usage] -->
 ## Usage
 
 | Command | What it does |
@@ -331,6 +363,9 @@ An episode is a class that subclasses `Episode` and implements `build()`. `from 
 
 Keep content inside the safe stage: x from −6.6 to 6.6, y from −3.45 to 3.15. The header and the progress bar sit outside it.
 
+<!-- --8<-- [end:usage] -->
+
+<!-- --8<-- [start:blocks] -->
 ## Blocks, charts and finishing
 
 ### Blocks
@@ -372,6 +407,9 @@ Install the `matplotlib` or `plotly` extra for them (see the extras table). Plot
 
 `music` is a file you provide; it loops under the narration and dips by `duck_db` while someone speaks. `captions` is `"srt"` (default) or `"burn"`. `end_card` is up to 4 lines. `manimvox join` then makes one video of the rendered episodes: a title card, then each episode with its own end card.
 
+<!-- --8<-- [end:blocks] -->
+
+<!-- --8<-- [start:configuration] -->
 ## Configuration
 
 ### series.json
@@ -425,6 +463,9 @@ Optional keys:
 | `MANIMVOX_ASSUME_YES` | `1` answers yes to download and licence prompts |
 | `OPENAI_API_KEY`, `ELEVENLABS_API_KEY` | Keys for the online engines |
 
+<!-- --8<-- [end:configuration] -->
+
+<!-- --8<-- [start:voices] -->
 ## Voices
 
 A voice is written `engine:voice`, and the default is `kokoro:af_heart`. It is chosen by `--voice` first, then `series.json`, then `MANIMVOX_VOICE`. If a voice is missing, not installed or lacks its key, the render stops with a one-line reason; manimvox never switches voice silently.
@@ -448,6 +489,9 @@ Notes on particular engines:
 
 Licences were summarised on 2026-10-16 and have not been legally reviewed. Verify them upstream before any commercial use.
 
+<!-- --8<-- [end:voices] -->
+
+<!-- --8<-- [start:development] -->
 ## Development
 
 ```bash
@@ -490,6 +534,16 @@ gemini-extension.json, plugin.json   Gemini CLI and agent-plugins manifests
 tests/
 ```
 
+<!-- --8<-- [end:development] -->
+
+## Roadmap
+
+What comes next, release by release: [ROADMAP.md](https://github.com/LaplacianAI/manimvox/blob/main/ROADMAP.md).
+
+## Contributing
+
+Contributions are welcome, from people and from their agents: read [CONTRIBUTING.md](https://github.com/LaplacianAI/manimvox/blob/main/CONTRIBUTING.md) to get set up, and [AGENTS.md](https://github.com/LaplacianAI/manimvox/blob/main/AGENTS.md) if an agent is doing the work. Everyone taking part follows the [Code of Conduct](https://github.com/LaplacianAI/manimvox/blob/main/CODE_OF_CONDUCT.md). Report a vulnerability privately as [SECURITY.md](https://github.com/LaplacianAI/manimvox/blob/main/SECURITY.md) describes; for help, see [SUPPORT.md](https://github.com/LaplacianAI/manimvox/blob/main/SUPPORT.md). Changes are listed in the [changelog](https://github.com/LaplacianAI/manimvox/blob/main/CHANGELOG.md).
+
 ## License
 
-[MIT](https://github.com/LaplacianAI/manimvox/blob/main/LICENSE). Voice engines and models carry their own licences; see [Voices](#voices).
+[MIT](https://github.com/LaplacianAI/manimvox/blob/main/LICENSE). Voice engines and models carry their own licences; see [Voices](https://laplacianai.github.io/manimvox/voices/).
