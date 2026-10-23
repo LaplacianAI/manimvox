@@ -3,6 +3,7 @@
 **Explainer videos made by your AI agent.** Ask Claude Code, Codex, Cursor or Gemini CLI for "an explainer video of" a paper, a codebase, an idea or a pull request. manimvox gives the agent what it needs to research the topic, write a cited script, animate it with [Manim](https://www.manim.community/), narrate it with a text-to-speech voice, and check the result before it ships. You direct; the agent does the work.
 
 [![PyPI](https://img.shields.io/pypi/v/manimvox.svg)](https://pypi.org/project/manimvox/)
+[![Docs](https://img.shields.io/badge/docs-laplacianai.github.io%2Fmanimvox-3DD6C6.svg)](https://laplacianai.github.io/manimvox/)
 [![CI](https://github.com/LaplacianAI/manimvox/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/LaplacianAI/manimvox/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/LaplacianAI/manimvox/blob/main/LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/LaplacianAI/manimvox/blob/main/pyproject.toml)
