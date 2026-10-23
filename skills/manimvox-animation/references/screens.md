@@ -37,6 +37,8 @@ self.say("Back to the page.", FadeOut(tag), shot.zoom_out())
 
 - **Regions are pixels of the source file**, whatever the clip's width or zoom. `shot.at(x, y)` is the scene point over a pixel.
 - **`shot.zoom(x, y, w, h)` zooms inside the clip's own frame,** so it never covers the header. It keeps a margin and the clip's shape. A full-page screenshot is small on screen: zoom before asking the viewer to read anything.
+- **Zoom to the words that matter, not the box around them:** the command, not the whole code block with its comments; the button, not the toolbar. How far a zoom magnifies is the screenshot's width over the region's: a region a third as wide reads three times larger. A region as wide as the page's text column barely zooms at all.
+- **Point at what each line names.** A zoom shows where to look; a cursor, spotlight or callout shows what. Use at least one of them in every scene that shows the screen, timed to the word.
 - **Make overlays after the clip has moved or zoomed,** and fade them out before the next zoom: they are placed for the picture as it is when they are made. An overlay on a region the zoom has hidden is an error.
 - **One thing at a time:** one spotlight or callout per line, faded out before the next.
 - **Before and after:** two screenshots side by side, `Group(a, b).arrange(RIGHT, buff=0.4)`, each with `width=6.2`, then zoom into the same region of each.
