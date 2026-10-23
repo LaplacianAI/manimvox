@@ -23,7 +23,7 @@ Then ask your agent: *"make an explainer video of &lt;paper / repo / idea / PR&g
 - **[Install](install.md)**: requirements for Linux, macOS and Windows, and the optional extras.
 - **[Make a video with an agent](agents.md)**: the skills, the workflows, and the tools for Python agent frameworks.
 - **[Write an episode by hand](quickstart.md)**: the same library, without an agent.
-- **[Gallery](gallery/index.md)**: finished videos, with the prompts and projects that made them.
+- **[Gallery](gallery/index.md)**: finished videos, with the prompts and projects that made them. Start with [Made by your agent](gallery/made-by-your-agent.md), a short introduction to manimvox made with manimvox.
 - **[Python API](api.md)**: every component, clip adapter and tool.
 
 </div>

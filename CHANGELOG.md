@@ -7,7 +7,7 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 ### Added
 
 - Documentation site at [laplacianai.github.io/manimvox](https://laplacianai.github.io/manimvox/), with a gallery of finished videos and a gallery of every block (`python -m manimvox.blocks docs`).
-- Gallery: *Inside the heart*, made by Claude Code with manimvox from a CT-derived heart, with its source project in `examples/gallery/heart`.
+- Gallery: *Made by your agent*, an introduction to manimvox, and *Inside the heart*, from a CT-derived heart; both made by Claude Code with manimvox, with their source projects in `examples/gallery/`.
 - `ROADMAP.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, and issue and pull request templates.
 - A `docs` extra for building the documentation site.
 

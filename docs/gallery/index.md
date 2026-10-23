@@ -4,6 +4,14 @@ Finished videos made with manimvox, most of them by an AI agent. Each one shows 
 
 <div class="grid cards" markdown>
 
+- **[Made by your agent](made-by-your-agent.md)**
+
+    ---
+
+    What manimvox is, why the agent writes code instead of calling tools (Anthropic, Cloudflare, CodeAct), and how to use it from a coding agent. About 100 seconds.
+
+    **Made by Claude Code** · start here
+
 - **[Inside the heart](heart.md)**
 
     ---

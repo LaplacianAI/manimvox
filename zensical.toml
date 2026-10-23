@@ -25,6 +25,7 @@ nav = [
   ] },
   { "Gallery" = [
     { "Gallery" = "gallery/index.md" },
+    { "Made by your agent" = "gallery/made-by-your-agent.md" },
     { "Inside the heart" = "gallery/heart.md" },
   ] },
   { "Reference" = [
