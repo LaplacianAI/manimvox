@@ -11,7 +11,7 @@
 
 ![A CT-derived heart turns, is sliced open to its four chambers, and blood streams through it](https://raw.githubusercontent.com/LaplacianAI/manimvox/main/docs/assets/demo.gif)
 
-*[Inside the heart](https://laplacianai.github.io/manimvox/gallery/heart/): made by Claude Code with manimvox from a few prompts, using a real CT scan. More in the [gallery](https://laplacianai.github.io/manimvox/gallery/). Documentation: [laplacianai.github.io/manimvox](https://laplacianai.github.io/manimvox/).*
+*[Inside the heart](https://laplacianai.github.io/manimvox/gallery/heart/): made by Claude Code with manimvox from a few prompts, using a real CT scan. More in the [gallery](https://laplacianai.github.io/manimvox/gallery/), and how agents and voices compare in the [benchmarks](https://laplacianai.github.io/manimvox/benchmarks/). Documentation: [laplacianai.github.io/manimvox](https://laplacianai.github.io/manimvox/).*
 
 > **Status:** alpha (0.1). Usable today and tested on Linux, macOS and Windows; expect breaking changes before 1.0.
 
@@ -34,7 +34,7 @@ The agent asks before it installs anything, downloads a model, fetches from the 
 
 - **Made for AI agents.** Eleven agent skills cover four workflows (a document, a concept, a codebase playlist, a pull request), and every command is also a typed tool for Python agent frameworks. It never prompts without a terminal, its errors are one line, and downloads need `--yes`.
 - **One episode file in, one finished MP4 out.** It comes with subtitles (`.srt`), and narration and picture stay in step.
-- **Eight voice engines behind one interface.** Kokoro is the default, and it runs offline with no key. Piper, macOS `say`, edge-tts, OpenAI, ElevenLabs, and the XTTS-v2 and F5-TTS voice cloners are also supported.
+- **Ten voice engines behind one interface.** Kokoro is the default, and it runs offline with no key. Piper, macOS `say`, edge-tts, OpenAI, ElevenLabs, Sarvam AI and Gnani.ai (for Indian languages), and the XTTS-v2 and F5-TTS voice cloners are also supported.
 - **Checks that gate a render:**
   - text contrast against the background (WCAG 2.1);
   - text off the safe stage or overlapping;
@@ -88,7 +88,7 @@ The development version installs from GitHub: `uv tool install "manimvox[kokoro]
 | `kokoro` | Kokoro (default voice) |
 | `piper` | Piper |
 | `edge` | edge-tts |
-| `cloud` | OpenAI and ElevenLabs (standard library; needs an API key) |
+| `cloud` | OpenAI, ElevenLabs, Sarvam AI and Gnani.ai (standard library; needs an API key) |
 | `xtts` | XTTS-v2 voice cloning (installs PyTorch) |
 | `f5` | F5-TTS voice cloning (installs PyTorch) |
 | `matplotlib` | Matplotlib charts as scenes (`manimvox.scenes`) |
@@ -462,7 +462,7 @@ Optional keys:
 | `MANIMVOX_VOICE` | Voice used when neither `--voice` nor `series.json` sets one |
 | `MANIMVOX_CACHE` | Where models and voices are stored. Default: `%LOCALAPPDATA%\manimvox` on Windows, `$XDG_CACHE_HOME/manimvox` or `~/.cache/manimvox` elsewhere |
 | `MANIMVOX_ASSUME_YES` | `1` answers yes to download and licence prompts |
-| `OPENAI_API_KEY`, `ELEVENLABS_API_KEY` | Keys for the online engines |
+| `OPENAI_API_KEY`, `ELEVENLABS_API_KEY`, `SARVAM_API_KEY`, `GNANI_API_KEY` | Keys for the online engines |
 
 <!-- --8<-- [end:configuration] -->
 
@@ -479,12 +479,15 @@ A voice is written `engine:voice`, and the default is `kokoro:af_heart`. It is c
 | edge-tts | `edge:en-US-AriaNeural` | `edge` | online, no key; text goes to Microsoft | LGPL-3.0 package; Microsoft service terms |
 | OpenAI | `openai:alloy`, `openai:tts-1-hd/onyx` | `cloud` + `OPENAI_API_KEY` | online, paid | OpenAI terms; disclose that the voice is AI-generated |
 | ElevenLabs | `elevenlabs:<voice id>` | `cloud` + `ELEVENLABS_API_KEY` | online, paid or free tier | ElevenLabs terms; the free tier requires attribution |
+| Sarvam AI | `sarvam:shubh`, `sarvam:anushka@hi-IN` | `cloud` + `SARVAM_API_KEY` | online, paid; 11 Indian languages | Sarvam AI terms |
+| Gnani.ai | `gnani:Kaveri`, `gnani:Shivani@ta-IN` | `cloud` + `GNANI_API_KEY` | online, paid; 10 Indian languages and Hinglish | Gnani.ai terms |
 | XTTS-v2 | `xtts:clone=voice.wav` | `xtts` | offline, ~1.9 GB + PyTorch | **non-commercial** (Coqui Public Model License) |
 | F5-TTS | `f5:clone=voice.wav` with `voice.txt` | `f5` | offline, ~1.3 GB + PyTorch | **non-commercial** weights (CC-BY-NC) |
 
 Notes on particular engines:
 - **Voice cloning:** the engines clone from a 6–30 second recording of the speaker. F5-TTS also needs a transcript of that recording: `voice.txt`, beside `voice.wav`, holding exactly what is said in it.
 - **Paths:** `clone=` recordings and local Piper `.onnx` voices are resolved from the project root.
+- **Indian languages:** Sarvam AI and Gnani.ai voices are written `[model/]voice[@language]`. With no model, the one that has the voice is used. With no language, Sarvam uses `en-IN` and Gnani detects it. For example, `sarvam:bulbul:v4-flash/simran_en_customer` or `gnani:timbre-v3.0/Avinash@hi-IN`. `manimvox voices sarvam` and `manimvox voices gnani` list the voices and languages. Sarvam takes speed 0.5 to 2.0 (0.3 to 3.0 on `bulbul:v2`), and Gnani takes 0.85 to 1.15.
 - **Online engines** receive only the narration text. `manimvox voices edge` and `manimvox voices elevenlabs` go online to list their voices.
 - **Downloads** happen only after you confirm (or pass `--yes`). Kokoro and Piper files are verified by hash.
 

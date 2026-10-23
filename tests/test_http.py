@@ -22,6 +22,15 @@ def test_success_returns_body_and_sends_headers(server):
     assert s.requests[0].get_method() == "POST" and s.requests[0].get_header("X-key") == "k"
 
 
+def test_requests_name_manimvox_as_the_agent(server):
+    # Cloudflare refuses urllib's default agent on some services (Gnani.ai answers 403, error 1010)
+    s = server(b"ok", b"ok")
+    http.request("Svc", "GET", "https://svc.test", headers={}, sleep=lambda t: None)
+    assert s.requests[0].get_header("User-agent") == http.USER_AGENT and http.USER_AGENT.startswith("manimvox/")
+    http.request("Svc", "GET", "https://svc.test", headers={"User-Agent": "mine"}, sleep=lambda t: None)
+    assert s.requests[1].get_header("User-agent") == "mine"
+
+
 def test_transient_errors_retry_with_backoff(server):
     s = server(503, URLError("reset"), b"ok")
     sleeps = []

@@ -9,3 +9,5 @@ media/
 /site/
 docs/assets/blocks/
 docs/blocks-gallery.md
+docs/.generated/
+*.env

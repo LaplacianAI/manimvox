@@ -21,10 +21,12 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.12"
-      # Neither step needs manimvox's dependencies (Manim, Cairo): the gallery script uses the standard
-      # library, and the API pages read the source without importing it. Versions match the docs extra.
+      # Neither step needs manimvox's dependencies (Manim, Cairo): the gallery and leaderboard scripts use the
+      # standard library, and the API pages read the source without importing it. Versions match the docs extra.
       - name: Block gallery from blocks/*/block.json and preview.png
         run: PYTHONPATH=src uv run --no-project python -m manimvox.blocks docs
+      - name: Leaderboards from benchmarks/runs/*/run.json
+        run: uv run --no-project python benchmarks/leaderboard.py
       - name: Build (strict)
         run: >-
           uv run --no-project --with "zensical>=0.0.71,<0.1" --with "mkdocstrings-python>=1.18,<3"

@@ -1,6 +1,6 @@
 ---
 name: manimvox-voice
-description: "Choosing and preparing the narration voice for a manimvox video: the eight engines (Kokoro default, Piper, macOS say, edge-tts, OpenAI, ElevenLabs, XTTS-v2, F5-TTS), their licences and privacy, listing voices, fixing pronunciation in series.json, voice-cloning consent, a music bed under the narration, burned-in captions, and subtitles. Use when the user asks for a different, online or cloned voice, or a word is mispronounced."
+description: "Choosing and preparing the narration voice for a manimvox video: the ten engines (Kokoro default, Piper, macOS say, edge-tts, OpenAI, ElevenLabs, Sarvam AI, Gnani.ai, XTTS-v2, F5-TTS), their licences and privacy, listing voices, fixing pronunciation in series.json, voice-cloning consent, a music bed under the narration, burned-in captions, and subtitles. Use when the user asks for a different, online or cloned voice, or a word is mispronounced."
 license: MIT
 ---
 
@@ -35,6 +35,8 @@ Default to Kokoro unless the user asks for something else.
 | edge-tts | `edge:en-US-AriaNeural` | free online voices | extra `edge` | online: text goes to Microsoft |
 | OpenAI | `openai:alloy`, `openai:tts-1-hd/onyx` | the user asks for it and has a key | extra `cloud`, `OPENAI_API_KEY` | online, paid; say the voice is AI-generated |
 | ElevenLabs | `elevenlabs:<voice id>` | the user asks for it and has a key | extra `cloud`, `ELEVENLABS_API_KEY` | online; the free tier requires attribution |
+| Sarvam AI | `sarvam:shubh`, `sarvam:anushka@hi-IN` | narration in an Indian language, or Indian English; the user has a key | extra `cloud`, `SARVAM_API_KEY` | online, paid |
+| Gnani.ai | `gnani:Kaveri`, `gnani:Shivani@ta-IN` | the same, or Hinglish (`@hi-en`) | extra `cloud`, `GNANI_API_KEY` | online, paid |
 | XTTS-v2 | `xtts:clone=voice.wav` | a voice the user owns and consents to clone | extra `xtts`, ~1.9 GB plus PyTorch | non-commercial |
 | F5-TTS | `f5:clone=voice.wav` | the same, with a transcript | extra `f5`, ~1.3 GB plus PyTorch | non-commercial |
 
@@ -54,8 +56,8 @@ Add an extra with `uv tool install --force "manimvox[kokoro,<extra>]"` (name eve
 
 - the extra is installed;
 - the model files are present (and offers to download them);
-- the voice exists: Kokoro, Piper, edge and `say` name close matches when it does not; OpenAI checks the name; ElevenLabs checks the voice id with the service;
-- the key variable is set, for OpenAI and ElevenLabs;
+- the voice exists: Kokoro, Piper, edge and `say` name close matches when it does not; OpenAI, Sarvam and Gnani check the name and the language; ElevenLabs checks the voice id with the service;
+- the key variable is set, for OpenAI, ElevenLabs, Sarvam and Gnani;
 - for XTTS-v2 and F5-TTS, that the recording exists, and for F5-TTS that `voice.txt` is beside it.
 
 It ends with `ready: engine:voice`.
@@ -96,7 +98,9 @@ If a word is mispronounced, fix it in the voice, not in the text on screen.
 
 System voices often speak faster than the default (about 190 words a minute against about 170). Whenever you use one, chosen or as a fallback, check the speech rate after the render (words in the `.srt` divided by the sum of its cue durations; the check is in [narration](../manimvox-creative/references/narration.md#length)) and lower `speed` in `series.json` only if it is above 175 words a minute (0.9 first).
 
-`speed` in `series.json` is a number above 0, `1.0` by default. ElevenLabs accepts only 0.7 to 1.2 and stops the render outside it.
+`speed` in `series.json` is a number above 0, `1.0` by default. ElevenLabs accepts only 0.7 to 1.2, Sarvam 0.5 to 2.0 (0.3 to 3.0 on `bulbul:v2`) and Gnani 0.85 to 1.15; each stops the render outside its range.
+
+Sarvam and Gnani voices are `[model/]voice[@language]`: the language goes after `@` (`sarvam:priya@ta-IN`, `gnani:Avinash@hi-IN`). Write the narration in the script of that language. Sarvam defaults to `en-IN`; Gnani detects the language when none is given.
 
 ## Subtitles, captions and music
 
@@ -123,13 +127,13 @@ Each failure is one line. What to do:
 | The line says | Do |
 |---|---|
 | not installed: `uv tool install --force "manimvox[kokoro,X]"` | ask, then install that extra (keep every extra already wanted) |
-| set `OPENAI_API_KEY` / `ELEVENLABS_API_KEY` | the user sets the variable; never write a key into a file in the project |
+| set `OPENAI_API_KEY` / `ELEVENLABS_API_KEY` / `SARVAM_API_KEY` / `GNANI_API_KEY` | the user sets the variable; never write a key into a file in the project |
 | rejected the key (HTTP 401) | the key is wrong or expired; the user fixes it |
 | rerun with `--yes` / model files are missing | ask about the download, then `manimvox voices --prepare ENGINE --yes` |
 | no voice 'X' (did you mean ...) | use the suggestion or `manimvox voices <engine>` |
 | `say` is macOS only | choose another engine |
 | F5-TTS needs the words spoken | write `voice.txt` beside the recording |
-| ElevenLabs speaks at speed 0.7 to 1.2 | change `speed` in `series.json` |
+| ElevenLabs, Sarvam or Gnani speaks at speed X to Y | change `speed` in `series.json` |
 | `audio check` fails after a render | the report lists silent lines: rerun `manimvox check audio <episode>`, then re-render; if one line keeps failing, reword it |
 
 Never install, download, go online or clone a voice to get past a failure without the user's explicit go-ahead. If you cannot ask, the answer is no: stop and report what you need.

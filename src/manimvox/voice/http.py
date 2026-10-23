@@ -9,10 +9,13 @@ from collections.abc import Callable, Mapping, Sequence
 from typing import TypeVar
 from urllib.error import HTTPError
 
+from .. import __version__
 from .base import VoiceError
 
 T = TypeVar("T")
 RETRY_STATUS = frozenset({408, 429, 500, 502, 503, 504})
+# Cloudflare refuses urllib's default "Python-urllib" agent on some services (Gnani.ai: error 1010)
+USER_AGENT = f"manimvox/{__version__}"
 _urlopen = urllib.request.urlopen
 
 
@@ -73,7 +76,7 @@ def request(
     resumable: bool = True,
 ) -> bytes:
     def once() -> bytes:
-        req = urllib.request.Request(url, data=body, headers=dict(headers), method=method)
+        req = urllib.request.Request(url, data=body, headers={"User-Agent": USER_AGENT, **headers}, method=method)
         with _urlopen(req, timeout=timeout) as r:
             return r.read()
 
