@@ -4,6 +4,14 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+
+- Screenshots and screen recordings for demo videos: `screenshot(path)` and `from_video(path)` in `manimvox.scenes`, `clip.zoom(x, y, w, h)` and `clip.zoom_out()` inside the clip's own frame, and overlays placed by pixel: `spotlight`, `callout`, `cursor` with `point` and `click`, and `window` chrome. Capture stays with the agent's own tools (a browser tool, computer use); the animation skill says how to capture, save and cite them.
+
+### Fixed
+
+- A `pron` pattern written `"\bword\b"` in `series.json` is refused with a hint: JSON reads `\b` as a backspace, so the rule silently never matched (write `"\\bword\\b"`). A pattern that is not a valid regex is refused too.
+
 ## [0.3.0] - 2026-10-23
 
 ### Added

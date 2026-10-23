@@ -167,6 +167,13 @@ def _pron(f: Path, raw: object) -> list[tuple[str, str]]:
     for i, entry in enumerate(raw, start=1):
         if not (isinstance(entry, list) and len(entry) == 2 and all(isinstance(x, str) for x in entry)):
             raise ProjectError(f"{f}: pron entry {i} must be a 2-item list of strings, got {entry!r}")
+        if any(ord(c) < 32 for c in entry[0]):  # JSON reads "\b" as a backspace, so the rule would never match
+            raise ProjectError(f"{f}: pron entry {i}'s pattern {entry[0]!r} has a control character; in JSON a "
+                               r'regex word boundary is written "\\b" (two backslashes), as in "\\bNumPy\\b"')
+        try:
+            re.compile(entry[0])
+        except re.error as e:
+            raise ProjectError(f"{f}: pron entry {i}'s pattern {entry[0]!r} is not a valid regex: {e}") from e
         pairs.append((entry[0], entry[1]))
     return pairs
 

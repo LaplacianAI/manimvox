@@ -21,6 +21,7 @@ nav = [
     { "Writing episodes" = "usage.md" },
     { "Blocks, charts and finishing" = "blocks.md" },
     { "3D models and data" = "3d.md" },
+    { "Screenshots and recordings" = "screens.md" },
     { "Voices" = "voices.md" },
   ] },
   { "Gallery" = [

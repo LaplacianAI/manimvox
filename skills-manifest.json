@@ -6,8 +6,8 @@
       "files": 1
     },
     "manimvox-animation": {
-      "sha256": "b3b682dfc688f5244fdb1cfab79775b6708dd44e443c888b95c425330fdfb52f",
-      "files": 4
+      "sha256": "704a680946b83b75e9d10e880406872ec68d9a26a328d788d739544f633a4bcb",
+      "files": 5
     },
     "manimvox-blocks": {
       "sha256": "9c7444bd4c376822fbadd02d498112fe3951e99893e8957fafe1896ab929b5be",
@@ -38,7 +38,7 @@
       "files": 3
     },
     "manimvox-pr": {
-      "sha256": "126bd17c246d2fa15714fa8d9ee60dfff244fc4cfa52cac0adb50fc3ee34fa91",
+      "sha256": "59346d60d88ae2fe0affd67ac48262e5570205f08243275e810ba984f13cb450",
       "files": 1
     },
     "manimvox-voice": {
