@@ -490,6 +490,10 @@ gemini-extension.json, plugin.json   Gemini CLI and agent-plugins manifests
 tests/
 ```
 
+## Roadmap
+
+What comes next, release by release: [ROADMAP.md](https://github.com/LaplacianAI/manimvox/blob/main/ROADMAP.md).
+
 ## License
 
 [MIT](https://github.com/LaplacianAI/manimvox/blob/main/LICENSE). Voice engines and models carry their own licences; see [Voices](#voices).
