@@ -4,6 +4,8 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-23
+
 ### Added
 
 - Documentation site at [laplacianai.github.io/manimvox](https://laplacianai.github.io/manimvox/), with a gallery of finished videos and a gallery of every block (`python -m manimvox.blocks docs`).
@@ -37,5 +39,6 @@ The first release.
 - **For agents:** eleven agent skills, the CLI as typed tools, adapters for eight Python agent frameworks, and plugin manifests for Claude Code, Codex, Cursor and Gemini CLI.
 - CI on Linux, macOS and Windows; releases published to PyPI with trusted publishing.
 
-[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/LaplacianAI/manimvox/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/LaplacianAI/manimvox/releases/tag/v0.1.0
