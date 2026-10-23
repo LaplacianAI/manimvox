@@ -306,3 +306,13 @@ def test_episode_3d_keeps_the_chrome_flat_and_returns_home_for_cards(tmp_path):
     assert tilted != pytest.approx(flat, abs=0.05)  # the layout check sees where the tilted camera shows it
     assert boxes["pinned"][0] == boxes["pinned"][1]  # pinned to the screen: the camera does not move it
     assert "Why tilt?" in [t["text"] for t in layout["frames"][0]["texts"]]
+
+
+def test_colour_helpers_take_the_kits_hex_strings():
+    from manimvox.kit import BG, ERROR, ManimColor, interpolate_color, invert_color
+
+    assert isinstance(ERROR, str)
+    assert interpolate_color(ERROR, BG, 0) == ManimColor(ERROR)
+    assert interpolate_color(ERROR, BG, 1) == ManimColor(BG)
+    assert interpolate_color("#000000", "#ffffff", 0.5).to_hex().lower() in ("#7f7f7f", "#808080")
+    assert invert_color("#000000").to_hex().lower() == "#ffffff"
