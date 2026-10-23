@@ -2,8 +2,8 @@
 
 Narrated, animated explainer videos from Python: [Manim](https://www.manim.community/) for the picture, a pluggable text-to-speech engine for the voice, and checks that fail loudly before a broken video ships.
 
-[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/LaplacianAI/manimvox/blob/main/LICENSE)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://github.com/LaplacianAI/manimvox/blob/main/pyproject.toml)
 ![Platforms](https://img.shields.io/badge/platform-macOS%20%7C%20Linux%20%7C%20Windows-lightgrey.svg)
 
 > **Status:** early development (0.1). The engine, CLI and agent skills work today; a PyPI release is on the [roadmap](#roadmap).
@@ -278,7 +278,7 @@ Notes:
 - A render takes minutes and a video takes many tool calls, so raise the framework's turn or request limit; the examples show how.
 - The plain functions, `json_tools()` and `file_tools()` with no folder, are unbound. Pass the folder, `json_tools(folder)` and `file_tools(folder)`, whenever a model is calling them.
 
-A runnable script for each framework is in [`examples/agents/`](examples/agents/).
+A runnable script for each framework is in [`examples/agents/`](https://github.com/LaplacianAI/manimvox/tree/main/examples/agents).
 
 ## Usage
 
@@ -489,4 +489,4 @@ tests/
 
 ## License
 
-[MIT](LICENSE). Voice engines and models carry their own licences; see [Voices](#voices).
+[MIT](https://github.com/LaplacianAI/manimvox/blob/main/LICENSE). Voice engines and models carry their own licences; see [Voices](#voices).

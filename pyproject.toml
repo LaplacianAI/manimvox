@@ -9,6 +9,21 @@ description = "Narrated, animated explainer videos with Manim and pluggable voic
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.11"
+keywords = ["manim", "explainer", "video", "animation", "text-to-speech", "agent-skills", "education"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Education",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Multimedia :: Video",
+  "Topic :: Multimedia :: Graphics :: Presentation",
+]
 dependencies = [
   "manim>=0.22,<0.23",
   "numpy>=1.26",
@@ -38,6 +53,11 @@ llamaindex = ["llama-index-core>=0.14.25,<0.15"]
 haystack = ["haystack-ai>=3.4,<3.5"]
 google-adk = ["google-adk>=2.12,<2.13"]
 dev = ["pytest>=8", "ruff>=0.6", "matplotlib>=3.8,<4", "plotly>=6.1,<8"]
+
+[project.urls]
+Homepage = "https://github.com/LaplacianAI/manimvox"
+Source = "https://github.com/LaplacianAI/manimvox"
+Issues = "https://github.com/LaplacianAI/manimvox/issues"
 
 [project.scripts]
 manimvox = "manimvox.cli:main"
