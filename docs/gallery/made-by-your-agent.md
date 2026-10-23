@@ -26,6 +26,8 @@ A short introduction to manimvox, made with manimvox: what it is, why it has the
 - Cloudflare, Kenton Varda and Sunil Pai, [*Code Mode: the better way to use MCP*](https://blog.cloudflare.com/code-mode/), 2025.
 - Wang et al., [*Executable Code Actions Elicit Better LLM Agents*](https://arxiv.org/abs/2402.01030) (CodeAct), ICML 2024.
 
+--8<-- "docs/.generated/leaderboard-made-by-your-agent.md"
+
 ## Source project
 
 The episode, its script and its facts are in [`examples/gallery/made-by-your-agent`](https://github.com/LaplacianAI/manimvox/tree/main/examples/gallery/made-by-your-agent).

@@ -10,22 +10,11 @@ Every run's records are in [`benchmarks/runs/`](https://github.com/LaplacianAI/m
 |---|---|---|
 | [UPI payments: Sarvam vs Gnani](upi-voices.md) | 2026-10-23 | Two Indian-English voices, on one episode made by Claude Code with Sonnet 5.5 |
 
-## Harnesses and models
+## Leaderboard
 
-How each agent did when it made a video from a prompt.
+Every run across all examples. Each gallery example with runs also shows its own leaderboard on its page. Compare rows from different examples with care: the prompts differ.
 
-| Harness | Model | Prompt | Time | Turns | Cost | Checks | Run |
-|---|---|---|---|---|---|---|---|
-| Claude Code 2.1.294 | Sonnet 5.5 | How UPI payments work | 3 min 3 s | 21 | $0.40 | all passed | [UPI](upi-voices.md) |
-
-## Voices
-
-Measured on the same 11 lines (178 words, 920 characters). **Bold** marks the better value.
-
-| Voice | Mean time per line | Word errors (ASR) | Words a minute | Loudness (RMS) | Price for these lines | Listener | Run |
-|---|---|---|---|---|---|---|---|
-| `sarvam:shubh` (Bulbul v3) | **1.36 s** | 4 (2.2%) | 215 | −13.7 dBFS | ₹2.76 | not clear, background noise; good pace for a short video | [UPI](upi-voices.md) |
-| `gnani:timbre-v3.0/Avinash@en-IN` | 3.97 s | **1 (0.6%)** | **171** | −21.5 dBFS | ₹2.78 | **clear**, but slow | [UPI](upi-voices.md) |
+--8<-- "docs/.generated/leaderboard-all.md"
 
 ## Methodology
 

@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v7
-      - run: bash .github/scripts/report.sh uv run --no-project --with "ruff>=0.6" ruff check src tests examples benchmarks/harness benchmarks/voice_score.py
+      - run: bash .github/scripts/report.sh uv run --no-project --with "ruff>=0.6" ruff check src tests examples benchmarks/harness benchmarks/voice_score.py benchmarks/leaderboard.py
 
   test:
     name: test (${{ matrix.os }}, py${{ matrix.python }})

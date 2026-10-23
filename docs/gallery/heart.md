@@ -28,6 +28,8 @@ These are the prompts that shaped the video, with spelling tidied:
 
 While making it, the agent also extended manimvox: `from_pyvista`, `screen_xy`, `Clip.at` and `Clip.loop` were added for this video, and are now part of the library.
 
+--8<-- "docs/.generated/leaderboard-heart.md"
+
 ## Source
 
 The whole project is in [`examples/gallery/heart`](https://github.com/LaplacianAI/manimvox/tree/main/examples/gallery/heart): the episode, its script, the facts, and the script that prepares the CT data. To render it yourself:

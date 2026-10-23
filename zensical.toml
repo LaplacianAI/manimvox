@@ -27,6 +27,7 @@ nav = [
     { "Gallery" = "gallery/index.md" },
     { "Made by your agent" = "gallery/made-by-your-agent.md" },
     { "Inside the heart" = "gallery/heart.md" },
+    { "How UPI payments work" = "gallery/upi.md" },
   ] },
   { "Benchmarks" = [
     { "Benchmarks" = "benchmarks/index.md" },

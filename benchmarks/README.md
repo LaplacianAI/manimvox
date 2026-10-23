@@ -4,7 +4,8 @@ Records and scripts behind the [benchmarks page](https://laplacianai.github.io/m
 
 ```
 harness/sitecustomize.py   logs every narration line a render synthesises (text, time, HTTP attempts, audio)
-voice_score.py             scores one render's lines: latency, cost inputs, intelligibility, pace, loudness, pitch
+voice_score.py             scores one render's lines: latency, cost inputs, intelligibility, pace, loudness, noise, pitch
+leaderboard.py             builds the Leaderboard section of each gallery example, and the Benchmarks page's tables
 runs/<date>-<name>/        one folder per run: the agent's project, its session summary, logs and scores
 ```
 
@@ -32,4 +33,29 @@ runs/<date>-<name>/        one folder per run: the agent's project, its session 
         python benchmarks/voice_score.py sarvam.jsonl project-sarvam/out/ep01.mp4 sarvam.score.json
     ```
 
-4. **Add the run.** Make a folder in `runs/` with the project, the session summary, the logs and the scores. Add its results to `docs/benchmarks/`, and list every remaining word error by hand.
+4. **Add the run.** Make a folder in `runs/` with the project, the session summary, the logs and the scores. Add a `run.json` that names the gallery example it belongs to (the file name of its page in `docs/gallery/`, without `.md`):
+
+    ```json
+    {
+      "title": "UPI payments: Sarvam vs Gnani",
+      "date": "2026-10-23",
+      "example": "upi",
+      "report": "benchmarks/upi-voices.md",
+      "agent": "agent-run.json",
+      "voices": [
+        {"voice": "sarvam:shubh", "score": "sarvam.score.json", "cost": "₹2.76", "listener": "notes from listening"}
+      ]
+    }
+    ```
+
+    `report` (a page under `docs/`), `agent` and `voices` are each optional. Write up anything worth a page in `docs/benchmarks/`, and list every remaining word error by hand.
+
+5. **Build the leaderboards.** `python benchmarks/leaderboard.py` writes them to `docs/.generated/`. The docs workflow runs it before every build. A gallery page shows its leaderboard if it includes its own file, as every gallery page does:
+
+    ```markdown
+    --8<-- "docs/.generated/leaderboard-<page>.md"
+    ```
+
+    The section stays empty until a run names that example. To change a score or a listener's note, edit the run's files and rebuild.
+
+Runs are made by hand: each one costs model and voice API fees.

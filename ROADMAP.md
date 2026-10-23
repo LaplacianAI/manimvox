@@ -24,6 +24,7 @@ People should see what manimvox makes before they install it.
 - [x] **A short demo** (GIF or video) at the top of the README.
 - [x] **Benchmarks** of harnesses, models and voices, with the method and every record published: first, Sarvam and Gnani on an episode made by Claude Code with Sonnet 5.5.
 - [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration.
+- [x] **A leaderboard on each gallery example** with benchmark runs: Voice, Harness and Model tables generated from the runs' records, so a new run updates every page it belongs to. Runs are made by hand for now: each costs model and voice API fees.
 
 ## 0.2: professor-quality visuals
 
@@ -47,3 +48,4 @@ Real objects and real data, used with their licences respected.
 
 - Faster renders: scenes in parallel, smarter caching.
 - Narration and subtitles in more languages.
+- Automated evals: every gallery submission rendered and scored by the benchmark, with its leaderboard published alongside. Until then, runs are made by hand, because each run costs model and voice API fees.
