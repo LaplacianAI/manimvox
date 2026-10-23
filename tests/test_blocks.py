@@ -380,3 +380,11 @@ def test_docs_gallery_lists_every_block_with_its_preview(tmp_path):
     for b in BLOCKS:
         assert f"### `{b.name}`" in page and f"manimvox add {b.name}" in page and b.import_line in page
         assert (tmp_path / "assets" / "blocks" / f"{b.name}.png").read_bytes() == (b.path / "preview.png").read_bytes()
+
+
+def test_docs_command_runs_without_pillow(tmp_path, monkeypatch):
+    from manimvox.blocks import _main
+
+    monkeypatch.setitem(sys.modules, "PIL", None)  # the docs workflow has only the standard library
+    assert _main(["docs", "--out", str(tmp_path), "--root", str(REG)]) == 0
+    assert (tmp_path / "blocks-gallery.md").is_file()

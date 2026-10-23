@@ -178,8 +178,6 @@ def write_docs(docs: Path, root: Path | None = None) -> list[Block]:
 
 
 def _main(argv: list[str]) -> int:
-    from PIL import Image
-
     ap = argparse.ArgumentParser(prog="python -m manimvox.blocks")
     sub = ap.add_subparsers(dest="cmd", required=True)
     pv = sub.add_parser("preview", help="render each block's demo and write or compare its preview.png")
@@ -196,6 +194,7 @@ def _main(argv: list[str]) -> int:
         n = len(write_docs(a.out, a.root))
         print(f"wrote {a.out / 'blocks-gallery.md'} ({n} blocks)")
         return 0
+    from PIL import Image  # only previews need it: `docs` runs on bare Python in the docs workflow
     blocks = [get_block(n, a.root) for n in a.names] if a.names else all_blocks(a.root)
     bad = 0
     with tempfile.TemporaryDirectory() as tmp:
