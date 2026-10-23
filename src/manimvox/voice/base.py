@@ -15,9 +15,9 @@ class VoiceError(Exception):
 
 
 def install_hint(extra: str) -> str:
-    """How to add an extra: manimvox is not on PyPI, and --force keeps the kokoro default voice."""
+    """How to add an extra: --force reinstalls with it, and naming kokoro keeps the default voice."""
     wanted = "kokoro" if extra == "kokoro" else f"kokoro,{extra}"
-    return f'uv tool install --force "manimvox[{wanted}] @ git+https://github.com/LaplacianAI/manimvox"'
+    return f'uv tool install --force "manimvox[{wanted}]"'
 
 
 class EngineNotInstalled(VoiceError):

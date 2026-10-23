@@ -1,6 +1,6 @@
 """manimvox on Agno: the skills through Agno's own loader, the tools as a toolkit.
 
-    pip install "manimvox[kokoro,agno] @ git+https://github.com/LaplacianAI/manimvox" anthropic
+    pip install "manimvox[kokoro,agno]" anthropic
     export ANTHROPIC_API_KEY=...
     python agno_agent.py ./hash-maps "Explain how a hash map works, for beginners"
 """

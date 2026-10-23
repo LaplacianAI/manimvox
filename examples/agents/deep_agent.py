@@ -1,7 +1,7 @@
 """manimvox on LangChain Deep Agents: the skills through the deep agent's skills loader, the tools as LangChain tools.
 The agent's file tools see the project folder as /; the skills are read-only under /skills/.
 
-    pip install "manimvox[kokoro,langchain] @ git+https://github.com/LaplacianAI/manimvox"
+    pip install "manimvox[kokoro,langchain]"
     export ANTHROPIC_API_KEY=...
     python deep_agent.py ./hash-maps "Explain how a hash map works, for beginners"
 """

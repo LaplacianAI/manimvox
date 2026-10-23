@@ -2,7 +2,7 @@
   "version": "0.1.0",
   "skills": {
     "manimvox": {
-      "sha256": "ba17319690e9403d26ce589cf9464086cd24f6ee685917d9779d28611b0f7e4c",
+      "sha256": "d8e3cc4b0eeedd60517ba9e8ad3b177f4944d26d8080cb058d13210c59e150c2",
       "files": 1
     },
     "manimvox-animation": {
@@ -42,7 +42,7 @@
       "files": 1
     },
     "manimvox-voice": {
-      "sha256": "7b6e0b1e40b2df7594ca4412994c2cbf9ad7b780c06ca8a61dfaf8fc1978f596",
+      "sha256": "dbcc614d09f932dad2e2fdfcc25a9dd4cdbd5e83b11e003a04e596ab3e43ec91",
       "files": 1
     }
   }

@@ -26,10 +26,10 @@ Open the workflow skill and follow it to the end. If the input is unclear, ask a
 Run `manimvox doctor`. A `FAIL` line names its fix; see [manimvox-cli](../manimvox-cli/SKILL.md). If `manimvox` is not installed, tell the user the install command and ask before running it:
 
 ```text
-uv tool install "manimvox[kokoro] @ git+https://github.com/LaplacianAI/manimvox"
+uv tool install "manimvox[kokoro]"
 ```
 
-manimvox is not on PyPI yet, so that command installs it from its repository. If you cannot ask, the answer is no: stop and report that manimvox must be installed.
+If you cannot ask, the answer is no: stop and report that manimvox must be installed.
 
 If you have no shell (an agent built on a Python framework), call the manimvox tools instead of the commands: see [manimvox-cli](../manimvox-cli/SKILL.md#without-a-shell). The checks and the steps are the same.
 

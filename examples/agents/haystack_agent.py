@@ -1,6 +1,6 @@
 """manimvox on Haystack: the skills through Haystack's own SkillToolset, the tools as Haystack tools.
 
-    pip install "manimvox[kokoro,haystack] @ git+https://github.com/LaplacianAI/manimvox"
+    pip install "manimvox[kokoro,haystack]"
     export OPENAI_API_KEY=... HAYSTACK_TELEMETRY_ENABLED=False
     python haystack_agent.py ./hash-maps "Explain how a hash map works, for beginners"
 """

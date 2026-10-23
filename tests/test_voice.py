@@ -51,7 +51,7 @@ def test_unknown_engine_lists_known():
 
 def test_engine_not_installed_message_names_extra():
     e = EngineNotInstalled("piper", "piper")
-    assert 'uv tool install --force "manimvox[kokoro,piper] @ git+https://github.com/LaplacianAI/manimvox"' in str(e)
+    assert 'uv tool install --force "manimvox[kokoro,piper]"' in str(e)
 
 
 def test_fake_tone_is_cached_and_timed(tmp_path):
