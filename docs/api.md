@@ -32,6 +32,10 @@ What an episode imports, and the tools an agent framework calls. Everything here
     options:
       members: [from_pyvista, screen_xy, from_model]
 
+## Screenshots and screen recordings
+
+::: manimvox.scenes.screen
+
 ## Tools for agents
 
 ::: manimvox.tools
