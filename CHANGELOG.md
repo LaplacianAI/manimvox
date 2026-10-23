@@ -4,6 +4,8 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-23
+
 ### Added
 
 - Even loudness across voices: every narration line is levelled to `loudness` in `series.json` (−16 LUFS by default, ITU-R BS.1770), with true peaks kept under −1.5 dBTP. The UPI benchmark episode, rendered with Sarvam, Gnani, ElevenLabs and Kokoro, went from a 7.9 LU spread to 0.1. The line as the voice returned it stays cached, so changing the target never pays for synthesis again. `null` keeps each voice's own level.
@@ -50,6 +52,7 @@ The first release.
 - **For agents:** eleven agent skills, the CLI as typed tools, adapters for eight Python agent frameworks, and plugin manifests for Claude Code, Codex, Cursor and Gemini CLI.
 - CI on Linux, macOS and Windows; releases published to PyPI with trusted publishing.
 
-[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/LaplacianAI/manimvox/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/LaplacianAI/manimvox/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/LaplacianAI/manimvox/releases/tag/v0.1.0

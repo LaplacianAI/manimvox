@@ -9,7 +9,7 @@
       "name": "manimvox",
       "source": ".",
       "description": "Narrated, animated explainer videos with Manim and pluggable voices, driven by agent skills.",
-      "version": "0.2.0"
+      "version": "0.3.0"
     }
   ]
 }
