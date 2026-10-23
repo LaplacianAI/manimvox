@@ -68,7 +68,7 @@ uv tool install --force "manimvox[kokoro,piper] @ git+https://github.com/Laplaci
 | `matplotlib` | Matplotlib charts as scenes (`manimvox.scenes`) |
 | `plotly` | Plotly charts as scenes (Kaleido needs Chrome on the machine) |
 | `trimesh` | 3D model files for the `mesh-model` block |
-| `pyvista` | 3D models rendered with lighting as clips (`from_model`; needs OpenGL) |
+| `pyvista` | 3D models and scans rendered with lighting as clips (`from_model`, `from_pyvista`; needs OpenGL, and on a Linux server with no display `sudo apt install libegl1 libosmesa6`) |
 | `agno`, `langchain`, `pydantic-ai`, `openai-agents`, `crewai`, `llamaindex`, `haystack`, `google-adk` | Tools for that agent framework (see [Use it from a Python agent framework](#use-it-from-a-python-agent-framework)) |
 
 ## Quickstart
