@@ -43,13 +43,13 @@ runs/<date>-<name>/        one folder per run: the agent's project, its session 
       "report": "benchmarks/upi-voices.md",
       "agent": "agent-run.json",
       "voices": [
-        {"voice": "sarvam:shubh", "score": "sarvam.score.json", "cost": "₹2.76",
+        {"voice": "sarvam:shubh", "score": "sarvam.score.json", "cost": "$0.029",
          "listener": "notes from listening", "listener_rank": 3}
       ]
     }
     ```
 
-    `report` (a page under `docs/`), `agent` and `voices` are each optional. `listener_rank` is the listener's order of the voices in this run (1 is best); the leaderboard ranks on it before any measurement, because measurements can't tell a natural voice from a synthetic one. Write up anything worth a page in `docs/benchmarks/`, and list every remaining word error by hand.
+    `report` (a page under `docs/`), `agent` and `voices` are each optional. Give `cost` in US dollars, converting another currency at the mid-market rate on the day of the run. `listener_rank` is the listener's order of the voices in this run (1 is best); the leaderboard ranks on it before any measurement, because measurements can't tell a natural voice from a synthetic one. Write up anything worth a page in `docs/benchmarks/`, and list every remaining word error by hand.
 
 5. **Build the leaderboards.** `python benchmarks/leaderboard.py` writes them to `docs/.generated/`. The docs workflow runs it before every build. A gallery page shows its leaderboard if it includes its own file, as every gallery page does:
 
