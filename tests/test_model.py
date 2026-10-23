@@ -154,3 +154,16 @@ def test_screen_xy_finds_a_point_in_the_frame(pv):
     from_pyvista(draw, seconds=0.5, fps=2, size=(64, 36), setup=lambda pl: pl.add_mesh(pv.Sphere()))
     assert where["centre"] == pytest.approx((32, 18), abs=0.6)
     assert where["up"][1] < where["centre"][1]  # up in the world is up the picture: a smaller y
+
+
+def test_no_opengl_is_an_error_with_the_fix_not_a_crash(monkeypatch):
+    from manimvox.scenes import model
+
+    class NoGL:
+        def SupportsOpenGL(self):
+            return 0
+
+    for platform, fix in (("win32", "mesa"), ("linux", "libosmesa6"), ("darwin", "graphics driver")):
+        monkeypatch.setattr(model.sys, "platform", platform)
+        with pytest.raises(SceneError, match=f"cannot render 3D.*{fix}"):
+            model._check_opengl(NoGL())
