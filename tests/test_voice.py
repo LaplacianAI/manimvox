@@ -122,7 +122,7 @@ def test_clone_reference_errors(tmp_path, bad, msg):
         clone_reference(bad, tmp_path)
 
 
-ALL = ["edge", "elevenlabs", "f5", "fake", "kokoro", "openai", "piper", "say", "xtts"]
+ALL = ["edge", "elevenlabs", "f5", "fake", "gnani", "kokoro", "openai", "piper", "sarvam", "say", "xtts"]
 
 
 def test_every_spec_engine_is_registered():

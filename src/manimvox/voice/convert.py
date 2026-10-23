@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import io
 from pathlib import Path
 
 import numpy as np
@@ -16,6 +17,18 @@ def pcm16_to_wav(pcm: bytes, rate: int, out: Path) -> None:
         raise VoiceError("the voice service returned no audio")
     data = np.frombuffer(pcm[: n * 2], dtype="<i2")
     sf.write(str(out), data, rate, format="WAV", subtype="PCM_16")
+
+
+def wav_bytes_to_wav(wav: bytes, out: Path) -> None:
+    """A WAV file a service returned (any width, any channels) -> mono 16-bit WAV at its own sample rate."""
+    try:
+        data, rate = sf.read(io.BytesIO(wav), dtype="int16", always_2d=True)
+    except (sf.LibsndfileError, RuntimeError, ValueError) as e:
+        raise VoiceError(f"the voice service returned audio that is not a readable WAV: {e}") from None
+    if not len(data):
+        raise VoiceError("the voice service returned no audio")
+    mono = data[:, 0] if data.shape[1] == 1 else data.mean(axis=1).astype("<i2")
+    sf.write(str(out), mono, rate, format="WAV", subtype="PCM_16")
 
 
 def to_wav(src: Path, out: Path) -> None:

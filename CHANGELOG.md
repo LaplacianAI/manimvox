@@ -10,6 +10,7 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 - Gallery: *Made by your agent*, an introduction to manimvox, and *Inside the heart*, from a CT-derived heart; both made by Claude Code with manimvox, with their source projects in `examples/gallery/`.
 - `ROADMAP.md`, `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, `SECURITY.md`, `SUPPORT.md`, and issue and pull request templates.
 - A `docs` extra for building the documentation site.
+- Voices for Indian languages: Sarvam AI (`sarvam:shubh`, `SARVAM_API_KEY`) and Gnani.ai (`gnani:Kaveri`, `GNANI_API_KEY`), in the `cloud` extra. A voice can name its language, as in `sarvam:anushka@hi-IN`.
 
 ## [0.1.0] - 2026-10-23
 

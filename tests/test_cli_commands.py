@@ -207,7 +207,7 @@ def test_voices_table_runs_offline_for_every_engine(project, capsys, monkeypatch
     monkeypatch.setattr(http, "_urlopen", lambda *a, **k: pytest.fail("network used"))
     assert main(["voices"]) == 0
     out = capsys.readouterr().out
-    for name in ["edge", "elevenlabs", "f5", "kokoro", "openai", "piper", "say", "xtts"]:
+    for name in ["edge", "elevenlabs", "f5", "gnani", "kokoro", "openai", "piper", "sarvam", "say", "xtts"]:
         assert name in out
     assert out.count("non-commercial use only") >= 3  # say, xtts, f5
 

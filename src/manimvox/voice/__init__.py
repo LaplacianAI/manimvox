@@ -31,6 +31,10 @@ from .engines.f5 import F5Engine
 
 register("f5", F5Engine)
 
+from .engines.gnani import GnaniEngine
+
+register("gnani", GnaniEngine)
+
 from .engines.kokoro import KokoroEngine
 
 register("kokoro", KokoroEngine)
@@ -42,6 +46,10 @@ register("openai", OpenAIEngine)
 from .engines.piper import PiperEngine
 
 register("piper", PiperEngine)
+
+from .engines.sarvam import SarvamEngine
+
+register("sarvam", SarvamEngine)
 
 from .engines.say import SayEngine
 
@@ -59,9 +67,11 @@ __all__ = [
     "EngineStatus",
     "F5Engine",
     "FakeEngine",
+    "GnaniEngine",
     "KokoroEngine",
     "OpenAIEngine",
     "PiperEngine",
+    "SarvamEngine",
     "SayEngine",
     "UnknownEngine",
     "VoiceEngine",
