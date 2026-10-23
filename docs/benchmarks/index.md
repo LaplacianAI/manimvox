@@ -22,10 +22,10 @@ How each agent did when it made a video from a prompt.
 
 Measured on the same 11 lines (178 words, 920 characters). **Bold** marks the better value.
 
-| Voice | Mean time per line | Word errors (ASR) | Words a minute | Loudness (RMS) | Price for these lines | Run |
-|---|---|---|---|---|---|---|
-| `sarvam:shubh` (Bulbul v3) | **1.36 s** | 4 (2.2%) | 218 | −13.7 dBFS | **₹2.76** | [UPI](upi-voices.md) |
-| `gnani:timbre-v3.0/Avinash@en-IN` | 3.97 s | **1 (0.6%)** | **173** | −21.5 dBFS | not published | [UPI](upi-voices.md) |
+| Voice | Mean time per line | Word errors (ASR) | Words a minute | Loudness (RMS) | Price for these lines | Listener | Run |
+|---|---|---|---|---|---|---|---|
+| `sarvam:shubh` (Bulbul v3) | **1.36 s** | 4 (2.2%) | 215 | −13.7 dBFS | ₹2.76 | not clear, background noise; good pace for a short video | [UPI](upi-voices.md) |
+| `gnani:timbre-v3.0/Avinash@en-IN` | 3.97 s | **1 (0.6%)** | **171** | −21.5 dBFS | ₹2.78 | **clear**, but slow | [UPI](upi-voices.md) |
 
 ## Methodology
 
@@ -49,13 +49,14 @@ Every score comes from the returned audio or the log, computed by [`benchmarks/v
 |---|---|
 | **Reliability** | Lines that failed, HTTP attempts (one per line means no retries), and manimvox's own audio check after the render. |
 | **Latency** | Wall time of each `synth` call, including network and retries: mean, median and maximum. The real-time factor is that time divided by the length of the audio. |
-| **Cost** | Characters sent, multiplied by the provider's published per-character price on the day of the run. |
+| **Cost** | Characters sent, multiplied by the provider's published per-character price on the day of the run. If there is no published price, the charge shown in the account's usage dashboard. |
 | **Intelligibility** | Each line is transcribed by a local speech recogniser (faster-whisper `small.en`, int8, beam 5) and compared with the text sent, as a word error rate. Both sides are normalised first: lower case, no punctuation or apostrophes, numbers as words, and acronyms joined whether written or spelt out (`NPCI`, `N P C I` and `N-P-C-I` all match). Every remaining error is listed on the run's page and checked by hand. |
 | **Pace** | Words divided by speaking time (each line's audio minus its leading and trailing silence). manimvox's skills aim for 150 to 175 words a minute. |
 | **Pauses** | Silences of 0.35 s or more inside a line, where silence is a 20 ms frame below −40 dBFS. |
 | **Loudness** | RMS level over all lines, its spread between lines, the peak level, and clipped samples. manimvox doesn't normalise loudness, so these levels reach the viewer unchanged. |
+| **Noise and distortion** | The crest factor (peak over RMS; a low value means heavy compression), the share of energy above 7 kHz (hiss), and the spectral flatness of each line's quietest frames (closer to 1 is more noise-like). The final video's audio is checked for clipping too, to tell the service's audio from manimvox's mix. |
 | **Intonation** | Median pitch and its spread in semitones over voiced frames (librosa pYIN). This is a rough measure of how much the pitch varies, not of whether it sounds right. |
-| **Listening** | Naturalness, accent and pronunciation as heard, scored 1 to 5 by a person who watched both videos. Measurements can't replace this. |
+| **Listening** | Notes by a person who watched both videos: clarity, noise, pace, accent and pronunciation. Measurements can't replace this. Here, the listener heard noise that the word error rate missed. |
 | **Picture** | Frames taken at the same narration line in each video are compared, to check that the animation still follows the voice. |
 
 ### Limitations

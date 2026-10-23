@@ -22,6 +22,7 @@ FRAME = 0.02  # seconds per analysis frame
 SILENT_DB = -40.0  # a frame quieter than this (dBFS RMS) is silence
 PAUSE = 0.35  # a silence this long inside a line counts as a pause
 CLIP = 0.999  # a sample at or above this (full scale 1.0) is clipped
+HISS_HZ = 7000  # energy above this is mostly hiss and sibilance, little of the voice itself
 ASR_MODEL = "small.en"
 
 
@@ -106,11 +107,29 @@ def pitch(x: np.ndarray, rate: int) -> tuple[float, float]:
     return med, float(np.std(12 * np.log2(f0 / med)))
 
 
-def video_seconds(path: Path) -> float:
+def noise(x: np.ndarray, rate: int, db: np.ndarray) -> tuple[float, float]:
+    """(share of energy above 7 kHz in dB, spectral flatness of the quietest 15% of frames). Hiss raises the
+    first; noise between and under words pushes the second toward 1."""
+    from scipy.signal import welch
+
+    f, p = welch(x, rate, nperseg=2048)
+    hiss = 10 * np.log10(p[f > HISS_HZ].sum() / p.sum())
+    n = int(rate * FRAME)
+    quiet = x[: len(db) * n].reshape(len(db), n)[db <= np.percentile(db, 15)].ravel()
+    _, q = welch(quiet, rate, nperseg=512)
+    return float(hiss), float(np.exp(np.mean(np.log(q + 1e-20))) / np.mean(q))
+
+
+def video_audio(path: Path) -> tuple[float, float, int]:
+    """(length in seconds, audio peak in dBFS, clipped samples) of the finished video: the mix, after manimvox."""
     import av
 
     with av.open(str(path)) as c:
-        return float(c.duration / 1_000_000)
+        chunks = [fr.to_ndarray().astype("float32").reshape(-1) for fr in c.decode(c.streams.audio[0])]
+        y = np.concatenate(chunks)
+        if not np.issubdtype(chunks[0].dtype, np.floating) or np.abs(y).max() > 1.5:
+            y = y / 32768
+        return float(c.duration / 1_000_000), float(20 * np.log10(np.abs(y).max())), int(np.sum(np.abs(y) >= CLIP))
 
 
 def main(log_path: str, video: str, out: str) -> None:
@@ -133,19 +152,24 @@ def main(log_path: str, video: str, out: str) -> None:
         ref, hyp = words(r["text"]), words(heard)
         dist, diff = edits(ref, hyp)
         dur = len(x) / rate
+        hiss, flat = noise(x, rate, db)
         lines.append({"i": r["i"], "text": r["text"], "heard": heard, "seconds": r["seconds"],
                       "http_attempts": r["http_attempts"], "audio_seconds": round(dur, 2),
                       "rtf": round(r["seconds"] / dur, 3), "words": len(ref), "word_errors": dist, "diff": diff,
                       "lead": round(lead, 2), "trail": round(trail, 2), "pauses": pauses,
                       "rms_db": round(float(20 * np.log10(np.sqrt(np.mean(x ** 2)) + 1e-9)), 1),
                       "peak_db": round(float(20 * np.log10(np.max(np.abs(x)) + 1e-9)), 1),
-                      "clipped": int(np.sum(np.abs(x) >= CLIP)), "ok": True})
+                      "clipped": int(np.sum(np.abs(x) >= CLIP)), "hiss_db": round(hiss, 1),
+                      "quiet_flatness": round(flat, 3), "ok": True})
         audio.append(x)
     good = [ln for ln in lines if ln["ok"]]
     allx = np.concatenate(audio)
     lat = [ln["seconds"] for ln in good]
     speech = sum(ln["audio_seconds"] - ln["lead"] - ln["trail"] for ln in good)
     f0, spread = pitch(allx, rate)
+    rms_all = float(20 * np.log10(np.sqrt(np.mean(allx ** 2))))
+    peak_all = float(20 * np.log10(np.max(np.abs(allx))))
+    video_len, video_peak, video_clipped = video_audio(Path(video))
     summary = {
         "voice": f"{rows[0]['engine']}:{rows[0]['voice']}",
         "lines": len(rows), "failed_lines": len(rows) - len(good),
@@ -154,14 +178,19 @@ def main(log_path: str, video: str, out: str) -> None:
         "latency_max": round(max(lat), 2), "latency_total": round(sum(lat), 1),
         "rtf_mean": round(statistics.mean(ln["rtf"] for ln in good), 3),
         "audio_seconds": round(sum(ln["audio_seconds"] for ln in good), 1),
-        "video_seconds": round(video_seconds(Path(video)), 1),
+        "video_seconds": round(video_len, 1),
         "wpm": round(sum(ln["words"] for ln in good) / (speech / 60), 0),
         "wer": round(sum(ln["word_errors"] for ln in good) / sum(ln["words"] for ln in good), 3),
         "lines_with_errors": sum(1 for ln in good if ln["word_errors"]),
         "lead_mean": round(statistics.mean(ln["lead"] for ln in good), 2),
         "trail_mean": round(statistics.mean(ln["trail"] for ln in good), 2),
         "pauses_per_line": round(statistics.mean(len(ln["pauses"]) for ln in good), 2),
-        "rms_db": round(float(20 * np.log10(np.sqrt(np.mean(allx ** 2)))), 1),
+        "rms_db": round(rms_all, 1),
+        "crest_db": round(peak_all - rms_all, 1),
+        "near_full_scale_pct": round(float(np.mean(np.abs(allx) > 10 ** (-1 / 20)) * 100), 3),
+        "hiss_db": round(statistics.median(ln["hiss_db"] for ln in good), 1),
+        "quiet_flatness": round(statistics.median(ln["quiet_flatness"] for ln in good), 2),
+        "video_peak_db": round(video_peak, 2), "video_clipped_samples": video_clipped,
         "rms_db_spread": round(statistics.pstdev(ln["rms_db"] for ln in good), 2),
         "peak_db": max(ln["peak_db"] for ln in good), "clipped_samples": sum(ln["clipped"] for ln in good),
         "sample_rate": rate, "f0_median": round(f0, 0), "f0_spread_semitones": round(spread, 2),

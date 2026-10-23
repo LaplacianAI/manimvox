@@ -53,22 +53,25 @@ The agent was given this prompt in an empty folder:
 | Mean time per line | **1.36 s** | 3.97 s | Sarvam |
 | Slowest line | **2.27 s** | 11.33 s | Sarvam |
 | Real-time factor (mean) | **0.30** | 0.66 | Sarvam |
-| Price for these 920 characters | **₹2.76** (₹30 per 10,000) | not published | Sarvam |
+| Cost for these 920 characters | ₹2.76 (published price: ₹30 per 10,000) | ₹2.78 (account dashboard; no published price) | about the same |
 | Word errors (ASR) | 4 of 178 (2.2%) | **1 of 178 (0.6%)** | Gnani |
-| Pace | 218 words a minute | **173 words a minute** | Gnani |
+| Pace | 215 words a minute | **171 words a minute** | Gnani |
 | Video length | 1:14 | 1:27 | (follows pace) |
 | Pauses inside a line | 0.45 per line | 0.91 per line | (style) |
 | Loudness | −13.7 dBFS, peak −0.2 dBFS | −21.5 dBFS, peak −1.3 dBFS | (see below) |
 | Loudness spread between lines | **0.56 dB** | 1.12 dB | Sarvam |
 | Clipped samples | 0 | 0 | tie |
+| Crest factor (peak over RMS) | 13.5 dB, heavily compressed | **20.2 dB** | Gnani |
+| Hiss: energy above 7 kHz | −23.5 dB | **−27.3 dB** | Gnani |
+| Noise in quiet parts (spectral flatness) | 0.13 | **0.07** | Gnani |
 | Pitch variation | 3.55 semitones | **4.30 semitones** | Gnani |
 | Picture follows the voice | yes | yes | tie |
-| Listening score (1 to 5) | *to be added* | *to be added* | |
+| **Listening** (one listener) | pace good for a short video; **not clear, with background noise** | **clear**, but slow | Gnani for clarity |
 
 ### What the numbers show
 
-- **Sarvam is faster and cheaper to run.** Every line came back in about 1.4 seconds, a third of the time it takes to say. Gnani's first five lines took 2.7 to 11.3 seconds, and the rest about 1.3 seconds. One run can't tell a slow start from a busy moment.
-- **Sarvam speaks too fast for an explainer.** At speed `1.0` it speaks 218 words a minute, well above the 150 to 175 manimvox aims for. The voice skill lowers `speed` in `series.json` when a voice is above 175 (0.9 first); this one needs about 0.8. Gnani's 173 words a minute is already in range, which is also why its video is 13 seconds longer.
+- **Sarvam is faster to generate; the cost is about the same.** Both cost under ₹3 for this video (Gnani's figure is from the account's usage dashboard, since Gnani publishes no price). Every line came back in about 1.4 seconds, a third of the time it takes to say. Gnani's first five lines took 2.7 to 11.3 seconds, and the rest about 1.3 seconds. One run can't tell a slow start from a busy moment.
+- **Sarvam speaks too fast for an explainer.** At speed `1.0` it speaks 215 words a minute, well above the 150 to 175 manimvox aims for. The voice skill lowers `speed` in `series.json` when a voice is above 175 (0.9 first); this one needs about 0.8. Gnani's 171 words a minute is already in range, which is also why its video is 13 seconds longer.
 - **Gnani was easier to transcribe.** These are the words the recogniser heard differently from the script:
 
     | Line | Sarvam heard | Gnani heard |
@@ -80,13 +83,19 @@ The agent was given this prompt in an empty folder:
 
     "Payee" is hard for both voices. In a real video, a `pron` entry or a rewording ("the person you're paying") would fix it.
 - **The voices differ in loudness by about 8 dB.** Sarvam's lines peak just under full scale, and Gnani's are much quieter. manimvox doesn't yet normalise loudness, so this reaches the viewer: the Gnani video plays noticeably quieter at the same volume setting.
-- **Gnani's intonation varies more**, and it pauses more inside sentences. Whether that sounds more natural is for a listener to judge.
+- **Gnani's intonation varies more**, and it pauses more inside sentences.
+- **The listener heard background noise in Sarvam's voice, and the measurements agree.** The noise is in the audio Sarvam returns, not added by manimvox: the final videos peak at −3.1 dBFS and never clip. Sarvam's audio is compressed hard (a crest factor of 13.5 dB against Gnani's 20.2, with 0.2% of samples within 1 dB of full scale). It also has more energy above 7 kHz, and its quiet parts are more noise-like. Together these make speech sound harsh and hissy. The speech recogniser still understood it, which is why the word error rate alone did not show the problem.
+
+### Listening
+
+One listener watched both videos on 2026-10-23:
+
+- **Gnani:** clear, but slow.
+- **Sarvam:** not clear; there seemed to be background noise. Its pace was better for a short video.
 
 ## Verdict
 
-For this episode, **Gnani's Avinash was the clearer narrator**: fewer mishearings, a pace already right for an explainer, and more varied intonation. **Sarvam's shubh was three times faster to generate, has a published price, and is even in loudness**, but for teaching it needs `speed` lowered to about 0.8, and it misheard "NPCI" and "later". The choice depends on the language and the listener. Both rendered without a single failed line, so either is reliable enough to use.
-
-The listening scores will be added once both videos have been watched.
+For this episode, **Gnani's Avinash is the better narrator**: it sounds clean, fewer of its words were misheard, and its intonation varies more. The listener found it slow. If a short video needs to move faster, raise `speed` toward Gnani's limit of 1.15, rather than switch voices. **Sarvam's shubh is three times faster to generate** at about the same cost, and its brisk pace suits a short video. But its audio is noisy and over-compressed, and that is the more serious fault for an explainer. Both rendered without a single failed line, so either is reliable enough to use.
 
 ## Files
 
