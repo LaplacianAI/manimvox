@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="manimvox">
+  <title>manimvox</title>
+  <g transform="translate(-2.5 -3)">
+  <!-- an "m" of two arches, drawn like an animation curve -->
+  <path d="M11 45 V28 a6.5 6.5 0 0 1 13 0 V45 M24 28 a6.5 6.5 0 0 1 13 0 V45" fill="none" stroke="#6CC4F0" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- running on into a voice waveform -->
+  <path d="M44 31 V41 M51 21 V49 M58 29 V39" fill="none" stroke="#5CC9B5" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

@@ -1,0 +1,53 @@
+{
+  "manimvox": "0.4.0",
+  "series": "Install manimvox and make a video",
+  "tagline": "From an empty folder to a narrated video, with Claude Code",
+  "voice": "gnani:timbre-v3.0/Avinash@en-IN",
+  "speed": 1.0,
+  "loudness": -16.0,
+  "pron": [
+    [
+      "\\bmanimvox\\b",
+      "Manim Vox"
+    ],
+    [
+      "\\bvenv\\b",
+      "vee env"
+    ],
+    [
+      "\\bPyPI\\b",
+      "pie pee eye"
+    ],
+    [
+      "\\bGnani\\b",
+      "Gnaani"
+    ]
+  ],
+  "theme": {
+    "source": "brand colours from the docs logo.svg (near-black #111417, blue #6CC4F0, teal #5CC9B5); neutrals and status colours from the kit default",
+    "bg": "#111417",
+    "panel": "#1B2026",
+    "panel2": "#252C34",
+    "line": "#3A434D",
+    "ink": "#ECEFF2",
+    "muted": "#A9B2BB",
+    "accent": "#6CC4F0",
+    "ok": "#5CC9B5",
+    "warn": "#F2C14E",
+    "error": "#FF7B72",
+    "blue": "#6CC4F0",
+    "orange": "#FF9F5A",
+    "violet": "#B497F0",
+    "pink": "#F08DC6",
+    "teal": "#5CC9B5",
+    "mark_svg": "mark.svg"
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_install",
+      "cls": "Ep01",
+      "title": "Install manimvox and make a video"
+    }
+  ]
+}

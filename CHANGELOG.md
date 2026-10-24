@@ -4,6 +4,15 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+
+- `clip.play(start=, end=)` plays part of a recording, at real speed by default: one part per narrated line.
+- Gallery: *Install manimvox and make a video*, a beginner's walkthrough made by Claude Code from one prompt with real terminal recordings, zooms and callouts; also on the docs' install and agent pages. Its project is in `examples/gallery/install-tutorial`.
+
+### Fixed
+
+- A zoom to a region at the picture's edge could leave the view a hair outside it (an offset of -1e-13), and a zoom out ended a hair short of the whole picture. Zooms now stay inside the picture and land exactly on their target.
+
 ## [0.4.0] - 2026-10-23
 
 ### Added

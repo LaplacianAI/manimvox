@@ -143,22 +143,31 @@ class Clip(ImageMobject):
         self.add_updater(step)
         return self
 
-    def play(self, run_time: float | None = None, **kwargs) -> PlayClip:
-        """The animation that runs through every frame over `run_time` seconds (default: the clip's own length)."""
-        return PlayClip(self, run_time=run_time, **kwargs)
+    def play(self, run_time: float | None = None, start: float = 0.0, end: float | None = None,
+             **kwargs) -> PlayClip:
+        """The animation that runs through the frames from `start` to `end` seconds of the clip (default: all of
+        it) over `run_time` seconds (default: that stretch's own length, so a recording plays at real speed).
+        Play one recording in parts, one part per narrated line."""
+        return PlayClip(self, run_time=run_time, start=start, end=end, **kwargs)
 
 
 class PlayClip(Animation):
-    """Steps a Clip through its frames, stretched or squeezed to the animation's run time."""
+    """Steps a Clip through its frames from `start` to `end` seconds, stretched or squeezed to the run time."""
 
-    def __init__(self, clip: Clip, run_time: float | None = None, rate_func=linear, **kwargs):
+    def __init__(self, clip: Clip, run_time: float | None = None, start: float = 0.0, end: float | None = None,
+                 rate_func=linear, **kwargs):
         if not isinstance(clip, Clip):
             raise SceneError(f"PlayClip plays a Clip, got {type(clip).__name__}")
-        super().__init__(clip, run_time=run_time or clip.seconds, rate_func=rate_func, **kwargs)
+        end = clip.seconds if end is None else end
+        if not 0 <= start < end <= clip.seconds + 1e-9:
+            raise SceneError(f"start and end must satisfy 0 <= start < end <= {clip.seconds:g} s (the clip's "
+                             f"length), got {start:g} and {end:g}")
+        self.first, self.last = int(start * clip.fps), min(len(clip.frames), round(end * clip.fps))
+        super().__init__(clip, run_time=run_time or end - start, rate_func=rate_func, **kwargs)
 
     def interpolate_mobject(self, alpha: float) -> None:
-        n = len(self.mobject.frames)
-        self.mobject.show(min(n - 1, int(alpha * n)))
+        n = max(1, self.last - self.first)
+        self.mobject.show(min(len(self.mobject.frames) - 1, self.first + min(n - 1, int(alpha * n))))
 
 
 class Zoom(Animation):
@@ -182,5 +191,9 @@ class Zoom(Animation):
         cx = x0 + w0 / 2 + k * (x1 + w1 / 2 - x0 - w0 / 2)
         cy = y0 + h0 / 2 + k * (y1 + h1 / 2 - y0 - h0 / 2)
         h = w * h0 / w0
-        self.mobject.view = (cx - w / 2, cy - h / 2, w, h)
+        sw, sh = self.mobject.space
+        if alpha >= 1:  # land exactly on the target: zoom_out ends on the whole picture, uncropped
+            self.mobject.view = self.target
+        else:  # rounding can put an edge a hair outside the source (-1e-13), which the crop refuses
+            self.mobject.view = (min(max(cx - w / 2, 0.0), sw - w), min(max(cy - h / 2, 0.0), sh - h), w, h)
         self.mobject.show(self.mobject.shown)

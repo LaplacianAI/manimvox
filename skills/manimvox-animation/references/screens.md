@@ -55,6 +55,7 @@ with self.narrate("Results appear as you type.") as dur:
 ```
 
 - Trim with `start` and `end` (seconds) to the part the line talks about; a clip holds at most 3600 frames.
+- Play one recording in parts, one per narrated line: `rec.play(start=4.0, end=9.5)` plays those seconds at real speed, or over `run_time=` when the line is longer or shorter.
 - Frames wider than 1280 pixels are scaled down to save memory; regions stay in the recording's own pixels.
 - `rec.zoom(...)` and the overlays work on a recording as on a screenshot, and can run while it plays.
 - Prefer screenshots with a cursor and zooms over long recordings: they are sharper, and every step can follow the narration.
