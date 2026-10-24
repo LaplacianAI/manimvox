@@ -1,5 +1,5 @@
 {
   "name": "manimvox",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Narrated, animated explainer videos with Manim and pluggable voices, driven by agent skills."
 }

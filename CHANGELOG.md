@@ -4,6 +4,8 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-10-24
+
 ### Added
 
 - `clip.play(start=, end=)` plays part of a recording, at real speed by default: one part per narrated line.
@@ -72,7 +74,8 @@ The first release.
 - **For agents:** eleven agent skills, the CLI as typed tools, adapters for eight Python agent frameworks, and plugin manifests for Claude Code, Codex, Cursor and Gemini CLI.
 - CI on Linux, macOS and Windows; releases published to PyPI with trusted publishing.
 
-[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.4.1...HEAD
+[0.4.1]: https://github.com/LaplacianAI/manimvox/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/LaplacianAI/manimvox/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/LaplacianAI/manimvox/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/LaplacianAI/manimvox/compare/v0.1.0...v0.2.0
