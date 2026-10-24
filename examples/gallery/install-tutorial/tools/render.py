@@ -76,7 +76,7 @@ def draw_screen(scr, cursor_on, badge=None):
 
 def sanitize(s):
     s = re.sub(r"\x1b\][^\x07\x1b]*(\x07|\x1b[\\])", "", s)
-    return s.replace("shrijeeth", "you").replace("shrij", "you")
+    return s.replace(os.environ.get("USERNAME", "you"), "you")  # the user name in any path
 
 
 def main():
