@@ -95,6 +95,8 @@ addopts = "-m 'not kokoro and not piper'"
 
 [tool.ruff]
 line-length = 120
+# the recorder an agent wrote for the install tutorial, kept as it wrote it
+extend-exclude = ["examples/gallery/install-tutorial/tools"]
 
 [tool.uv]
 # crewai needs openai<3 (openai-agents needs >=3) and rich>=14.2 (f5-tts's cached-path needs rich<14);

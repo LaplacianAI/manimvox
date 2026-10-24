@@ -12,6 +12,7 @@ from manimvox.scenes import (
     callout,
     click,
     cursor,
+    from_frames,
     from_video,
     point,
     screenshot,
@@ -238,3 +239,33 @@ def test_a_screenshot_tour_renders(tmp_path):
     assert mp4.exists()
     layout = next((d / "build").rglob("layout.json"))
     assert check_layout(load_layout(layout)) == []
+
+
+def test_play_runs_part_of_a_recording_at_real_speed():
+    c = from_frames(lambda t: np.full((9, 16, 3), int(t * 10) * 8, np.uint8), seconds=3, fps=10)  # 30 frames
+    p = c.play(start=1.0, end=2.0)
+    assert p.run_time == pytest.approx(1.0)
+    p.begin()
+    p.interpolate(0.0)
+    assert c.shown == 10
+    p.interpolate(0.999)
+    assert c.shown == 19
+    assert c.play(run_time=4, start=1.0, end=2.0).run_time == 4
+    with pytest.raises(SceneError, match="start and end"):
+        c.play(start=2.0, end=1.0)
+    with pytest.raises(SceneError, match="start and end"):
+        c.play(end=9.0)
+
+
+def test_a_zoom_to_the_edge_stays_inside_the_source_and_lands_exactly():
+    c = still(quadrants())
+    z = c.zoom(0, 0, 100, 56, pad=0.0)
+    z.begin()
+    for a in np.linspace(0, 1, 41):
+        z.interpolate_mobject(a)
+        x, y, w, h = c.view
+        assert x >= 0 and y >= 0 and x + w <= 320 + 1e-9 and y + h <= 180 + 1e-9
+    out = c.zoom_out()
+    out.begin()
+    out.interpolate_mobject(1.0)
+    assert c.view == c.whole  # exactly: the whole picture again, not a hair-cropped copy
