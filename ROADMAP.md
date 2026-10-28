@@ -2,9 +2,11 @@
 
 manimvox lets an AI agent make high-quality educational videos at low cost, with a person directing. Each release below moves one step closer to that goal. Items are planned, not promised; order and scope may change. Discuss any of them in [GitHub issues](https://github.com/LaplacianAI/manimvox/issues).
 
-**Released:** 0.2.0 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows.
+**Released:** 0.4.1 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows. Every change is in the [changelog](https://github.com/LaplacianAI/manimvox/blob/main/CHANGELOG.md).
 
-## 0.2: docs, gallery, benchmarks and Indian voices (released)
+## Released
+
+### 0.2: docs, gallery, benchmarks and Indian voices
 
 People should see what manimvox makes before they install it, and be able to compare the choices it offers.
 
@@ -17,13 +19,28 @@ People should see what manimvox makes before they install it, and be able to com
 - [x] **Voices for Indian languages:** Sarvam AI and Gnani.ai.
 - [x] **Fixes from the 0.1.0 showcase:** the Kokoro status line ends its sentence; `skills install` falls back to the built-in installer on Node older than 22.20; `scripts/release.py` sets the version everywhere at once.
 
-## Next
+### 0.3: even loudness
 
 - [x] **Even loudness across voices.** Every narration line is levelled to one loudness (−16 LUFS by default), so changing the voice doesn't change the volume. The voice benchmark's 7.9 LU spread is now 0.1.
+- [x] **Install with pip or uv,** in the docs, the skills, and the error that names a missing extra.
+
+### 0.4: screenshots and screen recordings
+
+Demo videos, app tours and PR walkthroughs whose change shows in the UI. The agent captures the screen with its own tools (a browser tool, computer use); manimvox presents what it captures.
+
+- [x] **Screenshots and recordings as clips:** `screenshot()` and `from_video()`, with `clip.play(start=, end=)` to play a recording one part per narrated line (0.4.1).
+- [x] **Zoom inside the clip's frame,** so a zoom never covers the header, and overlays placed by pixel: spotlight, callout, a cursor that points and clicks, and window chrome.
+- [x] **Skill guidance** for capturing, saving and citing screens, and for zooming to the words that matter.
+- [x] **Gallery:** *Install manimvox and make a video*, made by Claude Code from one prompt with real terminal recordings (0.4.1).
+- [x] **Fixes found by agents making videos:** Pillow 13 broke every image on a fresh install (capped below 13); a `pron` pattern written `"\bword\b"` in JSON silently never matched (now refused with the fix); a zoom to the picture's edge could fail (0.4.1).
+
+## Next
+
 - [ ] **More gallery videos:** a paper video next, then a concept video and a PR walkthrough.
 - [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
+- [ ] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it.
 
-## 0.3: professor-quality visuals
+## 0.5: professor-quality visuals
 
 Make the default output look like a good lecture, not slides. The 0.1.0 heart explainer only got there with pieces written inside the episode; they become part of the kit.
 
@@ -33,7 +50,7 @@ Make the default output look like a good lecture, not slides. The 0.1.0 heart ex
 - [ ] **Calmer kit defaults.** Fewer boxes, thinner lines, more space.
 - [ ] **A visual-quality checklist** in the skills, which agents run before a final render.
 
-## 0.4: 3D and real data
+## 0.6: 3D and real data
 
 Real objects and real data, used with their licences respected.
 
