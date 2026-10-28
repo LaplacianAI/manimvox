@@ -7,6 +7,7 @@ from importlib import resources
 from pathlib import Path
 
 from . import __version__
+from .brief import BRIEF_FILE, write_brief
 from .project import SERIES_FILE, ProjectError
 from .voice import DEFAULT_VOICE, parse_voice
 from .voice.loudness import DEFAULT_LOUDNESS
@@ -56,5 +57,7 @@ def new_project(directory: Path, series: str, tagline: str = "", voice: str = DE
     for name in ("FACTS.md", "SERIES.md"):
         if not (d / name).exists():
             (d / name).write_text(_template(name).replace("{{SERIES}}", series), encoding="utf-8")
+    if not (d / BRIEF_FILE).exists():
+        write_brief(d, None, series)  # the questions, open until the person answers or the agent decides
     _write_gitignore(d / ".gitignore")
     return d

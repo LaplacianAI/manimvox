@@ -19,7 +19,7 @@ manimvox turns a source into an animated video with a spoken voice, using Manim 
 
 When a request matches more than one row, the most specific row wins (a PR URL is a PR, not a page).
 
-Open the workflow skill and follow it to the end. If the input is unclear, ask at most one question, for example "Is there a document or repository to explain, or should I explain the idea itself?". If the user cannot be asked and there is a candidate subject (a document, URL, repo, topic or PR), pick the most likely workflow, say which one and why, and continue. If there is no subject at all ("make a video") and no way to ask, stop and report what is needed: what to explain, and any source.
+Open the workflow skill and follow it to the end. Each workflow starts with the brief: questions about who the video is for, what it should feel like, and how it opens and ends ([brief](../manimvox-creative/references/brief.md)). To choose the workflow, if the input is unclear, ask at most one question, for example "Is there a document or repository to explain, or should I explain the idea itself?". If the user cannot be asked and there is a candidate subject (a document, URL, repo, topic or PR), pick the most likely workflow, say which one and why, and continue. If there is no subject at all ("make a video") and no way to ask, stop and report what is needed: what to explain, and any source.
 
 ## 2 Check the setup
 
@@ -40,11 +40,11 @@ Ask the user before you install anything (manimvox included), download a model, 
 
 ## 4 Defaults
 
-State these; do not ask about them:
+State these; do not ask about them (the brief asks about everything else):
 
 - 16:9 at 1080p, 30 frames a second.
 - English, the only narration language in this version.
-- The voice `kokoro:af_heart`, which runs locally. A different, online or cloned voice is the user's choice, except the voice skill's local fallback when the user cannot be asked: see [manimvox-voice](../manimvox-voice/SKILL.md).
+- The voice `kokoro:af_heart`, which runs locally, unless the brief names another. A different, online or cloned voice is the user's choice, except the voice skill's local fallback when the user cannot be asked: see [manimvox-voice](../manimvox-voice/SKILL.md).
 
 ## 5 Domain skills
 

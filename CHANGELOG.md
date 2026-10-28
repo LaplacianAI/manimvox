@@ -4,6 +4,10 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+
+- **The brief.** Before any outline, the agent asks the person what they want from the video: who it is for, what they take away, how it should feel, their own angle, how it opens and ends, then the tone, look, length and voice. The answers go in a new `BRIEF.md` in every project, and the theme, script, opening and ending follow from it. An open question is decided by the agent and marked *(chosen by the agent)*, so videos stop falling back to the same opening and ending. `manimvox brief` writes it (from an app's answers in JSON; `--schema` prints the questions), `manimvox check brief` lists what is still open, and the tools `brief_questions` and `write_brief` let an app on an agent framework ask in its own UI.
+
 ## [0.4.1] - 2026-10-24
 
 ### Added
