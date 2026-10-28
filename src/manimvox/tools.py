@@ -16,7 +16,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 Say = Callable[[str], None]
-NEXT_STEPS = "facts into FACTS.md, outline into SERIES.md, episodes into series.json and episodes/"
+NEXT_STEPS = ("the brief into BRIEF.md (write_brief), facts into FACTS.md, outline into SERIES.md, episodes into "
+              "series.json and episodes/")
 
 
 class ToolError(Exception):
@@ -104,7 +105,7 @@ class SheetsResult:
 
 @_tool
 def new_project(directory: str, series: str, tagline: str = "", voice: str = "kokoro:af_heart") -> ProjectResult:
-    """Create a project folder with series.json, FACTS.md, SERIES.md, episodes/, out/ and research/.
+    """Create a project folder with series.json, BRIEF.md, FACTS.md, SERIES.md, episodes/, out/ and research/.
 
     Args:
         directory: The folder to create, best given as an absolute path; it must not already hold a project.
@@ -143,17 +144,24 @@ def draft(project: str, episode: str, every: float = 5.0) -> DraftResult:
 
 @_tool
 def check(project: str, what: str, episode: str | None = None) -> CheckResult:
-    """Run one check: theme (colour contrast and fonts), layout (the last draft) or audio (every line audible).
+    """Run one check: brief (every question in BRIEF.md answered or decided), theme (colour contrast and fonts),
+    layout (the last draft) or audio (every line audible).
 
     Args:
         project: The project folder, or any folder inside it.
-        what: theme, layout or audio.
+        what: brief, theme, layout or audio.
         episode: The episode, for layout and audio: ep01, 1, or its file stem.
     """
     what = what.strip().lower()
-    if what not in ("theme", "layout", "audio"):
-        raise ValueError(f"check must be theme, layout or audio, got {what!r}")
+    if what not in ("brief", "theme", "layout", "audio"):
+        raise ValueError(f"check must be brief, theme, layout or audio, got {what!r}")
     pr = _open(project)
+    if what == "brief":
+        from .brief import check_brief
+
+        found = check_brief(pr.root)
+        return CheckResult(not found, "brief", "brief check: ok" if not found else
+                           f"brief check: {len(found)} question(s) open", found)
     if what == "theme":
         from .checks.theme import check_theme
         from .kit.theme import Theme
@@ -611,9 +619,66 @@ def doctor() -> DoctorResult:
     return DoctorResult(not any(r.mark == "FAIL" for r in rows), rows)
 
 
-TOOLS = (new_project, draft, render, check, contact_sheet, voices, prepare_voice, list_blocks, add_block, join,
-         index, package, doctor)
+@dataclass(frozen=True)
+class BriefQuestionsResult:
+    ok: bool
+    how: str
+    questions: list[dict]
+
+
+@_tool
+def brief_questions() -> BriefQuestionsResult:
+    """The creative-brief questions to ask the person before any outline: who the video is for, what they take
+    away, how it should feel, their angle, how it opens and ends, tone, look, length and voice. Ask round 1, then
+    round 2; options are suggestions. Then write the answers with write_brief."""
+    from .brief import schema
+
+    s = schema()
+    return BriefQuestionsResult(True, s["how"], s["questions"])
+
+
+@dataclass(frozen=True)
+class BriefResult:
+    ok: bool
+    path: str
+    open: list[str]
+
+
+@_tool
+def write_brief(project: str, audience: str = "", takeaway: str = "", feeling: str = "", angle: str = "",
+                opening: str = "", ending: str = "", tone: str = "", look: str = "", length: str = "",
+                voice: str = "", force: bool = False) -> BriefResult:
+    """Write the person's answers to the brief questions (brief_questions) into the project's BRIEF.md. Leave a
+    question empty, or answer "You decide", when the person left it to you: then decide it, and write your choice
+    into BRIEF.md followed by "(chosen by the agent)". `open` lists the questions still to decide.
+
+    Args:
+        project: The project folder.
+        audience: Who the video is for, and what they already know.
+        takeaway: What they should understand, or be able to do, when it ends.
+        feeling: How it should feel to watch.
+        angle: The person's own angle: why this topic, a story or example they want in.
+        opening: How it should open.
+        ending: How it should end.
+        tone: The tone of the narration.
+        look: The look: a brand, colours, or videos whose look they like.
+        length: How long, and how fast.
+        voice: Which voice.
+        force: Replace a BRIEF.md that already holds answers.
+    """
+    from .brief import check_brief
+    from .brief import write_brief as write
+
+    pr = _open(project)
+    answers = {"audience": audience, "takeaway": takeaway, "feeling": feeling, "angle": angle,
+               "opening": opening, "ending": ending, "tone": tone, "look": look, "length": length, "voice": voice}
+    path = write(pr.root, answers, pr.series, force)
+    return BriefResult(True, str(path), [f.split("'")[1] for f in check_brief(pr.root) if "'" in f])
+
+
+TOOLS = (new_project, brief_questions, write_brief, draft, render, check, contact_sheet, voices, prepare_voice,
+         list_blocks, add_block, join, index, package, doctor)
 # the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks
-COMMANDS = {"new": "new_project", "draft": "draft", "render": "render", "check": "check", "sheets": "contact_sheet", "voices": "voices",
+COMMANDS = {"new": "new_project", "brief": "write_brief", "draft": "draft", "render": "render", "check": "check", "sheets": "contact_sheet", "voices": "voices",
             "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor"}
 SHELL_ONLY = frozenset({"skills"})  # installs skills into coding agents; a framework agent reads skills_path() instead

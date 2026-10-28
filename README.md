@@ -134,12 +134,20 @@ Agent-specific routes:
 
 Then ask your agent: "make an explainer video of <paper / repo / idea / PR>".
 
+**Before it outlines anything, the agent asks you about the video** in two short rounds, each question with suggested options and "you decide":
+- who it's for, and what they should take away;
+- how it should feel, and your own angle (a story, an example, the way you'd explain it);
+- how it should open and how it should end;
+- then the tone, the look, the length and the voice.
+
+Answer as much or as little as you like: "just make it" skips the rest. The answers go in the project's `BRIEF.md`, the agent decides what you leave open and marks it *(chosen by the agent)*, and the theme, the script, the opening and the ending follow from it. So two videos don't open and close the same way unless you want them to.
+
 | Skill | What it does |
 |---|---|
 | `manimvox` | Picks the workflow for your request and checks the setup |
 | `manimvox-core` | The authoring contract for episodes: structure, timing, safe stage, components |
 | `manimvox-animation` | Motion patterns: carry-overs, reveals, tables, graphs, zooms, sequence diagrams |
-| `manimvox-creative` | Theme, story and narration, and the facts discipline |
+| `manimvox-creative` | The brief (what you want from the video), theme, story and narration, and the facts discipline |
 | `manimvox-voice` | Choosing and preparing the voice: engines, licences, pronunciation, cloning consent |
 | `manimvox-cli` | The command line and how to read its output |
 | `manimvox-blocks` | Ready-made charts and diagrams to copy into a project, and how to write one |
@@ -163,6 +171,7 @@ This creates:
 ```
 demo/
   series.json   series name, voice, speed, loudness, pronunciations, theme, episode list
+  BRIEF.md      what you want from the video: audience, feeling, your angle, how it opens and ends
   FACTS.md      every claim the video makes, with its source
   SERIES.md     the outline every episode is written against
   episodes/     one Python file per episode
@@ -312,6 +321,19 @@ Other frameworks:
 - Frameworks that read `SKILL.md` folders take `manimvox.skills_path()`: Microsoft Agent Framework (`SkillsProvider.from_paths`) and AG2 (`SkillsToolkit`).
 - Any framework can register `manimvox.integrations.common.json_tools(folder)` and `file_tools(folder)` as plain functions.
 - `pydantic-ai-harness[skills]` and the OpenAI SDK's sandbox `Skills` are native alternatives to `read_skill`.
+
+**The brief.** A coding agent asks the person what they want from the video before it outlines anything. An agent in your app usually has no one to ask, so ask in your own UI and pass the answers in:
+
+```python
+from manimvox.tools import brief_questions, new_project, write_brief
+
+form = brief_questions().questions                   # ten questions with ids, options and rounds: show them as a form
+new_project("hash-maps", series="Hash maps, explained")
+write_brief("hash-maps", audience="Students new to data structures", opening="A scene of a slow lookup",
+            ending="Answer the opening, calling back to its scene")   # any question left out, the agent decides
+```
+
+`manimvox brief --schema` prints the same questions as JSON, and `manimvox brief answers.json` writes them from a file. The agent reads `BRIEF.md` and decides each open question on purpose, marked *(chosen by the agent)*, instead of falling back to the same default every time. The model can also call `brief_questions` and `write_brief` itself when your app relays its questions to the person.
 
 Notes:
 - Tell the agent which folder the project is in. `project_note(folder)` writes that line for the instructions.

@@ -7,8 +7,9 @@ import sys
 
 import pytest
 
-TOOL_NAMES = {"new_project", "draft", "render", "check", "contact_sheet", "voices", "prepare_voice", "list_blocks",
-              "add_block", "join", "index", "package", "doctor"}
+from manimvox import tools
+
+TOOL_NAMES = {f.__name__ for f in tools.TOOLS}  # every adapter offers every tool; a new tool needs no edit here
 FILE_NAMES = {"read_project_file", "write_project_file", "list_project_files"}
 ADAPTERS = [("agno", "agno", "agno"), ("langchain", "langchain_core", "langchain"),
             ("pydantic_ai", "pydantic_ai", "pydantic-ai"), ("openai_agents", "agents", "openai-agents")]

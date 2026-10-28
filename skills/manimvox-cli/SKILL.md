@@ -1,6 +1,6 @@
 ---
 name: manimvox-cli
-description: "The manimvox command line and how to read its output: doctor, new, draft, render, check theme|layout|audio, voices, add, join, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
+description: "The manimvox command line and how to read its output: doctor, new, brief, draft, render, check brief|theme|layout|audio, voices, add, join, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
 license: MIT
 ---
 
@@ -39,10 +39,12 @@ Ask the user before installing anything: a system package, manimvox itself, or a
 | Command | Flags | Writes | Exit | Tool |
 |---|---|---|---|---|
 | `manimvox doctor` | none | nothing | 1 if any `FAIL` | `doctor` |
-| `manimvox new DIR` | `--series NAME` (required), `--tagline T`, `--voice E:V` | `DIR/` with `series.json`, `FACTS.md`, `SERIES.md`, `.gitignore`, `episodes/`, `out/`, `research/` | 1 if `DIR` already holds a project | `new_project` |
+| `manimvox new DIR` | `--series NAME` (required), `--tagline T`, `--voice E:V` | `DIR/` with `series.json`, `BRIEF.md`, `FACTS.md`, `SERIES.md`, `.gitignore`, `episodes/`, `out/`, `research/` | 1 if `DIR` already holds a project | `new_project` |
+| `manimvox brief [ANSWERS.json]` | `--schema`, `--force` | `BRIEF.md` from the answers (by question id), the rest left open; `--schema` prints the questions as JSON instead | 1 if `BRIEF.md` already holds answers without `--force` | `write_brief`; the questions are `brief_questions` |
 | `manimvox draft EP` | `--every SECONDS` (default 5, above 0) | `sheets/<stem>/s_NN.png`, `build/<stem>/layout.json` | 1 on layout findings or a Manim error, 2 on a bad `--every` | `draft` |
 | `manimvox sheets EP` | `--every SECONDS` (default 5, above 0) | `sheets/<stem>/s_NN.png` from `out/<stem>.mp4`, else the last draft | 1 if there is no video yet, 2 on a bad `--every` | `contact_sheet` |
 | `manimvox render EP` | `--voice E:V`, `-y` / `--yes` | `out/<stem>.mp4`, `out/<stem>.srt` | 1 on a Manim error, a voice problem or `audio check: FAILED` | `render` |
+| `manimvox check brief` | none | nothing | 1 if a question in `BRIEF.md` is still open | `check` |
 | `manimvox check theme` | none | nothing | 1 on any failure | `check` |
 | `manimvox check layout EP` | none | nothing | 1 on findings | `check` |
 | `manimvox check audio EP` | none | nothing | 1 if a line is silent | `check` |
@@ -64,6 +66,8 @@ Notes:
 - Voice choice, engines and pronunciation are in [manimvox-voice](../manimvox-voice/SKILL.md). Ask the user before using an online voice: the narration text leaves the machine.
 
 ## Reading the output
+
+**Brief check.** `manimvox check brief` prints one line per open question, such as `BRIEF.md: 'How it opens' is still open; ask, or decide it and mark it (chosen by the agent)`, and ends `brief check: ok` or `brief check: N question(s) open`. Ask the person, or decide and write the answer followed by `(chosen by the agent)`. See [brief](../manimvox-creative/references/brief.md).
 
 **Theme check.** `manimvox check theme` prints one line per failure and ends `theme check: ok` or `theme check: N failure(s)`. A line such as `theme: accent: contrast 3.10 on bg, 3.40 on panel; text needs 4.5` means that colour is too dim for text. Lighten it in `series.json` under `theme` (text roles need 4.5:1, hues and named colours 3:1) and say in the theme's `source` that it was lightened for the video and from what. Other lines name a font Pango cannot load, a value that is not a `#RRGGBB` hex, or an empty `source`. A `note: roles from the kit's neutral default` line is not a failure: those roles were left out of the theme.
 

@@ -63,10 +63,27 @@ def _cmd_render(args) -> int:
     return 0 if r.ok else 1
 
 
+def _cmd_brief(args) -> int:
+    import json
+
+    from .brief import load_answers, schema
+    from .tools import write_brief
+
+    if args.schema:
+        print(json.dumps(schema(), indent=2, ensure_ascii=False))
+        return 0
+    answers = load_answers(Path(args.answers)) if args.answers else {}
+    r = write_brief(str(Path.cwd()), **answers, force=args.force)
+    print(f"brief: {r.path}")
+    if r.open:
+        print(f"open, for the agent to decide and mark (chosen by the agent): {', '.join(r.open)}")
+    return 0
+
+
 def _cmd_check(args) -> int:
     from .tools import check
 
-    if args.what != "theme" and not args.episode:
+    if args.what not in ("theme", "brief") and not args.episode:
         print(f"manimvox: check {args.what} needs an episode", file=sys.stderr)
         return 2
     r = check(str(Path.cwd()), args.what, args.episode)
@@ -333,6 +350,11 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--tagline", default="")
     s.add_argument("--voice", default="kokoro:af_heart", help="engine:voice")
     s.set_defaults(func=_cmd_new)
+    s = p._sub.add_parser("brief", help="the creative brief: write BRIEF.md, or print its questions (--schema)")
+    s.add_argument("answers", nargs="?", help="a JSON file of answers by question id (from an app's form)")
+    s.add_argument("--schema", action="store_true", help="print the questions as JSON, for an app to show as a form")
+    s.add_argument("--force", action="store_true", help="replace a BRIEF.md that already holds answers")
+    s.set_defaults(func=_cmd_brief)
     s = p._sub.add_parser("draft", help="fast 480p render, no voice, contact sheets and layout check")
     s.add_argument("episode")
     s.add_argument("--every", type=float, default=5.0, help="seconds between sampled frames")
@@ -350,7 +372,7 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=_cmd_sheets)
 
     s = p._sub.add_parser("check", help="run one check")
-    s.add_argument("what", choices=["theme", "layout", "audio"])
+    s.add_argument("what", choices=["brief", "theme", "layout", "audio"])
     s.add_argument("episode", nargs="?")
     s.set_defaults(func=_cmd_check)
 

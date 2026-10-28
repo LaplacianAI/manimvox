@@ -12,6 +12,7 @@ Copy this checklist and keep it current:
 
 ```text
 - [ ] 0 Setup      manimvox doctor; manimvox new <dir> --series "…" (outside any code repo)
+- [ ] 0b Brief     ask the brief questions (manimvox-creative brief); BRIEF.md; manimvox check brief
 - [ ] 1 Read the PR  gh pr view and gh pr diff; keep both in research/
 - [ ] 2 Facts      FACTS.md: one claim per line, path:line or PR description, labelled
 - [ ] 3 Theme      the repository's brand if it has one; manimvox check theme passes
@@ -35,6 +36,10 @@ manimvox new pr-1234-video --series "Title of the PR"
 ```
 
 Work from inside that folder. For a voice other than the default, see [manimvox-voice](../manimvox-voice/SKILL.md).
+
+## 0b Brief
+
+Before any outline, ask the person what they want from the video, as [brief](../manimvox-creative/references/brief.md) says: who it is for, what they take away and feel, their own angle, and how it opens and ends, in two short rounds with suggested options. Skip what the request already says. Write the answers with `manimvox brief` and decide what is left open, marked `(chosen by the agent)`, until `manimvox check brief` passes. If you cannot ask, decide every question on purpose, from the subject, and list your choices in the report. The theme, the outline, the script, the opening and the ending all follow from `BRIEF.md`.
 
 ## 1 Read the PR
 

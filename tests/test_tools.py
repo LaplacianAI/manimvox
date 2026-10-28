@@ -129,7 +129,7 @@ def test_every_command_has_a_tool_or_is_shell_only():
 
     names = {f.__name__ for f in tools.TOOLS}
     assert set(build_parser()._sub.choices) == set(tools.COMMANDS) | tools.SHELL_ONLY
-    assert set(tools.COMMANDS.values()) <= names and len(names) == len(tools.TOOLS) == 13
+    assert set(tools.COMMANDS.values()) <= names and len(names) == len(tools.TOOLS) == 15
 
 
 def test_list_blocks():

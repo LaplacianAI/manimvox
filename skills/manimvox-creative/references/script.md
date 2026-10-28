@@ -8,7 +8,7 @@ Write every spoken line before any scene code, and critique it in writing. Code 
 
 ## The opening: four moves
 
-This is 15 to 25 seconds at 5 minutes and up (see the [length table](#when-the-time-is-short) for shorter videos).
+The four moves are the bones; `BRIEF.md` says how it opens (a scene of the problem happening, a surprising number, a story, a quote, a question, or straight in) and what it should feel like. Build that, not the same title card every time. This is 15 to 25 seconds at 5 minutes and up (see the [length table](#when-the-time-is-short) for shorter videos).
 
 1. **The problem, felt.** A concrete situation where the obvious way is slow, wrong or impossible, drawn on screen, not only said over the title card. In a playlist episode, the problem is the question the previous episode ended on.
 2. **The question.** One sentence the whole video answers, in the viewer's words. Keep it: the ending says it again.
@@ -29,7 +29,7 @@ Connectives that carry flow: **So** (a consequence), **But** (a problem), **Now*
 
 ## The ending: four moves
 
-This is 20 to 40 seconds at 3 minutes and up (less for shorter videos, see the [length table](#when-the-time-is-short)).
+`BRIEF.md` says how it ends (a callback to the opening scene, a recap, a challenge for the viewer, a cliffhanger into the next video, a call to action); shape these moves to it. This is 20 to 40 seconds at 3 minutes and up (less for shorter videos, see the [length table](#when-the-time-is-short)).
 
 1. **The payoff.** Go back to the opening's situation and solve it on screen with what was built.
 2. **The callback.** Say the opening question again and answer it in one sentence: `self.outro(recap, narration, answer="…")` shows the question, then speaks and shows your answer, before the recap.
