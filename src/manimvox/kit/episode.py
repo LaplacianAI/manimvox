@@ -21,6 +21,7 @@ from manim import (
     Dot,
     FadeIn,
     FadeOut,
+    Group,
     GrowFromCenter,
     GrowFromEdge,
     Indicate,
@@ -246,7 +247,7 @@ class Episode(Scene):
             outs += [FadeIn(track), FadeIn(bar)]
             chrome += [track, bar]
             self._bar = bar
-        self.play(*outs, run_time=0.8)
+        self.play(*outs, run_time=0.8 if chrome else 0.45)
         self._chrome = chrome
         if chrome:
             self._pin(*chrome)
@@ -277,39 +278,54 @@ class Episode(Scene):
         return VGroup(ring1, ring2)
 
     def chapter(self, title, narration=None, tts=None, bridge=None, bridge_tts=None, transition=None, keep=(),
-                number=True):
+                number=True, card=True, entrance=None):
         """Transition into a new chapter: big title, then it docks top-right. `bridge` is a
         "So... / But..." line spoken over the finished picture before it is cleared.
         `number=False` drops the faded chapter numeral. `keep` is the mobjects carried across the seam:
         everything else on the stage is cleared. `transition` replaces the plain clear:
         a string ("blur", "down" or "dip", as in clear(how=...)), or what a motion helper returns:
         zoom_through(mob), flood(mob, colour), iris(point), dip(), or whip(direction), which waits for the
-        stage. chapter() plays its animations, then removes the old stage (except `keep`)."""
+        stage. chapter() plays its animations, then removes the old stage (except `keep`).
+        `entrance` is how the card's title arrives: a title helper such as words_in, letters_in or blur_in
+        (the default fades it up). `card=False` draws no card at all: the seam plays, `narration` is spoken over
+        what stays (`keep`), and the title only becomes the docked label when CHROME has one."""
         if bridge:
             with self.narrate(bridge, tts=bridge_tts):
                 pass
         self._leave(transition, keep)
         self._flat()
         self._chap_i += 1
+        if not card:
+            return self._chapter_without_card(title, narration, tts)
         num = T(f"{self._chap_i:02d}", 150, ACCENT, BOLD).set_opacity(0.16) if number else None
         ttl = P(title, 52, INK, max_w=10.5, weight=BOLD, align="center")
         rule = Line(LEFT * 0.9, RIGHT * 0.9).set_stroke(ACCENT, 6).next_to(ttl, DOWN, buff=0.35)
         if num is not None:
             num.next_to(ttl, UP, buff=0.1)
         VGroup(*([num] if num is not None else []), ttl, rule).move_to(ORIGIN)
-        anims = ([FadeIn(num, scale=1.3)] if num is not None else []) + [FadeIn(ttl, shift=UP * 0.35), GrowFromCenter(rule)]
+        anims = ([FadeIn(num, scale=1.3)] if num is not None else []) + [entrance(ttl) if entrance else FadeIn(ttl, shift=UP * 0.35), GrowFromCenter(rule)]
         if narration:
             self.say(narration, *anims, run_time=0.8, tts=tts)
         else:
             self.play(*anims, run_time=0.8)
             self.wait(1.0)
         outs = ([FadeOut(num)] if num is not None else []) + [FadeOut(rule)]
+        self._dock_chapter(title, outs, ttl)
+
+    def _chapter_without_card(self, title, narration, tts):
+        """chapter(card=False): no card; the narration plays over the kept picture, then the chrome moves on."""
+        if narration:
+            self.say(narration, tts=tts)
+        self._dock_chapter(title, [], None)
+
+    def _dock_chapter(self, title, outs, ttl):
+        """Dock the chapter's title top-right (as far as CHROME allows) and move the progress bar on."""
         dock = None
         if "label" in self.CHROME:
             dock = T(f"{self._chap_i:02d}  {title}", 15, ACCENT, BOLD, max_w=5.5)
             dock.move_to([6.75 - dock.width / 2, 3.72, 0])
-            outs.append(ReplacementTransform(ttl, dock))
-        else:
+            outs.append(ReplacementTransform(ttl, dock) if ttl is not None else FadeIn(dock))
+        elif ttl is not None:
             outs.append(FadeOut(ttl))
         if self._chap_label is not None:
             outs.append(FadeOut(self._chap_label))
@@ -319,7 +335,8 @@ class Episode(Scene):
             frac = min(1.0, self._chap_i / max(1, self.NCHAP))
             new_bar = Line([-7.2, -3.93, 0], [-7.2 + 14.4 * frac, -3.93, 0]).set_stroke(ACCENT, 5)
             outs.append(Transform(self._bar, new_bar))
-        self.play(*outs, run_time=0.7)
+        if outs:
+            self.play(*outs, run_time=0.7)
         if dock is not None:
             self._chap_label = dock
             self._chrome.append(dock)
@@ -337,22 +354,34 @@ class Episode(Scene):
         self.remove(*[m for m in self.stage() if not any(m is k for k in keep)])
 
     def outro(self, recap, narration, next_title=None, tts=None, next_label="NEXT", answer=None, answer_tts=None,
-              end=None):
+              end=None, keep=()):
         """Recap bullets and a pointer to the next episode. The last episode can
         point elsewhere instead: next_label="READ", next_title="docs/design.md".
         `answer` is spoken first, on screen under the question given to intro().
         An empty `recap` skips the Recap heading and bullets, keeps the answer on screen,
         and `narration` is still spoken over it.
         `end` (a line, or a list of up to 3) is a built end card: its lines are carried in word by word
-        and a rule is wiped in under them."""
-        self.clear()
+        and a rule is wiped in under them.
+        `keep` is the mobjects that stay on screen for the answer, such as the opening's picture brought back:
+        the answer goes in the larger free band above or below them. The recap and end card clear them."""
+        self.clear(keep=keep)
         self._flat()
         if answer:
             parts = []
             if self.question:
                 parts.append(P(self.question, 30, MUTED, max_w=11.5, align="center"))
             parts.append(P(answer, 40, INK, max_w=11.5, weight=BOLD, align="center"))
-            VGroup(*parts).arrange(DOWN, buff=0.45).move_to(STAGE_CENTER)
+            block = VGroup(*parts).arrange(DOWN, buff=0.45).move_to(STAGE_CENTER)
+            if keep:
+                kept = Group(*keep)
+                above, below = STAGE_TOP - kept.get_top()[1], kept.get_bottom()[1] - STAGE_BOTTOM
+                if above >= below:
+                    block.move_to([0, (STAGE_TOP + kept.get_top()[1]) / 2, 0])
+                else:
+                    block.move_to([0, (STAGE_BOTTOM + kept.get_bottom()[1]) / 2, 0])
+                room = max(above, below) - 0.3
+                if block.height > room > 0:
+                    block.scale(room / block.height)
             if len(parts) == 2:
                 self.play(FadeIn(parts[0]), run_time=0.6)
             self.say(answer, FadeIn(parts[-1], shift=UP * 0.2), tts=answer_tts)

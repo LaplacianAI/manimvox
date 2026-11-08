@@ -29,7 +29,7 @@ Connectives that carry flow: **So** (a consequence), **But** (a problem), **Now*
 
 ## The ending: four moves
 
-The four moves are one shape that works, not the rule. `DIRECTION.md` gives the last shot; a challenge or a cliffhanger uses `self.outro(recap=[], end="…")` and a call to action `end=[…]` with a link line. `BRIEF.md` says how it ends (a callback to the opening scene, a recap, a challenge for the viewer, a cliffhanger into the next video, a call to action); shape these moves to it. This is 20 to 40 seconds at 3 minutes and up (less for shorter videos, see the [length table](#when-the-time-is-short)).
+The four moves are one shape that works, not the rule. `DIRECTION.md` gives the last shot; a challenge or a cliffhanger uses `self.outro([], narration, end="…")` and a call to action `end=[…]` with a link line. `BRIEF.md` says how it ends (a callback to the opening scene, a recap, a challenge for the viewer, a cliffhanger into the next video, a call to action); shape these moves to it. This is 20 to 40 seconds at 3 minutes and up (less for shorter videos, see the [length table](#when-the-time-is-short)).
 
 1. **The payoff.** Go back to the opening's situation and solve it on screen with what was built.
 2. **The callback.** Say the opening question again and answer it in one sentence: `self.outro(recap, narration, answer="…")` shows the question, then speaks and shows your answer, before the recap.

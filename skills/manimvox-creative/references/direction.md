@@ -75,11 +75,11 @@ Each answer to "How should it open?" and "How should it end?" in `BRIEF.md` maps
 | Opening: a short story | Draw the story's first image before `self.intro(...)`, with `card=False` |
 | Opening: a quote | Show the quote with `blur_in` before `self.intro(...)`, with `card=False` |
 | Opening: straight in, no title card | `self.intro(narration, card=False)`, and `CHROME = ()` for a clean frame |
-| Ending: answer the opening, calling back to its scene | `self.outro(recap=[], narration, answer="…")`, with the opening's objects kept on screen by `keep` or `carry` |
+| Ending: answer the opening, calling back to its scene | Bring the opening's picture back, then `self.outro([], narration, answer="…", keep=[picture])`: the answer goes in the free space beside it |
 | Ending: a recap of the key ideas | `self.outro([...], narration)`, one sentence per chapter |
-| Ending: a challenge for the viewer | `self.outro(recap=[], end="Can you find the third bug?")` |
-| Ending: a cliffhanger into the next video | `self.outro(recap=[], end="Next: what happens when two writes collide?")` |
-| Ending: a call to action | `self.outro(recap=[], end=["Try it", "github.com/you/project"])`: up to 3 lines, the last one a link line |
+| Ending: a challenge for the viewer | `self.outro([], narration, end="Can you find the third bug?")` |
+| Ending: a cliffhanger into the next video | `self.outro([], narration, end="Next: what happens when two writes collide?")` |
+| Ending: a call to action | `self.outro([], narration, end=["Try it", "github.com/you/project"])`: up to 3 lines, the last one a link line |
 
 `end` is a string or a list of up to 3 lines. Either way it arrives as a built end card, not a still one.
 

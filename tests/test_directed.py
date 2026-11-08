@@ -5,7 +5,7 @@ import json
 import numpy as np
 import pytest
 
-from manimvox.checks.layout import variety_notes
+from manimvox.checks.layout import check_layout, variety_notes
 from manimvox.checks.theme import theme_notes
 from manimvox.kit.theme import Theme
 from manimvox.post.draw import card_image
@@ -229,3 +229,61 @@ def test_a_light_ground_renders_and_is_never_cleared(tmp_path):
     assert {"Paper", "Box"} <= shown
     r = run_py("from manimvox.kit import *; from manimvox.kit.ground import ground_mobject; print(ground_mobject() is not None)", p)
     assert r.stdout.strip() == "True", r.stderr
+
+
+SEAMS = '''import json
+from pathlib import Path
+
+from manimvox.kit import *
+
+
+class Ep02(Episode):
+    EP = 2
+    TITLE = "Seams"
+    TAGLINE = "No cards"
+    NCHAP = 2
+    CHROME = ("bar",)
+
+    def build(self):
+        rec = {}
+        shelf = node("Shelf").move_to(DOWN * 2.2)
+        self.add(shelf)
+        self.intro("Straight in.", question="Where is it?", card=False)
+        self.chapter("Cardless", "The shelf stays.", card=False, keep=[shelf], transition="dip")
+        rec["no_card_kept"] = shelf in self.mobjects
+        self.chapter("Typed", "A typed title.", entrance=letters_in, transition="blur")
+        rec["bar_full"] = round(self._bar.get_right()[0], 2)
+        self.say("Back to the shelf.", FadeIn(shelf))
+        self.outro([], "Ending.", answer="On the shelf.", keep=[shelf])
+        Path("probe.json").write_text(json.dumps(rec), encoding="utf-8")
+'''
+
+
+@pytest.mark.slow
+def test_chapters_without_cards_typed_titles_and_an_answer_over_the_kept_picture(tmp_path):
+    p = copy_fixture(tmp_path)
+    add_episode(p, "ep02_seams", "Ep02", "Seams", SEAMS)
+    layout = render_episode(p, "ep02_seams", "Ep02", voiced=False)
+    rec = json.loads((p / "probe.json").read_text(encoding="utf-8"))
+    assert rec == {"no_card_kept": True, "bar_full": 7.2}
+    texts = [{t["text"] for t in fr["texts"]} for fr in layout["frames"]]
+    shown = set().union(*texts)
+    assert "Cardless" not in shown and "Typed" in shown  # card=False draws no title; the other card does
+    answer = [fr for fr in layout["frames"] if any(t["text"] == "On the shelf." for t in fr["texts"])]
+    assert answer and all(any(t["text"] == "Shelf" for t in fr["texts"]) for fr in answer)  # the shelf stays
+    assert not check_layout(layout)  # and the answer does not overlap it
+
+
+def test_code_row_sits_on_its_line_and_counts_blank_lines():
+    from manimvox.kit.components import _code_lines, code
+
+    src = "def f(x):\n    y = x_1\n\n    return gy"
+    panel = code(src)
+    bars = {k: panel.row(k) for k in (0, 1, 3)}
+    lines = _code_lines(panel.text)
+    for k, line in zip((0, 1, 3), lines):
+        top, bottom = max(g.get_top()[1] for g in line), min(g.get_bottom()[1] for g in line)
+        assert bars[k].get_bottom()[1] <= bottom + 0.02 and bars[k].get_top()[1] >= top - 0.02
+    assert bars[0].get_center()[1] > bars[1].get_center()[1] > bars[3].get_center()[1]
+    with pytest.raises(ValueError, match="row 2"):
+        panel.row(2)  # the blank line

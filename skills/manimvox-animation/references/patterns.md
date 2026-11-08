@@ -242,11 +242,15 @@ Which one to use is set in `DIRECTION.md` (see [direction](../../manimvox-creati
 
 Chapter seams. `transition` is one of `"blur"`, `"down"`, `"dip"`, `zoom_through(mob)`, `flood(mob, colour)`, `iris(point)` or `whip(direction)`. `keep` is the mobjects carried across the seam; `number=False` drops the faded numeral.
 
+Chapter cards. The card is a centred title over a rule, so three of them in a row read as a template. Vary them: `entrance=words_in` (or `letters_in`, `blur_in`) changes how the title arrives, and `card=False` drops the card entirely, so the seam goes straight into the next scene and the picture carries the chapter (the title still becomes the docked label when `CHROME` has one). A kept mobject sits under the centred card: move it clear first, or use `card=False`.
+
 ```python
 self.chapter("Inside the cache", "Now look inside the box.", transition=zoom_through(cache_box))
 self.chapter("The failure", "Then the request fails.", transition=flood(bad_node, ERROR))
 self.chapter("Where it goes", "The answer leaves the server.", transition=iris(reply.get_center()), number=False)
 self.chapter("The next hop", "It arrives at the browser.", transition=whip(RIGHT), keep=(packet,))
+self.chapter("Collisions", "Two keys want one shelf.", card=False, keep=(shelf,), transition="dip")
+self.chapter("The fix", entrance=letters_in, transition="blur")
 ```
 
 Between scenes without a chapter card, `self.clear(how="left"|"blur"|"down"|"dip", keep=())` leaves some mobjects on stage. `morph(a, b)` turns one mobject into another, `carry(m, to)` moves one to a new place across a seam, and `dip()` is a dip to the background colour.
@@ -258,8 +262,10 @@ title = T("Why the cache missed", 56, INK, BOLD)
 self.play(words_in(title))                      # word by word
 self.play(letters_in(title))                    # letter by letter
 self.play(blur_in(title))                       # from blur to sharp
-self.play(slot(["Slow", "Late", "Wrong"], "Fast"))   # options roll past, the last one lands
+self.play(slot([T("Slow", 48), T("Late", 48)], T("Fast", 48, ACCENT)))   # mobjects, not strings: they roll past where the last one is, and it stays on stage
 self.play(accent_word(title, "missed"))         # the one word that carries the point takes the accent
 ```
 
-An opening with no card: `self.intro(narration, question="…", card=False)`. The cold open stays on screen and the title arrives as type over it. For a clean frame, set `CHROME = ()` on the episode class; the default is `CHROME = ("label", "bar")`, and the bar stays in a playlist, where it shows where the viewer is. An ending that is not a recap: `self.outro(recap=[], end="…")`, or `end=[…]` for up to 3 lines.
+An opening with no card: `self.intro(narration, question="…", card=False)`. The cold open stays on screen and the title arrives as type over it, centred at y = 2, so leave that band free. For a clean frame, set `CHROME = ()` on the episode class; the default is `CHROME = ("label", "bar")`, and the bar stays in a playlist, where it shows where the viewer is. An ending that is not a recap: `self.outro([], narration, end="…")`, or `end=[…]` for up to 3 lines. To answer over the opening's picture, bring it back and pass it as `keep`: `self.outro([], narration, answer="…", keep=[shelf])`.
+
+Code rows. `panel = code(src)` then `panel.row(k)` is a highlight bar exactly behind line `k` (counted from 0, blank lines included): `self.play(FadeIn(panel.row(2)))`. Don't estimate rows from the panel's height.
