@@ -55,6 +55,7 @@ from .text import STAGE_BOTTOM, STAGE_CENTER, STAGE_TOP, P, T
 config.background_color = BG
 WORDS_PER_SECOND = 2.6
 PAD = 0.7  # silence after every line: the viewer looks at what just changed before the next sentence
+SEAM_PAD = 0.25  # after a line spoken over a chapter seam: the new scene is what the viewer looks at next
 LOOK = 0.8  # steps() finishes this long (at most a quarter of the line) before the line ends
 STAGE = [-6.6, STAGE_BOTTOM, 6.6, STAGE_TOP]
 
@@ -295,8 +296,10 @@ class Episode(Scene):
                 pass
         if not card:
             if narration:
-                with self.narrate(narration, tts=tts):
-                    self._leave(transition, keep)
+                # The seam stretches to fill its line (up to 2 s) and the line keeps only a short pause,
+                # so the new scene starts as the voice finishes instead of after an empty frame.
+                with self.narrate(narration, tts=tts, pad=SEAM_PAD) as dur:
+                    self._leave(transition, keep, fill=min(dur, 2.0))
             else:
                 self._leave(transition, keep)
             self._flat()
@@ -344,11 +347,11 @@ class Episode(Scene):
             self._chrome.append(dock)
             self._pin(dock)
 
-    def _leave(self, transition, keep):
+    def _leave(self, transition, keep, fill=0.0):
         """Take the old stage off screen for chapter(): a plain clear, a named one, or a motion helper's animation."""
         if transition is None or isinstance(transition, str):
             self._seams.append(transition or "clear")
-            return self.clear(how=transition, keep=keep)
+            return self.clear(how=transition, keep=keep, run_time=max(0.55, fill))
         self._seams.append(getattr(transition, "mv_kind", type(transition).__name__))
         old = [m for m in self.stage() if not any(m is k for k in keep)]
         anims = transition(old) if callable(transition) else transition
@@ -356,7 +359,9 @@ class Episode(Scene):
         depths = [(m, m.z_index) for m in keep]
         for m, z in depths:
             m.set_z_index(max(z, COVER + 1))
-        self.play(*(anims if isinstance(anims, (list, tuple)) else [anims]))
+        anims = list(anims) if isinstance(anims, (list, tuple)) else [anims]
+        longest = max((a.run_time for a in anims), default=0.0)
+        self.play(*anims, **({"run_time": fill} if fill > longest else {}))
         self.remove(*[m for m in self.stage() if not any(m is k for k in keep)])
         for m, z in depths:
             m.set_z_index(z)

@@ -255,6 +255,8 @@ class Ep02(Episode):
         before = self.renderer.time
         self.chapter("Cardless", "The shelf stays.", card=False, keep=[shelf], transition="dip")
         rec["spoken_over_seam"] = abs(self._subs[-1][0] - before) < 0.05
+        # no empty frame after the seam's line: only its short pause and the progress bar's 0.7 s move (was 2.2 s)
+        rec["seam_fills_line"] = self.time - self._subs[-1][1] < 1.0
         rec["no_card_kept"] = shelf in self.mobjects
         self.chapter("Typed", "A typed title.", entrance=letters_in, transition=flood(shelf, ACCENT), keep=[shelf])
         rec["kept_depth_restored"] = shelf.z_index == 0
@@ -271,7 +273,7 @@ def test_chapters_without_cards_typed_titles_and_an_answer_over_the_kept_picture
     add_episode(p, "ep02_seams", "Ep02", "Seams", SEAMS)
     layout = render_episode(p, "ep02_seams", "Ep02", voiced=False)
     rec = json.loads((p / "probe.json").read_text(encoding="utf-8"))
-    assert rec == {"left_with_title": True, "spoken_over_seam": True, "no_card_kept": True, "kept_depth_restored": True, "bar_full": 7.2}
+    assert rec == {"left_with_title": True, "spoken_over_seam": True, "seam_fills_line": True, "no_card_kept": True, "kept_depth_restored": True, "bar_full": 7.2}
     texts = [{t["text"] for t in fr["texts"]} for fr in layout["frames"]]
     shown = set().union(*texts)
     assert "Cardless" not in shown and "Typed" in shown  # card=False draws no title; the other card does
