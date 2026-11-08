@@ -2,7 +2,7 @@
 
 manimvox lets an AI agent make high-quality educational videos at low cost, with a person directing. Each release below moves one step closer to that goal. Items are planned, not promised; order and scope may change. Discuss any of them in [GitHub issues](https://github.com/LaplacianAI/manimvox/issues).
 
-**Released:** 0.4.1 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows. Every change is in the [changelog](https://github.com/LaplacianAI/manimvox/blob/main/CHANGELOG.md).
+**Released:** 0.5.0 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows. Every change is in the [changelog](https://github.com/LaplacianAI/manimvox/blob/main/CHANGELOG.md).
 
 ## Released
 
@@ -34,9 +34,9 @@ Demo videos, app tours and PR walkthroughs whose change shows in the UI. The age
 - [x] **Gallery:** *Install manimvox and make a video*, made by Claude Code from one prompt with real terminal recordings (0.4.1).
 - [x] **Fixes found by agents making videos:** Pillow 13 broke every image on a fresh install (capped below 13); a `pron` pattern written `"\bword\b"` in JSON silently never matched (now refused with the fix); a zoom to the picture's edge could fail (0.4.1).
 
-## 0.5: directed videos
+### 0.5: directed videos
 
-Videos made with the same kit all began with one title card, faded chapter numbers and a still end card. Each video now starts from what the person wants and a direction of its own. Built and tested; it ships as the next release.
+Videos made with the same kit all began with one title card, faded chapter numbers and a still end card. Each video now starts from what the person wants and a direction of its own.
 
 - [x] **The brief.** Before any outline, the agent asks who the video is for, what they take away, how it should feel, and how it opens and ends; the answers go in `BRIEF.md`.
 - [x] **A direction step and `DIRECTION.md`.** After the brief, the agent writes three storylines (a device, a form, the first 2 seconds and the last shot), recommends one, and records the look from one medium, motion by role, a transition per chapter seam, and a list of banned tells.
