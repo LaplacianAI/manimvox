@@ -4,6 +4,8 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-09
+
 ### Added
 
 - **The direction.** After the brief, the agent writes three storylines (a device, a form, the first 2 seconds and the last shot), recommends one, and saves it to `DIRECTION.md` with the look from one medium, motion by role, a transition for each chapter seam, varied title entrances, and a list of banned tells, so videos stop sharing one title card, faded chapter numbers, a recap of bullets and a still end card. The skills no longer force one opening, one ending or a dark ground, and each brief answer for how a video opens and ends maps to a kit call. Arrives with the kit options below.
@@ -80,7 +82,8 @@ The first release.
 - **For agents:** eleven agent skills, the CLI as typed tools, adapters for eight Python agent frameworks, and plugin manifests for Claude Code, Codex, Cursor and Gemini CLI.
 - CI on Linux, macOS and Windows; releases published to PyPI with trusted publishing.
 
-[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.4.1...HEAD
+[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/LaplacianAI/manimvox/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/LaplacianAI/manimvox/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/LaplacianAI/manimvox/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/LaplacianAI/manimvox/compare/v0.2.0...v0.3.0
