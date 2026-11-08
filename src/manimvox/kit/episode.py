@@ -48,8 +48,8 @@ from ._context import NOTTS, PROJECT, STEM, THEME, VOICE
 from .colours import ACCENT, BG, INK, LINE, MUTED, PANEL, TEAL
 from .components import box, bullets, heading
 from .ground import ground_mobject
+from .motion import COVER, words_in
 from .motion import dip as _dip
-from .motion import words_in
 from .text import STAGE_BOTTOM, STAGE_CENTER, STAGE_TOP, P, T
 
 config.background_color = BG
@@ -192,16 +192,17 @@ class Episode(Scene):
         """True when the project lists exactly one episode: no episode numbers, no repeated series name."""
         return PROJECT is not None and len(PROJECT.episodes) == 1
 
-    def intro(self, narration, tts=None, question=None, card=True):
+    def intro(self, narration, tts=None, question=None, card=True, leave=()):
         """Title card, then it settles into the persistent header. Anything drawn before intro()
         (a cold open) is swept away first. `question` replaces the tagline on the card and is
         what outro(answer=...) answers.
         With `card=False` there is no card and no motif, and the cold open stays on screen: the title
         arrives as kinetic type over it (word by word), holds through the narration, then fades.
-        The header and progress bar are still added, as far as CHROME allows."""
+        The header and progress bar are still added, as far as CHROME allows. `leave` is the cold open's
+        mobjects that go with the title, so the next scene does not need a clear of its own."""
         self._intro_card = card
         if not card:
-            return self._intro_over_picture(narration, tts, question)
+            return self._intro_over_picture(narration, tts, question, leave)
         self.clear()
         self._flat()
         self.question = question
@@ -252,14 +253,14 @@ class Episode(Scene):
         if chrome:
             self._pin(*chrome)
 
-    def _intro_over_picture(self, narration, tts, question):
+    def _intro_over_picture(self, narration, tts, question, leave=()):
         """intro(card=False): the title as kinetic type over whatever is already on stage."""
         self._flat()
         self.question = question
         title = P(self.TITLE, 56, INK, max_w=11.5, weight=BOLD, align="center").move_to([0, 2.0, 0])
         with self.narrate(narration, tts=tts):
             self.play(words_in(title))
-        self._dock_chrome([FadeOut(title)])
+        self._dock_chrome([FadeOut(title), *[FadeOut(m) for m in leave]])
 
     def motif(self):
         """The title card's decoration, bottom right. The project's own mark when
@@ -287,16 +288,23 @@ class Episode(Scene):
         zoom_through(mob), flood(mob, colour), iris(point), dip(), or whip(direction), which waits for the
         stage. chapter() plays its animations, then removes the old stage (except `keep`).
         `entrance` is how the card's title arrives: a title helper such as words_in, letters_in or blur_in
-        (the default fades it up). `card=False` draws no card at all: the seam plays, `narration` is spoken over
-        what stays (`keep`), and the title only becomes the docked label when CHROME has one."""
+        (the default fades it up). `card=False` draws no card at all: `narration` is spoken while the seam plays,
+        so the transition is never silent, and the title only becomes the docked label when CHROME has one."""
         if bridge:
             with self.narrate(bridge, tts=bridge_tts):
                 pass
+        if not card:
+            if narration:
+                with self.narrate(narration, tts=tts):
+                    self._leave(transition, keep)
+            else:
+                self._leave(transition, keep)
+            self._flat()
+            self._chap_i += 1
+            return self._dock_chapter(title, [], None)
         self._leave(transition, keep)
         self._flat()
         self._chap_i += 1
-        if not card:
-            return self._chapter_without_card(title, narration, tts)
         num = T(f"{self._chap_i:02d}", 150, ACCENT, BOLD).set_opacity(0.16) if number else None
         ttl = P(title, 52, INK, max_w=10.5, weight=BOLD, align="center")
         rule = Line(LEFT * 0.9, RIGHT * 0.9).set_stroke(ACCENT, 6).next_to(ttl, DOWN, buff=0.35)
@@ -311,12 +319,6 @@ class Episode(Scene):
             self.wait(1.0)
         outs = ([FadeOut(num)] if num is not None else []) + [FadeOut(rule)]
         self._dock_chapter(title, outs, ttl)
-
-    def _chapter_without_card(self, title, narration, tts):
-        """chapter(card=False): no card; the narration plays over the kept picture, then the chrome moves on."""
-        if narration:
-            self.say(narration, tts=tts)
-        self._dock_chapter(title, [], None)
 
     def _dock_chapter(self, title, outs, ttl):
         """Dock the chapter's title top-right (as far as CHROME allows) and move the progress bar on."""
@@ -350,8 +352,14 @@ class Episode(Scene):
         self._seams.append(getattr(transition, "mv_kind", type(transition).__name__))
         old = [m for m in self.stage() if not any(m is k for k in keep)]
         anims = transition(old) if callable(transition) else transition
+        # A kept mobject rides above the flood or iris that covers the old stage, then goes back to its own depth.
+        depths = [(m, m.z_index) for m in keep]
+        for m, z in depths:
+            m.set_z_index(max(z, COVER + 1))
         self.play(*(anims if isinstance(anims, (list, tuple)) else [anims]))
         self.remove(*[m for m in self.stage() if not any(m is k for k in keep)])
+        for m, z in depths:
+            m.set_z_index(z)
 
     def outro(self, recap, narration, next_title=None, tts=None, next_label="NEXT", answer=None, answer_tts=None,
               end=None, keep=()):

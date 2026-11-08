@@ -248,10 +248,16 @@ class Ep02(Episode):
         rec = {}
         shelf = node("Shelf").move_to(DOWN * 2.2)
         self.add(shelf)
-        self.intro("Straight in.", question="Where is it?", card=False)
+        gone = node("Gone").move_to(UP * 0.5)
+        self.add(gone)
+        self.intro("Straight in.", question="Where is it?", card=False, leave=[gone])
+        rec["left_with_title"] = gone not in self.mobjects
+        before = self.renderer.time
         self.chapter("Cardless", "The shelf stays.", card=False, keep=[shelf], transition="dip")
+        rec["spoken_over_seam"] = abs(self._subs[-1][0] - before) < 0.05
         rec["no_card_kept"] = shelf in self.mobjects
-        self.chapter("Typed", "A typed title.", entrance=letters_in, transition="blur")
+        self.chapter("Typed", "A typed title.", entrance=letters_in, transition=flood(shelf, ACCENT), keep=[shelf])
+        rec["kept_depth_restored"] = shelf.z_index == 0
         rec["bar_full"] = round(self._bar.get_right()[0], 2)
         self.say("Back to the shelf.", FadeIn(shelf))
         self.outro([], "Ending.", answer="On the shelf.", keep=[shelf])
@@ -265,7 +271,7 @@ def test_chapters_without_cards_typed_titles_and_an_answer_over_the_kept_picture
     add_episode(p, "ep02_seams", "Ep02", "Seams", SEAMS)
     layout = render_episode(p, "ep02_seams", "Ep02", voiced=False)
     rec = json.loads((p / "probe.json").read_text(encoding="utf-8"))
-    assert rec == {"no_card_kept": True, "bar_full": 7.2}
+    assert rec == {"left_with_title": True, "spoken_over_seam": True, "no_card_kept": True, "kept_depth_restored": True, "bar_full": 7.2}
     texts = [{t["text"] for t in fr["texts"]} for fr in layout["frames"]]
     shown = set().union(*texts)
     assert "Cardless" not in shown and "Typed" in shown  # card=False draws no title; the other card does
@@ -287,3 +293,11 @@ def test_code_row_sits_on_its_line_and_counts_blank_lines():
     assert bars[0].get_center()[1] > bars[1].get_center()[1] > bars[3].get_center()[1]
     with pytest.raises(ValueError, match="row 2"):
         panel.row(2)  # the blank line
+
+
+def test_code_without_dots_keeps_the_title_and_drops_the_marks():
+    from manimvox.kit.components import code
+
+    with_dots, plain = code("x = 1", title="a.py"), code("x = 1", title="a.py", dots=False)
+    assert len(plain.submobjects) == len(with_dots.submobjects) - 1
+    assert plain.text.get_center()[1] == with_dots.text.get_center()[1]

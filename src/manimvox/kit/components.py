@@ -185,9 +185,11 @@ def table(rows, col_w, size=18, row_h=0.6, header=True, header_color=ACCENT, col
     return out
 
 
-def code(src, size=17, title=None, w=None, colors=None, line_spacing=-1):
+def code(src, size=17, title=None, w=None, colors=None, line_spacing=-1, dots=True):
     """Monospace panel. `colors` maps substrings to colours (t2c).
-    `line_spacing` above 0 opens the lines up (try 0.8) for code read aloud line by line."""
+    `line_spacing` above 0 opens the lines up (try 0.8) for code read aloud line by line.
+    `dots=False` leaves out the window dots, for a look that is not a desktop window.
+    `.row(k)` gives a highlight bar behind line k: call it after the panel is placed, it is drawn where the line is."""
     txt = Text(src.strip("\n"), font=MONO, font_size=size, color=INK, t2c=colors or {}, disable_ligatures=True,
                line_spacing=line_spacing)
     ttl = T(title, 14, MUTED, font=MONO) if title else None
@@ -196,11 +198,15 @@ def code(src, size=17, title=None, w=None, colors=None, line_spacing=-1):
         txt.scale_to_fit_width(w - 0.6)
     head_h = 0.42
     bg = box(w, txt.height + 0.6 + head_h, fill=CODE_BG, stroke=LINE)
-    dots = VGroup(*[Dot(radius=0.055, color=c) for c in (ERROR, WARN, OK)]).arrange(RIGHT, buff=0.1)
-    dots.move_to(bg.get_corner(UL) + RIGHT * 0.42 + DOWN * 0.25)
-    g = VGroup(bg, dots)
+    marks = VGroup(*[Dot(radius=0.055, color=c) for c in (ERROR, WARN, OK)]).arrange(RIGHT, buff=0.1)
+    marks.move_to(bg.get_corner(UL) + RIGHT * 0.42 + DOWN * 0.25)
+    g = VGroup(bg, marks) if dots else VGroup(bg)
     if ttl:
-        g.add(ttl.next_to(dots, RIGHT, buff=0.25))
+        if dots:
+            ttl.next_to(marks, RIGHT, buff=0.25)
+        else:
+            ttl.move_to(marks, aligned_edge=LEFT).shift(LEFT * 0.12)
+        g.add(ttl)
     txt.move_to(bg).shift(DOWN * head_h / 2).align_to(bg, LEFT).shift(RIGHT * 0.32)
     g.add(txt)
     g.text = txt
