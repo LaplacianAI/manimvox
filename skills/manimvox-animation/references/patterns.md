@@ -15,6 +15,7 @@ Each example is the body of one chapter inside an episode's `build()`, after `se
 9. Recipe: coloured words
 10. Recipe: a plane without Axes
 11. Recipe: a live number
+12. Transitions and title entrances
 
 ## 1. Carry an object between scenes
 
@@ -234,3 +235,31 @@ self.say("The count climbs from zero to a hundred.", FadeIn(caption), tracker.an
 readout.clear_updaters()
 meter.clear_updaters()
 ```
+
+## 12. Transitions and title entrances
+
+Which one to use is set in `DIRECTION.md` (see [direction](../../manimvox-creative/references/direction.md)): 3 to 5 kinds in a video, each caused by something on screen, never the same at every seam. `from manimvox.kit import *` gives all of these.
+
+Chapter seams. `transition` is one of `"blur"`, `"down"`, `"dip"`, `zoom_through(mob)`, `flood(mob, colour)`, `iris(point)` or `whip(direction)`. `keep` is the mobjects carried across the seam; `number=False` drops the faded numeral.
+
+```python
+self.chapter("Inside the cache", "Now look inside the box.", transition=zoom_through(cache_box))
+self.chapter("The failure", "Then the request fails.", transition=flood(bad_node, ERROR))
+self.chapter("Where it goes", "The answer leaves the server.", transition=iris(reply.get_center()), number=False)
+self.chapter("The next hop", "It arrives at the browser.", transition=whip(RIGHT), keep=(packet,))
+```
+
+Between scenes without a chapter card, `self.clear(how="left"|"blur"|"down"|"dip", keep=())` leaves some mobjects on stage. `morph(a, b)` turns one mobject into another, `carry(m, to)` moves one to a new place across a seam, and `dip()` is a dip to the background colour.
+
+Title entrances. Each returns an animation for a title `T(...)`:
+
+```python
+title = T("Why the cache missed", 56, INK, BOLD)
+self.play(words_in(title))                      # word by word
+self.play(letters_in(title))                    # letter by letter
+self.play(blur_in(title))                       # from blur to sharp
+self.play(slot(["Slow", "Late", "Wrong"], "Fast"))   # options roll past, the last one lands
+self.play(accent_word(title, "missed"))         # the one word that carries the point takes the accent
+```
+
+An opening with no card: `self.intro(narration, question="…", card=False)`. The cold open stays on screen and the title arrives as type over it. For a clean frame, set `CHROME = ()` on the episode class; the default is `CHROME = ("label", "bar")`, and the bar stays in a playlist, where it shows where the viewer is. An ending that is not a recap: `self.outro(recap=[], end="…")`, or `end=[…]` for up to 3 lines.

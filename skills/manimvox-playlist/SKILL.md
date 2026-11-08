@@ -13,6 +13,7 @@ Copy this checklist and keep it current:
 ```text
 - [ ] 0 Setup      manimvox doctor; manimvox new <dir> --series "…" (outside the project's repo)
 - [ ] 0b Brief     ask the brief questions (manimvox-creative brief); one BRIEF.md for the series; manimvox check brief
+- [ ] 0c Direction  three storylines, one picked; one DIRECTION.md for the series (manimvox-creative direction)
 - [ ] 1 Facts      FACTS.md, every claim sourced and labelled
 - [ ] 2 Theme      the project's own theme (manimvox-creative); manimvox check theme passes
 - [ ] 3 Ladder     SERIES.md and series.json episodes (with level and blurb); show the user
@@ -38,6 +39,10 @@ Work from inside that folder. For a voice other than the default, see [manimvox-
 ## 0b Brief
 
 Before any outline, ask the person what they want from the video, as [brief](../manimvox-creative/references/brief.md) says: who it is for, what they take away and feel, their own angle, and how it opens and ends, in two short rounds with suggested options. Skip what the request already says. Write the answers with `manimvox brief` and decide what is left open, marked `(chosen by the agent)`, until `manimvox check brief` passes. If you cannot ask, decide every question on purpose, from the subject, and list your choices in the report. The theme, the outline, the script, the opening and the ending all follow from `BRIEF.md`.
+
+## 0c Direction
+
+After the brief, write one `DIRECTION.md` for the whole series, as [direction](../manimvox-creative/references/direction.md) says: three storylines (a device, a form, the first 2 seconds and the last shot), one recommended; then the look from one medium, motion by role, the opening shot, the ending, a transition for each kind of seam, varied title entrances and a BANNED list. Episodes may vary within it; the look and the progress bar stay. The person picks; if you cannot ask, take the recommendation and name the other two in the report.
 
 ## 1 Facts
 

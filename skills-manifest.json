@@ -6,11 +6,11 @@
       "files": 1
     },
     "manimvox-animation": {
-      "sha256": "60ca5d9b7d37d7e8cfe8fe0cc0bf1792b52ee18cf82c9a595e9e86505cc80fba",
+      "sha256": "09db359f14ca036a466c47ecf7577e80db949c08259557817391a0bfd0fc50a9",
       "files": 5
     },
     "manimvox-blocks": {
-      "sha256": "9c7444bd4c376822fbadd02d498112fe3951e99893e8957fafe1896ab929b5be",
+      "sha256": "3c76b87920fdff4fca70457ace2b7798f2eeaef8a09de361ffd3fa858d8bdbe9",
       "files": 2
     },
     "manimvox-cli": {
@@ -18,27 +18,27 @@
       "files": 1
     },
     "manimvox-concept": {
-      "sha256": "510b2e58536d514cce730e440ff04cfb2c84841e2608df9fdb3d5d5fa370e85b",
+      "sha256": "6095b8aedb30f064a77608844b61df32c9b9b459f706fe4065f3104b4a1311b8",
       "files": 1
     },
     "manimvox-core": {
-      "sha256": "dec7a9a3bad3b2ddf63d53afabb8cd2a532e336511a72e5752f5507dc098c489",
+      "sha256": "9f79666493b639dc13db5821feaa14319002a083b3a95e9dc4d26ee740faefcd",
       "files": 2
     },
     "manimvox-creative": {
-      "sha256": "d831e9bb969271c4e3061952ef245c8b7b40755a7da557889f45be613ae5aacf",
-      "files": 7
+      "sha256": "bf82c2f47cf17858466eb0da0dde1af812195e76e08f0cd7ab7bc2608f412a47",
+      "files": 8
     },
     "manimvox-paper": {
-      "sha256": "32be42dbaf356a6fdfc0d85fccf5da17bade55c8ce2166166541499e9ed4af71",
+      "sha256": "ffda2b85489f03ec433930ba9ed731f59bdd12a12d7e4e19ab32dd0bcc0e671e",
       "files": 1
     },
     "manimvox-playlist": {
-      "sha256": "107273d46a74cdf9e82a7f72665eb149c42b68108d989aa5527135cba56d1d59",
+      "sha256": "bbe94814adae046b61cbd1541f3a2e423e88ea9cbd7af7c70cde85f17038eb74",
       "files": 3
     },
     "manimvox-pr": {
-      "sha256": "78987d2a78c03e73e70325424cab8b37815899fb8887cd78ac1e342dd60cfd5f",
+      "sha256": "9bf01ce3346ea8092aaea1362ba8317f8239ee5eb922c4a5b1f0fed6d96e826c",
       "files": 1
     },
     "manimvox-voice": {

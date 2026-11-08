@@ -16,7 +16,13 @@ Take the first source that has an answer for a role, and record what you used in
    - a children's or beginner topic: warmer hues and more of them, with the same contrast limits.
 5. **The kit's neutral dark default.** If nothing above applies, leave the roles out. `manimvox check theme` prints a note that they come from the default, and `source` should say "kit neutral default".
 
-Videos are dark. If a brand has only a light theme, keep its accent and hues, take the kit's dark neutrals, and say so in `source`.
+Videos may be dark or light. The direction ([direction](direction.md)) picks the medium and so the ground: a chalkboard is dark, paper and ink is light. A brand with a light theme can keep it.
+
+When `bg` is light, also set `panel`, `panel2` and `line`, because the kit's defaults for them are dark; `manimvox check theme` warns when they are missing. Set `code_bg` too, a shade darker than `bg`.
+
+### The ground
+
+An optional `ground` puts a texture behind everything: `"ground": {"kind": "grain", "amount": 0.3}`. `kind` is `solid`, `grain`, `grid` or `paper`; `amount` runs from 0 to 1. Keep `amount` low so text stays readable, and look at a contact sheet before keeping it.
 
 ## The roles
 

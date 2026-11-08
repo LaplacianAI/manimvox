@@ -8,14 +8,14 @@ Write every spoken line before any scene code, and critique it in writing. Code 
 
 ## The opening: four moves
 
-The four moves are the bones; `BRIEF.md` says how it opens (a scene of the problem happening, a surprising number, a story, a quote, a question, or straight in) and what it should feel like. Build that, not the same title card every time. This is 15 to 25 seconds at 5 minutes and up (see the [length table](#when-the-time-is-short) for shorter videos).
+The four moves are one shape that works, not the rule. `DIRECTION.md` ([direction](direction.md)) gives the first 2 seconds and may drop the title card; where it does, use `self.intro(narration, question="…", card=False)`. `BRIEF.md` says how it opens (a scene of the problem happening, a surprising number, a story, a quote, a question, or straight in) and what it should feel like. Build that, not the same title card every time. The moves below still hold for most videos: use as many as the opening needs. This is 15 to 25 seconds at 5 minutes and up (see the [length table](#when-the-time-is-short) for shorter videos).
 
 1. **The problem, felt.** A concrete situation where the obvious way is slow, wrong or impossible, drawn on screen, not only said over the title card. In a playlist episode, the problem is the question the previous episode ended on.
 2. **The question.** One sentence the whole video answers, in the viewer's words. Keep it: the ending says it again.
 3. **The promise.** What the viewer will be able to do or explain at the end.
 4. **The route.** The chapters in one sentence: "First…, then…, and last…".
 
-Do not open on a definition, name the idea before the problem is felt, or let the tagline give the answer away. A cold open is allowed: draw the problem before `self.intro(...)`; `intro` clears it. Pass the question to `self.intro(narration, question="…")` so the title card shows it and the outro can answer it.
+Do not open on a definition, name the idea before the problem is felt, or let the tagline give the answer away. A cold open is allowed: draw the problem before `self.intro(...)`; `intro` clears it. Pass the question to `self.intro(narration, question="…")` so the title card (or, with `card=False`, the type over the cold open) shows it and the outro can answer it.
 
 ## Chapters
 
@@ -29,11 +29,11 @@ Connectives that carry flow: **So** (a consequence), **But** (a problem), **Now*
 
 ## The ending: four moves
 
-`BRIEF.md` says how it ends (a callback to the opening scene, a recap, a challenge for the viewer, a cliffhanger into the next video, a call to action); shape these moves to it. This is 20 to 40 seconds at 3 minutes and up (less for shorter videos, see the [length table](#when-the-time-is-short)).
+The four moves are one shape that works, not the rule. `DIRECTION.md` gives the last shot; a challenge or a cliffhanger uses `self.outro(recap=[], end="…")` and a call to action `end=[…]` with a link line. `BRIEF.md` says how it ends (a callback to the opening scene, a recap, a challenge for the viewer, a cliffhanger into the next video, a call to action); shape these moves to it. This is 20 to 40 seconds at 3 minutes and up (less for shorter videos, see the [length table](#when-the-time-is-short)).
 
 1. **The payoff.** Go back to the opening's situation and solve it on screen with what was built.
 2. **The callback.** Say the opening question again and answer it in one sentence: `self.outro(recap, narration, answer="…")` shows the question, then speaks and shows your answer, before the recap.
-3. **The recap.** "To recap." Then one sentence per chapter, in order, in the words of each chapter's takeaway. The bullets on screen are those sentences. Skip it when the length is short (about 1 minute): pass an empty list, `self.outro([], narration, answer="…")`, and the narration is still spoken.
+3. **The recap** (optional). "To recap." Then one sentence per chapter, in order, in the words of each chapter's takeaway. The bullets on screen are those sentences. Skip it when the length is short (about 1 minute): pass an empty list, `self.outro([], narration, answer="…")`, and the narration is still spoken.
 4. **Next.** In a playlist, the next episode's real title. In a single video, the next step: where it shows up, what to read, what to try (`next_label="READ"` or `"TRY"`).
 
 Do not end on a new fact, a bare list of uses, or "That is all X is."

@@ -25,6 +25,9 @@ Run `manimvox add --list`. Each line is a block's name, what it draws, and its t
 | `code-diff` | code before and after, removed and added lines banded |
 | `surface-plot` | a 3D surface z = f(x, y) shaded by height, for an `Episode3D`; `downhill` gives a ball's route |
 | `mesh-model` | a 3D model from a glTF, OBJ or STL file as shaded faces the camera orbits, for an `Episode3D`; `mesh_part` picks a part (needs the `trimesh` extra) |
+| `kinetic-title` | a title that arrives as moving type, for an opening with no card or a chapter title |
+| `end-card` | a built end card: a challenge, a cliffhanger or a call to action with a link line |
+| `transitions-demo` | the chapter-seam transitions side by side, to see which fits |
 
 ## Copy it into the project
 
