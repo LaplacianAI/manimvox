@@ -1,0 +1,42 @@
+{
+  "manimvox": "0.4.1",
+  "series": "How a hash map finds a key",
+  "tagline": "Why a dict does not search",
+  "voice": "kokoro:af_heart",
+  "speed": 1.0,
+  "loudness": -16.0,
+  "pron": [],
+  "theme": {
+    "source": "paper and ink, chosen from the brief (light, paper ground); rust ink-red for ERROR, a blue ink accent; all text roles tuned for contrast on cream",
+    "bg": "#F4EFE4",
+    "panel": "#EAE3D2",
+    "panel2": "#DDD4BF",
+    "line": "#A99D84",
+    "code_bg": "#E8E0CC",
+    "ink": "#2A2620",
+    "muted": "#625A4B",
+    "accent": "#1F4E8C",
+    "ok": "#2F6B3B",
+    "warn": "#7A5200",
+    "error": "#A82A1C",
+    "blue": "#2F6DB0",
+    "orange": "#B35A12",
+    "violet": "#6B4C9A",
+    "pink": "#A8456E",
+    "teal": "#1F7A74",
+    "named": {},
+    "ground": {
+      "kind": "paper",
+      "amount": 0.25
+    }
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_hashmap",
+      "cls": "Ep01",
+      "title": "How a hash map finds a key"
+    }
+  ],
+  "ground": null
+}
