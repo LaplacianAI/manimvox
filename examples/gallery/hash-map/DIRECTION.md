@@ -23,18 +23,21 @@ Recommendation: A, because the brief asks for a scene of the problem that the en
 - One accent, a blue ink #1F4E8C, only on the thing the narration is naming (the box being looked at, the shelf number). Rust #A82A1C (ERROR) only for what failed/slow: the scanning frame.
 - Sizes: title 56 pt, body 28 to 34 pt, label 15 to 18 pt (box labels 18).
 
-**Motion by role.** Enter 0.8 s; move 0.8 s; exit 0.4 s. Scan hop 0.4 s per box (snappy, deliberate). Once the title lands it holds still. Calm: no more than 3 things move at once.
+**Motion by role.** Enter 0.8 s; move 0.8 s; exit 0.4 s. Scan hop 0.4 s per box. No silent stretch over 1.2 s except a 1 s beat after the answer; every seam plays while the next line is already being spoken. Calm: at most 3 things moving at once.
 
-**Opening shot.** Frame 0 is the shelf with the scan frame on box 0. No card, `intro(card=False)`; the title types itself over the shelf.
+**Type scale.** Hero numbers 96 (the remainder), 72 (looks counter), 48 and 44 (the big number and its division); every label (box entries, key tags, code chips) 24; notes 16 to 18.
 
-**Ending.** The shelf returns to its opening place and box 7 lights once, in one look; then the answer, then the built end card.
+**Opening shot.** Frame 0 is the shelf with the scan frame on box 0 and a "1 look" counter. No card; `intro(card=False)`; the title types itself over the shelf while the voice asks the question.
 
-**Transition per seam.**
-1. Opening to chapter 1: `iris` on box 7 (plum's box), because we are about to find out where plum lives. Shelf kept.
-2. Chapter 1 to 2: `whip(RIGHT)`, because the number just travelled right to its shelf. Shelf kept, `card=False`.
-3. Chapter 2 to 3: `flood` of the accent from box 7, because the next chapter is about that box getting crowded. Shelf kept, `card=False`.
+**Ending.** The shelf returns to its opening place with plum lit and "1 look"; the answer sits over it (`outro(..., keep=[shelf, one])`), then the built end card.
 
-**Title entrances.** Opening title `words_in` (kit); chapter 1's card `blur_in`; chapter 2 the value rolls in with `slot`; chapter 3 `accent_word` on the `≠` of "fig ≠ plum". No lead-line headings.
+**Transition per chapter seam** (all cardless; the voice already speaks over each).
+1. Opening to chapter 1: `iris` on box 7 (plum's box), because we are about to find out where plum lives.
+2. Chapter 1 to 2: `whip(RIGHT)`, because the number just travelled right to its box.
+3. Chapter 2 to 3: `flood` of the accent from box 7, because the next chapter is about that box getting crowded.
+The shelf is above the covers (z-index) so it never disappears under a seam.
+
+**Title entrances.** Opening title `words_in` (kit); the value rolls into view as a number and the check mark is drawn; no chapter cards, no lead-line headings. (`slot`, `accent_word`, `blur_in` were used in v2 and v3 dropped them with the headings.)
 
 **CHROME = ().** No header label, no progress bar.
 
@@ -54,13 +57,12 @@ Recommendation: A, because the brief asks for a scene of the problem that the en
 
 ## Tells found (reviews of the drafts)
 
-First draft, then the coordinator's review of the sheets. Found and fixed:
-- A solid-filled highlight hid the label and stayed red through every chapter. Fixed: stroke-only frame, scanned boxes dim.
-- Three identical centred chapter cards. Fixed: chapters 2 and 3 use `card=False` and the shelf carries the seam; chapter 1 keeps one card with `entrance=blur_in`.
-- The hero was a thin 12-box band in an empty frame. Fixed: 8 boxes at 1.45 x 1.5 with 30 pt labels, 87% of the width in the cold open and the ending; at 0.9 scale along the bottom while chapters work above; the mod result at 96 pt.
-- A lead-line heading on every scene ("Step one...", "Jump", "Two keys, one shelf"). Fixed: all removed; narration and picture carry each scene.
-- On-screen text that restated the voice ("The key says where it lives", the long compare and hashable sentences). Fixed: cut or shortened to "fig ≠ plum" and "hashable".
-- The ending used a rebuilt shelf that `outro` wiped. Fixed: `outro(..., keep=[shelf, one])` answers over the shelf in its opening place, plum lit, "1 look".
-- Arrows that crossed neighbouring boxes or text (chapters 1 and 3). Fixed: the result number sits above plum's box, tags drop onto the box's top edge.
-- Unused variable in the episode. Fixed.
-- ADDED TO BANNED: a solid-filled highlight that hides a label; on-screen text that restates the voice; arrows that cross text or other boxes; the same card at every seam.
+v1 to v2 (see below, kept for the record), then v3 for pace and clarity:
+- v2 had 15 of 62 s silent (title typing, the chapter 1 card, seams, pauses). Fixed: all chapter seams are cardless and play during the next line (`narrate` around `chapter`); lines follow each other at 0.3 s; the intro's own dock is shortened; speed 0.9 because the voice ran 200+ wpm. Largest gap between lines is in the report.
+- "mod" is jargon. Fixed: the remainder is shown as `7401935 = 8 × 925241 + 7` with the 7 lit, said as "what's left over"; `% 8` appears once, small.
+- A floating "3, example value" with a dashed arrow was confusing. Fixed: the value lives in the box ("plum: 3") and rises out of it on lookup.
+- The one 9 s collision line. Fixed: three short lines: two keys land in one box (fig: 5 stacked over plum: 3), the box checks which key you asked for (a tick on plum), why a key can not change (its box would move).
+- The glossary label "hashable" and the big "fig ≠ plum". Fixed: cut; the hashable fact is one spoken line with a picture (plum becomes plums and the arrow swings to another box); the Python docs cite is a small note.
+- The cold open's top third was empty once the title left. Fixed: the composition (shelf, counter, claim) is centred lower-middle; the callback uses the same place.
+- Earlier tells, still fixed: filled highlight hiding a label, identical chapter cards, thin 12-box hero, lead-line headings, text restating the voice, arrows crossing text.
+- ADDED TO BANNED: silent seams; a floating value with its own arrow; jargon in the voice (mod); a glossary label as a scene.

@@ -1,0 +1,46 @@
+{
+  "manimvox": "0.4.1",
+  "series": "Why every video looked the same",
+  "tagline": "The kit now lets each video choose its own opening, seams and ending",
+  "voice": "sarvam:shubh",
+  "speed": 1.0,
+  "loudness": -16.0,
+  "pron": [
+    [
+      "\\bmanimvox\\b",
+      "manim vox"
+    ]
+  ],
+  "theme": {
+    "source": "Terminal / code-editor look written for this video in DIRECTION.md: GitHub-dark-like neutrals, one amber accent.",
+    "bg": "#0D1117",
+    "panel": "#161B22",
+    "panel2": "#1F2630",
+    "line": "#30363D",
+    "ink": "#E6EDF3",
+    "muted": "#8B949E",
+    "accent": "#FFB454",
+    "ok": "#3FB950",
+    "warn": "#D29922",
+    "error": "#F85149",
+    "code_bg": "#010409",
+    "blue": "#58A6FF",
+    "orange": "#DB6D28",
+    "violet": "#A371F7",
+    "pink": "#DB61A2",
+    "teal": "#39C5CF",
+    "mono": "Menlo",
+    "ground": {
+      "kind": "grid",
+      "amount": 0.5
+    }
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_directed",
+      "cls": "Ep01",
+      "title": "Directed videos, not templates"
+    }
+  ]
+}

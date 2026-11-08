@@ -28,6 +28,7 @@ nav = [
     { "Gallery" = "gallery/index.md" },
     { "Install and make a video" = "gallery/install-tutorial.md" },
     { "How a hash map finds a key" = "gallery/hash-map.md" },
+    { "Directed videos, not templates" = "gallery/directed-videos.md" },
     { "Made by your agent" = "gallery/made-by-your-agent.md" },
     { "Inside the heart" = "gallery/heart.md" },
     { "How UPI payments work" = "gallery/upi.md" },

@@ -60,4 +60,4 @@ About 70 seconds; unhurried (chosen by the agent)
 
 > Which voice? The default runs offline; online voices sound different and send the narration out. It decides the voice in series.json (see manimvox voices).
 
-kokoro:af_heart
+sarvam:shubh (the person asked for Sarvam after the first renders)

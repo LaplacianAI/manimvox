@@ -16,9 +16,17 @@ Finished videos made with manimvox, most of them by an AI agent. Each one shows 
 
     ---
 
-    Why a dict does not search: the key becomes a shelf number. No title card, paper and ink, one shelf from the first frame to the answer. About 60 seconds.
+    Why a dict does not search: the key becomes a shelf number. No title card, paper and ink, one shelf from the first frame to the answer. One minute.
 
-    **Made by Claude Code** (Sonnet 5.5) with the direction step · Kokoro voice
+    **Made by Claude Code** (Sonnet 5.5) with the direction step · Sarvam voice
+
+- **[Directed videos, not templates](directed-videos.md)**
+
+    ---
+
+    A pull request walkthrough: why every manimvox video looked the same, shown on real frames, and the options that let each video choose its own shape. One minute.
+
+    **Made by Claude Code** (Sonnet 5.5) from a pull request · Sarvam voice
 
 - **[Made by your agent](made-by-your-agent.md)**
 

@@ -19,6 +19,12 @@ Every claim comes from here. Python references fetched from docs.python.org (the
 
 - Keys (fruit names), the values (3 for plum), the hash number 7401935 and the eight-box shelf are invented. 7401935 mod 8 = 7 (checked by hand: 8 x 925241 = 7401928, remainder 7). Python's real hash of a string differs between runs.
 
+## Added in v3
+
+- [EXTERNAL] The remainder after dividing by the number of boxes picks the box (the division method); it is shown as `7401935 = 8 x 925241 + 7` and, once, as Python's `%`. — Cormen et al., chapter 11. Python's `%` gives the remainder: https://docs.python.org/3/reference/expressions.html#binary-arithmetic-operations
+- [SOURCE] A key's hash must not change during its lifetime (the box would move). — https://docs.python.org/3/glossary.html#term-hashable
+- The values 3 and 5 (plum, fig) and the key "plums" are invented examples.
+
 ## What the video does not claim
 
 - How CPython lays out its table inside (open addressing, resizing): not said.
