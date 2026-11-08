@@ -11,6 +11,7 @@ from manim import (
     DEGREES,
     DOWN,
     LEFT,
+    NORMAL,
     ORIGIN,
     RIGHT,
     UL,
@@ -45,6 +46,9 @@ from ..voice.loudness import DEFAULT_LOUDNESS
 from ._context import NOTTS, PROJECT, STEM, THEME, VOICE
 from .colours import ACCENT, BG, INK, LINE, MUTED, PANEL, TEAL
 from .components import box, bullets, heading
+from .ground import ground_mobject
+from .motion import dip as _dip
+from .motion import words_in
 from .text import STAGE_BOTTOM, STAGE_CENTER, STAGE_TOP, P, T
 
 config.background_color = BG
@@ -79,11 +83,18 @@ class Episode(Scene):
     NCHAP = 1
     SERIES = PROJECT.series if PROJECT else "Explained"  # as written: a brand may forbid capitals
     question = None  # set by intro(question=...), answered on screen by outro(answer=...)
+    CHROME = ("label", "bar")  # what stays on every frame after intro(): "label" (episode and chapter), "bar" (progress)
 
     def construct(self):
         self._subs = []
         self._chap_i = 0
         self._chrome = []
+        self._seams = []  # the transition of each chapter, for the layout snapshot
+        self._intro_card = None
+        self._ground = ground_mobject()
+        if self._ground is not None:
+            self.add(self._ground)
+            self._pin(self._ground)
         self._chap_label = None
         self._bar = None
         self._frames = []
@@ -154,22 +165,42 @@ class Episode(Scene):
     def stage(self):
         """Everything on screen except the header and progress bar."""
         chrome = set(map(id, self._chrome))
+        if self._ground is not None:
+            chrome.add(id(self._ground))
         return [m for m in self.mobjects if id(m) not in chrome]
 
-    def clear(self, shift=LEFT * 0.7, run_time=0.55):
-        """Transition: sweep the stage away."""
-        mobs = self.stage()
-        if mobs:
-            self.play(*[FadeOut(m, shift=shift) for m in mobs], run_time=run_time)
+    def clear(self, shift=LEFT * 0.7, run_time=0.55, how=None, keep=()):
+        """Transition: sweep the stage away, except the mobjects in `keep`. `how` is "left" (slide out to
+        `shift`, the default), "blur" (fade with a slight shrink), "down" (sink away) or "dip" (dim to black briefly)."""
+        mobs = [m for m in self.stage() if not any(m is k for k in keep)]
+        if how not in (None, "left", "blur", "down", "dip"):
+            raise ValueError(f"clear: how must be left, blur, down or dip, got {how!r}")
+        if not mobs:
+            return
+        if how == "blur":
+            outs = [FadeOut(m, scale=0.96) for m in mobs]
+        elif how == "down":
+            outs = [FadeOut(m, shift=DOWN * 0.7) for m in mobs]
+        elif how == "dip":
+            outs = [FadeOut(m) for m in mobs] + [_dip(run_time)]
+        else:
+            outs = [FadeOut(m, shift=shift) for m in mobs]
+        self.play(*outs, run_time=run_time)
 
     def _single_video(self):
         """True when the project lists exactly one episode: no episode numbers, no repeated series name."""
         return PROJECT is not None and len(PROJECT.episodes) == 1
 
-    def intro(self, narration, tts=None, question=None):
+    def intro(self, narration, tts=None, question=None, card=True):
         """Title card, then it settles into the persistent header. Anything drawn before intro()
         (a cold open) is swept away first. `question` replaces the tagline on the card and is
-        what outro(answer=...) answers."""
+        what outro(answer=...) answers.
+        With `card=False` there is no card and no motif, and the cold open stays on screen: the title
+        arrives as kinetic type over it (word by word), holds through the narration, then fades.
+        The header and progress bar are still added, as far as CHROME allows."""
+        self._intro_card = card
+        if not card:
+            return self._intro_over_picture(narration, tts, question)
         self.clear()
         self._flat()
         self.question = question
@@ -194,17 +225,40 @@ class Episode(Scene):
             self.play(Create(motif), *([FadeIn(top, shift=RIGHT * 0.4)] if top is not None else []), run_time=0.8)
             self.play(FadeIn(title, shift=UP * 0.3), GrowFromEdge(rule, LEFT), run_time=0.9)
             self.play(FadeIn(tag, shift=UP * 0.2), run_time=0.6)
-        # persistent chrome
-        label = T(self.TITLE if single else f"EP {self.EP:02d}  ·  {self.TITLE}", 15, MUTED, BOLD, max_w=7.5)
-        label.move_to([-6.75 + label.width / 2, 3.72, 0])
-        track = Line([-7.2, -3.93, 0], [7.2, -3.93, 0]).set_stroke(LINE, 5)
-        bar = Line([-7.2, -3.93, 0], [-7.15, -3.93, 0]).set_stroke(ACCENT, 5)
-        to_label = ReplacementTransform(top, label) if top is not None else FadeIn(label)
-        self.play(FadeOut(VGroup(title, rule, tag, motif), shift=LEFT * 0.6),
-                  to_label, FadeIn(track), FadeIn(bar), run_time=0.8)
-        self._chrome = [label, track, bar]
-        self._bar = bar
-        self._pin(label, track, bar)
+        outs = [FadeOut(VGroup(title, rule, tag, motif), shift=LEFT * 0.6)]
+        self._dock_chrome(outs, top)
+
+    def _dock_chrome(self, outs, top=None):
+        """Add the persistent header and progress bar that CHROME asks for, playing `outs` with them.
+        `top` is the card's series line, which becomes the header (or fades if there is no header)."""
+        chrome = []
+        if "label" in self.CHROME:
+            single = self._single_video()
+            label = T(self.TITLE if single else f"EP {self.EP:02d}  ·  {self.TITLE}", 15, MUTED, BOLD, max_w=7.5)
+            label.move_to([-6.75 + label.width / 2, 3.72, 0])
+            outs.append(ReplacementTransform(top, label) if top is not None else FadeIn(label))
+            chrome.append(label)
+        elif top is not None:
+            outs.append(FadeOut(top))
+        if "bar" in self.CHROME:
+            track = Line([-7.2, -3.93, 0], [7.2, -3.93, 0]).set_stroke(LINE, 5)
+            bar = Line([-7.2, -3.93, 0], [-7.15, -3.93, 0]).set_stroke(ACCENT, 5)
+            outs += [FadeIn(track), FadeIn(bar)]
+            chrome += [track, bar]
+            self._bar = bar
+        self.play(*outs, run_time=0.8)
+        self._chrome = chrome
+        if chrome:
+            self._pin(*chrome)
+
+    def _intro_over_picture(self, narration, tts, question):
+        """intro(card=False): the title as kinetic type over whatever is already on stage."""
+        self._flat()
+        self.question = question
+        title = P(self.TITLE, 56, INK, max_w=11.5, weight=BOLD, align="center").move_to([0, 2.0, 0])
+        with self.narrate(narration, tts=tts):
+            self.play(words_in(title))
+        self._dock_chrome([FadeOut(title)])
 
     def motif(self):
         """The title card's decoration, bottom right. The project's own mark when
@@ -222,47 +276,75 @@ class Episode(Scene):
         ring2 = Circle(radius=2.2).set_stroke(TEAL, 2, 0.12).move_to([5.6, -2.2, 0])
         return VGroup(ring1, ring2)
 
-    def chapter(self, title, narration=None, tts=None, bridge=None, bridge_tts=None):
+    def chapter(self, title, narration=None, tts=None, bridge=None, bridge_tts=None, transition=None, keep=(),
+                number=True):
         """Transition into a new chapter: big title, then it docks top-right. `bridge` is a
-        "So... / But..." line spoken over the finished picture before it is cleared."""
+        "So... / But..." line spoken over the finished picture before it is cleared.
+        `number=False` drops the faded chapter numeral. `keep` is the mobjects carried across the seam:
+        everything else on the stage is cleared. `transition` replaces the plain clear:
+        a string ("blur", "down" or "dip", as in clear(how=...)), or what a motion helper returns:
+        zoom_through(mob), flood(mob, colour), iris(point), dip(), or whip(direction), which waits for the
+        stage. chapter() plays its animations, then removes the old stage (except `keep`)."""
         if bridge:
             with self.narrate(bridge, tts=bridge_tts):
                 pass
-        self.clear()
+        self._leave(transition, keep)
         self._flat()
         self._chap_i += 1
-        num = T(f"{self._chap_i:02d}", 150, ACCENT, BOLD).set_opacity(0.16)
+        num = T(f"{self._chap_i:02d}", 150, ACCENT, BOLD).set_opacity(0.16) if number else None
         ttl = P(title, 52, INK, max_w=10.5, weight=BOLD, align="center")
         rule = Line(LEFT * 0.9, RIGHT * 0.9).set_stroke(ACCENT, 6).next_to(ttl, DOWN, buff=0.35)
-        num.next_to(ttl, UP, buff=0.1)
-        VGroup(num, ttl, rule).move_to(ORIGIN)
-        anims = [FadeIn(num, scale=1.3), FadeIn(ttl, shift=UP * 0.35), GrowFromCenter(rule)]
+        if num is not None:
+            num.next_to(ttl, UP, buff=0.1)
+        VGroup(*([num] if num is not None else []), ttl, rule).move_to(ORIGIN)
+        anims = ([FadeIn(num, scale=1.3)] if num is not None else []) + [FadeIn(ttl, shift=UP * 0.35), GrowFromCenter(rule)]
         if narration:
             self.say(narration, *anims, run_time=0.8, tts=tts)
         else:
             self.play(*anims, run_time=0.8)
             self.wait(1.0)
-        dock = T(f"{self._chap_i:02d}  {title}", 15, ACCENT, BOLD, max_w=5.5)
-        dock.move_to([6.75 - dock.width / 2, 3.72, 0])
-        frac = min(1.0, self._chap_i / max(1, self.NCHAP))
-        new_bar = Line([-7.2, -3.93, 0], [-7.2 + 14.4 * frac, -3.93, 0]).set_stroke(ACCENT, 5)
-        outs = [FadeOut(num), FadeOut(rule), ReplacementTransform(ttl, dock)]
+        outs = ([FadeOut(num)] if num is not None else []) + [FadeOut(rule)]
+        dock = None
+        if "label" in self.CHROME:
+            dock = T(f"{self._chap_i:02d}  {title}", 15, ACCENT, BOLD, max_w=5.5)
+            dock.move_to([6.75 - dock.width / 2, 3.72, 0])
+            outs.append(ReplacementTransform(ttl, dock))
+        else:
+            outs.append(FadeOut(ttl))
         if self._chap_label is not None:
             outs.append(FadeOut(self._chap_label))
             self._chrome.remove(self._chap_label)
+            self._chap_label = None
         if self._bar is not None:
+            frac = min(1.0, self._chap_i / max(1, self.NCHAP))
+            new_bar = Line([-7.2, -3.93, 0], [-7.2 + 14.4 * frac, -3.93, 0]).set_stroke(ACCENT, 5)
             outs.append(Transform(self._bar, new_bar))
         self.play(*outs, run_time=0.7)
-        self._chap_label = dock
-        self._chrome.append(dock)
-        self._pin(dock)
+        if dock is not None:
+            self._chap_label = dock
+            self._chrome.append(dock)
+            self._pin(dock)
 
-    def outro(self, recap, narration, next_title=None, tts=None, next_label="NEXT", answer=None, answer_tts=None):
+    def _leave(self, transition, keep):
+        """Take the old stage off screen for chapter(): a plain clear, a named one, or a motion helper's animation."""
+        if transition is None or isinstance(transition, str):
+            self._seams.append(transition or "clear")
+            return self.clear(how=transition, keep=keep)
+        self._seams.append(getattr(transition, "mv_kind", type(transition).__name__))
+        old = [m for m in self.stage() if not any(m is k for k in keep)]
+        anims = transition(old) if callable(transition) else transition
+        self.play(*(anims if isinstance(anims, (list, tuple)) else [anims]))
+        self.remove(*[m for m in self.stage() if not any(m is k for k in keep)])
+
+    def outro(self, recap, narration, next_title=None, tts=None, next_label="NEXT", answer=None, answer_tts=None,
+              end=None):
         """Recap bullets and a pointer to the next episode. The last episode can
         point elsewhere instead: next_label="READ", next_title="docs/design.md".
         `answer` is spoken first, on screen under the question given to intro().
         An empty `recap` skips the Recap heading and bullets, keeps the answer on screen,
-        and `narration` is still spoken over it."""
+        and `narration` is still spoken over it.
+        `end` (a line, or a list of up to 3) is a built end card: its lines are carried in word by word
+        and a rule is wiped in under them."""
         self.clear()
         self._flat()
         if answer:
@@ -275,7 +357,7 @@ class Episode(Scene):
                 self.play(FadeIn(parts[0]), run_time=0.6)
             self.say(answer, FadeIn(parts[-1], shift=UP * 0.2), tts=answer_tts)
             self.beat()
-            if recap:
+            if recap or end:
                 self.clear()
         h = heading("Recap") if recap else None
         rows = bullets(recap, size=25, max_w=11.5) if recap else None
@@ -289,6 +371,10 @@ class Episode(Scene):
             plate = box(extra.width + 0.7, extra.height + 0.5, fill=PANEL, stroke=ACCENT)
             extra = VGroup(plate, extra.move_to(plate)).move_to([0, STAGE_BOTTOM + 0.55, 0])
             group.append(FadeIn(extra, shift=UP * 0.3))
+        if end:
+            if group:  # the recap and the pointer make way for the card
+                group.append([FadeOut(m) for m in (h, rows, extra) if m is not None])
+            group += self._end_card(end)
         # Wrapped bullets can run into the plate: shrink them into the space above it.
         if rows is not None:
             floor = (extra.get_top()[1] if extra is not None else STAGE_BOTTOM) + 0.3
@@ -298,7 +384,18 @@ class Episode(Scene):
                 rows.scale(room / rows.height, about_point=top_left)
         self.steps(narration, group, tts=tts)
         self.wait(1.5)
-        self.play(*[FadeOut(m) for m in self.mobjects], run_time=0.8)
+        self.play(*[FadeOut(m) for m in self.mobjects if m is not self._ground], run_time=0.8)
+
+    def _end_card(self, end):
+        """The steps that build the end card from `end`: its lines carried in word by word, then the rule wiped in."""
+        lines = [end] if isinstance(end, str) else list(end)
+        if not 1 <= len(lines) <= 3:
+            raise ValueError(f"outro: end takes a line or up to 3 lines, got {len(lines)}")
+        texts = VGroup(*[P(s, 40 if i == 0 else 28, INK if i == 0 else MUTED, max_w=11.5,
+                           weight=BOLD if i == 0 else NORMAL, align="center") for i, s in enumerate(lines)])
+        rule = Line(LEFT * 1.2, RIGHT * 1.2).set_stroke(ACCENT, 6)
+        VGroup(texts.arrange(DOWN, buff=0.35), rule).arrange(DOWN, buff=0.45).move_to(STAGE_CENTER)
+        return [[words_in(t) for t in texts], GrowFromCenter(rule)]
 
     # -- small helpers -----------------------------------------------------
     def swap(self, old, new, run_time=0.7):
@@ -371,7 +468,9 @@ class Episode(Scene):
             return
         d = PROJECT.build_dir / self._stem()
         d.mkdir(parents=True, exist_ok=True)
-        (d / "layout.json").write_text(json.dumps({"stage": STAGE, "frames": self._frames}), encoding="utf-8")
+        (d / "layout.json").write_text(json.dumps({"stage": STAGE, "frames": self._frames,
+                                                      "intro_card": self._intro_card,
+                                                      "chapters": [{"transition": k} for k in self._seams]}), encoding="utf-8")
 
 
 class Episode3D(Episode, ThreeDScene):

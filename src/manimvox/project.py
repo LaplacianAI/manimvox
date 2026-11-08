@@ -18,6 +18,23 @@ class ProjectError(Exception):
     """series.json is missing, malformed, or does not name what was asked for."""
 
 
+GROUND_KINDS = ("solid", "grain", "grid", "paper")
+
+
+def parse_ground(raw: object) -> dict | None:
+    """The theme's `ground` as {"kind", "amount"}, or None when unset. Raises ValueError with a one-line reason."""
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ValueError(f"theme.ground must be an object like {{\"kind\": \"grain\", \"amount\": 0.5}}, got {raw!r}")  # noqa: TRY004
+    kind, amount = raw.get("kind"), raw.get("amount", 0.5)
+    if kind not in GROUND_KINDS:
+        raise ValueError(f"theme.ground.kind must be one of {', '.join(GROUND_KINDS)}, got {kind!r}")
+    if isinstance(amount, bool) or not isinstance(amount, (int, float)) or not 0 <= amount <= 1:
+        raise ValueError(f"theme.ground.amount must be a number from 0 to 1, got {amount!r}")
+    return {"kind": kind, "amount": float(amount)}
+
+
 @dataclass(frozen=True)
 class EpisodeRef:
     n: int
@@ -107,6 +124,10 @@ def load_project(root: Path) -> Project:
     theme = data.get("theme", {})
     if not isinstance(theme, dict):
         raise ProjectError(f"{f}: 'theme' must be an object, got {theme!r}")
+    try:
+        parse_ground(theme.get("ground"))
+    except ValueError as e:
+        raise ProjectError(f"{f}: {e}") from e
     try:
         post = parse_post(data.get("post"))
     except ValueError as e:

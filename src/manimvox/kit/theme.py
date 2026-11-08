@@ -5,6 +5,8 @@ from __future__ import annotations
 import sys
 from dataclasses import dataclass, field
 
+from ..project import parse_ground
+
 DEFAULTS = {
     "bg": "#111417",
     "panel": "#1B2025",
@@ -50,6 +52,7 @@ class Theme:
     mark_svg: str | None = None
     source: str = ""
     defaulted: tuple[str, ...] = ()
+    ground: dict | None = None  # {"kind": "solid"|"grain"|"grid"|"paper", "amount": 0..1}, drawn once behind everything
 
     @classmethod
     def from_dict(cls, d: dict, platform: str = sys.platform) -> Theme:
@@ -67,6 +70,7 @@ class Theme:
             mark_svg=d.get("mark_svg"),
             source=str(d.get("source", "")).strip(),
             defaulted=defaulted,
+            ground=parse_ground(d.get("ground")),
         )
 
     def __getitem__(self, role: str) -> str:

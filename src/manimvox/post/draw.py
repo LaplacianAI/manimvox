@@ -76,8 +76,9 @@ def caption_overlay(text: str, frame_w: int, frame_h: int, theme) -> Overlay:
     return Overlay(x, y, surface_rgba(surf))
 
 
-def card_image(title: str | None, lines, w: int, h: int, theme) -> np.ndarray:
-    """A full frame on the theme's background: a bold title over an accent rule, then the lines in muted text."""
+def card_image(title: str | None, lines, w: int, h: int, theme, progress: float = 1.0) -> np.ndarray:
+    """A full frame on the theme's background: a bold title over an accent rule, then the lines in muted text.
+    `progress` (0..1) types the text in by characters and wipes the rule out from its centre; 1 is the finished card."""
     surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
     ctx = cairo.Context(surf)
     ctx.set_source_rgb(*hex_rgb(theme["bg"]))
@@ -99,13 +100,13 @@ def card_image(title: str | None, lines, w: int, h: int, theme) -> np.ndarray:
             tw = ctx.text_extents(text).x_advance
         y += size * 1.5
         ctx.set_source_rgb(*hex_rgb(colour))
-        ctx.move_to((w - tw) / 2, y - size * 0.4)
-        ctx.show_text(text)
+        ctx.move_to((w - tw) / 2, y - size * 0.4)  # placed by the full text, so typing does not shift it
+        ctx.show_text(text[:math.ceil(len(text) * progress)])
         if i == 0 and title:
             ctx.set_source_rgb(*hex_rgb(theme["accent"]))
             ctx.set_line_width(max(1.0, h * 0.006))
-            ctx.move_to(w * 0.44, y + rule_gap * 0.35)
-            ctx.line_to(w * 0.56, y + rule_gap * 0.35)
+            ctx.move_to(w * (0.5 - 0.06 * progress), y + rule_gap * 0.35)
+            ctx.line_to(w * (0.5 + 0.06 * progress), y + rule_gap * 0.35)
             ctx.stroke()
             y += rule_gap
     return np.ascontiguousarray(surface_rgba(surf)[..., :3])

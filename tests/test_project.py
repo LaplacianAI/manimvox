@@ -126,6 +126,9 @@ def test_episode_missing_cls_names_the_episode(tmp_path):
         ({"pron": [["\bGPT\b", "G P T"]]}, r'has a control character; in JSON a regex word boundary is written "\\b"'),  # JSON "\b": a backspace
         ({"pron": [["(GPT", "G P T"]]}, "pron entry 1's pattern '(GPT' is not a valid regex"),
         ({"theme": ["#8A83FF"]}, "'theme' must be an object, got ['#8A83FF']"),
+        ({"theme": {"ground": {"kind": "marble"}}}, "theme.ground.kind must be one of solid, grain, grid, paper, got 'marble'"),
+        ({"theme": {"ground": {"kind": "grain", "amount": 2}}}, "theme.ground.amount must be a number from 0 to 1, got 2"),
+        ({"theme": {"ground": "grain"}}, "theme.ground must be an object"),
         ({"episodes": {"n": 1}}, "'episodes' must be a list"),
         ({"episodes": ["ep01_hello"]}, "episode 1 must be an object, got 'ep01_hello'"),
         (

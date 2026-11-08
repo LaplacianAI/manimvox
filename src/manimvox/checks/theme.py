@@ -75,3 +75,12 @@ def check_theme(theme: Theme, root: Path, fonts: set[str] | None = None) -> list
     if not theme.source:
         out.append(Finding("theme", "source", "empty: say in one sentence where each value came from"))
     return out
+
+
+def theme_notes(theme: Theme) -> list[str]:
+    """Warnings that do not fail the check: a light background still carrying the dark panel defaults."""
+    if _HEX.fullmatch(theme["bg"]) and _lum(theme["bg"]) > 0.4:
+        dark = [r for r in ("panel", "panel2", "line") if r in theme.defaulted]
+        if dark:
+            return [f"warning: bg is light but {', '.join(dark)} kept the dark defaults; set them in series.json"]
+    return []
