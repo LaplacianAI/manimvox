@@ -163,22 +163,24 @@ def check(project: str, what: str, episode: str | None = None) -> CheckResult:
         return CheckResult(not found, "brief", "brief check: ok" if not found else
                            f"brief check: {len(found)} question(s) open", found)
     if what == "theme":
-        from .checks.theme import check_theme
+        from .checks.theme import check_theme, theme_notes
         from .kit.theme import Theme
 
         theme = Theme.from_dict(pr.theme)
         found = [str(f) for f in check_theme(theme, pr.root)]
         notes = [f"note: roles from the kit's neutral default: {', '.join(theme.defaulted)}"] if theme.defaulted else []
+        notes += theme_notes(theme)
         summary = "theme check: ok" if not found else f"theme check: {len(found)} failure(s)"
         return CheckResult(not found, "theme", summary, found, notes)
     if not episode:
         raise ValueError(f"check {what} needs an episode")
     ep = pr.episode(episode)
     if what == "layout":
-        from .checks.layout import check_layout, load_layout
+        from .checks.layout import check_layout, load_layout, variety_notes
 
-        found = [str(f) for f in check_layout(load_layout(pr.build_dir / ep.stem / "layout.json"))]
-        return CheckResult(not found, "layout", _layout_summary(found), found)
+        data = load_layout(pr.build_dir / ep.stem / "layout.json")
+        found = [str(f) for f in check_layout(data)]
+        return CheckResult(not found, "layout", _layout_summary(found), found, variety_notes(data))
     from .checks.audio import check_audio
 
     srt = pr.out_dir / f"{ep.stem}.srt"

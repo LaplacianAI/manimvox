@@ -18,6 +18,7 @@ from manim import (
     DashedVMobject,
     Dot,
     Line,
+    Rectangle,
     RoundedRectangle,
     Text,
     VGroup,
@@ -184,9 +185,11 @@ def table(rows, col_w, size=18, row_h=0.6, header=True, header_color=ACCENT, col
     return out
 
 
-def code(src, size=17, title=None, w=None, colors=None, line_spacing=-1):
+def code(src, size=17, title=None, w=None, colors=None, line_spacing=-1, dots=True):
     """Monospace panel. `colors` maps substrings to colours (t2c).
-    `line_spacing` above 0 opens the lines up (try 0.8) for code read aloud line by line."""
+    `line_spacing` above 0 opens the lines up (try 0.8) for code read aloud line by line.
+    `dots=False` leaves out the window dots, for a look that is not a desktop window.
+    `.row(k)` gives a highlight bar behind line k: call it after the panel is placed, it is drawn where the line is."""
     txt = Text(src.strip("\n"), font=MONO, font_size=size, color=INK, t2c=colors or {}, disable_ligatures=True,
                line_spacing=line_spacing)
     ttl = T(title, 14, MUTED, font=MONO) if title else None
@@ -195,15 +198,53 @@ def code(src, size=17, title=None, w=None, colors=None, line_spacing=-1):
         txt.scale_to_fit_width(w - 0.6)
     head_h = 0.42
     bg = box(w, txt.height + 0.6 + head_h, fill=CODE_BG, stroke=LINE)
-    dots = VGroup(*[Dot(radius=0.055, color=c) for c in (ERROR, WARN, OK)]).arrange(RIGHT, buff=0.1)
-    dots.move_to(bg.get_corner(UL) + RIGHT * 0.42 + DOWN * 0.25)
-    g = VGroup(bg, dots)
+    marks = VGroup(*[Dot(radius=0.055, color=c) for c in (ERROR, WARN, OK)]).arrange(RIGHT, buff=0.1)
+    marks.move_to(bg.get_corner(UL) + RIGHT * 0.42 + DOWN * 0.25)
+    g = VGroup(bg, marks) if dots else VGroup(bg)
     if ttl:
-        g.add(ttl.next_to(dots, RIGHT, buff=0.25))
+        if dots:
+            ttl.next_to(marks, RIGHT, buff=0.25)
+        else:
+            ttl.move_to(marks, aligned_edge=LEFT).shift(LEFT * 0.12)
+        g.add(ttl)
     txt.move_to(bg).shift(DOWN * head_h / 2).align_to(bg, LEFT).shift(RIGHT * 0.32)
     g.add(txt)
     g.text = txt
+    g.row = lambda k, color=ACCENT, opacity=0.18: _code_row(g, src.strip("\n").split("\n"), k, color, opacity)
     return g
+
+
+def _code_lines(txt):
+    """The glyphs of a multi-line Text, one list per line that has any. A glyph starts a new line when it sits
+    to the left of the previous one, or clearly below it (more than half a glyph lower: an underscore is not)."""
+    glyphs = [g for g in txt.submobjects if g.width > 1e-6]
+    drop = 0.5 * float(np.median([g.height for g in glyphs])) if glyphs else 0.0
+    lines, prev = [], None
+    for g in glyphs:
+        if prev is None or g.get_left()[0] < prev.get_left()[0] - 1e-3 or g.get_top()[1] < prev.get_bottom()[1] - drop:
+            lines.append([])
+        lines[-1].append(g)
+        prev = g
+    return lines
+
+
+def _code_row(panel, src_lines, k, color, opacity):
+    """A highlight bar behind line `k` (from 0, blank lines counted) of a code() panel, as wide as the panel."""
+    filled = [i for i, line in enumerate(src_lines) if line.strip()]
+    glyphs = _code_lines(panel.text)
+    if k not in filled or len(glyphs) != len(filled):
+        raise ValueError(f"code row {k}: not a line with text (lines with text: {filled})")
+    # Lines are evenly spaced, but each line's own glyphs sit higher or lower with its letters, so fit one
+    # straight line through their middles against the line numbers and read row k off it.
+    mids = np.array([(max(g.get_top()[1] for g in line) + min(g.get_bottom()[1] for g in line)) / 2 for line in glyphs])
+    idx = np.array(filled, dtype=float)
+    if len(idx) > 1:
+        slope, y0 = np.polyfit(idx, mids, 1)
+    else:
+        slope, y0 = -panel.text.height, mids[0] + panel.text.height * idx[0]
+    bg = panel[0]
+    bar = Rectangle(width=bg.width - 0.2, height=abs(slope) * 0.95).set_fill(color, opacity).set_stroke(color, 1.5, 0.6)
+    return bar.move_to([bg.get_center()[0], y0 + slope * k, 0])
 
 
 def flow(labels, w=2.2, color=BLUE, gap=0.55, size=19, subs=None, max_w=SAFE_W):

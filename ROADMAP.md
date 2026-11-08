@@ -34,23 +34,39 @@ Demo videos, app tours and PR walkthroughs whose change shows in the UI. The age
 - [x] **Gallery:** *Install manimvox and make a video*, made by Claude Code from one prompt with real terminal recordings (0.4.1).
 - [x] **Fixes found by agents making videos:** Pillow 13 broke every image on a fresh install (capped below 13); a `pron` pattern written `"\bword\b"` in JSON silently never matched (now refused with the fix); a zoom to the picture's edge could fail (0.4.1).
 
+## 0.5: directed videos
+
+Videos made with the same kit all began with one title card, faded chapter numbers and a still end card. Each video now starts from what the person wants and a direction of its own. Built and tested; it ships as the next release.
+
+- [x] **The brief.** Before any outline, the agent asks who the video is for, what they take away, how it should feel, and how it opens and ends; the answers go in `BRIEF.md`.
+- [x] **A direction step and `DIRECTION.md`.** After the brief, the agent writes three storylines (a device, a form, the first 2 seconds and the last shot), recommends one, and records the look from one medium, motion by role, a transition per chapter seam, and a list of banned tells.
+- [x] **Openings without a title card, and a clean frame.** `intro(card=False)` keeps the cold open on screen and brings the title in as type; `CHROME = ()` drops the header label and progress bar.
+- [x] **Chapters without cards.** `chapter(card=False)` speaks its line over the seam and goes straight into the next picture; `entrance=` varies a card's title when one is kept.
+- [x] **Transitions and title entrances in the kit.** Zoom through, flood, iris, whip, morph, blur, dip and carry across chapter seams; words, letters, blur, slot and accent-word title entrances.
+- [x] **Endings that answer the opening.** `outro(keep=[...])` gives the answer over the opening's picture; `outro(end=...)` builds a challenge, cliffhanger or call-to-action card.
+- [x] **Light grounds and textures.** Light backgrounds, and a theme `ground` of solid, grain, grid or paper.
+- [x] **Post cards that animate.** Title and end cards type in and wipe their rules instead of holding a still.
+- [x] **Exact code highlights.** `code(...).row(k)` puts a bar behind one line.
+- [x] **Opening, ending and transition blocks:** `kinetic-title`, `end-card` and `transitions-demo`.
+- [x] **A variety check and a review of tells.** `manimvox check layout` warns when every chapter seam uses the same transition; the skills have the agent check its contact sheet against the BANNED list in `DIRECTION.md` before a final render.
+- [x] **Gallery:** *How a hash map finds a key*, a concept video, and *Directed videos, not templates*, a PR walkthrough, both made by Claude Code with the direction step and narrated by Sarvam AI.
+
 ## Next
 
-- [ ] **More gallery videos:** a paper video next, then a concept video and a PR walkthrough.
+- [ ] **More gallery videos:** a paper video next.
 - [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
 - [ ] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it.
 
-## 0.5: professor-quality visuals
+## 0.6: professor-quality visuals
 
 Make the default output look like a good lecture, not slides. The 0.1.0 heart explainer only got there with pieces written inside the episode; they become part of the kit.
 
 - [ ] **Leader-line labels.** A dot on the part, a thin leader line, and the name in a column beside it, laid out so labels don't collide.
 - [ ] **Flow streams.** Glowing particles along a route that fade in where they enter and out where they leave, and can be dimmed: blood, data, current, traffic.
 - [ ] **Entry and exit markers.** Dashed arrows for "comes in here" or "leaves the picture here".
-- [ ] **Calmer kit defaults.** Fewer boxes, thinner lines, more space.
-- [ ] **A visual-quality checklist** in the skills, which agents run before a final render.
+- [ ] **Calmer options, steered to by the skills.** Fewer boxes, thinner lines, more space, as options the skills point towards. The kit's defaults stay as they are, so existing episodes render the same.
 
-## 0.6: 3D and real data
+## 0.7: 3D and real data
 
 Real objects and real data, used with their licences respected.
 
@@ -63,3 +79,4 @@ Real objects and real data, used with their licences respected.
 - Faster renders: scenes in parallel, smarter caching.
 - Narration and subtitles in more languages.
 - Automated evals: every gallery submission rendered and scored by the benchmark, with its leaderboard published alongside. Until then, runs are made by hand, because each run costs model and voice API fees.
+- Sound effects on visible actions, and music cut to the beat.

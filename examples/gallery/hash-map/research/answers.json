@@ -1,0 +1,12 @@
+{
+"audience":"Beginner programmers who use dicts but never thought how they work.",
+"takeaway":"A hash turns the key into a shelf number, so lookup jumps straight there instead of searching.",
+"feeling":"Calm and clear, like a good teacher, with a small click of surprise (chosen by the agent)",
+"angle":"No personal story. Running example: a shelf of labelled boxes, with invented keys and values, marked as an example.",
+"opening":"A scene that shows the problem happening: searching a long list one by one.",
+"ending":"Answer the opening, calling back to its scene.",
+"tone":"Plain spoken English, short sentences, no hype (chosen by the agent)",
+"look":"Light, paper and ink: a paper ground, light background.",
+"length":"About 70 seconds; unhurried (chosen by the agent)",
+"voice":"kokoro:af_heart"
+}

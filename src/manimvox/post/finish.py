@@ -10,10 +10,28 @@ from .draw import caption_overlay, card_image
 from .encode import Writer, frame_count, frames, video_info
 from .options import PostError, PostOptions
 
+CARD_ANIM = 0.6  # seconds a card takes to type in before it holds
+
+
+def smooth(t: float) -> float:
+    return t * t * (3 - 2 * t)
+
 
 def _ts(t: float) -> str:
     ms = round(t * 1000)
     return f"{ms // 3600000:02d}:{ms // 60000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
+
+
+def _card_frames(title, lines, w, h, theme, card_n, fps):
+    """The card for `card_n` frames: it types in over its first ~0.6 s, then holds."""
+    anim = min(card_n, round(CARD_ANIM * fps))
+    for i in range(card_n):
+        if i < anim:
+            yield card_image(title, lines, w, h, theme, progress=smooth(i / anim))
+        elif i == anim:
+            final = card_image(title, lines, w, h, theme)
+        if i >= anim:
+            yield final
 
 
 def srt_text(cues) -> str:
@@ -60,8 +78,7 @@ def finish(src: Path, dst: Path, cues, opts: PostOptions, theme, root: Path) -> 
         if opts.captions == "burn":
             done.append("captions burned in (the .srt ships too)")
         if opts.end_card:
-            card = card_image(None, list(opts.end_card), w, h, theme)
-            for _ in range(round(opts.card_seconds * fps)):
+            for card in _card_frames(None, list(opts.end_card), w, h, theme, round(opts.card_seconds * fps), fps):
                 out.add(card)
             done.append(f"end card, {opts.card_seconds:g} s")
         out.close()
@@ -87,8 +104,7 @@ def concat(parts, dst: Path, theme, title: list[str] | None = None, end=(), card
     out = Writer(dst, (w, h), fps)
     try:
         if title:
-            img = card_image(title[0], title[1:], w, h, theme)
-            for _ in range(card_n):
+            for img in _card_frames(title[0], title[1:], w, h, theme, card_n, fps):
                 out.add(img)
             out.sync()
         for p in parts:
@@ -98,8 +114,7 @@ def concat(parts, dst: Path, theme, title: list[str] | None = None, end=(), card
                 out.add(rgb)
             out.sync()
         if end:
-            img = card_image(None, list(end), w, h, theme)
-            for _ in range(card_n):
+            for img in _card_frames(None, list(end), w, h, theme, card_n, fps):
                 out.add(img)
         out.close()
     except BaseException:

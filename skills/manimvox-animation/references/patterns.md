@@ -15,6 +15,7 @@ Each example is the body of one chapter inside an episode's `build()`, after `se
 9. Recipe: coloured words
 10. Recipe: a plane without Axes
 11. Recipe: a live number
+12. Transitions and title entrances
 
 ## 1. Carry an object between scenes
 
@@ -234,3 +235,37 @@ self.say("The count climbs from zero to a hundred.", FadeIn(caption), tracker.an
 readout.clear_updaters()
 meter.clear_updaters()
 ```
+
+## 12. Transitions and title entrances
+
+Which one to use is set in `DIRECTION.md` (see [direction](../../manimvox-creative/references/direction.md)): 3 to 5 kinds in a video, each caused by something on screen, never the same at every seam. `from manimvox.kit import *` gives all of these.
+
+Chapter seams. `transition` is one of `"blur"`, `"down"`, `"dip"`, `zoom_through(mob)`, `flood(mob, colour)`, `iris(point)` or `whip(direction)`. `keep` is the mobjects carried across the seam; `number=False` drops the faded numeral.
+
+Chapter cards. The card is a centred title over a rule, so three of them in a row read as a template. Vary them: `entrance=words_in` (or `letters_in`, `blur_in`) changes how the title arrives, and `card=False` drops the card entirely, so the seam goes straight into the next scene and the picture carries the chapter (the title still becomes the docked label when `CHROME` has one). A kept mobject sits under the centred card: move it clear first, or use `card=False`. With `card=False` the chapter's `narration` is spoken while the seam plays, so a cardless seam is never silent, and kept mobjects ride above a flood or iris cover on their own. Don't wrap `chapter()` in `narrate()` or raise z-index by hand. Keep a cardless seam's line short, about as long as its transition ("Here is why.", "One more change."): the next scene starts only when the line ends, so a long line leaves an empty frame. Put the explanation in the next `say()` or `steps()`, over the new picture.
+
+```python
+self.chapter("Inside the cache", "Now look inside the box.", transition=zoom_through(cache_box))
+self.chapter("The failure", "Then the request fails.", transition=flood(bad_node, ERROR))
+self.chapter("Where it goes", "The answer leaves the server.", transition=iris(reply.get_center()), number=False)
+self.chapter("The next hop", "It arrives at the browser.", transition=whip(RIGHT), keep=(packet,))
+self.chapter("Collisions", "Two keys want one shelf.", card=False, keep=(shelf,), transition="dip")
+self.chapter("The fix", entrance=letters_in, transition="blur")
+```
+
+Between scenes without a chapter card, `self.clear(how="left"|"blur"|"down"|"dip", keep=())` leaves some mobjects on stage. `morph(a, b)` turns one mobject into another, `carry(m, to)` moves one to a new place across a seam, and `dip()` is a dip to the background colour.
+
+Title entrances. Each returns an animation for a title `T(...)`:
+
+```python
+title = T("Why the cache missed", 56, INK, BOLD)
+self.play(words_in(title))                      # word by word
+self.play(letters_in(title))                    # letter by letter
+self.play(blur_in(title))                       # from blur to sharp
+self.play(slot([T("Slow", 48), T("Late", 48)], T("Fast", 48, ACCENT)))   # mobjects, not strings: they roll past where the last one is, and it stays on stage
+self.play(accent_word(title, "missed"))         # the one word that carries the point takes the accent
+```
+
+An opening with no card: `self.intro(narration, question="…", card=False)`. The cold open stays on screen and the title arrives as type over it, centred at y = 2, so leave that band free. `leave=[…]` takes parts of the cold open off with the title, so the first chapter needs no clear of its own. For a clean frame, set `CHROME = ()` on the episode class; the default is `CHROME = ("label", "bar")`, and the bar stays in a playlist, where it shows where the viewer is. An ending that is not a recap: `self.outro([], narration, end="…")`, or `end=[…]` for up to 3 lines. To answer over the opening's picture, bring it back and pass it as `keep`: `self.outro([], narration, answer="…", keep=[shelf])`.
+
+Code rows. `panel = code(src)` then `panel.row(k)` is a highlight bar exactly behind line `k` (counted from 0, blank lines included): `self.play(FadeIn(panel.row(2)))`. Place the panel first, then call `row`: the bar is drawn where the line is at that moment. Don't estimate rows from the panel's height. `code(src, dots=False)` leaves out the window dots for a look that is not a desktop window.

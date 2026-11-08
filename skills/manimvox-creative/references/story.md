@@ -4,6 +4,8 @@ Decide the shape before writing a scene. A video teaches one thing to one viewer
 
 ## The beats table
 
+Write `DIRECTION.md` first ([direction](direction.md)): the storyline picked there decides the picture for each idea, the look and the seam between chapters.
+
 For each video, write as many chapters as its length allows (see the [length table](script.md#when-the-time-is-short): 1 or 2 at a minute, 3 at three minutes, 5 to 7 for a 5 to 8 minute episode), each as one idea and the picture that carries it. Naming the picture stops a chapter from becoming a bullet list.
 
 | # | Idea | Picture |

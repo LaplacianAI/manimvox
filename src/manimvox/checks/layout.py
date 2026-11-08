@@ -68,3 +68,12 @@ def check_layout(data: dict) -> list[Finding]:
                         seen.add(key)
                         out.append(Finding("layout", a["text"], f"overlaps '{b['text']}' at {_clock(t)}"))
     return out
+
+
+def variety_notes(data: dict) -> list[str]:
+    """Warnings, never failures: every chapter seam used the same explicit transition (3 or more chapters).
+    The default clear is not counted: a video that never chose a transition is not told off for it."""
+    seams = [c["transition"] for c in data.get("chapters", [])]
+    if len(seams) >= 3 and len(set(seams)) == 1 and seams[0] != "clear":
+        return [f"warning: all {len(seams)} chapter seams use the same transition ({seams[0]}); vary it with the story"]
+    return []

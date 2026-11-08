@@ -17,10 +17,11 @@ Each workflow follows the same discipline:
 
 1. **Sources first.** The agent gathers reputable sources and asks before it fetches anything from the web.
 2. **Facts before narration.** Every claim the video will make goes into `FACTS.md` with its source and a label. A claim with no source is dropped or shown as open.
-3. **Script before code.** The narration is written and critiqued first: an opening that asks one question, chapters that each end on a takeaway, an ending that answers the question.
-4. **Episodes from parts.** The agent writes each episode with the kit's components, ready-made blocks, and clips from charts, models or scans, in a theme chosen for the subject.
-5. **Draft, look, fix.** A fast draft produces contact sheets and a layout check. The agent reads them, fixes overlaps and pacing, and drafts again.
-6. **Render only when every check passes.** The final render adds the voice and subtitles, and fails if any narration line is silent.
+3. **A direction first.** After the brief, the agent writes three storylines and records the one chosen in `DIRECTION.md`: the look from one medium, how the video opens and ends, a different transition for each chapter seam, and a list of tells to avoid. Videos stop sharing one title card and one end card.
+4. **Script before code.** The narration is written and critiqued first: an opening that sets up one question, chapters that each end on a takeaway, an ending that answers the question (or ends as the direction says).
+5. **Episodes from parts.** The agent writes each episode with the kit's components, ready-made blocks, and clips from charts, models or scans, in a theme chosen for the subject, dark or light.
+6. **Draft, look, fix.** A fast draft produces contact sheets and a layout check. The agent reads them, fixes overlaps and pacing, and drafts again.
+7. **Render only when every check passes.** The final render adds the voice and subtitles, and fails if any narration line is silent.
 
 ## Why the agent writes code
 

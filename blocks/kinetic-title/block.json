@@ -1,0 +1,15 @@
+{
+  "name": "kinetic-title",
+  "function": "kinetic_title",
+  "helpers": [],
+  "description": "A title that types itself in over the picture, word by word or letter by letter, with one word picked out.",
+  "tags": ["title", "text", "motion"],
+  "parameters": [
+    {"name": "text", "description": "the title"},
+    {"name": "sub", "description": "a muted line under the title, or None"},
+    {"name": "accent", "description": "the word of the title that pick() colours in the accent"},
+    {"name": "size", "description": "font size of the title"},
+    {"name": "max_w", "description": "widest the title may be, in scene units"}
+  ],
+  "returns": "VGroup with .title .sub, .enter(style) the entrance (words, letters or blur), .land() the sub line's fade-in, .pick() the accent change"
+}

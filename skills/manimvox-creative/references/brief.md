@@ -45,3 +45,5 @@ A headless run, or an app that called you without a person to reply:
 - **Opening and ending:** build exactly what "How it opens" and "How it ends" say. A scene of the problem happening is a cold open drawn before `intro()`; a callback ending returns to that scene in the last chapter. The opening and the ending are the parts people remember: they should differ between videos as the subjects do.
 - **A playlist** has one brief for the series. Add a line per episode under "Your angle" when the person has one.
 - **A later change** to the brief that touches the opening, ending, theme or audience means redoing those parts, not patching around them.
+
+The brief is the input to the direction. Next, read [direction](direction.md): it turns the opening and ending answers into three storylines and a look, and maps each answer to a kit call.

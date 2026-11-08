@@ -54,6 +54,20 @@ from .icons import (  # noqa: F401
                       icon_till,
 )
 from .mesh import Mesh, load_mesh  # noqa: F401
+from .motion import (  # noqa: F401
+                      accent_word,
+                      blur_in,
+                      carry,
+                      dip,
+                      flood,
+                      iris,
+                      letters_in,
+                      morph,
+                      slot,
+                      whip,
+                      words_in,
+                      zoom_through,
+)
 from .text import AR, ARABIC, FONT, MONO, SAFE_H, SAFE_W, STAGE_BOTTOM, STAGE_CENTER, STAGE_TOP, P, T, fit  # noqa: F401
 
 globals().update(_colours.NAMED)
