@@ -1,0 +1,12 @@
+{
+  "name": "end-card",
+  "function": "end_card",
+  "helpers": [],
+  "description": "An end card built on screen: up to three lines carried in word by word, then a rule wiped in under them.",
+  "tags": ["ending", "title", "motion"],
+  "parameters": [
+    {"name": "lines", "description": "a line, or a list of up to three; the first is large, the rest muted"},
+    {"name": "rule", "description": "True to draw the accent rule under the lines"}
+  ],
+  "returns": "VGroup with .lines (the texts) and .rule, and .build() the steps for self.steps: lines in together, then the rule"
+}

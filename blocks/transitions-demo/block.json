@@ -1,0 +1,13 @@
+{
+  "name": "transitions-demo",
+  "function": "seam",
+  "helpers": ["transition_tile"],
+  "description": "Each chapter transition on a sample tile: zoom through, colour flood, iris, whip and dip.",
+  "tags": ["transition", "chapter", "motion"],
+  "parameters": [
+    {"name": "kind", "description": "zoom, flood, iris, whip or dip"},
+    {"name": "tile", "description": "the mobject the transition takes off from (a transition_tile)"},
+    {"name": "color", "description": "colour of the flood; default ACCENT"}
+  ],
+  "returns": "the transition to pass as chapter(transition=...); transition_tile(kind) makes a labelled sample to take off from"
+}
