@@ -59,7 +59,7 @@ Three moves almost every explanation needs, whatever the subject: pointing at a 
 - [x] **Flows.** Dots travelling along a path to show what moves and which way, fading in where they enter and out where they leave, dimmed or brightened as the narration moves between flows. For requests through services, money through a payment, data through a pipeline, or blood through a heart.
 - [x] **Entry and exit markers.** Dashed arrows for "comes in here" and "leaves the picture here": a request arriving, a response leaving, air in and out.
 - [x] **A calm style.** Fewer boxes, thinner lines, more space, so a video looks like a lecturer at a board rather than slides. An option the skills point to; the defaults stay as they are, so existing episodes render the same.
-- [x] **Proved on three different subjects:** the heart explainer rebuilt with the kit (173 lines to 135, the same picture), a web request through its services in the calm style, and a labelled screenshot, the last two in `examples/diagrams/`. None needed a special case.
+- [x] **Proved on three different subjects:** the heart explainer rebuilt with the kit (173 lines to 135, the same picture), a web request through its services in the calm style, and a labelled screenshot. Both were later rebuilt as the gallery videos *Why is the same page faster the second time?* and *Which site am I on?* (0.7). None needed a special case.
 
 ## Next
 
@@ -69,11 +69,13 @@ Three moves almost every explanation needs, whatever the subject: pointing at a 
 
 ## 0.7: 3D and real data
 
-Real objects and real data, used with their licences respected.
+Real objects and real data, used with their licences respected. Built and tested; it ships as the next release.
 
-- [ ] **`manimvox assets`.** Fetch a model or scan into `research/`, after asking, and record its source, licence and credit line in `FACTS.md`. Refuse a licence that doesn't allow the use.
-- [ ] **Cut-open view block.** Cut a volume mesh (a scan, a simulation) along a plane, colour its regions, and give the points to label. This generalises the heart explainer's CT cut.
-- [ ] **Better `mesh-model` shading.** manimvox's own lighting instead of Manim's wash towards white, and faster drawing of large models.
+- [x] **`manimvox assets`.** Fetch a model, scan, dataset or image into `research/assets/` after asking, and record its source, licence, checksum and credit line in `research/assets.json` and `FACTS.md`. Zenodo and Wikimedia Commons licences are read from the source; open licences are accepted, non-commercial ones only with `--non-commercial`, and no-derivatives or unknown ones refused.
+- [x] **Cut it open: `Cutaway`.** Any scan, CAD part or simulation cut along a plane, or a quarter cut away for a round part, with coloured regions or a continuous field, the cut faces capped, the removed part as glass, and one steady camera from the turn through the cut to the opened view. Its parts feed straight into `leaders`. The heart explainer is rebuilt on it, with the same picture.
+- [x] **Better `mesh-model` shading.** manimvox's own lighting instead of Manim's wash towards white, and large models drawn 15 to 20 times faster.
+- [x] **Fixes found making the videos:** an ending with nothing new to show spoke over a blank frame; a running stream did not fade out with the picture; labels can now sit in a row above or below a wide subject.
+- [x] **Gallery:** *What lets a loaded wheel turn so freely?* (a real bearing, cut open), *Why is the same page faster the second time?* and *Which site am I on?* (a real screenshot), made by Claude Code and rebuilt after review.
 
 ## Later
 
