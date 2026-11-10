@@ -14,6 +14,7 @@ src/manimvox/
   tools.py          typed tools mirroring the CLI, for agents with no shell
   integrations/     adapters for eight agent frameworks
   confirm.py        when a download may go ahead without asking
+  assets.py         manimvox assets: licence policy, Zenodo and Wikimedia lookup, fetch and record
   playlist.py       index page and share packages
   project.py        series.json loading and validation
   scaffold.py       manimvox new

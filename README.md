@@ -358,6 +358,8 @@ A runnable script for each framework is in [`examples/agents/`](https://github.c
 | `manimvox voices [ENGINE]` | Engines with status and licence, or the voices of one engine |
 | `manimvox voices --prepare ENGINE[:VOICE] [--yes]` | Download and check a voice ahead of a render |
 | `manimvox add [BLOCK ...] [--list] [--force]` | Copy a scene block into the project's `blocks/` folder |
+| `manimvox assets add URL [--licence ID] [--credit TEXT] [--name FILE] [--non-commercial] [--yes]` | Fetch a model, scan, dataset or image into `research/assets/` after asking, and record its source, licence and credit line in `research/assets.json` and `FACTS.md`; a licence that does not allow the use is refused |
+| `manimvox assets list` | The assets fetched into this project |
 | `manimvox join [EP ...] [-o OUT.mp4] [--no-cards]` | Join rendered episodes into one video with a title card (each episode keeps its own end card) |
 | `manimvox doctor` | System libraries, fonts and voice engines |
 

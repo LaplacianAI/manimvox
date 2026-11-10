@@ -1,0 +1,36 @@
+{
+  "manimvox": "0.6.0",
+  "series": "Why the second time is faster",
+  "tagline": "A cache, in one request",
+  "voice": "kokoro:af_heart",
+  "speed": 1.0,
+  "pron": [],
+  "theme": {
+    "source": "calm slate and soft blue, chosen for a quiet software diagram; the calm style draws thin strokes and generous padding",
+    "style": "calm",
+    "bg": "#12161C",
+    "panel": "#1B212A",
+    "panel2": "#242B36",
+    "line": "#3C4655",
+    "ink": "#E8EBEF",
+    "muted": "#9AA4B2",
+    "accent": "#6CA8F0",
+    "ok": "#7BC47F",
+    "warn": "#E8C468",
+    "error": "#EF6F7E",
+    "blue": "#6CA8F0",
+    "orange": "#F0A070",
+    "violet": "#B39DDB",
+    "pink": "#F48FB1",
+    "teal": "#4DD0C1",
+    "named": {}
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_cache",
+      "cls": "Ep01",
+      "title": "Why is the same page faster the second time?"
+    }
+  ]
+}

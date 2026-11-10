@@ -2,7 +2,7 @@
   "name": "mesh-model",
   "function": "mesh_model",
   "helpers": ["mesh_part"],
-  "description": "A 3D model from a glTF, OBJ or STL file (Blender exports glTF) as shaded faces the 3D camera orbits. Use in an Episode3D.",
+  "description": "A 3D model from a glTF, OBJ or STL file (Blender exports glTF) as lit faces the 3D camera orbits. Use in an Episode3D.",
   "tags": ["3d", "model", "mesh", "gltf", "blender"],
   "parameters": [
     {"name": "source", "description": "a .glb, .gltf, .obj, .stl or .ply file, or (vertices, faces) arrays"},
@@ -10,7 +10,10 @@
     {"name": "color", "description": "theme colour for faces the model gives no colour"},
     {"name": "max_faces", "description": "simplify to at most this many triangles, 4 to 5000; fewer renders faster"},
     {"name": "up", "description": "the source's up axis: \"y\" for glTF and OBJ, \"z\" for STL and CAD"},
-    {"name": "wire", "description": "draw face edges in the background colour, for a low-poly look"}
+    {"name": "wire", "description": "draw face edges in the background colour, for a low-poly look"},
+    {"name": "shading", "description": "\"lit\" (default): manimvox's own lighting, colours stay true; \"manim\": Manim's shading, which washes towards white and draws slower"},
+    {"name": "light", "description": "direction towards the light as the viewer sees it (x right, y up, z toward the viewer); default upper left, in front"},
+    {"name": "ambient", "description": "0 to 1: the share of its colour a face turned from the light keeps"}
   ],
   "returns": "VGroup of faces with .mesh, .parts and .centres; mesh_part(model, name, inside) picks the faces of one part"
 }

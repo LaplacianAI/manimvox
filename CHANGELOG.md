@@ -4,6 +4,20 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+
+- **`manimvox assets`** fetches a model, scan, dataset or image into `research/assets/` after asking, and records its source, licence and credit line in `research/assets.json` and `FACTS.md` (`manimvox assets add URL`, `manimvox assets list`; tools `fetch_asset` and `list_assets`). A Zenodo record or file and a Wikimedia Commons file page have their licence, authors, title and checksum read from the source, and the checksum is verified after download; other URLs take `--licence`. Public domain, CC0, CC BY, CC BY-SA and open software or data licences are accepted; no-derivatives, unknown and all-rights-reserved licences are refused, and non-commercial ones need `--non-commercial`, which `FACTS.md` records.
+- **`Cutaway`** in `manimvox.scenes` cuts any volume or surface mesh (a CT scan, a CAD part, a simulation) along a plane: coloured regions, the cut face, the removed part as glass, `turning`, `sweep` and `opened` clips, and `at`, `labelled` and `region_centre` to label the parts with `leaders`. A volume can instead be coloured by a continuous field (`field=`, `cmap=`, `clim=`, such as stress or temperature), with `extreme()` to find its peak on the cut. The heart explainer is rebuilt on it, with the same picture.
+
+### Changed
+
+- **`mesh-model` lights its faces itself:** each face keeps its own colour, darkened by its angle to a light fixed to the camera, and is never washed towards white. `shading="lit"` (the default) or `"manim"`, with `light=` and `ambient=`. Models draw much faster: about 15 to 20 times for 5000 faces, since `Episode3D` now uses a `LitCamera` that sorts and draws lit faces in bulk. Projects keep their copy of the block until `manimvox add mesh-model --force`.
+
+### Fixed
+
+- A `stream` faded out with its group (as at the end of a video) kept its dots at full brightness: the fade's own copies of the stream ran its updater and reset them every frame. Only the stream itself moves now, so it fades with everything else.
+- `outro([], narration)` with no answer, end card or next title cleared the screen and spoke the closing line over a blank frame. The last picture now stays on screen while it is spoken.
+
 ## [0.6.0] - 2026-11-10
 
 ### Added

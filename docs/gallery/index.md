@@ -12,6 +12,30 @@ Finished videos made with manimvox, most of them by an AI agent. Each one shows 
 
     **Made by Claude Code** (Sonnet 5.5) from one prompt · screen recordings · Gnani voice · start here
 
+- **[What lets a loaded wheel turn so freely?](tapered-bearing.md)**
+
+    ---
+
+    From a car wheel to the bearing inside it: a real part cut open a quarter at a time, the weight followed through a roller, and why the rollers are tapered. One minute.
+
+    **Made by Claude Code** (Sonnet 5.5) · a real 3D model, cut open · Kokoro voice
+
+- **[Why is the same page faster the second time?](page-cache.md)**
+
+    ---
+
+    One request, two trips through a browser, an app server, a cache and a database, with flows that go exactly where the voice says. 45 seconds.
+
+    **Made by Claude Code** (Sonnet 5.5) · flows and pointing labels · Kokoro voice
+
+- **[Which site am I on?](which-site.md)**
+
+    ---
+
+    A real browser window, its top strip lifted out and named part by part, until the answer is clear: the domain in the address bar. 40 seconds.
+
+    **Made by Claude Code** (Sonnet 5.5) · a real screenshot, labelled · Kokoro voice
+
 - **[How a hash map finds a key](hash-map.md)**
 
     ---

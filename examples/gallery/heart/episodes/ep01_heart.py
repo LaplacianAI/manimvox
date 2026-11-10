@@ -1,43 +1,26 @@
 from blocks.heart_ct import Heart
 
 from manimvox.kit import *
-from manimvox.scenes import from_pyvista, screen_xy
 
 CREDIT = "Heart from CT: Rodero et al. 2021, Zenodo 4590294, CC BY 4.0"
 ZOOM, WIDTH, CENTRE = 1.25, 10.6, DOWN * 0.2
 
 heart = Heart()
-px = {}  # pixel position of each landmark in the front view
-
-
-def front(pl, t):
-    heart.camera(pl, zoom=ZOOM)
-    for name, p in {**heart.p, "septum": heart.septum()}.items():
-        px[name] = screen_xy(pl, p)
+# pixel position of each landmark in the front view
+px = {name: heart.screen(p, zoom=ZOOM) for name, p in {**heart.p, "septum": heart.septum()}.items()}
 
 
 def turning():
-    return from_pyvista(lambda pl, t: heart.camera(pl, turn=360 * t / 9, zoom=ZOOM), 9, fps=15, width=WIDTH,
-                        setup=lambda pl: heart.add(pl, heart.outside))
+    return heart.turning(9, zoom=ZOOM, width=WIDTH)
 
 
 def cutting():
     """The front sliced away: the cut sweeps from in front of the heart to the four-chamber plane."""
-    shown = []
-
-    def draw(pl, t):
-        for a in shown:
-            pl.remove_actor(a)
-        shown.clear()
-        k = min(1.0, t / 2.2)
-        shown.extend(heart.add_cut(pl, offset=heart.radius * (1 - smooth(k)), glass=0))
-        heart.camera(pl, zoom=ZOOM)
-
-    return from_pyvista(draw, 2.4, fps=15, width=WIDTH)
+    return heart.sweep(2.4, zoom=ZOOM, width=WIDTH)
 
 
 def opened(glass):
-    return from_pyvista(front, 1 / 15, width=WIDTH, setup=lambda pl: heart.add_cut(pl, glass=glass))
+    return heart.opened(glass, zoom=ZOOM, width=WIDTH)
 
 
 def at(clip, spec):

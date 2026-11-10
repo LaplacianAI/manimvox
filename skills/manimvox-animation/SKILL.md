@@ -24,7 +24,7 @@ How things move in an episode. A scene is picture and voice together, so each pa
 
 ## 3D
 
-When depth is the idea (a surface, a landscape, vectors in space, stacked layers), subclass `Episode3D` and tilt the camera while a line is spoken. Pin labels to the screen with `pin()`; the kit keeps its header flat and draws every card flat. Use it for one or two scenes, not the whole video. [references/three-d.md](references/three-d.md) has the camera calls, the limits and a drafted pattern. For a real object (an organ, a machine, a building), load a 3D model file (glTF from Blender, OBJ, STL): the `mesh-model` block when Manim's camera should orbit it and the narration points at its parts, or `from_model` for a lit, realistic clip; the same file has both routes.
+When depth is the idea (a surface, a landscape, vectors in space, stacked layers), subclass `Episode3D` and tilt the camera while a line is spoken. Pin labels to the screen with `pin()`; the kit keeps its header flat and draws every card flat. Use it for one or two scenes, not the whole video. [references/three-d.md](references/three-d.md) has the camera calls, the limits and a drafted pattern. For a real object (an organ, a machine, a building), load a 3D model file (glTF from Blender, OBJ, STL): the `mesh-model` block when Manim's camera should orbit it and the narration points at its parts, or `from_model` for a lit, realistic clip; the same file has both routes. Fetch the file with `manimvox assets add <url>`, not `curl`, and credit it on screen from the recorded credit line.
 
 ## Rules for motion
 

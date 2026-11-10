@@ -303,3 +303,30 @@ def test_code_without_dots_keeps_the_title_and_drops_the_marks():
     with_dots, plain = code("x = 1", title="a.py"), code("x = 1", title="a.py", dots=False)
     assert len(plain.submobjects) == len(with_dots.submobjects) - 1
     assert plain.text.get_center()[1] == with_dots.text.get_center()[1]
+
+
+BARE_OUTRO = '''from manimvox.kit import *
+
+
+class Ep03(Episode):
+    EP = 3
+    TITLE = "Bare"
+    TAGLINE = "An ending with nothing new"
+    NCHAP = 1
+
+    def build(self):
+        self.intro("Opening.")
+        self.chapter("One", "A picture.")
+        self.say("Here it is.", FadeIn(T("Picture", 40)))
+        self.outro([], "Closing line.")
+'''
+
+
+@pytest.mark.slow
+def test_an_ending_with_nothing_new_keeps_the_picture_while_it_is_spoken(tmp_path):
+    """outro([], narration) used to clear the stage and speak over a blank frame."""
+    p = copy_fixture(tmp_path)
+    add_episode(p, "ep03_bare", "Ep03", "Bare", BARE_OUTRO)
+    layout = render_episode(p, "ep03_bare", "Ep03", voiced=False)
+    last = layout["frames"][-1]  # the frame snapshot while the closing line is spoken
+    assert "Picture" in {t["text"] for t in last["texts"]}

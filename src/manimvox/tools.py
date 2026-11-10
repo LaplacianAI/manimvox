@@ -678,9 +678,81 @@ def write_brief(project: str, audience: str = "", takeaway: str = "", feeling: s
     return BriefResult(True, str(path), [f.split("'")[1] for f in check_brief(pr.root) if "'" in f])
 
 
+@dataclass(frozen=True)
+class AssetResult:
+    ok: bool  # False: nothing was downloaded yet; `ask` says what to put to the user
+    downloaded: bool
+    file: str
+    url: str
+    licence: str
+    licence_basis: str
+    credit: str
+    non_commercial: bool
+    size: int | None = None
+    archive: bool = False
+    ask: str = ""
+    next: str = ""
+
+
+@_tool
+def fetch_asset(project: str, url: str, licence: str = "", credit: str = "", name: str = "",
+                non_commercial: bool = False, yes: bool = False) -> AssetResult:
+    """Fetch a real file an explainer needs (a 3D model, a scan, a dataset, an image) into the project's
+    research/assets/, and record its source, licence and credit line in research/assets.json and FACTS.md. Without
+    yes=True nothing is downloaded: the result (ok=False) holds the details in `ask`; put them to the user, and
+    with their go-ahead call again with yes=True. Zenodo records and Wikimedia Commons files have their licence
+    detected and their checksum verified; for any other URL pass licence. A licence that does not allow the use
+    (no derivatives, unknown, all rights reserved, or non-commercial without non_commercial=True) raises ToolError.
+
+    Args:
+        project: The project folder, or any folder inside it.
+        url: A Zenodo record or file URL, a Wikimedia Commons file page, or any https URL to the file.
+        licence: The licence the source states, e.g. "CC-BY-4.0"; needed unless the source publishes it.
+        credit: The credit line to show on screen; by default built from what the source publishes.
+        name: The file name to save as; by default the one in the URL.
+        non_commercial: True only when the user agreed the video is never used commercially.
+        yes: True only when the user has agreed to this download.
+    """
+    from . import assets
+    from .project import find_project
+
+    root = find_project(Path(project).expanduser())
+    p = assets.plan(root, url, licence, credit, name, non_commercial)
+    base = {"url": p.url, "licence": p.licence, "licence_basis": p.licence_basis, "credit": p.credit,
+                "non_commercial": p.non_commercial, "size": p.size}
+    if not yes and not p.present:
+        return AssetResult(False, False, p.file, ask=p.question(),
+                           next="ask the user; with their go-ahead call fetch_asset again with yes=true", **base)
+    f = assets.fetch(root, p, lambda _q: True)
+    note = " It is an archive, saved as downloaded; extracting it is your choice." if f.archive else ""
+    return AssetResult(True, not p.present, p.file, archive=f.archive,
+                       next=f"credit it on screen with the credit line; recorded in research/assets.json and FACTS.md.{note}",
+                       **base)
+
+
+@dataclass(frozen=True)
+class AssetsResult:
+    ok: bool
+    assets: list[dict]
+
+
+@_tool
+def list_assets(project: str) -> AssetsResult:
+    """List the assets fetched into the project (research/assets.json): file, source, licence and credit line.
+
+    Args:
+        project: The project folder, or any folder inside it.
+    """
+    from . import assets
+    from .project import find_project
+
+    return AssetsResult(True, assets.load(find_project(Path(project).expanduser())))
+
+
 TOOLS = (new_project, brief_questions, write_brief, draft, render, check, contact_sheet, voices, prepare_voice,
-         list_blocks, add_block, join, index, package, doctor)
-# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks
+         list_blocks, add_block, join, index, package, doctor, fetch_asset, list_assets)
+# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets
 COMMANDS = {"new": "new_project", "brief": "write_brief", "draft": "draft", "render": "render", "check": "check", "sheets": "contact_sheet", "voices": "voices",
-            "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor"}
+            "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor",
+            "assets": "fetch_asset"}
 SHELL_ONLY = frozenset({"skills"})  # installs skills into coding agents; a framework agent reads skills_path() instead

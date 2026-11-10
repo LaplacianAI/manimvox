@@ -1,0 +1,18 @@
+{
+  "assets": [
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Firefox_157.0_opening_Wikipedia_article_on_Linux_screenshot.png",
+      "page": "https://commons.wikimedia.org/wiki/File:Firefox_157.0_opening_Wikipedia_article_on_Linux_screenshot.png",
+      "file": "research/assets/Firefox_157.0_opening_Wikipedia_article_on_Linux_screenshot.png",
+      "sha256": "4c2c215e87ccc64e8297f4532834bb28e9f3e81c53b317449d92f2e80d64cffa",
+      "bytes": 448243,
+      "licence": "CC-BY-SA-4.0",
+      "licence_stated": "",
+      "licence_detected": "CC BY-SA 4.0",
+      "licence_basis": "detected from Wikimedia Commons",
+      "credit": "Software: Mozilla Foundation and contributors Website and content: Wikimedia Foundation and contributors Screenshot: Exploraz, \"Firefox 157.0 opening Wikipedia article on Linux screenshot\" (2026), Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Firefox_157.0_opening_Wikipedia_article_on_Linux_screenshot.png",
+      "non_commercial": false,
+      "fetched": "2026-11-10"
+    }
+  ]
+}

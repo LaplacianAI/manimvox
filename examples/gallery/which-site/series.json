@@ -1,12 +1,12 @@
 {
   "manimvox": "0.6.0",
-  "series": "Reading a screenshot",
-  "tagline": "Naming the parts of a picture",
+  "series": "Which site am I on?",
+  "tagline": "Reading the top of a browser window",
   "voice": "kokoro:af_heart",
   "speed": 1.0,
   "pron": [],
   "theme": {
-    "source": "paper and ink to sit beside the hash-map frame it labels; calm style",
+    "source": "light paper ground with ink-blue accent, because the subject is a light browser window and the page should sit on it without a dark frame; calm style",
     "style": "calm",
     "bg": "#F4EFE4",
     "panel": "#EAE3D2",
@@ -28,9 +28,9 @@
   "episodes": [
     {
       "n": 1,
-      "stem": "ep01_screenshot",
+      "stem": "ep01_address",
       "cls": "Ep01",
-      "title": "Reading a screenshot"
+      "title": "Which site am I on?"
     }
   ]
 }
