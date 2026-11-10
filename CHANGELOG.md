@@ -4,10 +4,12 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-10
+
 ### Added
 
 - **`manimvox assets`** fetches a model, scan, dataset or image into `research/assets/` after asking, and records its source, licence and credit line in `research/assets.json` and `FACTS.md` (`manimvox assets add URL`, `manimvox assets list`; tools `fetch_asset` and `list_assets`). A Zenodo record or file and a Wikimedia Commons file page have their licence, authors, title and checksum read from the source, and the checksum is verified after download; other URLs take `--licence`. Public domain, CC0, CC BY, CC BY-SA and open software or data licences are accepted; no-derivatives, unknown and all-rights-reserved licences are refused, and non-commercial ones need `--non-commercial`, which `FACTS.md` records.
-- **`Cutaway`** in `manimvox.scenes` cuts any volume or surface mesh (a CT scan, a CAD part, a simulation) along a plane: coloured regions, the cut face, the removed part as glass, `turning`, `sweep` and `opened` clips, and `at`, `labelled` and `region_centre` to label the parts with `leaders`. A volume can instead be coloured by a continuous field (`field=`, `cmap=`, `clim=`, such as stress or temperature), with `extreme()` to find its peak on the cut. The heart explainer is rebuilt on it, with the same picture.
+- **`Cutaway`** in `manimvox.scenes` cuts any volume or surface mesh (a CT scan, a CAD part, a simulation) along a plane, or removes a 90° wedge with `axis=` for a round part: coloured regions, the cut face, the removed part as glass, `turning`, `sweep` and `opened` clips, and `at`, `labelled` and `region_centre` to label the parts with `leaders`. A volume can instead be coloured by a continuous field (`field=`, `cmap=`, `clim=`, such as stress or temperature), with `extreme()` to find its peak on the cut. The heart explainer is rebuilt on it, with the same picture.
 
 ### Changed
 
@@ -103,7 +105,8 @@ The first release.
 - **For agents:** eleven agent skills, the CLI as typed tools, adapters for eight Python agent frameworks, and plugin manifests for Claude Code, Codex, Cursor and Gemini CLI.
 - CI on Linux, macOS and Windows; releases published to PyPI with trusted publishing.
 
-[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/LaplacianAI/manimvox/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/LaplacianAI/manimvox/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/LaplacianAI/manimvox/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/LaplacianAI/manimvox/compare/v0.4.0...v0.4.1
