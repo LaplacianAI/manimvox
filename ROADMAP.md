@@ -59,13 +59,13 @@ Videos made with the same kit all began with one title card, faded chapter numbe
 
 ## 0.6: diagrams that explain
 
-Three moves almost every explanation needs, whatever the subject: pointing at a part and naming it, showing something move through a system, and showing what comes in and what leaves. Agents now fake them with boxes and still arrows. The heart explainer drew them inside its own episode; they become part of the kit, built once for any subject.
+Three moves almost every explanation needs, whatever the subject: pointing at a part and naming it, showing something move through a system, and showing what comes in and what leaves. Agents now fake them with boxes and still arrows. The heart explainer drew them inside its own episode; they become part of the kit, built once for any subject. Built and tested; it ships as the next release.
 
-- [ ] **Labels that point.** A dot on the part, a thin line out to the side, and the name beside it, laid out so labels never collide and lines never cross. For the parts of an architecture diagram, the buttons on a screenshot, or the parts of a cell.
-- [ ] **Flows.** Dots travelling along a path to show what moves and which way, fading in where they enter and out where they leave, dimmed or brightened as the narration moves between flows. For requests through services, money through a payment, data through a pipeline, or blood through a heart.
-- [ ] **Entry and exit markers.** Dashed arrows for "comes in here" and "leaves the picture here": a request arriving, a response leaving, air in and out.
-- [ ] **A calm style.** Fewer boxes, thinner lines, more space, so a video looks like a lecturer at a board rather than slides. An option the skills point to; the defaults stay as they are, so existing episodes render the same.
-- [ ] **Proved on three different subjects:** the heart explainer rebuilt with the kit, a software diagram (a web request through its services), and a labelled screenshot. A design that needs a special case for any of them is redone.
+- [x] **Labels that point.** A dot on the part, a thin line out to the side, and the name beside it, laid out so labels never collide and lines never cross. For the parts of an architecture diagram, the buttons on a screenshot, or the parts of a cell.
+- [x] **Flows.** Dots travelling along a path to show what moves and which way, fading in where they enter and out where they leave, dimmed or brightened as the narration moves between flows. For requests through services, money through a payment, data through a pipeline, or blood through a heart.
+- [x] **Entry and exit markers.** Dashed arrows for "comes in here" and "leaves the picture here": a request arriving, a response leaving, air in and out.
+- [x] **A calm style.** Fewer boxes, thinner lines, more space, so a video looks like a lecturer at a board rather than slides. An option the skills point to; the defaults stay as they are, so existing episodes render the same.
+- [x] **Proved on three different subjects:** the heart explainer rebuilt with the kit (173 lines to 135, the same picture), a web request through its services in the calm style, and a labelled screenshot, the last two in `examples/diagrams/`. None needed a special case.
 
 ## 0.7: 3D and real data
 

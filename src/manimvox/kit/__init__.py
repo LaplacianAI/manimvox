@@ -40,6 +40,7 @@ from .components import (  # noqa: F401
                       stat,
                       table,
 )
+from .diagram import enters, leader, leaders, leaves, stream  # noqa: F401
 from .episode import Episode, Episode3D  # noqa: F401
 from .icons import (  # noqa: F401
                       icon_bot,

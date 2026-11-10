@@ -4,6 +4,11 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+
+- **Diagrams that explain.** Three moves any explanation needs are now kit functions that work for any subject: `leaders` and `leader` (a dot on the part, a thin line out to the side and the name beside it, with labels spread so they never overlap or leave the stage and lines that never cross; for a screenshot or recording pass `clip.at(x, y)`; `weight=BOLD` for bold names; a label column that would sit over the picture is refused with the fix), `stream` (dots travelling along a path, fading in and out at its ends, with `.fade_to(level)`, `.brighten()` and `.stop()`), and `enters` and `leaves` (dashed arrows for what comes in and what leaves). The skills now prefer pointing labels over boxed callouts. New blocks `labelled-diagram` and `flow-stream`.
+- An opt-in calm style: `"style": "calm"` in the series.json theme draws the kit's components with thinner strokes, lighter box outlines and more padding. The default is `"standard"`, so existing episodes render the same.
+
 ## [0.5.0] - 2026-11-09
 
 ### Added

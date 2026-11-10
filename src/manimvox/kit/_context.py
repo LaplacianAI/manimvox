@@ -28,3 +28,6 @@ NOTTS: bool = os.environ.get("MANIMVOX_NOTTS") == "1"
 VOICE: VoiceSpec = parse_voice(os.environ.get("MANIMVOX_VOICE_RESOLVED")
                                or (PROJECT.voice if PROJECT and PROJECT.voice else DEFAULT_VOICE))
 STEM: str | None = os.environ.get("MANIMVOX_STEM")
+STROKE: float = THEME.stroke_scale  # 1.0 unless theme.style is "calm"
+PAD: float = THEME.pad_scale
+OUTLINE: float = THEME.outline_opacity

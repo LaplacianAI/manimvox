@@ -38,7 +38,8 @@ def test_blocks_path_finds_the_repo_blocks_in_a_dev_install():
 def test_registry_is_the_starter_set():
     assert {b.name for b in BLOCKS} == {"venn", "bar-ranking", "bug-grid", "line-by-level", "log-scatter",
                                         "token-panel", "request-flow", "sequence-diagram", "code-diff", "surface-plot",
-                                        "mesh-model", "kinetic-title", "end-card", "transitions-demo"}
+                                        "mesh-model", "kinetic-title", "end-card", "transitions-demo",
+                                        "labelled-diagram", "flow-stream"}
 
 
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
