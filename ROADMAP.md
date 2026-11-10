@@ -57,14 +57,15 @@ Videos made with the same kit all began with one title card, faded chapter numbe
 - [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
 - [ ] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it.
 
-## 0.6: professor-quality visuals
+## 0.6: diagrams that explain
 
-Make the default output look like a good lecture, not slides. The 0.1.0 heart explainer only got there with pieces written inside the episode; they become part of the kit.
+Three moves almost every explanation needs, whatever the subject: pointing at a part and naming it, showing something move through a system, and showing what comes in and what leaves. Agents now fake them with boxes and still arrows. The heart explainer drew them inside its own episode; they become part of the kit, built once for any subject.
 
-- [ ] **Leader-line labels.** A dot on the part, a thin leader line, and the name in a column beside it, laid out so labels don't collide.
-- [ ] **Flow streams.** Glowing particles along a route that fade in where they enter and out where they leave, and can be dimmed: blood, data, current, traffic.
-- [ ] **Entry and exit markers.** Dashed arrows for "comes in here" or "leaves the picture here".
-- [ ] **Calmer options, steered to by the skills.** Fewer boxes, thinner lines, more space, as options the skills point towards. The kit's defaults stay as they are, so existing episodes render the same.
+- [ ] **Labels that point.** A dot on the part, a thin line out to the side, and the name beside it, laid out so labels never collide and lines never cross. For the parts of an architecture diagram, the buttons on a screenshot, or the parts of a cell.
+- [ ] **Flows.** Dots travelling along a path to show what moves and which way, fading in where they enter and out where they leave, dimmed or brightened as the narration moves between flows. For requests through services, money through a payment, data through a pipeline, or blood through a heart.
+- [ ] **Entry and exit markers.** Dashed arrows for "comes in here" and "leaves the picture here": a request arriving, a response leaving, air in and out.
+- [ ] **A calm style.** Fewer boxes, thinner lines, more space, so a video looks like a lecturer at a board rather than slides. An option the skills point to; the defaults stay as they are, so existing episodes render the same.
+- [ ] **Proved on three different subjects:** the heart explainer rebuilt with the kit, a software diagram (a web request through its services), and a labelled screenshot. A design that needs a special case for any of them is redone.
 
 ## 0.7: 3D and real data
 
