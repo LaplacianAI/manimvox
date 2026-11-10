@@ -40,19 +40,6 @@ def opened(glass):
     return from_pyvista(front, 1 / 15, width=WIDTH, setup=lambda pl: heart.add_cut(pl, glass=glass))
 
 
-def tag(clip, name, text, color, x, dy=0.0):
-    """A clean anatomy label: a dot on the part, a thin leader, the name off to the side (`dy` lower)."""
-    p = clip.at(*px[name])
-    label = T(text, 22, color, BOLD)
-    label.move_to([x, p[1] - dy, 0])
-    if x < 0:
-        label.align_to([x, 0, 0], RIGHT)
-    else:
-        label.align_to([x, 0, 0], LEFT)
-    end = label.get_right() + RIGHT * 0.15 if x < 0 else label.get_left() + LEFT * 0.15
-    return VGroup(Line(end, p, color=LINE, stroke_width=2), Dot(p, radius=0.06, color=color), label)
-
-
 def at(clip, spec):
     """A scene point on the clip: a landmark name, or (name, dx, dy) pixels from it, or (a, b, f) part way."""
     if isinstance(spec, str):
@@ -65,34 +52,11 @@ def at(clip, spec):
     return clip.at(x + dx, y + dy)
 
 
-def stream(clip, route_specs, color, n=40, speed=0.16):
-    """Blood as a stream of glowing dots along the route, fading in where it enters and out where it leaves."""
-    route = VMobject().set_points_smoothly([at(clip, r) for r in route_specs])
-    trail = route.copy().set_stroke(color, 9, opacity=0.14)
-    dots = VGroup(*[VGroup(Dot(radius=0.085, color=color), Dot(radius=0.042, color=color)) for _ in range(n)])
-    dots.phase, dots.level = 0.0, 1.0
-
-    def flow(m, dt):
-        m.phase = (m.phase + dt * speed) % 1
-        for i, d in enumerate(m):
-            s = (m.phase + i / n) % 1
-            d.move_to(route.point_from_proportion(s))
-            a = m.level * max(0.0, min(1.0, s / 0.08, (1 - s) / 0.12))
-            d[0].set_opacity(0.22 * a)
-            d[1].set_opacity(a)
-
-    flow(dots, 0)
-    dots.add_updater(flow)
-    return trail, dots
-
-
-def exit_arrow(clip, valve, dx, text, color):
-    """Where blood leaves through an artery in front of the cut: a dashed arrow up from the valve."""
+def out(clip, valve, dx, text, color):
+    """Blood leaving through an artery in front of the cut: `leaves` from just above the valve, up to the top."""
     start = at(clip, valve) + UP * 0.15
-    end = np.array([start[0] + dx, clip.at(0, 30)[1], 0])
-    arr = arrow(start, end, color=color, dashed=True, sw=3)
-    label = T(text, 20, color, BOLD).next_to(end, LEFT if dx < 0 else RIGHT, buff=0.15)
-    return VGroup(arr, label)
+    way = np.array([dx, clip.at(0, 30)[1] - start[1], 0])
+    return leaves(start, way, text, length=float(np.linalg.norm(way)), color=color)
 
 
 class Ep01(Episode):
@@ -124,17 +88,18 @@ class Ep01(Episode):
         self.remove(cut)
         self.add(clean)
 
-        ra = tag(clean, "ra", "Right atrium", OXYGEN_POOR, -3.4)
-        la = tag(clean, "la", "Left atrium", OXYGEN_RICH, 3.4)
-        rv = tag(clean, "rv", "Right ventricle", OXYGEN_POOR, -3.4)
-        lv = tag(clean, "lv", "Left ventricle", OXYGEN_RICH, 3.4)
-        self.say("On top, the two atria take blood in.", LaggedStart(FadeIn(ra), FadeIn(la), lag_ratio=0.4))
-        self.say("Below, the two ventricles pump it out.", LaggedStart(FadeIn(rv), FadeIn(lv), lag_ratio=0.4))
-        septum = tag(clean, "septum", "Septum", INK, -3.4, dy=1.1)
-        self.say("A wall of tissue, the septum, keeps the two sides apart.", FadeIn(septum))
-        tv = tag(clean, "tricuspid", "Tricuspid valve", WARN, -3.4)
-        mv = tag(clean, "mitral", "Mitral valve", WARN, 3.4)
-        self.say("And valves, in yellow, keep blood moving one way.", LaggedStart(FadeIn(tv), FadeIn(mv), lag_ratio=0.4))
+        # one column a side, laid out together so labels shown later never collide with the earlier ones
+        left = leaders([(at(clean, "ra"), "Right atrium", OXYGEN_POOR), (at(clean, "rv"), "Right ventricle", OXYGEN_POOR),
+                        (at(clean, "septum"), "Septum", INK), (at(clean, "tricuspid"), "Tricuspid valve", WARN)],
+                       side="left", x=-3.4, weight=BOLD)
+        right = leaders([(at(clean, "la"), "Left atrium", OXYGEN_RICH), (at(clean, "lv"), "Left ventricle", OXYGEN_RICH),
+                         (at(clean, "mitral"), "Mitral valve", WARN)], side="right", x=3.4, weight=BOLD)
+        ra, rv, septum, tv = left
+        la, lv, mv = right
+        self.say("On top, the two atria take blood in.", LaggedStart(ra.grow(), la.grow(), lag_ratio=0.4))
+        self.say("Below, the two ventricles pump it out.", LaggedStart(rv.grow(), lv.grow(), lag_ratio=0.4))
+        self.say("A wall of tissue, the septum, keeps the two sides apart.", septum.grow())
+        self.say("And valves, in yellow, keep blood moving one way.", LaggedStart(tv.grow(), mv.grow(), lag_ratio=0.4))
         self.beat(0.5)
 
         # 2 -- the flow: the right side to the lungs, the left side to the body
@@ -142,28 +107,25 @@ class Ep01(Episode):
         self.add(clean, note(CREDIT))
         self.play(FadeIn(clean), run_time=0.6)
         # down the outer wall of each ventricle, then up beside the septum to the outflow valve
-        poor_trail, poor = stream(clean, [("svc", 0, -70), "svc", "ra", "tricuspid", ("rv", -45, 40),
-                                          ("rv_apex", "rv", 0.3), ("septum", -40, -30), "pulmonary_valve"],
-                                  OXYGEN_POOR)
-        rich_trail, rich = stream(clean, [("rspv", 0, -40), "la", "mitral", ("lv", 55, 20), ("apex", "lv", 0.35),
-                                          ("septum", 40, -30), "aortic_valve"], OXYGEN_RICH)
-        to_lungs = exit_arrow(clean, "pulmonary_valve", -1.6, "to the lungs", OXYGEN_POOR)
-        to_body = exit_arrow(clean, "aortic_valve", 1.6, "to the body", OXYGEN_RICH)
+        poor = stream([at(clean, r) for r in [("svc", 0, -70), "svc", "ra", "tricuspid", ("rv", -45, 40),
+                                              ("rv_apex", "rv", 0.3), ("septum", -40, -30), "pulmonary_valve"]],
+                      OXYGEN_POOR, size=0.042)
+        rich = stream([at(clean, r) for r in [("rspv", 0, -40), "la", "mitral", ("lv", 55, 20), ("apex", "lv", 0.35),
+                                              ("septum", 40, -30), "aortic_valve"]], OXYGEN_RICH)
+        to_lungs = out(clean, "pulmonary_valve", -1.6, "to the lungs", OXYGEN_POOR)
+        to_body = out(clean, "aortic_valve", 1.6, "to the body", OXYGEN_RICH)
 
-        self.say("Oxygen-poor blood from the body enters the right atrium.", Create(poor_trail), FadeIn(poor))
+        self.say("Oxygen-poor blood from the body enters the right atrium.", FadeIn(poor))
         self.say("It passes the tricuspid valve into the right ventricle,")
-        self.say("which pumps it through the pulmonary valve, to the lungs.", Create(to_lungs[0]), FadeIn(to_lungs[1]))
+        self.say("which pumps it through the pulmonary valve, to the lungs.", FadeIn(to_lungs))
         self.say("Oxygen-rich blood comes back from the lungs into the left atrium.",
-                 Create(rich_trail), FadeIn(rich), poor_trail.animate.set_stroke(opacity=0.05), to_lungs.animate.set_opacity(0.3))
-        poor.level = 0.3
+                 FadeIn(rich), poor.fade_to(0.3), to_lungs.animate.set_opacity(0.3))
         self.say("It passes the mitral valve into the left ventricle,")
-        self.say("which pumps it through the aortic valve, to the whole body.", Create(to_body[0]), FadeIn(to_body[1]))
-        poor.level = 1.0
+        self.say("which pumps it through the aortic valve, to the whole body.", FadeIn(to_body))
         self.say("Right side to the lungs, left side to the body: two pumps, side by side.",
-                 poor_trail.animate.set_stroke(opacity=0.14), to_lungs.animate.set_opacity(1))
+                 poor.brighten(), to_lungs.animate.set_opacity(1))
         self.beat(1.0)
-        for m in (poor, rich):
-            m.clear_updaters()
+        poor.stop(), rich.stop()
 
         self.outro(["The atria take blood in; the ventricles pump it out",
                     "The septum keeps the sides apart; valves keep blood moving one way",
