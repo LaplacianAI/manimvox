@@ -122,6 +122,32 @@ def _cmd_add(args) -> int:
     return 0
 
 
+def _cmd_assets(args) -> int:
+    from . import assets
+    from .project import find_project
+
+    root = find_project(Path.cwd())
+    if args.action == "list":
+        items = assets.load(root)
+        for a in items:
+            nc = "  NON-COMMERCIAL" if a.get("non_commercial") else ""
+            print(f"{a['file']}  {a['licence']} ({a['licence_basis']}){nc}")
+            print(f"  source: {a['url']}")
+            print(f"  credit: {a['credit']}")
+        if not items:
+            print("no assets yet: manimvox assets add <url> [--licence ID]")
+        return 0
+    p = assets.plan(root, args.url, args.licence, args.credit, args.name, args.non_commercial)
+    f = assets.fetch(root, p, _confirm(args))
+    print(f"{'already here' if p.present else 'saved'}: {f.path}  ({f.bytes} bytes, sha256 {f.sha256[:12]})")
+    print(f"licence: {p.licence} ({p.licence_basis})" + ("; non-commercial use only" if p.non_commercial else ""))
+    print(f"credit: {p.credit}")
+    if f.archive:
+        print("an archive, saved as downloaded; extract it if you need the files inside")
+    print("recorded in research/assets.json and FACTS.md; credit it on screen")
+    return 0
+
+
 def _cmd_voices(args) -> int:
     from .tools import _prepare_voice, voices
 
@@ -402,9 +428,23 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("-y", "--yes", action="store_true", default=argparse.SUPPRESS, help="answer yes to confirmations")
     s.set_defaults(func=_cmd_voices)
 
+    yes = {"action": "store_true", "default": argparse.SUPPRESS, "help": "answer yes to confirmations"}
+    s = p._sub.add_parser("assets", help="fetch a model, scan, dataset or image into research/, with its licence")
+    sub = s.add_subparsers(dest="action", metavar="<action>", required=True)
+    a = sub.add_parser("add", help="download a file after asking, and record its source, licence and credit")
+    a.add_argument("url")
+    a.add_argument("--licence", default="", metavar="ID", help="the licence the source states (needed unless "
+                   "Zenodo or Wikimedia Commons publish it), e.g. CC-BY-4.0")
+    a.add_argument("--credit", default="", help="the credit line (default: built from the source)")
+    a.add_argument("--name", default="", help="file name to save as (default: from the URL)")
+    a.add_argument("--non-commercial", action="store_true", help="accept a non-commercial licence: the video "
+                   "must then never be used commercially")
+    a.add_argument("-y", "--yes", **yes)
+    sub.add_parser("list", help="list the assets fetched into this project")
+    s.set_defaults(func=_cmd_assets)
+
     s = p._sub.add_parser("skills", help="install, check, update or remove the agent skills")
     sub = s.add_subparsers(dest="action", metavar="<action>", required=True)
-    yes = {"action": "store_true", "default": argparse.SUPPRESS, "help": "answer yes to confirmations"}
     a = sub.add_parser("install", help="put the skills where your coding agents look")
     a.add_argument("--agent", action="append", metavar="ID", help="an agent id (repeatable)")
     g = a.add_mutually_exclusive_group()

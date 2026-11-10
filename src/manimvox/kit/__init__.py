@@ -69,6 +69,7 @@ from .motion import (  # noqa: F401
                       words_in,
                       zoom_through,
 )
+from .shading import Lighting, LitCamera  # noqa: F401
 from .text import AR, ARABIC, FONT, MONO, SAFE_H, SAFE_W, STAGE_BOTTOM, STAGE_CENTER, STAGE_TOP, P, T, fit  # noqa: F401
 
 globals().update(_colours.NAMED)

@@ -4,7 +4,7 @@ import json
 
 import numpy as np
 import pytest
-from manim import DOWN, LEFT, RIGHT, UP
+from manim import DOWN, LEFT, RIGHT, UP, FadeOut, Square, VGroup
 
 from manimvox.kit import enters, leader, leaders, leaves, node, stream
 from manimvox.kit.text import STAGE_BOTTOM, STAGE_TOP
@@ -103,6 +103,52 @@ def test_leader_takes_a_mobject_or_a_point():
 # ------------------------------------------------------------------ streams
 def _opacities(s):
     return [d[-1].fill_opacity for d in s.dots]
+
+
+def test_leaders_below_a_wide_strip_never_overlap_or_cross():
+    g = leaders(_items([(-3, 1), (-1.5, 1), (0.2, 1.1), (2.5, 1), (5, 0.9)]), side="below")
+    assert len(g) == 5
+    _check_layout(g)
+    assert all(m.label.get_top()[1] < 0.9 for m in g)  # the row sits under every target
+    xs = [m.label.get_center()[0] for m in g]
+    assert xs == sorted(xs)  # left to right, the order of the targets
+
+
+def test_leaders_above_a_row_of_parts():
+    g = leaders(_items([(-4, -1), (-1, -1.2), (3, -1)]), side="above")
+    _check_layout(g)
+    assert all(m.label.get_bottom()[1] > -1 for m in g)
+
+
+def test_leaders_row_with_targets_close_together_spreads_the_labels():
+    g = leaders(_items([(0.0, 1), (0.1, 1), (0.2, 1), (0.3, 1)]), side="below")
+    _check_layout(g)
+    xs = sorted(m.label.get_center()[0] for m in g)
+    assert xs[-1] - xs[0] > 3
+
+
+def test_leaders_row_at_the_stage_edges_stays_inside():
+    g = leaders(_items([(-6.4, 1), (6.4, 1), (0, 1)]), side="below")
+    _check_layout(g)
+
+
+def test_leaders_row_takes_mobjects_and_a_given_row_height():
+    a, b = node("A", w=1.5).move_to([-2, 1, 0]), node("B", w=1.5).move_to([2, 1, 0])
+    g = leaders([(a, "first"), (b, "second")], side="above", y=2.4)
+    _check_layout(g)
+    assert abs(g[0].label.get_bottom()[1] - 2.4) < 1e-6
+
+
+def test_a_label_row_over_the_picture_is_refused():
+    with pytest.raises(ValueError, match="row at y"):
+        leaders(_items([(-1, 1), (1, 1)]), side="below", y=1.0)
+    with pytest.raises(ValueError, match="row at y"):
+        leaders(_items([(-1, 1), (1, 1)]), side="above", y=1.0)
+
+
+def test_too_many_labels_for_one_row_is_refused():
+    with pytest.raises(ValueError, match="do not fit"):
+        leaders(_items([(i, 0) for i in range(-6, 7)]), side="below")
 
 
 def test_stream_fades_in_and_out_along_the_path():
@@ -281,3 +327,18 @@ def test_bold_labels():
     a, b = leader((0, 0, 0), "name"), leader((0, 0, 0), "name", weight="BOLD")
     assert b.label.width > a.label.width
     assert leaders([((0, 0, 0), "name")], weight="BOLD")[0].label.width == pytest.approx(b.label.width)
+
+
+def test_a_stream_fades_out_inside_a_group():
+    """A fade runs the updaters of its own copies of the mobject; the stream's copies must not restore the dots."""
+    s = stream([(-5, 0, 0), (5, 0, 0)])
+    a = FadeOut(VGroup(Square(), s))
+    a.begin()
+    for k in range(1, 10):
+        a.update_mobjects(0.05)
+        a.interpolate(k / 10)
+    assert max(d[-1].get_fill_opacity() for d in s.dots) < 0.2
+    moving = stream([(-5, 0, 0), (5, 0, 0)])
+    before = moving.dots[0].get_center().copy()
+    moving.update(0.5)
+    assert not np.allclose(moving.dots[0].get_center(), before)  # the stream itself still moves

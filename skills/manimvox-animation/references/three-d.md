@@ -33,7 +33,7 @@ A model file (.glb, .gltf, .obj, .stl, .ply) goes in two ways. From Blender, exp
 
 | | `mesh-model` block | `from_model` clip |
 |---|---|---|
-| Drawn by | Manim, one shaded face per triangle | a 3D renderer, with real lighting and materials |
+| Drawn by | manimvox's own lighting, one flat face per triangle | a 3D renderer, with real lighting and materials |
 | Camera | Manim's: tilt, orbit, `pin()` labels beside it | its own orbit, set when the clip is made |
 | Detail | simplified to `max_faces` (default 1500, at most 5000) | every triangle |
 | Parts | `mesh_part` picks faces to recolour or label | none: the clip is one picture |
@@ -42,7 +42,7 @@ A model file (.glb, .gltf, .obj, .stl, .ply) goes in two ways. From Blender, exp
 
 Use the block when the narration points at parts or the camera moves with the rest of the scene. Use the clip when the model should look real, or it moves.
 
-Both extras are installs: ask the user before adding one. A model from the web has a licence: check it allows the use, and put its credit on screen (a muted line at `STAGE_BOTTOM`) and in `FACTS.md`. Keep model files in the project's `research/` folder.
+Both extras are installs: ask the user before adding one. A model from the web has a licence. Fetch it with `manimvox assets add <url>` instead of `curl`: it asks first, refuses a licence that does not allow the use (no-derivatives, unknown, non-commercial), saves into `research/assets/` and records the source, licence and credit line in `FACTS.md` and `research/assets.json`. Put that credit line on screen (a muted line at `STAGE_BOTTOM`). A Zenodo record or Wikimedia Commons page has its licence read for you; for any other site pass `--licence` from the page.
 
 ### The block
 
@@ -55,8 +55,8 @@ self.say("Blood leaves through the vessels at the top.", vessels.animate.set_fil
 
 - Run `manimvox add mesh-model` first. `up="y"` suits glTF and OBJ; an STL standing on its side wants `up="z"`. Draft once and look.
 - `mesh_part(model, name="aorta")` picks a glTF part by name; `model.parts` lists them.
-- Manim's light washes the faces that face it towards white: pass a darker `color` than you want to see, such as `interpolate_color(ERROR, BG, 0.35)`.
-- Every face costs render time on every frame: a 2500-face model made a one-minute episode take about two minutes to draft. Lower `max_faces` until the shape starts to suffer.
+- The faces are lit by manimvox, not Manim: each keeps its own colour, darkened by its angle to a light fixed to the camera (upper left, in front), and never brightened towards white. Pass the colour you want to see. `light=(x, y, z)` moves the light as the viewer sees it, `ambient=` (0 to 1) sets how much of its colour a face turned from the light keeps. `shading="manim"` brings back Manim's own shading, which washes towards white and draws several times slower.
+- Faces are drawn in bulk, so a model of 5000 faces drafts in about the time 1500 faces took before. A copy of the block made before this keeps Manim's shading; `manimvox add mesh-model --force` replaces it (it overwrites any edits you made to the copy).
 - Reveal it with `FadeIn`. `Create` draws every edge and is slow.
 
 ### The clip

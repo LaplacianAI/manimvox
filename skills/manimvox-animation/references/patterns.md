@@ -17,6 +17,7 @@ Each example is the body of one chapter inside an episode's `build()`, after `se
 11. Recipe: a live number
 12. Transitions and title entrances
 13. Pointing labels, streams and markers
+14. Cut it open: a scan, a part or a simulation
 
 ## 1. Carry an object between scenes
 
@@ -295,7 +296,7 @@ parts = leaders([(clip.at(*px["aorta"]), "aorta"), (clip.at(*px["valve"]), "valv
 self.say("Four parts to name.", parts.grow(lag=0.5))
 ```
 
-Set `x` to put the label column somewhere else; by default the column starts a short way past the outermost part, and never runs off the stage. A column that would sit over the picture raises an error that says where it must start: move the picture, shorten the labels or use the other side. `weight=BOLD` makes the names bold. Place the picture first: labels are laid out where the targets are when `leaders` is called.
+For a wide, short subject (a toolbar, a timeline, a row of parts) use `side="below"` or `"above"`: one row of labels under or over the targets, spread sideways so none overlap, each reached by a vertical drop (`y` sets the row's inner edge; a row over the picture raises the same kind of error). Set `x` to put the label column somewhere else; by default the column starts a short way past the outermost part, and never runs off the stage. A column that would sit over the picture raises an error that says where it must start: move the picture, shorten the labels or use the other side. `weight=BOLD` makes the names bold. Place the picture first: labels are laid out where the targets are when `leaders` is called.
 
 Flows. `stream(path, color=ACCENT, n=40, speed=0.16, glow=True, trail=True, size=0.042)` makes dots travel along a path (a VMobject, or a list of points) and fade in where it starts and out where it ends. An updater moves them, so they keep going through `self.say` and `self.wait`. Add the handle to the scene once; play its animations as the narration moves between flows, and call `stop()` when it is done.
 
@@ -314,3 +315,45 @@ Entry and exit markers. `enters(point, direction=RIGHT, text=None, length=1.2, c
 self.say("A request arrives and the answer leaves.", FadeIn(enters(client.get_left(), RIGHT, "request")),
          FadeIn(leaves(client.get_right(), RIGHT, "response")))
 ```
+
+## 14. Cut it open: a scan, a part or a simulation
+
+For any volume or surface mesh (a CT scan, a CAD part, a simulation), `Cutaway` from `manimvox.scenes` turns the whole object, sweeps a cut through it, shows the opened view and gives the points to label, with no code that is special to the subject. It needs the pyvista extra and OpenGL, and draws with the kit's lighting, so the colours stay true.
+
+```python
+from manimvox.scenes import Cutaway
+
+# source: a pyvista dataset or a .vtk, .vtu, .stl, .obj or .ply path; regions: an array that labels the parts
+cut = Cutaway("research/engine.vtu", regions="material", plane="y")   # plane: "x", "y", "z", "-y", a normal, or (origin, normal)
+spin = cut.turning(8, zoom=1.2, width=10).move_to(DOWN * 0.2)         # the whole object turning, uncut
+sweep = cut.sweep(2.4, zoom=1.2, width=10).move_to(DOWN * 0.2)        # the cut sweeping in to the plane
+opened = cut.opened(glass=0.3, zoom=1.2, width=10).move_to(DOWN * 0.2)  # a still of the opened view
+self.add(spin); self.say("This is the engine, rebuilt from its scan.", spin.play())
+self.remove(spin); self.add(sweep); self.say("Slice away the front.", sweep.play())
+self.remove(sweep); self.add(opened)
+
+# name the parts: a 3D point becomes a scene point with cut.at; region_centre finds a region on the cut face
+names = {"Piston": cut.region_centre(2), "Cylinder wall": cut.region_centre(1), "Valve": valve_xyz}
+labels = leaders(cut.labelled(opened, names), side="right", weight=BOLD)
+self.say("Three parts matter.", labels.grow(lag=0.5))
+```
+
+`regions` is the name of a cell or point array; `colours` is a dict `{value: colour}` or a list in order of the sorted values, and defaults to the theme's hues. `section_colours` sets the cut face (default the colours, lightened) and `glass_regions=[5, 6]` limits the glass to those regions, so a heavy interior never hides the cut. A closed surface (STL, OBJ) is capped, so the cut shows a solid face. `offset` on `cut`, `section`, `glass`, `add` and `opened` moves the plane toward the camera in the mesh's own units; `cut.camera(pl, turn, zoom, lift)` sets the camera inside a `from_pyvista` clip of your own, and `cut.screen(point, zoom=, turn=, lift=)` gives a point's pixel without a plotter. Call `opened` with the same `zoom`, `turn` and `lift` you gave `screen`, and place the clip before calling `leaders`. Landmarks you only know as pixels still work with `clip.at(px, py)`.
+
+A machine part, or anything round, reads best as a quarter cut seen from three quarters: the engineering-drawing convention, a 90 degree wedge removed between two perpendicular planes through the part's axis, so the outside and the inside show together. An organ or a scan with one natural plane keeps the single plane and the front view above.
+
+```python
+# axis: the part's axis ("x", "y", "z", a direction, or (origin, direction)); towards: where the wedge opens
+cut = Cutaway("research/part.stl", regions="part", axis="x", towards=(0, 0, 1), up=(1, 0, 0),
+              colours={0: "#B8BFC8", 1: "#9AA3AE"}, ghost={2: 0.22})   # ghost: regions drawn see-through
+cam = dict(turn=25, lift=0.5, zoom=1.6)          # one camera for every clip: turn swings toward the axis, lift tilts
+spin = cut.turning(8, **cam, width=14.2)         # the part turns about its own axis; the camera stays put
+wedge = cut.sweep(2.4, **cam, width=14.2)        # the wedge opens from 0 to 90 degrees
+opened = cut.opened(0.0, **cam, width=14.2)     # the still to label
+push = cut.move(2.4, cam, {**cam, "zoom": 1.9, "aim": cut.region_centre(0, face=0)}, width=14.2)  # glide in on one part
+marks = leaders(cut.labelled(opened, {"rollers": cut.region_centre(0, face=0)}), side="left")
+```
+
+Keep the camera the same in `turning`, `sweep`, `opened` and `screen`, so the viewer never loses orientation, and `at`, `labelled` and `region_centre(value, face=0 or 1)` work as for one plane (`face` picks one of the two cut faces). In a quarter cut `offset` is in degrees not yet cut away. `cut.colour(colours, section_colours, ghost)` recolours the clips made after it, so one shot can light the part the voice names in the accent and leave the rest steel grey; clips are drawn when made, so a cross-fade between two stills reads as a recolour. Pick `towards` so a cut face runs through a roller, spoke or other feature worth showing.
+
+A simulation's continuous field (stress, temperature, pressure) colours a volume with `Cutaway(source, field="stress", cmap=[BLUE, LINE, ORANGE], clim=(lo, hi))` instead of `regions`; `cut.extreme(highest=True)` (or `False`) gives the point on the cut face where the field peaks, to label "hottest here". Say on screen where the numbers come from: a solver's output, or a value you computed. An STL with several bodies and no region array: name the bodies in the episode from their geometry (by connected piece, size or radius), then label them with `region_centre`. Fetch the model with `manimvox assets add` and show the credit line it recorded.

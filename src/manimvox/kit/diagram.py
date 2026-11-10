@@ -45,6 +45,13 @@ def _edge(target, side) -> float:
     return float(_point(target)[0])
 
 
+def _vedge(target, side) -> float:
+    """The target's outermost y on `side` ("below" or "above"): a mobject's edge, or a point's own y."""
+    if hasattr(target, "get_bottom"):
+        return float((target.get_bottom() if side == "below" else target.get_top())[1])
+    return float(_point(target)[1])
+
+
 def _grow(self, run_time: float = 1.0):
     return Succession(FadeIn(self.dot, run_time=run_time * 0.2), Create(self.line, run_time=run_time * 0.45),
                       FadeIn(self.label, run_time=run_time * 0.35))
@@ -144,8 +151,55 @@ def _column(entries, side, x, gap, size, weight=NORMAL):
             for r, c in zip(rows, cols)}
 
 
-def leaders(items, side="right", x=None, gap=None, size=22, weight=NORMAL):
-    """One column of pointing labels. `items` are `(target, text)` or `(target, text, color)`.
+def _build_row(p, text, color, size, side, y, label_x, weight=NORMAL):
+    """One leader of a row whose labels start at height `y` (their inner edge) and whose label is centred on `label_x`."""
+    sign = -1 if side == "below" else 1
+    label = T(text, size, color or INK, weight)
+    label.move_to([label_x, y + sign * label.height / 2, 0])
+    edge = np.array([label_x, y - sign * _GAP_TO_LABEL, 0])
+    elbow = edge - np.array([0, sign * _RUN, 0])
+    dot = Dot(p, radius=0.06, color=color or ACCENT)
+    line = VMobject().set_points_as_corners([p, elbow, edge]).set_stroke(LINE, 2 * STROKE)
+    g = VGroup(line, dot, label)
+    g.dot, g.line, g.label = dot, line, label
+    g.grow = lambda run_time=1.0: _grow(g, run_time)
+    return g
+
+
+def _row(entries, side, y, gap, size, weight=NORMAL):
+    """entries: [(index, point, text, color, target)] laid out in one row under ("below") or over ("above") the
+    targets, sorted by x. Returns {index: leader}."""
+    if not entries:
+        return {}
+    order = sorted(entries, key=lambda e: (e[1][0], e[0]))
+    probes = [T(e[2], size, weight=weight) for e in order]
+    h, w = max(pr.height for pr in probes), max(pr.width for pr in probes)
+    gap = gap if gap is not None else w + 0.3  # centre to centre, so the widest label never touches its neighbour
+    n = len(order)
+    if gap * (n - 1) + w > SAFE_W + 1e-9:
+        raise ValueError(f"leaders: {n} labels up to {w:.2f} wide do not fit in one row {SAFE_W:g} wide; shorten the "
+                         "labels, use a smaller size or put some of them in a column")
+    below = side == "below"
+    reach = (min if below else max)(_vedge(e[4], side) for e in entries)
+    need = reach - (_GAP_TO_LABEL + _RUN) if below else reach + _GAP_TO_LABEL + _RUN  # the bend sits clear of every target
+    if y is None:
+        y = max(reach - _REACH, STAGE_BOTTOM + h) if below else min(reach + _REACH, STAGE_TOP - h)
+    if (y > need + 1e-9) if below else (y < need - 1e-9):
+        raise ValueError(
+            f"leaders: the {side} label row at y={y:.2f} would sit over the picture (a target reaches y={reach:.2f}; "
+            f"the row must start at y {'<=' if below else '>='} {need:.2f}). Move the picture away from that side, "
+            f"shorten the labels, or put them on the other side.")
+    # _spread packs a list from the top down, so give it the negated x: left to right is then "downwards".
+    xs = [-v for v in _spread([-e[1][0] for e in order], gap, -(SAFE_W / 2 - w / 2), SAFE_W / 2 - w / 2)]
+    elbow_y = y + (_GAP_TO_LABEL + _RUN) * (1 if below else -1)
+    cost = [[float(np.hypot(e[1][0] - x, e[1][1] - elbow_y)) for x in xs] for e in order]
+    rows, cols = linear_sum_assignment(cost)
+    return {order[r][0]: _build_row(order[r][1], order[r][2], order[r][3], size, side, y, xs[c], weight)
+            for r, c in zip(rows, cols)}
+
+
+def leaders(items, side="right", x=None, gap=None, size=22, weight=NORMAL, y=None):
+    """One column (or row) of pointing labels. `items` are `(target, text)` or `(target, text, color)`.
 
     Label heights start at the targets' heights, then are pushed apart so they keep a vertical `gap` (default: a
     line of text and a little more) and stay inside the stage. Targets take the slots that make the lines shortest
@@ -153,14 +207,21 @@ def leaders(items, side="right", x=None, gap=None, size=22, weight=NORMAL):
     bends in a short horizontal run before its label, so the lines never cross. `side="both"` puts the
     targets left of their mean x on the left, the rest on the right. `x` is the column's inner edge (see `leader`).
     Returns a VGroup of leaders, in the order given, each with `.dot`, `.line` and `.label`; `.grow(lag=0.3)` on
-    the group animates them one after another, and `.grow()` on a member animates just that one."""
-    if side not in ("right", "left", "both"):
-        raise ValueError(f"leaders: side must be 'right', 'left' or 'both', got {side!r}")
+    the group animates them one after another, and `.grow()` on a member animates just that one.
+    `side="below"` or `"above"` is for a wide, short subject (a toolbar, a timeline, a row of parts): one row of
+    labels under or over the targets, spread apart sideways (no two overlap, all inside the safe width), each
+    reached by a vertical drop with a short elbow, assigned so no lines cross. `y` is the row's inner edge (the
+    top of a row below, the bottom of a row above), by default a short way past the outermost target; a row that
+    would sit over the picture, or too many labels for one row, raises a ValueError that says what to change."""
+    if side not in ("right", "left", "both", "below", "above"):
+        raise ValueError(f"leaders: side must be 'right', 'left', 'both', 'below' or 'above', got {side!r}")
     entries = []
     for i, it in enumerate(items):
         target, text, *rest = it
         entries.append((i, _point(target), text, rest[0] if rest else None, target))
-    if side == "both":
+    if side in ("below", "above"):
+        placed = _row(entries, side, y, gap, size, weight)
+    elif side == "both":
         mean = float(np.mean([e[1][0] for e in entries])) if entries else 0.0
         left = [e for e in entries if e[1][0] < mean]
         right = [e for e in entries if e[1][0] >= mean]
@@ -202,7 +263,8 @@ def stream(path, color=ACCENT, n=40, speed=0.16, glow=True, trail=True, size=0.0
     flow enters and vanish where it leaves. `glow` puts a larger faint dot behind each; `trail` draws a faint wide
     line along the path. The dots move by an updater, so they keep moving through `self.say` and `self.wait`.
     Add the returned handle to the scene. It has `.fade_to(level=0.25)` and `.brighten()` (animations: play them
-    as the narration moves between flows) and `.stop()`. The motion is the same on every render."""
+    as the narration moves between flows) and `.stop()`. The motion is the same on every render. A copy
+    of the handle stays still: build another `stream` for a second flow."""
     if isinstance(path, VMobject):
         route = path
     else:
@@ -216,8 +278,13 @@ def stream(path, color=ACCENT, n=40, speed=0.16, glow=True, trail=True, size=0.0
     g = _Flow(*parts)
     g.route, g.trail, g.dots, g.level = tr, tr if trail else None, dots, ValueTracker(1.0)
     g.phase = 0.0
+    # Animations copy what they animate and run the copies' updaters too (a fade's target copy would be set back
+    # to full brightness every frame, so the dots never faded). Only the stream itself moves: copies stay still.
+    g._live_id = id(g)
 
     def move(m, dt):
+        if id(m) != m._live_id:
+            return
         m.phase = (m.phase + dt * speed) % 1
         level = m.level.get_value()
         for i, d in enumerate(m.dots):
@@ -237,14 +304,14 @@ def stream(path, color=ACCENT, n=40, speed=0.16, glow=True, trail=True, size=0.0
 
 
 # ------------------------------------------------------------------ entry and exit
-def _marker(a, b, text, color, label_at, side):
+def _marker(a, b, text, color, label_at, side, size=20):
     arr = arrow(a, b, color=color, dashed=True, buff=0)
     g = VGroup(arr)
     g.arrow = arr
     g.label = None
     if text:
         d = (b - a) / (np.linalg.norm(b - a) or 1)
-        lab = T(text, 20, color)
+        lab = T(text, size, color)
         horiz = abs(d[0]) >= abs(d[1])
         if horiz:
             lab.next_to(label_at, RIGHT if side[0] > 0 else LEFT, buff=0.15)
@@ -260,21 +327,21 @@ def _unit(direction):
     return d / (np.linalg.norm(d) or 1.0)
 
 
-def enters(point, direction=RIGHT, text=None, length=1.2, color=MUTED):
+def enters(point, direction=RIGHT, text=None, length=1.2, color=MUTED, size=20):
     """A dashed arrow that ends at `point`, travelling along `direction` (so it comes in from the opposite side).
-    The optional `text` sits at the far end, beyond where the arrow starts. Returns a VGroup with `.arrow` and
+    The optional `text` (`size` pt, default 20) sits at the far end, beyond where the arrow starts. Returns a VGroup with `.arrow` and
     `.label` (None without text)."""
     d, p = _unit(direction), _point(point)
     a = p - d * length
-    return _marker(a, p, text, color, a, -d)
+    return _marker(a, p, text, color, a, -d, size)
 
 
-def leaves(point, direction=RIGHT, text=None, length=1.2, color=MUTED):
+def leaves(point, direction=RIGHT, text=None, length=1.2, color=MUTED, size=20):
     """A dashed arrow that starts at `point` and travels along `direction`, off the picture. The optional `text`
     sits at the far end, beyond the arrowhead. Returns a VGroup with `.arrow` and `.label` (None without text)."""
     d, p = _unit(direction), _point(point)
     b = p + d * length
-    return _marker(p, b, text, color, b, d)
+    return _marker(p, b, text, color, b, d, size)
 
 
 __all__ = ["enters", "leader", "leaders", "leaves", "stream"]

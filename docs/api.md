@@ -38,6 +38,8 @@ What an episode imports, and the tools an agent framework calls. Everything here
     options:
       members: [from_pyvista, screen_xy, from_model]
 
+::: manimvox.scenes.cutaway.Cutaway
+
 ## Screenshots and screen recordings
 
 ::: manimvox.scenes.screen

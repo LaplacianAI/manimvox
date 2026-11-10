@@ -50,6 +50,7 @@ from .components import box, bullets, heading
 from .ground import ground_mobject
 from .motion import COVER, words_in
 from .motion import dip as _dip
+from .shading import LitCamera
 from .text import STAGE_BOTTOM, STAGE_CENTER, STAGE_TOP, P, T
 
 config.background_color = BG
@@ -376,8 +377,11 @@ class Episode(Scene):
         `end` (a line, or a list of up to 3) is a built end card: its lines are carried in word by word
         and a rule is wiped in under them.
         `keep` is the mobjects that stay on screen for the answer, such as the opening's picture brought back:
-        the answer goes in the larger free band above or below them. The recap and end card clear them."""
-        self.clear(keep=keep)
+        the answer goes in the larger free band above or below them. The recap and end card clear them.
+        With nothing new to show (no recap, answer, end card or next title), the last picture stays on screen
+        while `narration` is spoken over it, instead of a blank frame."""
+        if recap or answer or end or next_title:
+            self.clear(keep=keep)
         self._flat()
         if answer:
             parts = []
@@ -519,7 +523,11 @@ class Episode3D(Episode, ThreeDScene):
     """An Episode with Manim's 3D camera: tilt and turn it with move_camera(), set_camera_orientation()
     and begin_ambient_camera_rotation(). The header, chapter label and progress bar stay put on screen.
     intro(), chapter() and outro() clear the stage, then put the camera back to the flat view, so their
-    cards are never tilted. Text placed in the 3D scene turns with it; pin() a label to keep it flat."""
+    cards are never tilted. Text placed in the 3D scene turns with it; pin() a label to keep it flat.
+    Its camera is a LitCamera, which also lights and draws model faces (see kit/shading.py)."""
+
+    def __init__(self, camera_class=LitCamera, **kwargs):
+        super().__init__(camera_class=camera_class, **kwargs)
 
     def pin(self, *mobs):
         """Keep `mobs` where they are on screen while the camera moves. Call it before revealing them."""

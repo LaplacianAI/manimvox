@@ -1,6 +1,6 @@
 ---
 name: manimvox-cli
-description: "The manimvox command line and how to read its output: doctor, new, brief, draft, render, check brief|theme|layout|audio, voices, add, join, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
+description: "The manimvox command line and how to read its output: doctor, new, brief, draft, render, check brief|theme|layout|audio, voices, add, assets, join, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
 license: MIT
 ---
 
@@ -50,10 +50,14 @@ Ask the user before installing anything: a system package, manimvox itself, or a
 | `manimvox check audio EP` | none | nothing | 1 if a line is silent | `check` |
 | `manimvox voices [ENGINE]` | `--prepare ENGINE[:VOICE]`, `-y` | model files in the cache | 1 on a voice error | `voices`; `--prepare` is `prepare_voice` |
 | `manimvox add [BLOCK ...]` | `--list`, `--force` | `blocks/<block>.py`, `blocks/__init__.py` | 1 on an unknown block or one already in the project without `--force` | `add_block`; `--list` is `list_blocks` |
+| `manimvox assets add URL` | `--licence ID`, `--credit TEXT`, `--name FILE`, `--non-commercial`, `-y` / `--yes` | `research/assets/<file>`, `research/assets.json`, an entry under `## Assets` in `FACTS.md` | 1 on a refused licence, a checksum mismatch, a file already there that differs, or no `--yes` with no terminal | `fetch_asset` (downloads only with `yes=true`; without it the result holds what to ask the user) |
+| `manimvox assets list` | none | nothing | 1 outside a project | `list_assets` |
 | `manimvox join [EP ...]` | `-o OUT.mp4`, `--no-cards` | `out/<Series>.mp4` and `.srt` (title card, then the episodes in order, each with its own end card) | 1 if an episode is not rendered or the frame rates differ | `join` |
 | `manimvox index` | none | `out/index.html` | 1 on error | `index` |
 | `manimvox package` | none | `share/<Name>/`, `share/<Name>-720p/` and a zip of each | 1 on error | `package` |
 | `manimvox skills install\|check\|update\|remove` | see [Skills in your agents](#skills-in-your-agents) | the skill folders of your coding agents | 1 on a problem, 2 with no terminal and no flag | none: a shell-only command |
+
+`manimvox assets add` fetches a real file (a 3D model, a scan, a dataset, an image) instead of `curl`, and it asks first: ask the user, then pass `--yes`; with no way to ask, the answer is no. A Zenodo record or file URL and a Wikimedia Commons file page have their licence, author, title and checksum read from the source (the checksum is verified); any other URL needs `--licence`, recorded as stated by you, and `--credit` when you know the proper line. A `--licence` that contradicts the source's is refused. Accepted: public domain, CC0, CC BY, CC BY-SA and open-source or open-data licences (MIT, BSD, Apache-2.0, ISC, ODC-By, ODbL, PDDL, OGL). Refused: any no-derivatives licence (cutting, simplifying or recolouring a model is a derivative), an unknown or all-rights-reserved licence, and a non-commercial one unless the user agrees the video is never used commercially and you pass `--non-commercial`. An archive (`.zip`, `.tar.gz`) is saved as downloaded; extract it yourself. Credit the file on screen from the recorded credit line.
 
 Notes:
 - `-y` / `--yes` (or `MANIMVOX_ASSUME_YES=1`) answers yes to download prompts. Use it only with the user's go-ahead.
