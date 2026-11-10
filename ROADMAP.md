@@ -2,7 +2,7 @@
 
 manimvox lets an AI agent make high-quality educational videos at low cost, with a person directing. Each release below moves one step closer to that goal. Items are planned, not promised; order and scope may change. Discuss any of them in [GitHub issues](https://github.com/LaplacianAI/manimvox/issues).
 
-**Released:** 0.6.0 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows. Every change is in the [changelog](https://github.com/LaplacianAI/manimvox/blob/main/CHANGELOG.md).
+**Released:** 0.7.0 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows. Every change is in the [changelog](https://github.com/LaplacianAI/manimvox/blob/main/CHANGELOG.md).
 
 ## Released
 
@@ -61,21 +61,21 @@ Three moves almost every explanation needs, whatever the subject: pointing at a 
 - [x] **A calm style.** Fewer boxes, thinner lines, more space, so a video looks like a lecturer at a board rather than slides. An option the skills point to; the defaults stay as they are, so existing episodes render the same.
 - [x] **Proved on three different subjects:** the heart explainer rebuilt with the kit (173 lines to 135, the same picture), a web request through its services in the calm style, and a labelled screenshot. Both were later rebuilt as the gallery videos *Why is the same page faster the second time?* and *Which site am I on?* (0.7). None needed a special case.
 
-## Next
+### 0.7: 3D and real data
 
-- [ ] **More gallery videos:** a paper video next.
-- [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
-- [ ] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it.
-
-## 0.7: 3D and real data
-
-Real objects and real data, used with their licences respected. Built and tested; it ships as the next release.
+Real objects and real data, used with their licences respected.
 
 - [x] **`manimvox assets`.** Fetch a model, scan, dataset or image into `research/assets/` after asking, and record its source, licence, checksum and credit line in `research/assets.json` and `FACTS.md`. Zenodo and Wikimedia Commons licences are read from the source; open licences are accepted, non-commercial ones only with `--non-commercial`, and no-derivatives or unknown ones refused.
 - [x] **Cut it open: `Cutaway`.** Any scan, CAD part or simulation cut along a plane, or a quarter cut away for a round part, with coloured regions or a continuous field, the cut faces capped, the removed part as glass, and one steady camera from the turn through the cut to the opened view. Its parts feed straight into `leaders`. The heart explainer is rebuilt on it, with the same picture.
 - [x] **Better `mesh-model` shading.** manimvox's own lighting instead of Manim's wash towards white, and large models drawn 15 to 20 times faster.
 - [x] **Fixes found making the videos:** an ending with nothing new to show spoke over a blank frame; a running stream did not fade out with the picture; labels can now sit in a row above or below a wide subject.
 - [x] **Gallery:** *What lets a loaded wheel turn so freely?* (a real bearing, cut open), *Why is the same page faster the second time?* and *Which site am I on?* (a real screenshot), made by Claude Code and rebuilt after review.
+
+## Next
+
+- [ ] **More gallery videos:** a paper video next.
+- [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
+- [ ] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it.
 
 ## Later
 
