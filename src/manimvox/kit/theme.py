@@ -5,7 +5,7 @@ from __future__ import annotations
 import sys
 from dataclasses import dataclass, field
 
-from ..project import parse_ground
+from ..project import parse_ground, parse_style
 
 DEFAULTS = {
     "bg": "#111417",
@@ -53,6 +53,7 @@ class Theme:
     source: str = ""
     defaulted: tuple[str, ...] = ()
     ground: dict | None = None  # {"kind": "solid"|"grain"|"grid"|"paper", "amount": 0..1}, drawn once behind everything
+    style: str = "standard"  # "calm" draws thinner strokes, lighter outlines and more padding in the kit's components
 
     @classmethod
     def from_dict(cls, d: dict, platform: str = sys.platform) -> Theme:
@@ -71,7 +72,23 @@ class Theme:
             source=str(d.get("source", "")).strip(),
             defaulted=defaulted,
             ground=parse_ground(d.get("ground")),
+            style=parse_style(d.get("style")),
         )
+
+    @property
+    def stroke_scale(self) -> float:
+        """Factor on the stroke widths the kit's components draw."""
+        return 0.6 if self.style == "calm" else 1.0
+
+    @property
+    def pad_scale(self) -> float:
+        """Factor on the padding inside the kit's boxes, cards and nodes."""
+        return 1.25 if self.style == "calm" else 1.0
+
+    @property
+    def outline_opacity(self) -> float:
+        """Opacity of box outlines."""
+        return 0.55 if self.style == "calm" else 1.0
 
     def __getitem__(self, role: str) -> str:
         return self.roles[role]

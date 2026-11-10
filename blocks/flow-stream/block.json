@@ -1,0 +1,16 @@
+{
+  "name": "flow-stream",
+  "function": "flow_stream",
+  "helpers": [],
+  "description": "A stream of dots through a pipe of stages that dims and brightens, with entry and exit markers.",
+  "tags": ["flow", "stream", "markers"],
+  "parameters": [
+    {"name": "stages", "description": "box labels, left to right"},
+    {"name": "inbound", "description": "label on the arrow that comes in, or None"},
+    {"name": "outbound", "description": "label on the arrow that leaves, or None"},
+    {"name": "color", "description": "colour of the dots and the boxes"},
+    {"name": "w", "description": "box width in scene units"},
+    {"name": "gap", "description": "space between boxes"}
+  ],
+  "returns": "VGroup with .nodes, .stream (.fade_to(level), .brighten(), .stop()), .entry, .exit; add it, then play the stream's animations as the narration moves on"
+}

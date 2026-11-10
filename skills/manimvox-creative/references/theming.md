@@ -24,6 +24,10 @@ When `bg` is light, also set `panel`, `panel2` and `line`, because the kit's def
 
 An optional `ground` puts a texture behind everything: `"ground": {"kind": "grain", "amount": 0.3}`. `kind` is `solid`, `grain`, `grid` or `paper`; `amount` runs from 0 to 1. Keep `amount` low so text stays readable, and look at a contact sheet before keeping it.
 
+### The style
+
+`"style": "calm"` in the theme draws the kit's components with thinner strokes, lighter box outlines and more padding, so a video looks like a lecturer at a board rather than slides. The default is `"standard"` and an episode that does not ask for `calm` renders as it always did. Pick `calm` for a lecture-style explanation: one subject drawn up slowly, few boxes, labels that point (`leaders`, see [patterns](../../manimvox-animation/references/patterns.md#13-pointing-labels-streams-and-markers)) rather than callouts in boxes. Keep `standard` for product tours, dashboards and anything that should look like an interface. Calm pairs well with a `paper` or `grain` ground.
+
 ## The roles
 
 `bg panel panel2 line ink muted accent ok warn error code_bg blue orange violet pink teal named`. Roles you leave out fall back to the kit's neutral dark values, except `code_bg`, which falls back to your `bg`.

@@ -35,6 +35,18 @@ def parse_ground(raw: object) -> dict | None:
     return {"kind": kind, "amount": float(amount)}
 
 
+STYLES = ("standard", "calm")
+
+
+def parse_style(raw: object) -> str:
+    """The theme's `style`: "standard" (default) or "calm". Raises ValueError with a one-line reason."""
+    if raw is None:
+        return "standard"
+    if raw not in STYLES:
+        raise ValueError(f"theme.style must be one of {', '.join(STYLES)}, got {raw!r}")
+    return raw
+
+
 @dataclass(frozen=True)
 class EpisodeRef:
     n: int
@@ -126,6 +138,7 @@ def load_project(root: Path) -> Project:
         raise ProjectError(f"{f}: 'theme' must be an object, got {theme!r}")
     try:
         parse_ground(theme.get("ground"))
+        parse_style(theme.get("style"))
     except ValueError as e:
         raise ProjectError(f"{f}: {e}") from e
     try:

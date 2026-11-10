@@ -1,0 +1,16 @@
+{
+  "name": "labelled-diagram",
+  "function": "labelled_diagram",
+  "helpers": [],
+  "description": "A small architecture diagram, boxes joined by arrows, with each part named by a pointing label.",
+  "tags": ["diagram", "labels", "architecture"],
+  "parameters": [
+    {"name": "parts", "description": "(name, note) pairs, top to bottom"},
+    {"name": "color", "description": "box outline colour"},
+    {"name": "side", "description": "right, left or both: where the labels stand"},
+    {"name": "w", "description": "box width in scene units"},
+    {"name": "gap", "description": "space between boxes"},
+    {"name": "at", "description": "where the boxes' centre goes; labels are laid out there"}
+  ],
+  "returns": "VGroup with .nodes, .arrows, .labels (leaders: each has .dot .line .label), .labels.grow() the animation that points out every part"
+}

@@ -14,6 +14,12 @@ What an episode imports, and the tools an agent framework calls. Everything here
     options:
       show_root_heading: false
 
+## Diagrams that explain
+
+::: manimvox.kit.diagram
+    options:
+      show_root_heading: false
+
 ## 3D meshes
 
 ::: manimvox.kit.mesh

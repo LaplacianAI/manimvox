@@ -28,6 +28,8 @@ Run `manimvox add --list`. Each line is a block's name, what it draws, and its t
 | `kinetic-title` | a title that arrives as moving type, for an opening with no card or a chapter title |
 | `end-card` | a built end card: a challenge, a cliffhanger or a call to action with a link line |
 | `transitions-demo` | the chapter-seam transitions side by side, to see which fits |
+| `labelled-diagram` | boxes joined by arrows with a pointing label for each part |
+| `flow-stream` | dots flowing through stages, dimmed and brightened, with entry and exit markers |
 
 ## Copy it into the project
 

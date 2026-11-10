@@ -24,6 +24,7 @@ Once one storyline is picked, add a Direction section to `DIRECTION.md` with eac
 **Look from one medium.** Pick one: chalkboard, blueprint, paper and ink, lab notebook, terminal, or the product's own UI. Then give:
 
 - the ground: the `bg` hex and the texture (`ground` in the theme, see [theming](theming.md));
+- the style: `"style": "calm"` in the theme for a lecture at a board (thin lines, few boxes, room to breathe), or leave it `standard` (see [theming](theming.md));
 - the ink: the text colour and the muted colour;
 - one accent, and where it may appear (for example: only on the thing the narration is naming);
 - font sizes: title, body and label, in points.

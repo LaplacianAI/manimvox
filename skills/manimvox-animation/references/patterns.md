@@ -16,6 +16,7 @@ Each example is the body of one chapter inside an episode's `build()`, after `se
 10. Recipe: a plane without Axes
 11. Recipe: a live number
 12. Transitions and title entrances
+13. Pointing labels, streams and markers
 
 ## 1. Carry an object between scenes
 
@@ -269,3 +270,47 @@ self.play(accent_word(title, "missed"))         # the one word that carries the 
 An opening with no card: `self.intro(narration, question="…", card=False)`. The cold open stays on screen and the title arrives as type over it, centred at y = 2, so leave that band free. `leave=[…]` takes parts of the cold open off with the title, so the first chapter needs no clear of its own. For a clean frame, set `CHROME = ()` on the episode class; the default is `CHROME = ("label", "bar")`, and the bar stays in a playlist, where it shows where the viewer is. An ending that is not a recap: `self.outro([], narration, end="…")`, or `end=[…]` for up to 3 lines. To answer over the opening's picture, bring it back and pass it as `keep`: `self.outro([], narration, answer="…", keep=[shelf])`.
 
 Code rows. `panel = code(src)` then `panel.row(k)` is a highlight bar exactly behind line `k` (counted from 0, blank lines included): `self.play(FadeIn(panel.row(2)))`. Place the panel first, then call `row`: the bar is drawn where the line is at that moment. Don't estimate rows from the panel's height. `code(src, dots=False)` leaves out the window dots for a look that is not a desktop window.
+
+## 13. Pointing labels, streams and markers
+
+Three moves for any subject: name a part, show what moves through the system, show what comes in and what leaves. `from manimvox.kit import *` gives `leaders`, `leader`, `stream`, `enters` and `leaves`. Prefer `leaders` over boxed callouts: a dot on the part, a thin line out to the side and the name beside it keep the picture clean, where a box over the picture hides it.
+
+Labels that point. `leaders(items, side="right", x=None, gap=None, size=22)` takes `(target, text)` or `(target, text, colour)`. A target is a mobject (its centre is used) or a point. It places one column of labels, pushes them apart so none overlap and all stay inside the stage, and draws each line with a short elbow so no two cross. `side="both"` splits the items left and right of their mean x. `leader(target, text, side=, x=, color=, size=)` is one label. Each leader has `.dot`, `.line` and `.label`; `.grow()` fades the dot in, draws the line, then fades the label in, and on the group of `leaders` it runs them one after another.
+
+```python
+# An architecture diagram: name the services as the narration reaches them.
+names = leaders([(gateway.get_right(), "checks who you are"), (service.get_right(), "does the work"),
+                 (db.get_right(), "remembers the result", ACCENT)])
+self.say("Each service has one job.", names.grow())
+
+# A screenshot: clip.at(px, py) is a point, so it needs no special case.
+from manimvox.scenes import screenshot
+shot = screenshot("research/screens/01-home.png", width=8).move_to(LEFT * 2)
+pins = leaders([(shot.at(1160, 26), "search"), (shot.at(210, 340), "the file list"), (shot.at(700, 520), "the editor")])
+self.say("Three places matter.", pins.grow())
+
+# Anatomy: label both sides of a picture; the targets split by x.
+parts = leaders([(clip.at(*px["aorta"]), "aorta"), (clip.at(*px["valve"]), "valve", ERROR),
+                 (clip.at(*px["left"]), "left ventricle"), (clip.at(*px["right"]), "right ventricle")], side="both")
+self.say("Four parts to name.", parts.grow(lag=0.5))
+```
+
+Set `x` to put the label column somewhere else; by default the column starts a short way past the outermost part, and never runs off the stage. A column that would sit over the picture raises an error that says where it must start: move the picture, shorten the labels or use the other side. `weight=BOLD` makes the names bold. Place the picture first: labels are laid out where the targets are when `leaders` is called.
+
+Flows. `stream(path, color=ACCENT, n=40, speed=0.16, glow=True, trail=True, size=0.042)` makes dots travel along a path (a VMobject, or a list of points) and fade in where it starts and out where it ends. An updater moves them, so they keep going through `self.say` and `self.wait`. Add the handle to the scene once; play its animations as the narration moves between flows, and call `stop()` when it is done.
+
+```python
+requests = stream([client.get_right(), gateway.get_left(), service.get_left()], color=ACCENT)
+replies = stream([service.get_top(), gateway.get_top(), client.get_top()], color=OK)
+self.add(requests, replies)
+self.say("A request goes in.", replies.fade_to(0.25))                 # the other flow steps back
+self.say("Then the reply comes back.", requests.fade_to(0.25), replies.brighten())
+requests.stop()
+```
+
+Entry and exit markers. `enters(point, direction=RIGHT, text=None, length=1.2, color=MUTED)` is a dashed arrow that ends at `point`, travelling along `direction`, with its label at the far end. `leaves(point, direction=RIGHT, text=None, ...)` starts at `point` and runs off along `direction`, the label past the arrowhead. Use them for "a request arrives here" and "the answer leaves here".
+
+```python
+self.say("A request arrives and the answer leaves.", FadeIn(enters(client.get_left(), RIGHT, "request")),
+         FadeIn(leaves(client.get_right(), RIGHT, "response")))
+```

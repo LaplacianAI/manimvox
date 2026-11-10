@@ -24,24 +24,26 @@ from manim import (
     VGroup,
 )
 
+from ._context import OUTLINE, PAD, STROKE
 from .colours import ACCENT, BG, BLUE, CODE_BG, ERROR, INK, LINE, MUTED, OK, PANEL, PANEL2, WARN
 from .text import FONT, MONO, SAFE_W, STAGE_BOTTOM, STAGE_TOP, P, T, fit
 
 
 def box(w, h, fill=PANEL, stroke=LINE, r=0.16, sw=2, op=1.0):
     r = min(r, w / 2 - 0.01, h / 2 - 0.01)
-    return RoundedRectangle(corner_radius=r, width=w, height=h).set_fill(fill, op).set_stroke(stroke, sw)
+    return RoundedRectangle(corner_radius=r, width=w, height=h).set_fill(fill, op).set_stroke(stroke, sw * STROKE, OUTLINE)
 
 
 def chip(text, color=ACCENT, size=16, filled=False, weight=BOLD):
     """Small pill label."""
     t = T(text, size, BG if filled else color, weight)
-    bg = box(t.width + 0.36, t.height + 0.22, fill=color if filled else BG, stroke=color, r=0.2, sw=1.6)
+    bg = box(t.width + 0.36 * PAD, t.height + 0.22 * PAD, fill=color if filled else BG, stroke=color, r=0.2, sw=1.6)
     return VGroup(bg, t.move_to(bg))
 
 
 def card(title, body=None, w=3.8, color=BLUE, title_size=24, body_size=17, pad=0.26, fill=PANEL, icon=None):
     """Titled panel with an accent bar. `body` is a string or list of strings."""
+    pad *= PAD
     inner = w - 2 * pad - 0.12
     head = T(title, title_size, INK, BOLD, max_w=inner - (0.75 if icon else 0))
     if icon is not None:
@@ -66,7 +68,7 @@ def node(label, sub=None, w=2.6, h=None, color=BLUE, size=21, sub_size=14, fill=
     if sub:
         texts.add(P(sub, sub_size, MUTED, max_w=w - 0.36, align="center"))
     texts.arrange(DOWN, buff=0.09)
-    bg = box(w, h or texts.height + 0.46, fill=fill, stroke=color, sw=2.4)
+    bg = box(w, h or texts.height + 0.46 * PAD, fill=fill, stroke=color, sw=2.4)
     g = VGroup(bg, texts.move_to(bg))
     g.bg = bg
     return g
@@ -88,13 +90,13 @@ def arrow(a, b, color=MUTED, label=None, buff=0.12, sw=3.0, label_size=14, curve
     if pb is None:
         pb = (b.get_left() if d[0] > 0 else b.get_right()) if horiz else (b.get_bottom() if d[1] > 0 else b.get_top())
     if curve:
-        arr = CurvedArrow(pa, pb, angle=curve, color=color, stroke_width=sw, tip_length=0.2)
+        arr = CurvedArrow(pa, pb, angle=curve, color=color, stroke_width=sw * STROKE, tip_length=0.2)
     else:
-        arr = Arrow(pa, pb, buff=buff, color=color, stroke_width=sw, tip_length=0.2,
+        arr = Arrow(pa, pb, buff=buff, color=color, stroke_width=sw * STROKE, tip_length=0.2,
                     max_tip_length_to_length_ratio=0.4, max_stroke_width_to_length_ratio=20)
     if dashed:
         tip = arr.tip
-        arr = VGroup(DashedVMobject(Line(pa, pb, buff=buff).set_stroke(color, sw), num_dashes=14), tip)
+        arr = VGroup(DashedVMobject(Line(pa, pb, buff=buff).set_stroke(color, sw * STROKE), num_dashes=14), tip)
     g = VGroup(arr)
     if label:
         t = T(label, label_size, label_color or color)
@@ -130,7 +132,7 @@ def gedge(a, b, label=None, color=LINE, size=13):
     u = d / (np.linalg.norm(d) or 1)
     pa = sa.get_center() + u * (sa.width / 2 + 0.06)
     pb = sb.get_center() - u * (sb.width / 2 + 0.1)
-    arr = Arrow(pa, pb, buff=0, color=color, stroke_width=2.5, tip_length=0.16,
+    arr = Arrow(pa, pb, buff=0, color=color, stroke_width=2.5 * STROKE, tip_length=0.16,
                 max_tip_length_to_length_ratio=0.25)
     g = VGroup(arr)
     if label:
@@ -158,7 +160,7 @@ def stat(value, label, color=ACCENT, w=3.0, vsize=52, lsize=16, fill=PANEL):
     v = T(value, vsize, color, BOLD, max_w=w - 0.4)
     l = P(label, lsize, MUTED, max_w=w - 0.4, align="center")
     inner = VGroup(v, l).arrange(DOWN, buff=0.14)
-    bg = box(w, inner.height + 0.6, fill=fill)
+    bg = box(w, inner.height + 0.6 * PAD, fill=fill)
     g = VGroup(bg, inner.move_to(bg))
     g.value = v
     return g
@@ -275,7 +277,7 @@ def lifeline(label, x, top=2.2, bottom=-3.2, color=BLUE, w=2.3, size=18):
     """Sequence-diagram column: a header box at `top` and a dashed line down to
     `bottom`. Returns VGroup(head, line); `.x` is the column's x."""
     head = node(label, w=w, color=color, size=size).move_to([x, top, 0])
-    line = DashedLine(head.get_bottom(), [x, bottom, 0], dash_length=0.12).set_stroke(LINE, 2)
+    line = DashedLine(head.get_bottom(), [x, bottom, 0], dash_length=0.12).set_stroke(LINE, 2 * STROKE)
     g = VGroup(head, line)
     g.x = x
     return g
@@ -288,11 +290,11 @@ def message(a, b, y, label=None, color=MUTED, dashed=False, size=15):
     d = 1 if b.x > a.x else -1
     pa, pb = pa + RIGHT * d * 0.08, pb - RIGHT * d * 0.08
     if dashed:
-        line = DashedLine(pa, pb, dash_length=0.1).set_stroke(color, 2.5)
-        tip = Arrow(pb - RIGHT * d * 0.3, pb, buff=0, color=color, stroke_width=2.5, tip_length=0.18).tip
+        line = DashedLine(pa, pb, dash_length=0.1).set_stroke(color, 2.5 * STROKE)
+        tip = Arrow(pb - RIGHT * d * 0.3, pb, buff=0, color=color, stroke_width=2.5 * STROKE, tip_length=0.18).tip
         arr = VGroup(line, tip)
     else:
-        arr = Arrow(pa, pb, buff=0, color=color, stroke_width=3, tip_length=0.18,
+        arr = Arrow(pa, pb, buff=0, color=color, stroke_width=3 * STROKE, tip_length=0.18,
                     max_tip_length_to_length_ratio=0.3)
     g = VGroup(arr)
     if label:
