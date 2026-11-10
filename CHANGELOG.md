@@ -4,6 +4,8 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-10
+
 ### Added
 
 - **Diagrams that explain.** Three moves any explanation needs are now kit functions that work for any subject: `leaders` and `leader` (a dot on the part, a thin line out to the side and the name beside it, with labels spread so they never overlap or leave the stage and lines that never cross; for a screenshot or recording pass `clip.at(x, y)`; `weight=BOLD` for bold names; a label column that would sit over the picture is refused with the fix), `stream` (dots travelling along a path, fading in and out at its ends, with `.fade_to(level)`, `.brighten()` and `.stop()`), and `enters` and `leaves` (dashed arrows for what comes in and what leaves). The skills now prefer pointing labels over boxed callouts. New blocks `labelled-diagram` and `flow-stream`.
@@ -87,7 +89,8 @@ The first release.
 - **For agents:** eleven agent skills, the CLI as typed tools, adapters for eight Python agent frameworks, and plugin manifests for Claude Code, Codex, Cursor and Gemini CLI.
 - CI on Linux, macOS and Windows; releases published to PyPI with trusted publishing.
 
-[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/LaplacianAI/manimvox/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/LaplacianAI/manimvox/compare/v0.4.1...v0.5.0
 [0.4.1]: https://github.com/LaplacianAI/manimvox/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/LaplacianAI/manimvox/compare/v0.3.0...v0.4.0

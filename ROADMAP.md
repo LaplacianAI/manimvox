@@ -2,7 +2,7 @@
 
 manimvox lets an AI agent make high-quality educational videos at low cost, with a person directing. Each release below moves one step closer to that goal. Items are planned, not promised; order and scope may change. Discuss any of them in [GitHub issues](https://github.com/LaplacianAI/manimvox/issues).
 
-**Released:** 0.5.0 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows. Every change is in the [changelog](https://github.com/LaplacianAI/manimvox/blob/main/CHANGELOG.md).
+**Released:** 0.6.0 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows. Every change is in the [changelog](https://github.com/LaplacianAI/manimvox/blob/main/CHANGELOG.md).
 
 ## Released
 
@@ -51,21 +51,21 @@ Videos made with the same kit all began with one title card, faded chapter numbe
 - [x] **A variety check and a review of tells.** `manimvox check layout` warns when every chapter seam uses the same transition; the skills have the agent check its contact sheet against the BANNED list in `DIRECTION.md` before a final render.
 - [x] **Gallery:** *How a hash map finds a key*, a concept video, and *Directed videos, not templates*, a PR walkthrough, both made by Claude Code with the direction step and narrated by Sarvam AI.
 
-## Next
+### 0.6: diagrams that explain
 
-- [ ] **More gallery videos:** a paper video next.
-- [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
-- [ ] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it.
-
-## 0.6: diagrams that explain
-
-Three moves almost every explanation needs, whatever the subject: pointing at a part and naming it, showing something move through a system, and showing what comes in and what leaves. Agents now fake them with boxes and still arrows. The heart explainer drew them inside its own episode; they become part of the kit, built once for any subject. Built and tested; it ships as the next release.
+Three moves almost every explanation needs, whatever the subject: pointing at a part and naming it, showing something move through a system, and showing what comes in and what leaves. Agents now fake them with boxes and still arrows. The heart explainer drew them inside its own episode; they become part of the kit, built once for any subject.
 
 - [x] **Labels that point.** A dot on the part, a thin line out to the side, and the name beside it, laid out so labels never collide and lines never cross. For the parts of an architecture diagram, the buttons on a screenshot, or the parts of a cell.
 - [x] **Flows.** Dots travelling along a path to show what moves and which way, fading in where they enter and out where they leave, dimmed or brightened as the narration moves between flows. For requests through services, money through a payment, data through a pipeline, or blood through a heart.
 - [x] **Entry and exit markers.** Dashed arrows for "comes in here" and "leaves the picture here": a request arriving, a response leaving, air in and out.
 - [x] **A calm style.** Fewer boxes, thinner lines, more space, so a video looks like a lecturer at a board rather than slides. An option the skills point to; the defaults stay as they are, so existing episodes render the same.
 - [x] **Proved on three different subjects:** the heart explainer rebuilt with the kit (173 lines to 135, the same picture), a web request through its services in the calm style, and a labelled screenshot, the last two in `examples/diagrams/`. None needed a special case.
+
+## Next
+
+- [ ] **More gallery videos:** a paper video next.
+- [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
+- [ ] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it.
 
 ## 0.7: 3D and real data
 
