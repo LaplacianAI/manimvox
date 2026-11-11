@@ -2,11 +2,10 @@
 file (`screenshot`) and a screen recording (`from_video`)."""
 from __future__ import annotations
 
-import math
 from collections.abc import Callable
 from pathlib import Path
 
-from .clip import DEFAULT_WIDTH, MAX_FRAMES, Clip, SceneError, png
+from .clip import DEFAULT_WIDTH, MAX_FRAMES, Clip, SceneError, VideoFrames, png
 
 
 def frame_count(seconds: float, fps: float) -> int:
@@ -62,39 +61,36 @@ def screenshot(path, width: float = DEFAULT_WIDTH) -> Clip:
 
 
 def from_video(path, fps: float = 15, start: float = 0.0, end: float | None = None, width: float = DEFAULT_WIDTH,
-               max_width: int = 1280) -> Clip:
-    """A screen recording (MP4, WebM, MOV) from `start` to `end` seconds as a Clip of `fps` frames a second.
-    Frames wider than `max_width` pixels are scaled down to save memory, but positions stay in the recording's
-    own pixels. Play it with `clip.play()`, which runs at the recording's speed by default."""
-    import av
-    from PIL import Image
+               max_width: int = 1280, sound: bool = False, volume: float = 0.0) -> Clip:
+    """A recording (MP4, WebM, MOV) from `start` to `end` seconds as a Clip of `fps` frames a second, of any
+    length: frames are read from the file as they are shown, not held in memory. Frames wider than `max_width`
+    pixels are scaled down, but positions stay in the recording's own pixels. Play it with `clip.play()`, which
+    runs at the recording's speed by default.
 
-    with av.open(str(_open(path))) as box:
+    `sound=True` keeps the recording's sound: it is heard whenever the clip plays, levelled to the project's
+    loudness and `volume` dB from there, sped up or slowed with the clip (its pitch kept). Do not narrate over a
+    clip that speaks. A looped clip is silent."""
+    import hashlib
+
+    import av
+
+    p = _open(path)
+    with av.open(str(p)) as box:
+        if not box.streams.video:
+            raise SceneError(f"{p.name} has no picture")
         stream = box.streams.video[0]
         size = (stream.codec_context.width, stream.codec_context.height)
         length = float(stream.duration * stream.time_base) if stream.duration else (box.duration or 0) / 1e6
-        stop = min(end, length) if end is not None and length else (end if end is not None else length)
-        if start > 0:
-            box.seek(int(start / stream.time_base), stream=stream, backward=True)
-        frames, last = [], None  # frames[k] is what the recording shows at start + k / fps
-        for frame in box.decode(stream):
-            t = float(frame.time or 0.0)
-            if stop and t >= stop - 1e-6:
-                break
-            k = math.floor((t - start) * fps + 1e-6)  # the clip frame this recording frame falls in
-            if k < len(frames):  # more frames a second than the clip needs, or before `start`
-                continue
-            while last is not None and len(frames) < k:  # a gap in the recording: hold the frame before it
-                frames.append(last)
-            img = frame.to_image()
-            if img.width > max_width:
-                img = img.resize((max_width, round(img.height * max_width / img.width)), Image.Resampling.LANCZOS)
-            last = png(img)
-            frames.append(last)
-            if len(frames) > MAX_FRAMES:
-                raise SceneError(f"more than {MAX_FRAMES} frames; lower fps or pass start and end")
-        while last is not None and len(frames) < round((stop - start) * fps):  # the last frame lasts to the end
-            frames.append(last)
-    if not frames:
+        has_sound = bool(box.streams.audio)
+    stop = min(end, length) if end is not None and length else (end if end is not None else length)
+    count = round((stop - start) * fps) if stop else 0
+    if start < 0 or count < 1:
         raise SceneError(f"{path} has no frames between {start:g} s and {'its end' if end is None else f'{end:g} s'}")
-    return Clip(frames, fps, width, space=size)
+    if sound and not has_sound:
+        raise SceneError(f"{p.name} has no sound; leave out sound=True")
+    scaled = size if size[0] <= max_width else (max_width, 2 * round(size[1] * max_width / size[0] / 2))
+    st = p.stat()
+    digest = hashlib.sha256(f"{p.resolve()}|{st.st_size}|{st.st_mtime_ns}|{start}|{stop}|{fps}|{scaled}".encode()
+                            ).hexdigest()
+    frames = VideoFrames(p.resolve(), start, count, fps, scaled, digest)
+    return Clip(frames, fps, width, space=size, sound=(str(p.resolve()), float(start), float(volume)) if sound else None)

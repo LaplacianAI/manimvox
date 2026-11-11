@@ -54,8 +54,10 @@ with self.narrate("Results appear as you type.") as dur:
     self.play(rec.play(), run_time=dur)
 ```
 
-- Trim with `start` and `end` (seconds) to the part the line talks about; a clip holds at most 3600 frames.
+- Trim with `start` and `end` (seconds) to the part the line talks about. A recording of any length works: frames are read from the file as they are shown.
+- `from_video(..., sound=True)` keeps the recording's own sound (a person speaking, an app's sounds): it is heard whenever the clip plays, levelled to the narration's loudness, `volume=` dB from there, and sped up or slowed with the clip with its pitch kept. Do not narrate over a clip that speaks: play it with `self.play(rec.play())` between narrated lines. A looped clip is silent.
+- To edit a whole recording (cut it by its words, drop pauses, caption the speaker, mix music) rather than show part of it in an episode, use `manimvox edit`: see [manimvox-cli](../../manimvox-cli/SKILL.md).
 - Play one recording in parts, one per narrated line: `rec.play(start=4.0, end=9.5)` plays those seconds at real speed, or over `run_time=` when the line is longer or shorter.
-- Frames wider than 1280 pixels are scaled down to save memory; regions stay in the recording's own pixels.
+- Frames wider than 1280 pixels are scaled down; regions stay in the recording's own pixels.
 - `rec.zoom(...)` and the overlays work on a recording as on a screenshot, and can run while it plays.
 - Prefer screenshots with a cursor and zooms over long recordings: they are sharper, and every step can follow the narration.

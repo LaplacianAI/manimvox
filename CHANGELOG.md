@@ -24,6 +24,7 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
   - `captions: true` captions what the speaker says, at its place on the film; music dips under the speaker as it does under narration, and the speaker's own sound does not.
   - `check edit` lists the pieces each clip keeps.
   - The sound is decoded by manimvox and handed to faster-whisper as samples: faster-whisper 1.2's own decoder passes PyAV an argument PyAV 19 removed.
+- **Footage inside explainers.** `from_video` reads a recording of any length from the file as it plays, instead of holding up to 3600 frames in memory. `from_video(..., sound=True, volume=)` keeps the recording's sound: it is heard when the clip plays in the episode, levelled to the narration's loudness and at the clip's playing speed, also on a re-render that Manim serves from its cache.
 
 ## [0.7.0] - 2026-11-10
 
