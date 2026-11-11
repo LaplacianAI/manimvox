@@ -1,6 +1,6 @@
 ---
 name: manimvox
-description: "Makes narrated, animated explainer videos with Manim and a text-to-speech voice: one video from a paper, article or URL; a beginner-to-advanced playlist from a codebase or spec; a 3Blue1Brown-style explainer of a concept; or a walkthrough of a pull request. Use when the user asks for an explainer video, an animated explanation, a video series or playlist, or to turn a document, codebase, idea or PR into a video. Picks the workflow and checks the setup."
+description: "Makes narrated, animated explainer videos with Manim and a text-to-speech voice: one video from a paper, article or URL; a beginner-to-advanced playlist from a codebase or spec; a 3Blue1Brown-style explainer of a concept; a walkthrough of a pull request; or the user's own footage, edited. Use when the user asks for an explainer video, an animated explanation, a video series or playlist, or to turn a document, codebase, idea or PR into a video, or to edit their own recordings. Picks the workflow and checks the setup."
 license: MIT
 ---
 
@@ -16,8 +16,9 @@ manimvox turns a source into an animated video with a spoken voice, using Manim 
 | a codebase, repo URL or local repo, spec, design doc, or asks for "a series" | [manimvox-playlist](../manimvox-playlist/SKILL.md): a ladder of 5 to 9 episodes |
 | a topic or concept with no source | [manimvox-concept](../manimvox-concept/SKILL.md): one idea, one video |
 | a PR URL, `owner/repo#N`, `PR #N`, `#N` or "this PR" (the workflow asks which repository if it is not given) | [manimvox-pr](../manimvox-pr/SKILL.md): a 1 to 3 minute walkthrough |
+| video files of their own to cut, trim, join, caption, narrate or score (an interview, a talk, a screen recording) | [manimvox-edit](../manimvox-edit/SKILL.md): their footage, edited |
 
-When a request matches more than one row, the most specific row wins (a PR URL is a PR, not a page).
+When a request matches more than one row, the most specific row wins (a PR URL is a PR, not a page). An explainer that should also show the user's footage at length is an explainer workflow first; its episode then goes into an edit beside the footage (manimvox-edit).
 
 Open the workflow skill and follow it to the end. Each workflow starts with the brief: questions about who the video is for, what it should feel like, and how it opens and ends ([brief](../manimvox-creative/references/brief.md)). To choose the workflow, if the input is unclear, ask at most one question, for example "Is there a document or repository to explain, or should I explain the idea itself?". If the user cannot be asked and there is a candidate subject (a document, URL, repo, topic or PR), pick the most likely workflow, say which one and why, and continue. If there is no subject at all ("make a video") and no way to ask, stop and report what is needed: what to explain, and any source.
 
@@ -59,4 +60,4 @@ The workflows read these; open one when you need it.
 
 ## 6 What done means
 
-The checks passed (`audio check: ok` on every render), you reported the MP4 path and its duration, and you listed every claim that could not be verified from the source.
+The checks passed (`audio check: ok` on every render), you reported the MP4 path and its duration, and you listed every claim that could not be verified from the source. For an edit, done is the report at the end of [manimvox-edit](../manimvox-edit/SKILL.md).

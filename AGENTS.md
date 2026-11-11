@@ -74,6 +74,7 @@ Tests that render with Manim are marked `slow`; tests needing real engines are o
 | `manimvox-playlist` | workflow | a codebase or spec into a beginner-to-advanced series |
 | `manimvox-concept` | workflow | a concept with no source into one video |
 | `manimvox-pr` | workflow | a pull request into a short walkthrough |
+| `manimvox-edit` | workflow | the user's own footage into a finished, edited video |
 | `manimvox-core` | domain | the authoring contract for episode files |
 | `manimvox-creative` | domain | theme, story, narration, facts |
 | `manimvox-animation` | domain | motion patterns |

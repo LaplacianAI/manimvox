@@ -317,3 +317,13 @@ def test_new_edit_starts_from_the_files(project):
     with pytest.raises(ValueError, match="give videos"):
         new_edit(project, "other", ["notes.txt"], base=project)
 
+
+
+def test_a_python_edit_can_hold_a_frame_source_itself():
+    from manimvox.edit import Frames, Timeline, frames
+    from manimvox.edit.timeline import validate
+
+    src = frames(lambda t: np.zeros((18, 32, 3), np.uint8), 2)
+    assert validate(Timeline((Frames(src),))).segments[0].source is src
+    with pytest.raises(ValueError, match='must be "path.py:name"'):
+        validate(Timeline((Frames(42),)))

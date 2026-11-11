@@ -399,7 +399,8 @@ def _segment(where: str, raw) -> Segment:
     if lead == "frames":
         _unknown(where, raw, ("frames", "seconds", "fit", "effects", "transition"))
         secs = raw.get("seconds")
-        return Frames(_ref(f"{where}.frames", raw["frames"]),
+        src = raw["frames"]  # from Python, a frame source itself (frames(...), a MoviePy clip) as well as a ref
+        return Frames(src if hasattr(src, "get_frame") else _ref(f"{where}.frames", src),
                       None if secs is None else _num(f"{where}.seconds", secs, hi=3600, above=0),
                       _choice(f"{where}.fit", raw.get("fit", "contain"), ("contain", "cover")), effects, tr)
     _unknown(where, raw, ("title", "lines", "seconds", "transition"))
