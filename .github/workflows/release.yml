@@ -7,9 +7,10 @@ on:
   push:
     tags: ["v*"]
 
+# ubuntu-24.04, not ubuntu-latest: the 26.04 image from 2026-11-01 cannot resolve Ubuntu's package servers. Back to ubuntu-latest once GitHub fixes it.
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v7
@@ -26,7 +27,7 @@ jobs:
 
   publish:
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     environment:
       name: pypi
       url: https://pypi.org/project/manimvox/
