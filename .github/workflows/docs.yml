@@ -13,10 +13,9 @@ concurrency:
   group: docs-${{ github.ref }}
   cancel-in-progress: true
 
-# ubuntu-24.04, not ubuntu-latest: the 26.04 image from 2026-11-01 cannot resolve Ubuntu's package servers. Back to ubuntu-latest once GitHub fixes it.
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v7
@@ -39,7 +38,7 @@ jobs:
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       pages: write
       id-token: write
