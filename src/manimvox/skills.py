@@ -12,7 +12,7 @@ from . import __version__
 
 SKILL_NAMES = (
     "manimvox", "manimvox-core", "manimvox-animation", "manimvox-creative", "manimvox-voice", "manimvox-cli", "manimvox-blocks",
-    "manimvox-paper", "manimvox-playlist", "manimvox-concept", "manimvox-pr",
+    "manimvox-paper", "manimvox-playlist", "manimvox-concept", "manimvox-pr", "manimvox-edit",
 )
 MANIFEST_NAME = "skills-manifest.json"
 

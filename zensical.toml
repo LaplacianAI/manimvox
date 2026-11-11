@@ -22,6 +22,7 @@ nav = [
     { "Blocks, charts and finishing" = "blocks.md" },
     { "3D models and data" = "3d.md" },
     { "Screenshots and recordings" = "screens.md" },
+    { "Editing your own footage" = "editing.md" },
     { "Voices" = "voices.md" },
   ] },
   { "Gallery" = [
@@ -45,6 +46,7 @@ nav = [
   ] },
   { "Reference" = [
     { "Configuration" = "configuration.md" },
+    { "The edit file" = "edit-file.md" },
     { "Python API" = "api.md" },
   ] },
   { "Project" = [

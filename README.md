@@ -105,7 +105,7 @@ The development version installs from GitHub: `uv tool install "manimvox[kokoro]
 <!-- --8<-- [start:coding-agents] -->
 ## Make a video with your coding agent
 
-manimvox ships eleven agent skills, so your coding agent can plan, write, render and check a video for you. Install them into the agents you use:
+manimvox ships twelve agent skills, so your coding agent can plan, write, render and check a video for you. Install them into the agents you use:
 
 ```bash
 npx skills add LaplacianAI/manimvox                      # detects your agents and lets you pick
@@ -123,7 +123,7 @@ manimvox skills update
 manimvox skills remove
 ```
 
-Other flags: `--project` (the default) installs in the current project, `--copy` copies the skills instead of linking them, and `--native` skips npx even when it is present. Without a terminal, `install` and `remove` need `--yes` (with `--agent ID` to choose agents), npx or not. An `npx` in the current folder is ignored. Only the eleven manimvox skills are ever touched.
+Other flags: `--project` (the default) installs in the current project, `--copy` copies the skills instead of linking them, and `--native` skips npx even when it is present. Without a terminal, `install` and `remove` need `--yes` (with `--agent ID` to choose agents), npx or not. An `npx` in the current folder is ignored. Only the twelve manimvox skills are ever touched.
 
 `npx skills add LaplacianAI/manimvox` fetches from GitHub, so it installs whatever is on the default branch. `manimvox skills install` installs the skills that match your installed manimvox version.
 
@@ -155,6 +155,7 @@ Answer as much or as little as you like: "just make it" skips the rest. The answ
 | `manimvox-playlist` | A codebase or spec into a beginner-to-advanced playlist, with page and zips |
 | `manimvox-concept` | An idea with no source document into a 3Blue1Brown-style video |
 | `manimvox-pr` | A pull request into a 1-3 minute walkthrough |
+| `manimvox-edit` | Your own footage cut by what is said, captioned, narrated and scored, with titles, graphics and explainer episodes |
 
 <!-- --8<-- [end:coding-agents] -->
 
@@ -561,7 +562,7 @@ src/manimvox/
   voice/            the voice interface, cache, downloads, HTTP, audio conversion
   voice/engines/    one module per text-to-speech engine
 examples/agents/   one script per framework
-skills/             the eleven agent skills (bundled into the wheel)
+skills/             the twelve agent skills (bundled into the wheel)
 .claude-plugin/     Claude Code plugin and marketplace manifests
 .codex-plugin/      Codex plugin manifest
 .cursor-plugin/     Cursor plugin manifest
