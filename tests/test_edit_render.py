@@ -62,6 +62,11 @@ def edit(project, data, name="cut") -> str:
     return name
 
 
+def rel(project: Path, path: str) -> str:
+    """`path` relative to the project, with forward slashes on every system."""
+    return Path(path).relative_to(project).as_posix()
+
+
 def frames_of(path) -> list[np.ndarray]:
     with av.open(str(path)) as c:
         return [f.to_ndarray(format="rgb24") for f in c.decode(c.streams.video[0])]
@@ -96,7 +101,7 @@ def test_two_cuts_give_exactly_their_frames_and_sound_in_step(project):
     edit(project, {"segments": [{"clip": "footage/red.mp4", "end": 2}, {"clip": "footage/blue.mp4", "start": 1,
                                                                         "end": 2.5}]})
     r = render(project, "cut")
-    assert r.video.endswith("out/cut.mp4") and r.size == (320, 180)
+    assert rel(project, r.video) == "out/cut.mp4" and r.size == (320, 180)
     fr = frames_of(r.video)
     assert len(fr) == 35
     assert centre(fr[19])[0] > 150 and centre(fr[20])[2] > 150  # the cut is on frame 20, at 2.0 s
@@ -211,7 +216,7 @@ def test_a_window_matches_the_full_render(project):
                                 {"clip": "footage/blue.mp4", "end": 2, "transition": {"kind": "fade", "seconds": 1}}]})
     full = frames_of(render(project, "cut").video)
     r = render(project, "cut", start=1.2, end=2.4)
-    assert "build/edit/cut/final_" in r.video and r.seconds == 1.2
+    assert rel(project, r.video).startswith("build/edit/cut/final_") and r.seconds == 1.2
     part = frames_of(r.video)
     assert len(part) == 12
     for i, f in enumerate(part):
@@ -221,7 +226,7 @@ def test_a_window_matches_the_full_render(project):
 def test_a_draft_is_480p_in_build(project):
     edit(project, {"size": [1280, 720], "segments": [{"clip": "footage/red.mp4", "end": 1}]})
     r = render_edit(project, "cut", draft=True, sheets=False)
-    assert r.size == (854, 480) and r.video.endswith("build/edit/cut/draft.mp4")
+    assert r.size == (854, 480) and rel(project, r.video) == "build/edit/cut/draft.mp4"
 
 
 # ---------------------------------------------------------------- refusals
