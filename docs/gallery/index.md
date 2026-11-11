@@ -20,6 +20,14 @@ Finished videos made with manimvox, most of them by an AI agent. Each one shows 
 
     **Made by Claude Code** (Opus 5.5) · your own footage · `manimvox edit` · Kokoro voice
 
+- **[How does two metres of DNA pack into a chromosome?](dna-packing.md)**
+
+    ---
+
+    One prompt, two models: a one-minute 3D explainer of DNA wound on histone spools, looped and packed, made once by Fable 5.2 and once by Opus 5.5, side by side with the benchmark.
+
+    **Made by Claude Code** (Fable 5.2 and Opus 5.5) from one prompt · 3D · Kokoro voice · a benchmark
+
 - **[What lets a loaded wheel turn so freely?](tapered-bearing.md)**
 
     ---

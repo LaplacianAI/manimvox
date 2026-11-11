@@ -31,7 +31,13 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 - **Gallery: *An interview, edited*.** A real 2013 interview (UNESCO-IHE Archive, CC BY 3.0) cut by its own words into an 85-second film with captions, a lower third, question cards, a narrated diagram and a music bed, from one edit file. Made by Claude Code; making it found the four problems fixed above.
 - **The `manimvox-edit` skill**, the twelfth: it takes an agent from your footage to a finished film (probe and read the transcript, ask what the film is for, write the edit, check it, review a draft, render, report with credits). The `manimvox` skill sends requests to edit recordings to it.
 - **Docs:** *Editing your own footage*, the edit file reference (every field), and `manimvox.edit` in the Python API.
+- **Gallery and benchmark: *How does two metres of DNA pack into a chromosome?*** One prompt given to Claude Code twice, once with Opus 5.5 and once with Fable 5.2, each making a one-minute 3D explainer alone. Both videos, the two projects, and a report comparing time, tokens, renders, checks, sources and the videos themselves.
+- **The benchmark leaderboard takes a reviewer's order of agent runs** (`review`, `review_rank` in `run.json`), ranked before cost and time, as a listener's order already is for voices; a run without a recorded cost or turn count shows "not recorded".
 - **Footage inside explainers.** `from_video` reads a recording of any length from the file as it plays, instead of holding up to 3600 frames in memory. `from_video(..., sound=True, volume=)` keeps the recording's sound: it is heard when the clip plays in the episode, levelled to the narration's loudness and at the clip's playing speed, also on a re-render that Manim serves from its cache.
+
+### Fixed
+
+- **In a 3D episode, the theme's ground texture no longer covers the solids.** The 3D camera drew everything without a depth after the solids, the ground included; a mobject with a negative z-index is now drawn behind them.
 
 ## [0.7.0] - 2026-11-10
 

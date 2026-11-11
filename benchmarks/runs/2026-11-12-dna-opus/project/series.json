@@ -1,0 +1,43 @@
+{
+  "manimvox": "0.7.0",
+  "series": "How DNA fits in a chromosome",
+  "tagline": "From a two-nanometre helix to a chromosome, in two moves",
+  "voice": "kokoro:af_heart",
+  "speed": 1.0,
+  "loudness": -16.0,
+  "pron": [],
+  "theme": {
+    "source": "chosen for the subject: a dark-field microscope look; one warm accent for the numbers, one hue per level of packing (agent's choice, no brand); no grain ground: in Episode3D the ground image was drawn over 3D surfaces (kit workaround)",
+    "bg": "#0A0E14",
+    "panel": "#151B24",
+    "panel2": "#1F2733",
+    "line": "#364152",
+    "ink": "#E8ECF1",
+    "muted": "#9AA4B1",
+    "accent": "#F2C14E",
+    "ok": "#7BC67E",
+    "warn": "#F2C14E",
+    "error": "#FF6B6B",
+    "blue": "#5AA9E6",
+    "orange": "#FF8A4C",
+    "violet": "#B28DF0",
+    "pink": "#E57AC4",
+    "teal": "#4FD1B5",
+    "named": {
+      "strand_a": "#5AA9E6",
+      "strand_b": "#4FD1B5",
+      "histone": "#FF8A4C",
+      "loop": "#B28DF0",
+      "condensin": "#D6E05A"
+    },
+    "style": "calm"
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_dna_packing",
+      "cls": "Ep01",
+      "title": "How DNA fits in a chromosome"
+    }
+  ]
+}

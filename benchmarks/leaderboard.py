@@ -34,6 +34,8 @@ class Run:
     report: str | None
     agent: dict | None
     voices: list[dict] = field(default_factory=list)
+    review: str = ""  # a reviewer's note on the agent's video
+    review_rank: int = UNRANKED  # the reviewer's order of the videos made for one example (1 is best)
     example_title: str = ""  # the gallery page's title, set by write_docs
 
 
@@ -47,13 +49,19 @@ def load_runs(runs: Path = RUNS) -> list[Run]:
         for v in d.get("voices", []):
             summary = json.loads((here / v["score"]).read_text(encoding="utf-8"))["summary"]
             voices.append({**v, **summary, "voice": v["voice"]})
-        out.append(Run(here.name, d["title"], d["date"], d["example"], d.get("report"), agent, voices))
+        out.append(Run(here.name, d["title"], d["date"], d["example"], d.get("report"), agent, voices,
+                       d.get("review", ""), d.get("review_rank", UNRANKED)))
     return out
 
 
 def minutes(seconds: float) -> str:
     m, s = divmod(round(seconds), 60)
     return f"{m} min {s} s" if m else f"{s} s"
+
+
+def dollars(cost: float | None) -> str:
+    """A cost, or a dash where the harness does not report one (a sub-agent inside another session)."""
+    return "not recorded" if cost is None else f"${cost:.2f}"
 
 
 def run_link(run: Run, up: str) -> str:
@@ -78,16 +86,18 @@ def voice_rows(runs: list[Run], up: str) -> list[str]:
 
 
 def agent_rows(runs: list[Run], up: str) -> list[str]:
-    """Ranked by result (a finished video first), then cost, then time."""
+    """Ranked by result (a finished video first), then a reviewer's order of the videos where there is one
+    (measurements can't judge a video), then cost, then time."""
     rows = [r for r in runs if r.agent]
-    rows.sort(key=lambda r: (r.agent["result"] != "success", r.agent["cost_usd"], r.agent["duration_s"]))
-    head = ["| # | Harness | Model | Example | Result | Time | Turns | Cost | Run |",
-            "|---|---|---|---|---|---|---|---|---|"]
+    rows.sort(key=lambda r: (r.agent["result"] != "success", r.review_rank, r.agent.get("cost_usd") is None,
+                             r.agent.get("cost_usd") or 0, r.agent["duration_s"]))
+    head = ["| # | Harness | Model | Example | Result | Time | Turns | Cost | Review | Run |",
+            "|---|---|---|---|---|---|---|---|---|---|"]
     return head + [
         f"| {i} | {a['harness']} {a['harness_version']} | `{a['model']}` "
         f"| [{r.example_title or r.example}]({up}gallery/{r.example}.md) "
         f"| {'video made' if a['result'] == 'success' else a['result']} | {minutes(a['duration_s'])} "
-        f"| {a['turns']} | ${a['cost_usd']:.2f} | {run_link(r, up)} |"
+        f"| {a.get('turns') or 'not recorded'} | {dollars(a.get('cost_usd'))} | {r.review} | {run_link(r, up)} |"
         for i, (r, a) in enumerate(((r, r.agent) for r in rows), 1)]
 
 
@@ -100,14 +110,15 @@ def model_rows(runs: list[Run]) -> list[str]:
     stats = []
     for model, agents in by.items():
         ok = sum(a["result"] == "success" for a in agents) / len(agents)
-        cost = sum(a["cost_usd"] for a in agents) / len(agents)
+        costs = [a["cost_usd"] for a in agents if a.get("cost_usd") is not None]
+        cost = sum(costs) / len(costs) if costs else None  # the mean over the runs that recorded one
         secs = sum(a["duration_s"] for a in agents) / len(agents)
         harnesses = ", ".join(sorted({a["harness"] for a in agents}))
         stats.append((model, len(agents), ok, cost, secs, harnesses))
-    stats.sort(key=lambda s: (-s[2], s[3]))
+    stats.sort(key=lambda s: (-s[2], s[3] is None, s[3] or 0))
     head = ["| # | Model | Runs | Videos made | Mean cost | Mean time | Harnesses |",
             "|---|---|---|---|---|---|---|"]
-    return head + [f"| {i} | `{m}` | {n} | {ok:.0%} | ${cost:.2f} | {minutes(secs)} | {h} |"
+    return head + [f"| {i} | `{m}` | {n} | {ok:.0%} | {dollars(cost)} | {minutes(secs)} | {h} |"
                    for i, (m, n, ok, cost, secs, h) in enumerate(stats, 1)]
 
 
@@ -118,7 +129,7 @@ def tables(runs: list[Run], up: str, level: str = "###") -> list[str]:
                  "compressed, cleaner audio). "
                 "Each voice read the same lines as the others in its run."), "", *voice_rows(runs, up), ""]
     if any(r.agent for r in runs):
-        out += [f"{level} Harness", "", "Ranked by result, then cost, then time.", "", *agent_rows(runs, up), ""]
+        out += [f"{level} Harness", "", "Ranked by result, then a reviewer's order of the videos, then cost, then time.", "", *agent_rows(runs, up), ""]
         out += [f"{level} Model", "", ("Every run with each model, ranked by the share that made a video, "
                 "then mean cost."), "", *model_rows(runs), ""]
     return out

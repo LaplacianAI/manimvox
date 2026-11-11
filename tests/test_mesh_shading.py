@@ -110,6 +110,18 @@ def test_the_lit_camera_sorts_by_depth_and_leaves_other_mobjects_alone(tmp_path,
     assert depth == sorted(depth)
 
 
+def test_the_ground_and_other_backdrops_draw_behind_the_solids(tmp_path, monkeypatch):
+    from manim import Dot, ImageMobject
+
+    mm = _block(tmp_path, monkeypatch)
+    model = mm.mesh_model(TETRA, up="z")
+    cam = LitCamera()
+    ground = ImageMobject(np.zeros((9, 16, 3), np.uint8)).set_z_index(-1000)  # as the theme's ground is
+    label = Dot()
+    shown = cam.get_mobjects_to_display([ground, *model.submobjects, label])
+    assert shown[0] is ground and shown[-1] is label  # a texture over the solids hid them in a 3D episode
+
+
 @pytest.mark.slow
 def test_a_lit_model_renders_and_keeps_its_colour(tmp_path):
     from manimvox.project import load_project
