@@ -837,10 +837,50 @@ def new_edit(project: str, name: str, files: list[str]) -> EditResult:
                                     f"'edit', {Path(p).stem!r})")
 
 
+@dataclass(frozen=True)
+class EditRenderResult:
+    ok: bool
+    video: str
+    srt: str | None
+    seconds: float
+    size: list[int]
+    sheets: list[str]
+    notes: list[str]
+
+
+def _render_edit(project: str, name: str, voice: str | None, confirm: Callable[[str], bool], draft: bool,
+                 start: float | None, end: float | None, say: Say | None) -> EditRenderResult:
+    from .edit.render import render_edit as run
+    from .project import find_project
+
+    root = find_project(Path(project).expanduser())
+    r = run(root, name, voice=voice, confirm=confirm, draft=draft, start=start, end=end, say=say)
+    return EditRenderResult(True, r.video, r.srt, r.seconds, list(r.size), r.sheets, r.notes)
+
+
+@_tool
+def render_edit(project: str, name: str, draft: bool = False, start: float | None = None, end: float | None = None,
+                voice: str | None = None, allow_download: bool = False) -> EditRenderResult:
+    """Render an edit (edits/<name>.json or .py) to out/<name>.mp4 and .srt, then write contact sheets of it to
+    sheets/edit/<name>/. Check it first with check(project, "edit", name): a render refuses an edit with findings.
+
+    Args:
+        project: The project folder, or any folder inside it.
+        name: The edit's name.
+        draft: Render at 480p with a fast encoder, into build/edit/<name>/, to look at quickly.
+        start: Render only from this second of the film (with end, a window into build/edit/<name>/).
+        end: Render only up to this second of the film.
+        voice: engine:voice for the narration lines, instead of the project's.
+        allow_download: Let the voice download its model; ask the user first.
+    """
+    return _render_edit(project, name, voice, _consent(allow_download), draft, start, end, None)
+
+
 TOOLS = (new_project, brief_questions, write_brief, draft, render, check, contact_sheet, voices, prepare_voice,
-         list_blocks, add_block, join, index, package, doctor, fetch_asset, list_assets, probe_media, new_edit)
-# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets and `edit new` is new_edit
+         list_blocks, add_block, join, index, package, doctor, fetch_asset, list_assets, probe_media, new_edit,
+         render_edit)
+# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets and `edit new` is new_edit and `edit probe` is probe_media
 COMMANDS = {"new": "new_project", "brief": "write_brief", "draft": "draft", "render": "render", "check": "check", "sheets": "contact_sheet", "voices": "voices",
             "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor",
-            "assets": "fetch_asset", "edit": "probe_media"}
+            "assets": "fetch_asset", "edit": "render_edit"}
 SHELL_ONLY = frozenset({"skills"})  # installs skills into coding agents; a framework agent reads skills_path() instead

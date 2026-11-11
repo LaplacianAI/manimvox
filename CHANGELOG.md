@@ -11,7 +11,13 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
   - Over the picture: images, text, picture-in-picture, graphics drawn by code (`Draw`) and Manim scenes (`Scene`).
   - Sound: narration lines, a music bed and sound files.
   - Any segment can be made by code (`Frames`, with `frames(fn, seconds)` or `from_moviepy(clip)`) and changed frame by frame (`effects`). A hook is `"path.py:name"` in JSON, or the function itself in Python.
-- **`manimvox edit new NAME FILE...`** starts an edit from videos and images; **`manimvox edit probe FILE`** says what a file holds and writes contact sheets of a video; **`manimvox check edit NAME`** checks an edit against its files (times past a file's end, crops and boxes outside the picture, hooks that do not import) and shows where each piece lands. Tools: `new_edit`, `probe_media`, and `check` with `what="edit"`. Rendering an edit comes next.
+- **`manimvox edit new NAME FILE...`** starts an edit from videos and images; **`manimvox edit probe FILE`** says what a file holds and writes contact sheets of a video; **`manimvox check edit NAME`** checks an edit against its files (times past a file's end, crops and boxes outside the picture, hooks that do not import) and shows where each piece lands. Tools: `new_edit`, `probe_media`, and `check` with `what="edit"`.
+- **`manimvox edit render NAME`** renders an edit to `out/NAME.mp4` and `.srt` (tool: `render_edit`).
+  - **Picture:** frames stream through FFmpeg's scaler; fades and dips; images, text, picture-in-picture, drawn layers and transparent Manim scenes on top; captions drawn last.
+  - **Sound:** each clip levelled to the project's loudness (raised at most 12 dB, so room tone never roars); speed changes keep the pitch; 30 ms fades at every cut; footage and music dip under narration; true peaks kept under -1 dB.
+  - **Memory:** sound is mixed 30 seconds at a time as the frames go out, so memory does not grow with the film.
+  - **Fast checks:** `--draft` renders at 480p with a fast encoder; `--from`/`--to` renders one window of the film, matching the full render.
+  - **Refusals:** it refuses an edit with `check edit` findings, and narration lines that overlap or run past the end, saying where to move them.
 
 ## [0.7.0] - 2026-11-10
 
