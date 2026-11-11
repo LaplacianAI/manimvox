@@ -27,6 +27,7 @@ nav = [
   { "Gallery" = [
     { "Gallery" = "gallery/index.md" },
     { "Install and make a video" = "gallery/install-tutorial.md" },
+    { "An interview, edited" = "gallery/edited-interview.md" },
     { "What lets a loaded wheel turn so freely?" = "gallery/tapered-bearing.md" },
     { "Why is the same page faster the second time?" = "gallery/page-cache.md" },
     { "Which site am I on?" = "gallery/which-site.md" },

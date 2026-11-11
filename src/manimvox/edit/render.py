@@ -269,7 +269,7 @@ class _Render:
 
     def _speech(self, transcripts: dict) -> list[Cue]:
         """Captions of the words spoken in captioned clips, at their times on the output."""
-        from .transcribe import caption_cues
+        from .transcribe import caption_cues, respell
 
         # Each word goes to the captioned piece it overlaps most: word times drift, so a word whose sound was
         # kept can have a time that only partly falls in its piece, and a word over a cut is shown once.
@@ -281,15 +281,18 @@ class _Render:
             seg = p.segment
             end = seg.start + p.seconds * seg.speed
             for k, w in enumerate(tr.words):
-                lo, hi = max(w.start, seg.start), min(w.end, end)
-                if hi <= lo:
+                # A word after a pause is given a start too early (the pause is folded into it), so its sound is
+                # at its end: judge which piece it is in by its last 0.15 s.
+                core = max(w.start, w.end - 0.15)
+                if min(w.end, end) - max(core, seg.start) < (w.end - core) / 2:
                     continue
+                lo, hi = max(w.start, seg.start), min(w.end, end)
                 key = (id(tr), k)
                 if key not in best or hi - lo > best[key][0]:
                     best[key] = (hi - lo, (p.at + (lo - seg.start) / seg.speed, p.at + (hi - seg.start) / seg.speed,
                                            w.text))
         words = sorted(v[1] for v in best.values())
-        return [Cue(a, b, text) for a, b, text in caption_cues(words)]
+        return [Cue(a, b, respell(text, self.tl.spellings)) for a, b, text in caption_cues(words)]
 
     # ---- sound
 
@@ -324,8 +327,10 @@ class _Render:
             x = read_span(path, a0, s1 + pad)
             x = stretch(x, seg.speed)
             x = fit_length(x[:, samples((s0 - a0) / seg.speed):], n)
+            if seg.episode is not None:  # a rendered episode's narration is levelled already, line by line
+                return x * db(seg.volume)
             end = seg.end if seg.end is not None else seg.start + p.seconds * seg.speed
-            g = self._gain((f"segments[{p.index}] ({seg.path or seg.episode})", str(path), seg.start, end),
+            g = self._gain((f"segments[{p.index}] ({seg.path})", str(path), seg.start, end),
                            lambda: read_span(path, seg.start, end))
             return x * db(g + seg.volume)
         if isinstance(seg, Frames):

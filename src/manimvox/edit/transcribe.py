@@ -24,6 +24,7 @@ WHISPER_RATE = 16000  # Whisper hears 16 kHz mono
 PAD_BEFORE, PAD_AFTER = 0.05, 0.08  # s kept before a clip's first word and after its last: word times drift a little
 KEEP = 0.15  # s of a removed pause kept on each side, so speech never runs together
 MIN_PIECE = 0.1  # s: a piece shorter than this after cutting is dropped
+MIN_CUT = 0.3  # s: a removal shorter than this is not made: it saves no time and makes the picture jump
 CAPTION_GAP, CAPTION_WORDS, CAPTION_CHARS, CAPTION_MIN = 0.3, 7, 84, 0.35
 FILLERS = {"um", "umm", "uh", "uhh", "uhm", "er", "erm", "ah", "hmm", "hm", "mm", "mhm"}
 # Whisper tidies speech into prose and drops "um"s. An English prompt written with fillers makes it keep them.
@@ -262,7 +263,7 @@ def pieces(where: str, tr: Transcript, start: float, end: float | None, from_wor
             if b < y:
                 nxt.append((b, y))
         keep = nxt
-    keep = [(round(x, 3), round(y, 3)) for x, y in keep if y - x >= MIN_PIECE]
+    keep = join([(round(x, 3), round(y, 3)) for x, y in keep if y - x >= MIN_PIECE])
     if not keep:
         raise TranscribeError(f"{where}: nothing is left after cutting; check from_words, to_words and cut_silences")
     return keep
@@ -330,13 +331,26 @@ def snap(kept: list[tuple[float, float]], words: tuple[Word, ...], runs: list[tu
                     b = min(ceil, last[1] + KEEP)
         if b - a >= MIN_PIECE:
             out.append((round(a, 3), round(b, 3)))
-    joined = []
-    for a, b in out:
-        if joined and a <= joined[-1][1] + 1e-6:
+    return join(out)
+
+
+def join(kept: list[tuple[float, float]]) -> list[tuple[float, float]]:
+    """Pieces less than MIN_CUT apart made one: so short a cut saves no time and makes the picture jump."""
+    joined: list[tuple[float, float]] = []
+    for a, b in kept:
+        if joined and a - joined[-1][1] < MIN_CUT:
             joined[-1] = (joined[-1][0], max(joined[-1][1], b))
         else:
             joined.append((a, b))
     return joined
+
+
+def respell(text: str, spellings) -> str:
+    """`text` with each heard word or phrase replaced by its written form, matched as whole words in any case,
+    with the punctuation after it kept."""
+    for heard, written in spellings:
+        text = re.sub(rf"(?<![\w'-]){re.escape(heard)}(?![\w'-])", written, text, flags=re.IGNORECASE)
+    return text
 
 
 def caption_cues(words: list[tuple[float, float, str]]) -> list[tuple[float, float, str]]:
