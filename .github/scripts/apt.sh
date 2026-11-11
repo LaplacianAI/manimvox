@@ -6,13 +6,14 @@ set -uo pipefail
 
 MIRROR="http://mirrors.edge.kernel.org/ubuntu"
 LOG="$(mktemp)"
+OPTS=(-o Acquire::Retries=3 -o Acquire::ForceIPv4=true)  # some runners have no IPv6 route
 
 try() {
-  sudo apt-get update -o Acquire::Retries=2 2>&1 | tee "$LOG"
+  sudo apt-get "${OPTS[@]}" update 2>&1 | tee "$LOG"
   if grep -qE '^(Err:|W: Failed to fetch).*ubuntu\.com' "$LOG"; then
     return 1
   fi
-  sudo apt-get install -y "$@"
+  sudo apt-get "${OPTS[@]}" install -y "$@"
 }
 
 if try "$@"; then
