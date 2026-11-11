@@ -139,6 +139,15 @@ def test_edges_snap_to_the_speech_heard_in_the_sound():
     assert snap([(0.5, 0.95)], words, runs, 0.5, 0.95, fixed_lo=True, fixed_hi=True) == [(0.5, 0.95)]
 
 
+def test_a_cut_too_short_to_save_time_is_not_made():
+    from manimvox.edit.transcribe import MIN_CUT, join
+
+    assert join([(0.0, 1.0), (1.02, 2.0), (2.01 + MIN_CUT, 3.0)]) == [(0.0, 2.0), (2.01 + MIN_CUT, 3.0)]
+    words = (Word(0.0, 0.8, "first."), Word(1.6, 2.0, "second."))
+    runs = [(0.0, 0.9), (1.05, 2.0)]  # by the sound the pause is only 0.15 s: snapping would leave a 0.02 s cut
+    assert snap([(0.0, 0.95), (1.45, 2.0)], words, runs, 0.0, 3.0) == [(0.0, 2.15)]
+
+
 def test_inside_continuous_speech_the_transcript_edge_stays():
     words = (Word(0.0, 0.5, "one"), Word(0.55, 1.0, "two"), Word(1.05, 1.5, "three"))
     runs = [(0.0, 1.5)]  # no pause to measure between the words
@@ -268,6 +277,20 @@ def test_a_cut_by_words_is_captioned_at_its_place_on_the_film(project):
     srt = Path(r.srt).read_text()
     assert "00:00:00,050 -->" in srt and "flash the firmware." in srt  # 4.60 s of the file is 0.05 s of the film
     assert "And that's it." in srt
+    assert "So" not in srt.split("And that's it.")[1]  # "So" at 7.20 s is after the cut, not grazing into it
+
+
+def test_a_word_whose_time_folds_in_the_pause_before_it_is_captioned_by_its_end(project):
+    # whisper's "and" starts right after "understanding" (folding in the pause); its sound is at its end, after
+    # the cut, so it is not captioned. "Now" folds in a pause too, but its end is inside the piece: captioned.
+    tr = Transcript((Word(1.0, 1.5, "understanding."), Word(1.5, 2.4, "and"), Word(4.0, 4.6, "Now"),
+                     Word(4.62, 5.0, "then.")), "en", "base", 9.0)
+    save(project, project / "footage" / "talk.mp4", tr)
+    edit(project, {"segments": [{"clip": "footage/talk.mp4", "end": 1.8, "captions": True},
+                                {"clip": "footage/talk.mp4", "start": 4.45, "end": 5.2, "captions": True}]})
+    srt = Path(render_edit(project, "cut", sheets=False).srt).read_text()
+    captions = [block.split("\n")[2] for block in srt.strip().split("\n\n")]
+    assert captions == ["understanding.", "Now then."]
 
 
 def test_the_music_dips_under_the_speaker_but_the_footage_does_not(project):
@@ -372,3 +395,20 @@ def test_real_whisper_cuts_kokoro_speech_without_clipping_a_word(project):
     assert last.end >= runs[-1][1] or last.end >= tr.seconds - 0.05  # "green" is kept to its last sound
     words = heard(render_edit(project, "cut", sheets=False).video)
     assert words == tokens("restart the board. Now the light turns green."), words
+
+
+def test_spellings_fix_misheard_names_in_the_captions(project):
+    from manimvox.edit.transcribe import respell
+
+    fixes = (("Joita", "Joyeeta"), ("UNESCO IT", "UNESCO-IHE"))
+    assert respell("I'm Joita Gupta, at UNESCO IT.", fixes) == "I'm Joyeeta Gupta, at UNESCO-IHE."
+    assert respell("unesco it, Joitas", fixes) == "UNESCO-IHE, Joitas"  # whole words only
+    one = Transcript((Word(0.5, 0.9, "I'm"), Word(0.95, 1.4, "Joita"), Word(1.45, 1.9, "Gupta.")), "en", "base", 3.0)
+    save(project, project / "footage" / "talk.mp4", one)
+    edit(project, {"spellings": {"Joita": "Joyeeta"}, "segments": [{"clip": "footage/talk.mp4", "end": 3,
+                                                                    "captions": True}]})
+    assert "I'm Joyeeta Gupta." in Path(render_edit(project, "cut", sheets=False).srt).read_text()
+    tl = parse({"spellings": {"Joita": "Joyeeta"}, "segments": [{"clip": "a.mp4"}]})
+    assert tl.spellings == (("Joita", "Joyeeta"),) and tl.to_dict()["spellings"] == {"Joita": "Joyeeta"}
+    with pytest.raises(ValueError, match="spellings must be"):
+        parse({"spellings": ["Joita"], "segments": [{"clip": "a.mp4"}]})

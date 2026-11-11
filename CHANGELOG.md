@@ -24,6 +24,12 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
   - `captions: true` captions what the speaker says, at its place on the film; music dips under the speaker as it does under narration, and the speaker's own sound does not.
   - `check edit` lists the pieces each clip keeps.
   - The sound is decoded by manimvox and handed to faster-whisper as samples: faster-whisper 1.2's own decoder passes PyAV an argument PyAV 19 removed.
+  - `spellings` in an edit, `{"heard": "written"}`, fixes misheard names and terms in the speaker's captions.
+  - A cut that would remove less than 0.3 s is not made: it saves no time and makes the picture jump.
+  - A word is captioned by its last 0.15 s: speech-to-text folds the pause before a word into its time, so a word just after a cut was captioned though its sound was cut.
+  - A rendered episode used as a segment goes in at its own level: its narration is levelled when it renders, and was being raised a second time.
+- **Gallery: *An interview, edited*.** A real 2013 interview (UNESCO-IHE Archive, CC BY 3.0) cut by its own words into an 85-second film with captions, a lower third, question cards, a narrated diagram and a music bed, from one edit file. Made by Claude Code; making it found the four problems fixed above.
+- **Footage inside explainers.** `from_video` reads a recording of any length from the file as it plays, instead of holding up to 3600 frames in memory. `from_video(..., sound=True, volume=)` keeps the recording's sound: it is heard when the clip plays in the episode, levelled to the narration's loudness and at the clip's playing speed, also on a re-render that Manim serves from its cache.
 
 ## [0.7.0] - 2026-11-10
 

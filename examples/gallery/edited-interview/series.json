@@ -1,0 +1,37 @@
+{
+  "manimvox": "0.7.0",
+  "series": "An interview, edited",
+  "tagline": "Real footage cut by its words with manimvox edit",
+  "voice": "kokoro:af_heart",
+  "speed": 1.0,
+  "loudness": -16.0,
+  "pron": [],
+  "theme": {
+    "source": "calm deep blue and water teal, chosen for a piece about water research; calm style for thin strokes and space",
+    "style": "calm",
+    "bg": "#0E1822",
+    "panel": "#16242F",
+    "panel2": "#1E2F3C",
+    "line": "#36505F",
+    "ink": "#E6EEF2",
+    "muted": "#93A7B4",
+    "accent": "#4FC3C9",
+    "ok": "#7CC8A0",
+    "warn": "#E8C468",
+    "error": "#EF6F7E",
+    "blue": "#6CA8F0",
+    "orange": "#F0A070",
+    "violet": "#B39DDB",
+    "pink": "#F48FB1",
+    "teal": "#4FC3C9",
+    "named": {}
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_plan",
+      "cls": "Ep01",
+      "title": "The plan she describes"
+    }
+  ]
+}

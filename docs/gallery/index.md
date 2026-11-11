@@ -12,6 +12,14 @@ Finished videos made with manimvox, most of them by an AI agent. Each one shows 
 
     **Made by Claude Code** (Sonnet 5.5) from one prompt · screen recordings · Gnani voice · start here
 
+- **[An interview, edited](edited-interview.md)**
+
+    ---
+
+    A real 2013 interview, cut by its own words into an 85-second film: captions, a lower third, question cards, a narrated diagram in the middle, music that dips under speech. All from one edit file.
+
+    **Made by Claude Code** (Opus 5.5) · your own footage · `manimvox edit` · Kokoro voice
+
 - **[What lets a loaded wheel turn so freely?](tapered-bearing.md)**
 
     ---

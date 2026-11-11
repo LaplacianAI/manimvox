@@ -86,7 +86,7 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 - [x] **Sound.** The footage's own sound, narration lines in the project voice at set times, music that dips under speech, extra sound files, and one loudness level for the whole video. Captions as an `.srt` file or burned in.
 - [x] **Fast, flat-memory rendering.** Frames stream through, so an hour of 4K fits. A 480p draft, and a render of just one window (`--from`, `--to`) to check a fix in seconds. Contact sheets to review the result.
 - [x] **See before you cut: `manimvox edit probe`.** Length, size, sound and contact sheets of any file. With the opt-in `transcribe` extra (faster-whisper, local, asks before downloading the model): the words with their times, cuts by words, pauses and "um"s removed, and captions of the speaker.
-- [ ] **Footage inside explainers.** `from_video` with no 2-minute limit, and `sound=True` to keep a clip's sound in the episode.
+- [x] **Footage inside explainers.** `from_video` with no 2-minute limit, and `sound=True` to keep a clip's sound in the episode.
 - [ ] **A `manimvox-edit` skill, a docs page and a gallery video.**
 
 ## 0.8.5: editing, further

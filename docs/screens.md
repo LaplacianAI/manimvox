@@ -7,7 +7,7 @@ Product demos, "how to use this app" videos and PR walkthroughs whose change sho
 | | |
 |---|---|
 | `screenshot(path)` | a PNG, JPEG or WebP file as a clip |
-| `from_video(path, start=, end=)` | a screen recording (MP4, WebM, MOV) as a clip that plays |
+| `from_video(path, start=, end=, sound=)` | a recording (MP4, WebM, MOV) of any length as a clip that plays; `sound=True` keeps its sound |
 | `clip.zoom(x, y, w, h)` / `clip.zoom_out()` | zoom into a region inside the clip's own frame, and back |
 | `spotlight(clip, region)` | dim everything except a region, and outline it |
 | `callout(clip, region, "text", side=)` | a label with an arrow to a region |

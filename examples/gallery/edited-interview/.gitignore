@@ -1,0 +1,8 @@
+build/
+.manimvox/
+sheets/
+media/
+__pycache__/
+share/
+out/
+research/assets/

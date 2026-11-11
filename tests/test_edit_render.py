@@ -268,3 +268,16 @@ def test_a_manim_scene_lies_over_the_footage_with_its_transparency(project):
     assert np.abs(c - [131, 193, 103]).max() < 12
     assert fr[10][10, 10][0] > 150  # the corner stays red: the scene's background is transparent
     assert centre(fr[17])[0] > 150  # after its 1 s
+
+
+def test_an_episode_goes_in_at_its_own_level(project):
+    """A rendered episode's narration is levelled when it renders; the edit must not level it again."""
+    out = project / "out"
+    out.mkdir()
+    quiet = footage(out / "ep01_hello.mp4", 2, (0, 0, 0), 1000)
+    edit(project, {"segments": [{"episode": "ep01"}, {"clip": "footage/red.mp4", "end": 1}]})
+    r = render(project, "cut")
+    assert not any("ep01" in n for n in r.notes)  # nothing raised or lowered
+    src = read_audio(quiet).mean(axis=0)
+    got = read_audio(Path(r.video)).mean(axis=0)
+    assert abs(20 * np.log10(level_at(got, 1000, 0.5, 1.5) / level_at(src, 1000, 0.5, 1.5))) < 1

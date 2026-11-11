@@ -4,13 +4,14 @@ from __future__ import annotations
 import hashlib
 import io
 from collections.abc import Sequence
+from pathlib import Path
 
 import numpy as np
 from manim import Animation, ImageMobject, linear, smooth
 from PIL import Image
 
 DEFAULT_WIDTH = 9.6  # scene units: three quarters of the safe stage's width
-MAX_FRAMES = 3600  # two minutes at 30 fps; frames are held in memory as PNG bytes
+MAX_FRAMES = 3600  # two minutes at 30 fps of made frames, held in memory as PNG bytes (a video file has no limit)
 ZOOM_PAD = 0.15  # a zoom leaves this fraction of the region's size as margin on each side
 
 
@@ -37,6 +38,32 @@ def png(img) -> bytes:
     return buf.getvalue()
 
 
+_READERS: dict = {}  # open video files, outside the clips: Manim deep-copies mobjects, and play calls are hashed
+
+
+class VideoFrames:
+    """The frames of a video file, decoded when shown instead of held in memory, so a recording of any length
+    fits. Frame i is what the file shows at `start + i / fps` seconds, scaled to `size`. Only plain values live
+    here; the open file is kept in _READERS."""
+
+    def __init__(self, path, start: float, count: int, fps: float, size: tuple[int, int], digest: str):
+        self.path, self.start, self.count, self.fps = str(path), float(start), int(count), float(fps)
+        self.size, self.digest = (int(size[0]), int(size[1])), digest
+
+    def __len__(self) -> int:
+        return self.count
+
+    def image(self, i: int) -> Image.Image:
+        from ..edit.picture import Reader
+
+        reader = _READERS.get(self.path)
+        if reader is None:
+            reader = _READERS[self.path] = Reader(self.path)
+        f = reader.at(self.start + i / self.fps)
+        # Not .to_image(): PyAV converts to RGB there, whatever the frame's format, and Manim draws RGBA.
+        return Image.fromarray(f.reformat(width=self.size[0], height=self.size[1], format="rgba").to_ndarray(), "RGBA")
+
+
 class Clip(ImageMobject):
     """Frames on the stage. Move and scale it like any mobject; `self.play(clip.play(), run_time=...)` plays it.
     Its width is set in scene units, so a draft and a final render place it the same.
@@ -44,26 +71,34 @@ class Clip(ImageMobject):
     Positions on a clip are pixels of its source, counted from the top left. `space` is the source's size when
     the frames were scaled down from it, so positions read off the original screenshot or recording still hold."""
 
-    def __init__(self, frames: Sequence[bytes], fps: float, width: float = DEFAULT_WIDTH,
-                 space: tuple[float, float] | None = None, **kwargs):
-        frames = list(frames)
-        if not frames:
-            raise SceneError("a clip needs at least one frame")
-        if len(frames) > MAX_FRAMES:
-            raise SceneError(f"{len(frames)} frames is more than {MAX_FRAMES}; lower fps or split the clip")
+    def __init__(self, frames: Sequence[bytes] | VideoFrames, fps: float, width: float = DEFAULT_WIDTH,
+                 space: tuple[float, float] | None = None, sound=None, **kwargs):
         if not fps > 0:
             raise SceneError(f"fps must be greater than 0, got {fps}")
-        sizes = {Image.open(io.BytesIO(f)).size for f in frames}  # reads the headers only
-        if len(sizes) > 1:
-            raise SceneError(f"every frame must be the same size, got {sorted(sizes)}")
-        self.frames = frames
-        self.pixels = sizes.pop()  # (width, height) of every frame
+        if isinstance(frames, VideoFrames):
+            if not len(frames):
+                raise SceneError("a clip needs at least one frame")
+            self.frames = frames
+            self.pixels = frames.size
+            self.frames_digest = frames.digest
+        else:
+            frames = list(frames)
+            if not frames:
+                raise SceneError("a clip needs at least one frame")
+            if len(frames) > MAX_FRAMES:
+                raise SceneError(f"{len(frames)} frames is more than {MAX_FRAMES}; lower fps or split the clip")
+            sizes = {Image.open(io.BytesIO(f)).size for f in frames}  # reads the headers only
+            if len(sizes) > 1:
+                raise SceneError(f"every frame must be the same size, got {sorted(sizes)}")
+            self.frames = frames
+            self.pixels = sizes.pop()  # (width, height) of every frame
+            # Manim's play cache writes each bytes value as its type name, so frames 1..n would never reach the
+            # key; this digest does, and a changed frame re-renders instead of reusing a stale partial movie.
+            self.frames_digest = hashlib.sha256(b"".join(hashlib.sha256(f).digest() for f in frames)).hexdigest()
+        self.sound = sound  # (file, seconds into it where frame 0 is, dB): heard when the clip plays
         self.space = (float((space or self.pixels)[0]), float((space or self.pixels)[1]))
         self.view = self.whole  # the part of the source shown: x, y, w, h in `space`
         self.fps = float(fps)
-        # Manim's play cache writes each bytes value as its type name, so frames 1..n would never reach the
-        # key; this digest does, and a changed frame re-renders instead of reusing a stale partial movie.
-        self.frames_digest = hashlib.sha256(b"".join(hashlib.sha256(f).digest() for f in frames)).hexdigest()
         self._shown = (0, self.view)
         super().__init__(self._decode(0), **kwargs)
         self.scale_to_fit_width(width)  # an ImageMobject's own size depends on the render's resolution
@@ -82,7 +117,10 @@ class Clip(ImageMobject):
         return self._shown[0]
 
     def _decode(self, i: int) -> np.ndarray:
-        img = Image.open(io.BytesIO(self.frames[i])).convert("RGBA")
+        if isinstance(self.frames, VideoFrames):
+            img = self.frames.image(i)
+        else:
+            img = Image.open(io.BytesIO(self.frames[i])).convert("RGBA")
         if self.view != self.whole:  # crop the view out of the frame and fill the clip with it
             kx, ky = self.pixels[0] / self.space[0], self.pixels[1] / self.space[1]
             x, y, w, h = self.view
@@ -163,11 +201,58 @@ class PlayClip(Animation):
             raise SceneError(f"start and end must satisfy 0 <= start < end <= {clip.seconds:g} s (the clip's "
                              f"length), got {start:g} and {end:g}")
         self.first, self.last = int(start * clip.fps), min(len(clip.frames), round(end * clip.fps))
+        self.span = (float(start), float(end))
         super().__init__(clip, run_time=run_time or end - start, rate_func=rate_func, **kwargs)
+
+    def _setup_scene(self, scene) -> None:
+        """A clip made with sound=True is heard from the moment it starts playing, at its playing speed."""
+        super()._setup_scene(scene)
+        if getattr(self.mobject, "sound", None) is None or scene is None:
+            return
+        path = clip_sound(self.mobject.sound, *self.span, self.run_time)
+        mgr = scene._get_manager() if hasattr(scene, "_get_manager") else scene.renderer
+        start = mgr.time
+        if getattr(scene.renderer, "skip_animations", False):
+            # A play served from Manim's cache (or skipped) has its duration added to the clock before the
+            # animations begin, so the clock already reads the end of this play.
+            start -= scene.duration
+        # Not scene.add_sound(): Manim drops a sound added just after an animation it served from its cache.
+        mgr.file_writer.add_sound(str(path), start)
 
     def interpolate_mobject(self, alpha: float) -> None:
         n = max(1, self.last - self.first)
         self.mobject.show(min(len(self.mobject.frames) - 1, self.first + min(n - 1, int(alpha * n))))
+
+
+def clip_sound(sound, start: float, end: float, run_time: float):
+    """The WAV of a clip's sound from `start` to `end` seconds of the clip, played over `run_time` seconds (its
+    pitch kept), levelled to the project's loudness: raised at most 12 dB, so room tone never roars. Cached."""
+    import os
+
+    import soundfile as sf
+
+    from ..edit.sound import RATE, db, levelling_db, read_span, stretch
+    from ..kit._context import PROJECT
+    from ..voice.loudness import DEFAULT_LOUDNESS
+
+    file, offset, volume = sound
+    target = PROJECT.loudness if PROJECT else DEFAULT_LOUDNESS
+    f = Path(file)
+    st = f.stat()
+    speed = (end - start) / run_time
+    key = hashlib.sha1(f"{f.resolve()}|{st.st_size}|{st.st_mtime_ns}|{offset + start:.4f}|{offset + end:.4f}|"
+                       f"{speed:.5f}|{volume}|{target}".encode()).hexdigest()[:16]
+    root = Path(os.environ.get("MANIMVOX_PROJECT") or ".")
+    out = root / ".manimvox" / "clips" / f"{key}.wav"
+    if not out.is_file():
+        x = read_span(f, offset + start, offset + end)
+        gain, _ = levelling_db(x, target)
+        x = stretch(x, speed) * db(gain + volume)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        tmp = out.with_name(f"{key}.{os.getpid()}.tmp.wav")
+        sf.write(str(tmp), x.T, RATE, subtype="PCM_16")
+        os.replace(tmp, out)
+    return out
 
 
 class Zoom(Animation):
