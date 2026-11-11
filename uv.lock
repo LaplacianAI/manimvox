@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.11"
 resolution-markers = [
     "python_full_version >= '3.14' and sys_platform == 'win32' and extra != 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents'",
@@ -88,10 +88,10 @@ dependencies = [
     { name = "httpx", extra = ["http2"] },
     { name = "packaging" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "pydantic-settings" },
     { name = "pyyaml" },
-    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents' or extra != 'extra-8-manimvox-crewai'" },
+    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "rich", version = "14.3.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-crewai'" },
     { name = "typing-extensions" },
 ]
@@ -107,7 +107,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
     { name = "questionary" },
-    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents' or extra != 'extra-8-manimvox-crewai'" },
+    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "rich", version = "14.3.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-crewai'" },
     { name = "typer" },
 ]
@@ -145,7 +145,7 @@ dependencies = [
     { name = "frozenlist" },
     { name = "multidict" },
     { name = "propcache" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
     { name = "yarl" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/6c/4c/bdccd81e9ee225b69c60e7766c9a5b05364f118f4d383713b89a682d772d/aiohttp-3.14.5.tar.gz", hash = "sha256:5558a7f5a05af9ecf744af91e5baefc436f93c9333e656c27ec253f9a6bbe178", size = 8078052, upload-time = "2026-10-11T01:05:12.408Z" }
@@ -300,7 +300,7 @@ version = "1.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "frozenlist" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/61/62/06741b579156360248d1ec624842ad0edf697050bbaf7c3e46394e106ad1/aiosignal-1.4.0.tar.gz", hash = "sha256:f47eecd9468083c2029cc99945502cb7708b082c232f9aca65da147157b251c7", size = 25007, upload-time = "2025-07-03T22:54:43.528Z" }
 wheels = [
@@ -394,10 +394,10 @@ dependencies = [
     { name = "docstring-parser" },
     { name = "httpx2" },
     { name = "jiter", version = "0.14.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "jiter", version = "0.17.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "jiter", version = "0.17.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "opentelemetry-api" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "sniffio" },
     { name = "typing-extensions" },
 ]
@@ -427,7 +427,7 @@ version = "4.15.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "idna" },
-    { name = "typing-extensions", marker = "python_full_version < '3.15' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.15'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a9/d2/f4d173e22df740bc37b1db102b386ba719b66e95b0f0d751f556b387e6d2/anyio-4.15.1.tar.gz", hash = "sha256:9f28306018cbd6d329e64a36d58256edff76dd996fe423bc957326e578b82a94", size = 276966, upload-time = "2026-09-05T10:42:39.44Z" }
 wheels = [
@@ -635,14 +635,14 @@ name = "banks"
 version = "2.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "deprecated", version = "1.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "deprecated", version = "3.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "deprecated", version = "1.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "deprecated", version = "3.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "filetype" },
     { name = "griffe" },
     { name = "jinja2" },
     { name = "platformdirs" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f0/92/0449c32e718c10e4af40a3e040c830a77cdaeec6e9066622ee60e4c93e6e/banks-2.5.1.tar.gz", hash = "sha256:a7ca5c250b605ae90cfd6e4ca5dd6ce2ee377d5d59021b6feba44e345910026d", size = 196398, upload-time = "2026-09-10T10:15:34.569Z" }
 wheels = [
@@ -724,8 +724,8 @@ name = "beautifulsoup4"
 version = "4.15.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "soupsieve", version = "2.10", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11.5' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "soupsieve", version = "3.0.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11.5' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "soupsieve", version = "2.10", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11.5'" },
+    { name = "soupsieve", version = "3.0.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11.5'" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/43/65/318323f98dbee45d42dff61d8f047181bc6f2268a9068cfad035a46be5af/beautifulsoup4-4.15.0.tar.gz", hash = "sha256:288e3ca7d54b06f2ac191970bc275c1939cb46d450b255bf6718b04aa37ab4f7", size = 632571, upload-time = "2026-06-07T16:44:20.453Z" }
@@ -898,7 +898,7 @@ name = "cffi"
 version = "2.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pycparser", marker = "implementation_name != 'PyPy' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pycparser", marker = "implementation_name != 'PyPy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9e/ef/008a1939e372c06329a3fce4279c02f328488f3526744906eeec3da7ad5f/cffi-2.1.1.tar.gz", hash = "sha256:dd31f52ea1086513bb9df30f8fcee9b8918323ae067a3d5b78bc826a000712be", size = 530807, upload-time = "2026-08-03T21:21:18.939Z" }
 wheels = [
@@ -1166,7 +1166,7 @@ dependencies = [
     { name = "kubernetes", marker = "python_full_version < '3.14'" },
     { name = "mmh3", marker = "python_full_version < '3.14'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents') or (python_full_version >= '3.14' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (python_full_version >= '3.14' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (python_full_version >= '3.14' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
     { name = "onnxruntime", marker = "python_full_version < '3.14'" },
     { name = "opentelemetry-api", marker = "python_full_version < '3.14'" },
     { name = "opentelemetry-exporter-otlp-proto-grpc", marker = "python_full_version < '3.14'" },
@@ -1219,7 +1219,7 @@ version = "4.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
-    { name = "typing-extensions", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/05/e2/d41446c6195eff0db3b671ddb202e39f42f9ea7c0dd15cd43fbf5cf0d7f7/cloup-4.0.0.tar.gz", hash = "sha256:83b0870ee863bcc85129e40e1b208bcfdebe4cd2142e9ce1d0daf7d276cab038", size = 252135, upload-time = "2026-09-12T03:23:39.698Z" }
 wheels = [
@@ -1256,7 +1256,7 @@ resolution-markers = [
     "python_full_version < '3.11.5' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/58/01/1253e6698a07380cd31a736d248a3f2a50a7c88779a1813da27503cadc2a/contourpy-1.3.3.tar.gz", hash = "sha256:083e12155b210502d0bca491432bb04d56dc3432f95a979b429f2848c3dbe880", size = 13466174, upload-time = "2025-07-26T12:03:12.549Z" }
 wheels = [
@@ -1361,7 +1361,7 @@ resolution-markers = [
     "python_full_version == '3.12.*' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/83/5a/a55177dd22553a277388e8a1b3220e92de91bacb28356cdc73caa240121d/contourpy-1.4.0.tar.gz", hash = "sha256:20156f5a1ac4f8ce02656e39a61e82164a3d359796dc8026f75b062783d500e1", size = 13323726, upload-time = "2026-09-11T19:05:05.808Z" }
 wheels = [
@@ -1460,19 +1460,19 @@ dependencies = [
     { name = "fsspec", extra = ["http"] },
     { name = "inflect" },
     { name = "ko-speech-tools" },
-    { name = "librosa", version = "0.11.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "librosa", version = "1.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "librosa", version = "0.11.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "librosa", version = "1.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "matplotlib" },
     { name = "monotonic-alignment-search" },
     { name = "num2words" },
     { name = "numba" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "packaging" },
     { name = "pysbd" },
     { name = "pyyaml" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "soundfile" },
     { name = "tqdm" },
     { name = "transformers" },
@@ -1597,7 +1597,7 @@ name = "cryptography"
 version = "50.0.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cffi", marker = "platform_python_implementation != 'PyPy' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "cffi", marker = "platform_python_implementation != 'PyPy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/9d/af/182eb91b0df3fe75c4d9f26fe70684569566745f6ba7e5c9c73a862c5252/cryptography-50.0.2.tar.gz", hash = "sha256:7b46165bb56eb4704e2eaaf86f3c940d19154535d9b0ca7d6d590b04060e00d5", size = 880623, upload-time = "2026-09-30T15:30:04.884Z" }
 wheels = [
@@ -1659,6 +1659,53 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/b6/b1/d9121a717e0f893c64bd6ca7702614778d7df2a5c309128a002421788516/cryptography-50.0.2-pp311-pypy311_pp73-manylinux_2_34_x86_64.whl", hash = "sha256:1ba34f04897fcdaa73f74145c25f3ec146fbd56593853e88adc2e811303c5f42", size = 4726322, upload-time = "2026-09-30T15:29:54.263Z" },
     { url = "https://files.pythonhosted.org/packages/36/8b/e6d153808bf353e152abd2fd4d8f09670d956ac78379ac46e60d7efbf04c/cryptography-50.0.2-pp311-pypy311_pp80-macosx_11_0_arm64.whl", hash = "sha256:3dc4fd8058cea1644971207d530e1a03a184a805ffc8ebdddf0599d78a331b81", size = 3873097, upload-time = "2026-09-30T15:29:56.097Z" },
     { url = "https://files.pythonhosted.org/packages/ca/1d/1271f287ff7170ddafc2aad36260c4eec20ccd2fea70f38455e9d56d427b/cryptography-50.0.2-pp311-pypy311_pp80-win_amd64.whl", hash = "sha256:7b75de3c8b3be1cdb1052747c929440c3eea46c1bc2cb8a6e3a48388e9b7b452", size = 3805376, upload-time = "2026-09-30T15:29:58.729Z" },
+]
+
+[[package]]
+name = "ctranslate2"
+version = "4.9.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "pyyaml" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/41/6b/ca9fe0dbc7c4f76d57c1d759a23cf059c3e323effc29b2c21208908b5bb7/ctranslate2-4.9.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:78a0a59721031193e52732b1e565bfaee7c22ec0d1c48d40e9ed4bc7341a843e", size = 1662417, upload-time = "2026-11-10T19:52:14.628Z" },
+    { url = "https://files.pythonhosted.org/packages/84/8c/9526dc3503f9de160b8a103be15684090919a7ecbcd68486b9ae125d4747/ctranslate2-4.9.0-cp311-cp311-macosx_11_0_x86_64.whl", hash = "sha256:b31ef0802cd25c15321813f4bc3b83b822c5660acfed437c25e47b04eea3c08e", size = 12190765, upload-time = "2026-11-10T19:52:16.426Z" },
+    { url = "https://files.pythonhosted.org/packages/66/67/9886a3f60214aa6dcece801306a99b29e597ec3d00b8222cdaf1f4a736f8/ctranslate2-4.9.0-cp311-cp311-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:ea9e15a05f0fe2fe33ed7ed79350e96043112f85299d56393134655166911ad3", size = 18928735, upload-time = "2026-11-10T19:52:18.725Z" },
+    { url = "https://files.pythonhosted.org/packages/a3/5d/4533eb4ea00da0248611e0e6b8b142b2f5c14f4f1110e6fcc2b5aff099cd/ctranslate2-4.9.0-cp311-cp311-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:9cb2363ff54810a3a38d0579fe2818138ba8d605215906e9e68022cfe5b663eb", size = 42583989, upload-time = "2026-11-10T19:52:22.204Z" },
+    { url = "https://files.pythonhosted.org/packages/c8/c3/99c3155ac369fde882f53333558ff89aabcee910140318c2338bd1256d5b/ctranslate2-4.9.0-cp311-cp311-win_amd64.whl", hash = "sha256:a81306ee947ff9e8fdffd016c9131801c56472a89c50161a00dc802bd55d47b9", size = 20406902, upload-time = "2026-11-10T19:52:25.371Z" },
+    { url = "https://files.pythonhosted.org/packages/6e/75/4a4a3de8a92f288c3bd6b38d744d3dd3fb7fb28cb8afc2daf374d5bf2500/ctranslate2-4.9.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:ca2cc29f5d561e231c15e9e97b13dcbd1913d6615b727fafa1eeffcb0c1f242a", size = 1662843, upload-time = "2026-11-10T19:52:27.424Z" },
+    { url = "https://files.pythonhosted.org/packages/55/f9/2bc6b291e6f15b1a178f7ea3ed8111f673965c9d2d1a15a39cf430345799/ctranslate2-4.9.0-cp312-cp312-macosx_11_0_x86_64.whl", hash = "sha256:7dd5e790e1343aeb4ee0156551e60bb04f2c1a38bfdb3d187c9483da4ad9c4e3", size = 12195837, upload-time = "2026-11-10T19:52:29.067Z" },
+    { url = "https://files.pythonhosted.org/packages/72/af/d4e78ae886ac357a80d6ac2319576858d1856c2924b8c69a403add095586/ctranslate2-4.9.0-cp312-cp312-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a2488042f823647050f1e55bb598da8326e14a691a14661f555624b3b2e51fac", size = 19087256, upload-time = "2026-11-10T19:52:31.674Z" },
+    { url = "https://files.pythonhosted.org/packages/61/41/f416fe0c6be955b0cdb8c09df145965d33bfd8a847b13229f547c1a7a5fd/ctranslate2-4.9.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:5d9b3edd73ba665f16a19cd3a498ce74fbfb6204bc0ac321f00f2600a41e8810", size = 42804016, upload-time = "2026-11-10T19:52:35.401Z" },
+    { url = "https://files.pythonhosted.org/packages/c6/ee/0f5bafde2a434b90bec1f979906963ecda6f0d18afc5abaec6f19c7feab1/ctranslate2-4.9.0-cp312-cp312-win_amd64.whl", hash = "sha256:ee930e984679ad16c5fb7bc8da2eaca8c269f86d02cb9eeec087baa1837b5bd2", size = 20408736, upload-time = "2026-11-10T19:52:40.009Z" },
+    { url = "https://files.pythonhosted.org/packages/76/c9/957a2b3a255e0d82f4273284b72108d6eaea7bfd2056dc690a97da35d469/ctranslate2-4.9.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:3b258e28e5a37177ace32939238100aa3ea6c8e916704266e98c475741120169", size = 1662708, upload-time = "2026-11-10T19:52:41.919Z" },
+    { url = "https://files.pythonhosted.org/packages/d4/cd/85d05739ab1b71608c684199fd2e6934231dc1f9c4527141b5f5a85a5085/ctranslate2-4.9.0-cp313-cp313-macosx_11_0_x86_64.whl", hash = "sha256:239e704b0c4de0450f2eafaece45569a9f2c097e4ae382b5deb9de339a869c25", size = 12195808, upload-time = "2026-11-10T19:52:43.517Z" },
+    { url = "https://files.pythonhosted.org/packages/ba/0e/8d4f2a7187bfc87ca1d305a5fa8224c9af2ec3542905a6440cd06ac76a1a/ctranslate2-4.9.0-cp313-cp313-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:0f8bb74a0268f08adfaf01ed74209949a344f01f86713421f12810b99e7d46c9", size = 19085050, upload-time = "2026-11-10T19:52:46.167Z" },
+    { url = "https://files.pythonhosted.org/packages/16/1f/a6785567ff5c252dd4fea261786ca5818abd80a282aa399b01c294470f67/ctranslate2-4.9.0-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c749bdd14f91994f92ff455969a5a7daff85f72ba7240187357aa262e75346e3", size = 42769889, upload-time = "2026-11-10T19:52:49.538Z" },
+    { url = "https://files.pythonhosted.org/packages/3f/71/cd84a3e26cf8a932c7826a4e7d45ddbf2e2899880d6dcc5ad4833169e6da/ctranslate2-4.9.0-cp313-cp313-win_amd64.whl", hash = "sha256:d009840a95a5ced75563da030d1aa79dba85c7f280a658e518d575aed40ef095", size = 20408731, upload-time = "2026-11-10T19:52:53.046Z" },
+    { url = "https://files.pythonhosted.org/packages/bf/6c/99ecfe1b52a25df550a99547b19b709fe562ca29ac8f4cd1da920b357212/ctranslate2-4.9.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:159afd25eca6720b14cb87a6a45f745091510ae00454ed1207e0fe08260e4cdf", size = 1663826, upload-time = "2026-11-10T19:52:55.412Z" },
+    { url = "https://files.pythonhosted.org/packages/95/95/59aefbc70785ca88aa7715758d2ff3b5e513416e45e3b671a897e40d26c9/ctranslate2-4.9.0-cp314-cp314-macosx_11_0_x86_64.whl", hash = "sha256:a7067415c9ecacc3cf80e5200742392bc804aaefaf39e480815d73fd42a5c337", size = 12195956, upload-time = "2026-11-10T19:52:56.938Z" },
+    { url = "https://files.pythonhosted.org/packages/98/e8/b41df1b57cbd86cea2043cb39e56e7ecd4f4ef046c6372d58068ad2873df/ctranslate2-4.9.0-cp314-cp314-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:a8c74d2c77ff23560b29dad4ebbf61b1bc5e19da40b69e60edf14cc582d75926", size = 19067997, upload-time = "2026-11-10T19:52:59.824Z" },
+    { url = "https://files.pythonhosted.org/packages/e1/37/8357cfd1d39ede1d26881efb1fb903160ba988d8b73ad4a3437393890307/ctranslate2-4.9.0-cp314-cp314-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:1f1c344d26368f8dc2d4b46a6d9a7115fa6308124b82de64dcaa6f6907b1e97a", size = 42746497, upload-time = "2026-11-10T19:53:03.617Z" },
+    { url = "https://files.pythonhosted.org/packages/d3/f8/b546a4eca219d089ee936a4e604ff83b96eea74b6e982d0864d6a1dead4b/ctranslate2-4.9.0-cp314-cp314-win_amd64.whl", hash = "sha256:36ec6213ec7ff7609229db0a35f7b2403a66e1b5e1bd4c606f51e4e3ea56c330", size = 20682430, upload-time = "2026-11-10T19:53:07.02Z" },
+    { url = "https://files.pythonhosted.org/packages/5c/d8/f53a1d8d287f0365cd5e5f72badf75974d8510477c900f146634bdb2bf39/ctranslate2-4.9.0-cp314-cp314t-macosx_11_0_arm64.whl", hash = "sha256:39f084b7f20ab281098b4ae5783669f1b51adcae98b420d60153c67d1a39b4ab", size = 1692018, upload-time = "2026-11-10T19:53:09.073Z" },
+    { url = "https://files.pythonhosted.org/packages/86/83/2c135ebe17d7f7a877f47568f70373877d5f2175351186f36975efaf5469/ctranslate2-4.9.0-cp314-cp314t-macosx_11_0_x86_64.whl", hash = "sha256:3ed9f2792c30e914233ce92fbe8939361179798ddfb2f6306dd60c6a18131bba", size = 12222910, upload-time = "2026-11-10T19:53:11.119Z" },
+    { url = "https://files.pythonhosted.org/packages/e2/c8/eaeb42a937c67792911cfabaa527452f64bfb9e36aa7c6eeb44e4f15a5ac/ctranslate2-4.9.0-cp314-cp314t-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:e6707364d219831af8109fd1802208e9d8146a9c119c46e989f4be580ccb7aca", size = 19429542, upload-time = "2026-11-10T19:53:14.264Z" },
+    { url = "https://files.pythonhosted.org/packages/5c/5d/a85bbaefcb73b97a62ed98bb62088389c449d5b5d04b618fbd615d0e551f/ctranslate2-4.9.0-cp314-cp314t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:c310abe4ad6a9f037a20fb7885e285f2de39bc419713746f52779b2ed675643e", size = 43109427, upload-time = "2026-11-10T19:53:18.445Z" },
+    { url = "https://files.pythonhosted.org/packages/ea/b4/c8596dbe42286f3ff06a81ed47782db952c68b2cd35441ae5b572cd16cce/ctranslate2-4.9.0-cp314-cp314t-win_amd64.whl", hash = "sha256:21e8343886d9cb64a16f3ae08ebe337d1ecb5bd6e05f0e9ffa017e4e74891a56", size = 20710447, upload-time = "2026-11-10T19:53:21.603Z" },
+    { url = "https://files.pythonhosted.org/packages/67/31/b322f798e81f3b2f1d92327b5a517a91c8f0a4cf5b7eb51db1adfd667e06/ctranslate2-4.9.0-cp315-cp315-macosx_11_0_arm64.whl", hash = "sha256:02e43bfd939fc7d8786e1a450f918a04d6112c35a5c509817d1b3fbcab138260", size = 1664462, upload-time = "2026-11-10T19:53:24.134Z" },
+    { url = "https://files.pythonhosted.org/packages/f3/96/0a174dc664ea208f40c720d78a5fdf07900520288babc9731af4a8093072/ctranslate2-4.9.0-cp315-cp315-macosx_11_0_x86_64.whl", hash = "sha256:9db553aee7863df8cfad3b4db7772ce4369e7838b249b580e8a27a4e372ad66e", size = 12195959, upload-time = "2026-11-10T19:53:25.905Z" },
+    { url = "https://files.pythonhosted.org/packages/c8/31/86ef934e964c22884c1ad40ab734b61d12cab988870d3dae4cb566388dd1/ctranslate2-4.9.0-cp315-cp315-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:11c1df222fd137a5c37d4b5c219ebee16d851bbf95f9797935ca6d2de2c8f164", size = 19074236, upload-time = "2026-11-10T19:53:28.762Z" },
+    { url = "https://files.pythonhosted.org/packages/ce/8d/03316483b55353e14bd4bea2c0bd9b60b7b5eb9a00b93ce0c90380aac84f/ctranslate2-4.9.0-cp315-cp315-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:ce7f0c9c14d8d0022c68197b9a963928ef048ccf75349f415ddda76028ae550c", size = 42771422, upload-time = "2026-11-10T19:53:32.754Z" },
+    { url = "https://files.pythonhosted.org/packages/91/68/1ff40109301a91adfca639300ead7ded4b3bf773dc44bbad2a52c0b15ecb/ctranslate2-4.9.0-cp315-cp315-win_amd64.whl", hash = "sha256:0eede9e2b607b90682deb3b9fc70667a73bd8026d4358e2dcf8b63ed2264d2b1", size = 20682460, upload-time = "2026-11-10T19:53:36.207Z" },
+    { url = "https://files.pythonhosted.org/packages/5f/4b/5b3b879b5bdf25d1166af574ea4ceecd115eb6466f3145aaddfbb326f931/ctranslate2-4.9.0-cp315-cp315t-macosx_11_0_arm64.whl", hash = "sha256:47f953d79657d049819b11b798ff563ae3036f07693b4d72c2a1ef4a78590830", size = 1692360, upload-time = "2026-11-10T19:53:38.413Z" },
+    { url = "https://files.pythonhosted.org/packages/06/de/cbaacd0332a5a12e737297ad48d57b01b4a98dd7e5314c4cca1307079bec/ctranslate2-4.9.0-cp315-cp315t-macosx_11_0_x86_64.whl", hash = "sha256:fcd2d67ba703e2e2e2b5cdf3ecda3fea0744abfeee17a5debaaa1d10a5d899d6", size = 12222693, upload-time = "2026-11-10T19:53:40.449Z" },
+    { url = "https://files.pythonhosted.org/packages/73/da/1cf776218d7b9a53c1244c7698087a2606b3ae833618726ce9f62e0d3c19/ctranslate2-4.9.0-cp315-cp315t-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:d65c11e91e10d34c83dbf8e7c0b3e804e7e1a41fc3892fb9003d3f1345a7a562", size = 19482697, upload-time = "2026-11-10T19:53:43.742Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/09/2812d5bb99a33f5de199881840e51884950399c1a51bee7ca22b74e0c0e8/ctranslate2-4.9.0-cp315-cp315t-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e83480dc19cf8402fec7b3f4e87e22e2855b9e4a0492754afc232a9d31c82586", size = 43163365, upload-time = "2026-11-10T19:53:47.782Z" },
+    { url = "https://files.pythonhosted.org/packages/04/fb/2f4d8f8cc245db7bd2f68ab4e0d39f7a7b68f3bc677a71d91d7d056f3c9d/ctranslate2-4.9.0-cp315-cp315t-win_amd64.whl", hash = "sha256:8cbb5432933fa48b721e55da433e8ac71534dd2758cf605919ba69b9a3d6073a", size = 20710713, upload-time = "2026-11-10T19:53:50.943Z" },
 ]
 
 [[package]]
@@ -1772,7 +1819,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "docstring-parser" },
-    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents' or extra != 'extra-8-manimvox-crewai'" },
+    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "rich", version = "14.3.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-crewai'" },
     { name = "rich-rst" },
 ]
@@ -1788,34 +1835,11 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/a9/d8/4981ef716ad0e3ff0d3ef383aefc6b03c4a88dee33b272bf8e0d833001ca/cython-3.3.0.tar.gz", hash = "sha256:eed0d93fbca7087f143b42c34b05a825849bdf17f101572c2105acfa49aa88b8", size = 3727515, upload-time = "2026-08-22T05:16:39.493Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/af/67/dffaf12b7203f7e936d98b967e065c50a7883f152c51ded44ed8762128f4/cython-3.3.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:ec09dbf73ff4f7be2b339b995fadae9c4bb517bbbed7ec11d6fe99c2092b48fd", size = 3134644, upload-time = "2026-08-22T05:16:59.112Z" },
-    { url = "https://files.pythonhosted.org/packages/6a/f2/9dc6a3bad9c9d11bf31903321553820a661ce00319a57c4181bf0dcb87f4/cython-3.3.0-cp311-cp311-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:11e437f086affee8051cec4bb531be3edb646ab66e325154aa6849377f365033", size = 3346108, upload-time = "2026-08-22T05:17:01.082Z" },
-    { url = "https://files.pythonhosted.org/packages/3f/9b/dd726d11b2aff24f0c3fa68ce9e3934097a058aca471a8cc9888aeae5471/cython-3.3.0-cp311-cp311-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:e6035b5231a9316edc19d6415f4296fd1d0370e2a165a714b3edc167b9ca00e1", size = 3479260, upload-time = "2026-08-22T05:17:03.476Z" },
-    { url = "https://files.pythonhosted.org/packages/43/55/7408773fdadb2b3434501109696533555ba89f233366519c661372c69098/cython-3.3.0-cp311-cp311-win_amd64.whl", hash = "sha256:8566ea804cfc265f5e9dda71d1b716aa24ee4c3423a5da4b28a248a78c33e3f9", size = 2862883, upload-time = "2026-08-22T05:17:06.008Z" },
     { url = "https://files.pythonhosted.org/packages/da/0f/95bad838a80ac52c9e982dad00bd9a0b2bad57fb4c688e5f53ac3ef65ff0/cython-3.3.0-cp312-cp312-macosx_11_0_arm64.whl", hash = "sha256:03bc5333932f5dda3ba9315298ecdd21daa1b58410bb1f8ce04c78ec8337130a", size = 3143472, upload-time = "2026-08-22T05:17:07.956Z" },
-    { url = "https://files.pythonhosted.org/packages/91/8b/53d4a84de853b39940a0e35a6a2a9ed5f54cb05468daee95bc0fd1c2a178/cython-3.3.0-cp312-cp312-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:7e321ae700995a16dc3055ada06ffb8d61e1a7434e5d0e811547a45ac1015ebd", size = 3258974, upload-time = "2026-08-22T05:17:09.908Z" },
-    { url = "https://files.pythonhosted.org/packages/6a/4e/6b1c5a4e6bbe1726104de007aa2fdf01a3e2e386b4ec93c7be5f5085d53f/cython-3.3.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:428fafed98ea26927000a287b4dfc9ef07339f56656a5329a34eaa593f79a4f8", size = 3412225, upload-time = "2026-08-22T05:17:12.281Z" },
-    { url = "https://files.pythonhosted.org/packages/f4/9b/cd724d91c500116769bdb853450a2197ba3d640dbbe3b02fc54ebdfdbd1b/cython-3.3.0-cp312-cp312-win_amd64.whl", hash = "sha256:333449cc0350baedee5a6af27929eac8a71eac4ec59333c45ff476b33c6c660d", size = 2872123, upload-time = "2026-08-22T05:17:14.322Z" },
     { url = "https://files.pythonhosted.org/packages/2f/cc/abc977cf683140e372714acea42164ecfc5cd3d3984ed025860e6d830ee4/cython-3.3.0-cp313-cp313-macosx_11_0_arm64.whl", hash = "sha256:03056533fe4fdbc4f1d34a39178f9a4937ff35196f8bcdde2a67b5b5809c61fe", size = 3134892, upload-time = "2026-08-22T05:17:16.675Z" },
-    { url = "https://files.pythonhosted.org/packages/a3/60/5367e7c80776a185ac11e0ea738fdaf18b9d0bc21d2c2bafc4d87eb19964/cython-3.3.0-cp313-cp313-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:bc2f2a6b65a991666cfd35a35bab0cd88ffba4df2f601edb6e76cc8116de24b9", size = 3251835, upload-time = "2026-08-22T05:17:18.458Z" },
-    { url = "https://files.pythonhosted.org/packages/bc/b8/fc595c60a7b6f5f08b4f6ad65e60688e8c61f76064ebe847eaf85d0c59fa/cython-3.3.0-cp313-cp313-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:23942b0662642927a55676e4b26e6840fb166dd7d76436384685227e7e8619a4", size = 3407705, upload-time = "2026-08-22T05:17:20.387Z" },
-    { url = "https://files.pythonhosted.org/packages/d8/d7/376572ff69ef39a9bdcd727124f6c38aa066300e97734a4902a3ae0d2af0/cython-3.3.0-cp313-cp313-win_amd64.whl", hash = "sha256:ab24d1a4fb6aaf0b5b6fcd75a6d70255fbd3130fa78884c26991f8d5502616b5", size = 2866216, upload-time = "2026-08-22T05:17:22.348Z" },
     { url = "https://files.pythonhosted.org/packages/8a/7f/e409f76bb955ecdcb746b80350b945fbb808846d797346d647a37e1790ca/cython-3.3.0-cp314-cp314-macosx_11_0_arm64.whl", hash = "sha256:0deedc2e9a5a664e1adfa4c2d310aa7b54903e1a647c274b6c9213f77a02d637", size = 3186700, upload-time = "2026-08-22T05:17:24.288Z" },
-    { url = "https://files.pythonhosted.org/packages/0e/6b/4a623ab6e4a5b9814b22849665cb212273f9735399a7ebca4f3e8c254f1a/cython-3.3.0-cp314-cp314-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:46072c0d404616b5e652a63882c79cc3f8a1d62635a8692f56ed0e416a4dfed8", size = 3330606, upload-time = "2026-08-22T05:17:26.041Z" },
-    { url = "https://files.pythonhosted.org/packages/9f/57/6d620ebee4fc24d89340427702f6ceaf7b956511d1f2222a88c92c1a72b7/cython-3.3.0-cp314-cp314-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:82f94565b6001bab8e31bf52a0911672910b5735910612a2c0f772c719670006", size = 3454681, upload-time = "2026-08-22T05:17:28.449Z" },
-    { url = "https://files.pythonhosted.org/packages/73/4e/26e0a584d06c5b3f345df491d2546479606c89217627ee163f1aa55e899f/cython-3.3.0-cp314-cp314-win_amd64.whl", hash = "sha256:51999fb834365721b6c7f689cf6e2ec7c8667aae783df9eb5e589c290a414d9c", size = 2925966, upload-time = "2026-08-22T05:17:30.549Z" },
     { url = "https://files.pythonhosted.org/packages/ea/45/7f6988070013e16918e39b1b3dab9c5f2c8e404253a7fd10ee685bbd6902/cython-3.3.0-cp315-cp315-macosx_11_0_arm64.whl", hash = "sha256:596e8df019372a2cd417805015022d42cb8ee4e1803ccdc11ed00e451625fb66", size = 3177681, upload-time = "2026-08-22T05:17:32.523Z" },
-    { url = "https://files.pythonhosted.org/packages/6e/5d/afb6866ab10236bb208dff0f172ea4b397c9693c5250280c4d9d26057218/cython-3.3.0-cp315-cp315-manylinux2014_aarch64.manylinux_2_17_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:4a36c34d1950845b8ac148653b07cdc62421a4b0d9abfcc849e69f1c4ff9919d", size = 3328312, upload-time = "2026-08-22T05:17:34.511Z" },
-    { url = "https://files.pythonhosted.org/packages/c9/aa/4c0b6773ecf6bc1ec6cda7db8312a566611b330fb6dae87d740e44a47822/cython-3.3.0-cp315-cp315-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:b447f6906e0555f05dc4742ef1f99091b1e5d9aa9f16616e772fbf9ff6271616", size = 3454285, upload-time = "2026-08-22T05:17:36.538Z" },
-    { url = "https://files.pythonhosted.org/packages/44/bb/3e2631122f96300723d6fc42b9cf65550bdcda570a6ad5c4e0226e2e787c/cython-3.3.0-cp315-cp315-win_amd64.whl", hash = "sha256:b55c72e8eccdd508c8de3cf3bbc543aafbb3bf6a518e1ee20358d3241cd780ef", size = 2924709, upload-time = "2026-08-22T05:17:38.65Z" },
     { url = "https://files.pythonhosted.org/packages/14/59/bc1a84b434cb5bebb0cd6f50da8f239d35a5c141b20fdeafc2817fd87778/cython-3.3.0-cp39-abi3-macosx_10_9_x86_64.whl", hash = "sha256:e0d2713d2b292c826bc21dc8732bd9e47628103aa3764180c881e04b3fef95dc", size = 3063660, upload-time = "2026-08-22T05:17:40.923Z" },
-    { url = "https://files.pythonhosted.org/packages/ba/6d/542e32908fb421d88354f327ed6450e14240f9825d25393065bc65f4723f/cython-3.3.0-cp39-abi3-manylinux1_i686.manylinux_2_28_i686.manylinux_2_5_i686.whl", hash = "sha256:169e56fd411f4cd5bba51c82f8239421d547a846099db2b261e4aed48ba9f51f", size = 3358395, upload-time = "2026-08-22T05:17:43.036Z" },
-    { url = "https://files.pythonhosted.org/packages/9c/7c/ddaf197bc65b581e1891657940bc4f7cb1f740e822115e828920b3a119ce/cython-3.3.0-cp39-abi3-manylinux2014_armv7l.manylinux_2_17_armv7l.manylinux_2_31_armv7l.whl", hash = "sha256:29f38ebafdf23e3da2516f40c4d065da38bfe002181bf93e2b8cf1262449aba6", size = 3041760, upload-time = "2026-08-22T05:17:44.907Z" },
-    { url = "https://files.pythonhosted.org/packages/19/a7/ae5ec3e34d43da846ed4c425734752d83aae0dae49feb929f09c90fc9afa/cython-3.3.0-cp39-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:75c4ae8a6d3a5ccf3cdaba8ab32e6a8d0cd38e3a476aa7ac12df8f8171a8d570", size = 3156152, upload-time = "2026-08-22T05:17:46.884Z" },
-    { url = "https://files.pythonhosted.org/packages/31/44/c60b601fc43f0b08e9d6f14b94e0dd02eb0ca8d60f46e242ace7191ac1be/cython-3.3.0-cp39-abi3-musllinux_1_2_armv7l.whl", hash = "sha256:b94fb5613b9fe34c27d13ec9972dc0dcd2a2155db2902e93921cadc162610a38", size = 3046690, upload-time = "2026-08-22T05:17:48.731Z" },
-    { url = "https://files.pythonhosted.org/packages/b0/9e/d735c26ed907563d3365534006acb263651c2d3b87fee804f7a483dd1714/cython-3.3.0-cp39-abi3-musllinux_1_2_i686.whl", hash = "sha256:c4558ba85849ab65dc57e10fd0efb13fabd9d3c09981a2566e18dec7cf47586a", size = 3373534, upload-time = "2026-08-22T05:17:50.7Z" },
-    { url = "https://files.pythonhosted.org/packages/e0/e8/aa7b4f3a28d6e8117c76e2cf78a0df7a503486cdf7243c5b53200c9533a1/cython-3.3.0-cp39-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:311a016369adfd1e0015c4f9819168fc0e518451d7efb4435c30d65a3a26d52b", size = 3265110, upload-time = "2026-08-22T05:17:52.577Z" },
-    { url = "https://files.pythonhosted.org/packages/9c/66/37892a8999d6bbd3f92d691a9701cb720c8ddd6171e16f5148eee6e8cb7f/cython-3.3.0-cp39-abi3-win32.whl", hash = "sha256:90869072e50b7c8904fe1dd7810321ae901fd5637a6eec6646ed9c57f9eb1081", size = 2587733, upload-time = "2026-08-22T05:17:54.547Z" },
-    { url = "https://files.pythonhosted.org/packages/19/a2/5f4d305cbd4489d21570e5491ad5c483c478cdab032853e2125c280e3bd5/cython-3.3.0-cp39-abi3-win_arm64.whl", hash = "sha256:dce56c26d388f00a19426371b6926bf2f77c5c03b71d5273e4556c68be98c2dd", size = 2608078, upload-time = "2026-08-22T05:17:56.386Z" },
     { url = "https://files.pythonhosted.org/packages/bf/77/67b0b24e45073a699610e50f00c18474ff9b09ea29ecc95083bdf5e60acd/cython-3.3.0-py3-none-any.whl", hash = "sha256:9b24b5c8cd536946b62086fcafee6d5509d3f549f72d553d2336af87ffbe0da1", size = 1349151, upload-time = "2026-08-22T05:16:36.741Z" },
 ]
 
@@ -1839,7 +1863,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dill" },
     { name = "filelock" },
-    { name = "fsspec", extra = ["http"], marker = "extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents' or extra != 'extra-8-manimvox-crewai'" },
+    { name = "fsspec", extra = ["http"], marker = "extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "huggingface-hub" },
     { name = "multiprocess" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra != 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
@@ -1922,7 +1946,7 @@ resolution-markers = [
     "python_full_version < '3.11.5' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "wrapt", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "wrapt" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/49/85/12f0a49a7c4ffb70572b6c2ef13c90c88fd190debda93b23f026b25f9634/deprecated-1.3.1.tar.gz", hash = "sha256:b1b50e0ff0c1fddaa5708a2c6b0a6588bb09b892825ab2b214ac9ea9d92a5223", size = 2932523, upload-time = "2025-10-30T08:19:02.757Z" }
 wheels = [
@@ -1957,7 +1981,7 @@ resolution-markers = [
     "python_full_version == '3.12.*' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "wrapt", marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "wrapt" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f7/9c/16649913bf14c73e0a9453782e148362ff2657067deff6aa9c7ebcddcc31/deprecated-3.0.0.tar.gz", hash = "sha256:16850204d3a1e6bb0acd06bff48d96e8b0a0d25d1c52f71705405a0f4894192d", size = 166912, upload-time = "2026-09-26T13:58:10.675Z" }
 wheels = [
@@ -2166,8 +2190,8 @@ name = "fast-simplification"
 version = "0.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/f3/0a/b943887803aefecd01d30cd150bd2a6f03d90b96886e3befdcc5d4276c98/fast_simplification-0.2.0.tar.gz", hash = "sha256:ed02ea6f4968ec98f963f2d3665dbafd0297ec12aea9e4d0a87c4b3c14d608a8", size = 31865, upload-time = "2026-08-12T19:53:50.49Z" }
 wheels = [
@@ -2200,7 +2224,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "starlette" },
     { name = "typing-extensions" },
     { name = "typing-inspection" },
@@ -2208,6 +2232,23 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/8a/02/91e3416a8fdd715abb903a952a6bec7cdd8d14eed55d415fc8595524c319/fastapi-0.141.1.tar.gz", hash = "sha256:e8822fc40db1e1858054d7a949a888695bc9bdce70139178e33bd2871a453ca1", size = 425799, upload-time = "2026-07-29T17:18:05.568Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/cb/03/10388a42375ee7e4ac9b94eb2c5c569c8b5795e377e701c9ac3ad63de890/fastapi-0.141.1-py3-none-any.whl", hash = "sha256:bfb91aa2d334c61cb35ba9a116fc123b3d3df31640b801cf57a7a78ec3f603b3", size = 131954, upload-time = "2026-07-29T17:18:04.364Z" },
+]
+
+[[package]]
+name = "faster-whisper"
+version = "1.2.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "av", version = "18.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "av", version = "19.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "ctranslate2" },
+    { name = "huggingface-hub" },
+    { name = "onnxruntime" },
+    { name = "tokenizers" },
+    { name = "tqdm" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/05/99/49ee85903dee060d9f08297b4a342e5e0bcfca2f027a07b4ee0a38ab13f9/faster_whisper-1.2.1-py3-none-any.whl", hash = "sha256:79a66ad50688c0b794dd501dc340a736992a6342f7f95e5811be60b5224a26a7", size = 1118909, upload-time = "2025-10-31T11:35:47.794Z" },
 ]
 
 [[package]]
@@ -2436,7 +2477,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx2" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ad/de/119c7ba00b9ddbf629de34cf390ab472da6d7bc5df0c51cdbec900280a74/genai_prices-0.1.13.tar.gz", hash = "sha256:76c9e2dd3917fdacdf3bc562297c4591384142ea2283c477e1512fafa4e3a384", size = 134622, upload-time = "2026-10-15T09:47:04.739Z" }
 wheels = [
@@ -2504,7 +2545,7 @@ version = "2.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiosqlite", version = "0.21.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "aiosqlite", version = "0.22.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "aiosqlite", version = "0.22.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "authlib" },
     { name = "click" },
     { name = "cryptography" },
@@ -2518,7 +2559,7 @@ dependencies = [
     { name = "opentelemetry-sdk" },
     { name = "packaging" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "python-dotenv" },
     { name = "python-multipart" },
     { name = "pyyaml" },
@@ -2645,7 +2686,7 @@ dependencies = [
     { name = "google-auth", extra = ["requests"] },
     { name = "httpx" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "requests" },
     { name = "sniffio" },
     { name = "tenacity" },
@@ -2727,7 +2768,7 @@ version = "1.75.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "protobuf", version = "6.33.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "protobuf", version = "7.36.2", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents' or extra != 'extra-8-manimvox-crewai'" },
+    { name = "protobuf", version = "7.36.2", source = { registry = "https://pypi.org/simple" }, marker = "extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8d/2b/6ce81972d5c8cab9705fddce3153be63222d9e12fd96f8baba5038a744dd/googleapis_common_protos-1.75.5.tar.gz", hash = "sha256:c7a866fc34ed29a3b10af627a4b9b1dc2433313ca6e959f0ae4feb132047ed72", size = 156513, upload-time = "2026-09-29T19:26:14.863Z" }
 wheels = [
@@ -3017,15 +3058,15 @@ dependencies = [
     { name = "lazy-imports" },
     { name = "markupsafe" },
     { name = "more-itertools" },
-    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "networkx", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "networkx", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "openai", version = "2.54.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "openai", version = "3.33.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "openai", version = "3.33.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "posthog" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "python-dateutil" },
     { name = "pyyaml" },
     { name = "tenacity" },
@@ -3100,8 +3141,8 @@ name = "httpcore2"
 version = "2.13.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "h11", marker = "sys_platform != 'emscripten' or extra == 'extra-8-manimvox-crewai'" },
-    { name = "truststore", marker = "sys_platform != 'emscripten' or extra == 'extra-8-manimvox-crewai'" },
+    { name = "h11" },
+    { name = "truststore" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cb/f3/1db7aa2bc2524062192bb0e0323969492d1883152a232fe36eea65f4e35c/httpcore2-2.13.1.tar.gz", hash = "sha256:e0aa977abe17e69a3b820a24542a6fa88702676d83880b8d194dcd18408e5103", size = 68071, upload-time = "2026-09-23T07:47:22.372Z" }
 wheels = [
@@ -3241,12 +3282,12 @@ name = "httpx2"
 version = "2.13.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "anyio", marker = "sys_platform != 'emscripten' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "httpcore2", marker = "sys_platform != 'emscripten' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "httpx2-jsfetch", marker = "(python_full_version >= '3.12' and sys_platform == 'emscripten') or (python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents') or (sys_platform != 'emscripten' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (sys_platform != 'emscripten' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (sys_platform != 'emscripten' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "anyio", marker = "sys_platform != 'emscripten'" },
+    { name = "httpcore2", marker = "sys_platform != 'emscripten'" },
+    { name = "httpx2-jsfetch", marker = "python_full_version >= '3.12' and sys_platform == 'emscripten'" },
     { name = "idna" },
-    { name = "truststore", marker = "sys_platform != 'emscripten' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "truststore", marker = "sys_platform != 'emscripten'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/d5/44/474bef2a0e9d90f1715d32cb98b0738695ca17ba324095fb2497ed7fbd59/httpx2-2.13.1.tar.gz", hash = "sha256:e48744a19e3af5ee48313d0ce5fe941d5422fae5705ea922a4aabf94d7800dfa", size = 100405, upload-time = "2026-09-23T07:47:23.052Z" }
 wheels = [
@@ -3270,7 +3311,7 @@ dependencies = [
     { name = "click" },
     { name = "filelock" },
     { name = "fsspec" },
-    { name = "hf-xet", marker = "platform_machine == 'AMD64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "hf-xet", marker = "platform_machine == 'AMD64' or platform_machine == 'aarch64' or platform_machine == 'amd64' or platform_machine == 'arm64' or platform_machine == 'x86_64'" },
     { name = "httpx" },
     { name = "packaging" },
     { name = "pyyaml" },
@@ -3372,8 +3413,8 @@ name = "isosurfaces"
 version = "0.1.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/da/cf/bd7e70bb7b8dfd77afdc79aba8d83afd4a9263f045861cd4ddd34b7f6a12/isosurfaces-0.1.2.tar.gz", hash = "sha256:fa51ebe864ea9355b26830e27fdd6a41d5a58b419fa8d4b47e3b8b80718d6e21", size = 11348, upload-time = "2024-02-26T00:20:52.066Z" }
 wheels = [
@@ -3901,8 +3942,8 @@ version = "0.6.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "espeakng-loader" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "onnxruntime" },
     { name = "phonemizer" },
 ]
@@ -3967,7 +4008,7 @@ dependencies = [
     { name = "deprecation", marker = "python_full_version < '3.14'" },
     { name = "lance-namespace", marker = "python_full_version < '3.14'" },
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (python_full_version < '3.12' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents') or (python_full_version >= '3.14' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (python_full_version >= '3.14' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (python_full_version >= '3.14' and extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version >= '3.12' and python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
     { name = "overrides", marker = "python_full_version < '3.12'" },
     { name = "packaging", marker = "python_full_version < '3.14'" },
     { name = "pyarrow", marker = "python_full_version < '3.14'" },
@@ -3991,7 +4032,7 @@ dependencies = [
     { name = "langchain-core" },
     { name = "langgraph" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/d1/19/f4fd7d8ea845558bdc75c249bf9392250c67f38b7a242a9a3854c4f8e32e/langchain-1.4.6.tar.gz", hash = "sha256:ad3ccfdc50005eb06bf1fcbae61aa69ad98fe8bc7d7c1b4ad88323b5bda4cbac", size = 754010, upload-time = "2026-10-14T17:27:49.315Z" }
 wheels = [
@@ -4006,7 +4047,7 @@ dependencies = [
     { name = "anthropic" },
     { name = "langchain-core" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/3c/45/b369666909be4a6f58877b18e692655ee792e06047c6c572d1218e09a31c/langchain_anthropic-1.7.6.tar.gz", hash = "sha256:e5b41959a39810e69bc608fd6622b7d5d017bde93f858b09332fbb6ac764c393", size = 765188, upload-time = "2026-10-12T14:39:58.537Z" }
 wheels = [
@@ -4024,7 +4065,7 @@ dependencies = [
     { name = "langsmith" },
     { name = "packaging" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "pyyaml" },
     { name = "tenacity" },
     { name = "typing-extensions" },
@@ -4044,7 +4085,7 @@ dependencies = [
     { name = "google-genai" },
     { name = "langchain-core" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e9/c5/dce61b4fb570012c4a856d971626355bd29c9425af7195e2c242e77297f8/langchain_google_genai-4.4.2.tar.gz", hash = "sha256:0872df6de1ebf031c4dad59aead504f168ff31a4d73ea74e52bb1fcdb8f4ab91", size = 379336, upload-time = "2026-10-13T17:25:46.943Z" }
 wheels = [
@@ -4073,7 +4114,7 @@ dependencies = [
     { name = "langgraph-prebuilt" },
     { name = "langgraph-sdk" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "xxhash" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/db/65/69de99a24546c1e3b75a67905dbcc17ed6cd0ed81694d4cc021ed688a60d/langgraph-1.2.16.tar.gz", hash = "sha256:e4dd63480bfd3ee14a6ab80ecf1311698780519693d8e3b67a28f3486e69e1f7", size = 772613, upload-time = "2026-10-16T22:11:14.147Z" }
@@ -4131,10 +4172,10 @@ dependencies = [
     { name = "anyio" },
     { name = "distro" },
     { name = "httpx2" },
-    { name = "orjson", marker = "platform_python_implementation != 'PyPy' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "orjson", marker = "platform_python_implementation != 'PyPy'" },
     { name = "packaging" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "requests" },
     { name = "requests-toolbelt" },
     { name = "sniffio" },
@@ -4200,19 +4241,19 @@ resolution-markers = [
     "python_full_version < '3.11.5' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "audioread", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "decorator", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "joblib", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "lazy-loader", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "msgpack", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numba", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pooch", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "scikit-learn", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "soundfile", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "soxr", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "typing-extensions", marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "audioread" },
+    { name = "decorator" },
+    { name = "joblib" },
+    { name = "lazy-loader" },
+    { name = "msgpack" },
+    { name = "numba" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
+    { name = "pooch" },
+    { name = "scikit-learn" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "soundfile" },
+    { name = "soxr" },
+    { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/64/36/360b5aafa0238e29758729e9486c6ed92a6f37fa403b7875e06c115cdf4a/librosa-0.11.0.tar.gz", hash = "sha256:f5ed951ca189b375bbe2e33b2abd7e040ceeee302b9bbaeeffdfddb8d0ace908", size = 327001, upload-time = "2025-03-11T15:09:54.884Z" }
 wheels = [
@@ -4247,17 +4288,17 @@ resolution-markers = [
     "python_full_version == '3.12.*' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "decorator", marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "joblib", marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "lazy-loader", marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "msgpack", marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numba", marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pooch", marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "scikit-learn", marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "soundfile", marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "soxr", marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "decorator" },
+    { name = "joblib" },
+    { name = "lazy-loader" },
+    { name = "msgpack" },
+    { name = "numba" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" } },
+    { name = "pooch" },
+    { name = "scikit-learn" },
+    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" } },
+    { name = "soundfile" },
+    { name = "soxr" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/8e/c1/ce66b20953b7370421dd13d22b4e04e401346c824ceacb9f4e722eec84dc/librosa-1.0.0.tar.gz", hash = "sha256:73ed480d4022e436e85dfa6f6b06ff38a259b9210039ac99939cd64854b61a57", size = 377965, upload-time = "2026-08-11T15:37:37.013Z" }
 wheels = [
@@ -4280,26 +4321,26 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
     { name = "aiosqlite", version = "0.21.0", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "aiosqlite", version = "0.22.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "aiosqlite", version = "0.22.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "banks" },
     { name = "dataclasses-json" },
-    { name = "deprecated", version = "1.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "deprecated", version = "3.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "deprecated", version = "1.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "deprecated", version = "3.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "dirtyjson" },
     { name = "filetype" },
     { name = "fsspec" },
     { name = "httpx" },
     { name = "llama-index-workflows" },
     { name = "nest-asyncio" },
-    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "networkx", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "networkx", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "nltk" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pillow" },
     { name = "platformdirs" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "pyyaml" },
     { name = "requests" },
     { name = "setuptools" },
@@ -4322,10 +4363,10 @@ name = "llama-index-instrumentation"
 version = "0.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "deprecated", version = "1.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "deprecated", version = "3.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "deprecated", version = "1.3.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "deprecated", version = "3.0.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/70/ac/ffc116bac024cb0a54b4d28ca9b421e9a08f408c1fcc0039a36de2c0c97b/llama_index_instrumentation-0.6.0.tar.gz", hash = "sha256:b185c4e28a7f32899c27649cc2e2d7d54267fa2ff0cd43cbe2b5212bae98fe3a", size = 56517, upload-time = "2026-08-29T15:33:16.861Z" }
 wheels = [
@@ -4339,7 +4380,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "llama-index-instrumentation" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/1d/42/d4e1b004a041fcbad1e3acc804090a28161358ac567b0c74be2a3eef760c/llama_index_workflows-2.26.0.tar.gz", hash = "sha256:1aa685b678acbbd0a01a22e4d73aecd374cd12f923cf12ea83c5264f68bafa16", size = 159151, upload-time = "2026-10-11T15:00:02.452Z" }
@@ -4422,9 +4463,9 @@ name = "manim"
 version = "0.22.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "audioop-lts", marker = "python_full_version >= '3.13' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "av", version = "18.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "av", version = "19.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "audioop-lts", marker = "python_full_version >= '3.13'" },
+    { name = "av", version = "18.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "av", version = "19.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "beautifulsoup4" },
     { name = "click" },
     { name = "cloup" },
@@ -4434,18 +4475,18 @@ dependencies = [
     { name = "mapbox-earcut" },
     { name = "moderngl" },
     { name = "moderngl-window" },
-    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "networkx", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "networkx", version = "3.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "networkx", version = "3.7", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pillow" },
     { name = "pycairo" },
     { name = "pydub" },
     { name = "pygments" },
-    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents' or extra != 'extra-8-manimvox-crewai'" },
+    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "rich", version = "14.3.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-crewai'" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "screeninfo" },
     { name = "skia-pathops" },
     { name = "srt" },
@@ -4491,11 +4532,11 @@ wheels = [
 name = "manimvox"
 source = { editable = "." }
 dependencies = [
-    { name = "av", version = "18.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "av", version = "19.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "av", version = "18.1.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "av", version = "19.0.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "manim" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pillow" },
     { name = "pycairo" },
     { name = "soundfile" },
@@ -4562,6 +4603,9 @@ pyvista = [
     { name = "pyvista" },
     { name = "vtk" },
 ]
+transcribe = [
+    { name = "faster-whisper" },
+]
 trimesh = [
     { name = "fast-simplification" },
     { name = "trimesh" },
@@ -4581,6 +4625,7 @@ requires-dist = [
     { name = "f5-tts", marker = "extra == 'f5'", specifier = ">=1.1,<2" },
     { name = "fast-simplification", marker = "extra == 'dev'", specifier = ">=0.1.9,<1" },
     { name = "fast-simplification", marker = "extra == 'trimesh'", specifier = ">=0.1.9,<1" },
+    { name = "faster-whisper", marker = "extra == 'transcribe'", specifier = ">=1.1,<2" },
     { name = "google-adk", marker = "extra == 'google-adk'", specifier = ">=2.12,<2.13" },
     { name = "haystack-ai", marker = "extra == 'haystack'", specifier = ">=3.4,<3.5" },
     { name = "kaleido", marker = "extra == 'plotly'", specifier = ">=1.1,<2" },
@@ -4608,15 +4653,15 @@ requires-dist = [
     { name = "vtk", marker = "extra == 'pyvista'", specifier = ">=9.4,<10" },
     { name = "zensical", marker = "extra == 'docs'", specifier = ">=0.0.71,<0.1" },
 ]
-provides-extras = ["agno", "cloud", "crewai", "dev", "docs", "edge", "f5", "google-adk", "haystack", "kokoro", "langchain", "llamaindex", "matplotlib", "openai-agents", "piper", "plotly", "pydantic-ai", "pyvista", "trimesh", "xtts"]
+provides-extras = ["agno", "cloud", "crewai", "dev", "docs", "edge", "f5", "google-adk", "haystack", "kokoro", "langchain", "llamaindex", "matplotlib", "openai-agents", "piper", "plotly", "pydantic-ai", "pyvista", "transcribe", "trimesh", "xtts"]
 
 [[package]]
 name = "mapbox-earcut"
 version = "2.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/aa/14/8505f246191c41da54a64a4d6c30049ed47b6047930d8f0de328dadb06ee/mapbox_earcut-2.1.0.tar.gz", hash = "sha256:fb0c1e43581a635bbaabf4a5149009014d370c515816c4d5a7d8118477f28d48", size = 46744, upload-time = "2026-09-08T19:01:06.749Z" }
 wheels = [
@@ -4853,13 +4898,13 @@ name = "matplotlib"
 version = "3.11.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "contourpy", version = "1.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "contourpy", version = "1.4.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "contourpy", version = "1.3.3", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "contourpy", version = "1.4.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "cycler" },
     { name = "fonttools" },
     { name = "kiwisolver" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "packaging" },
     { name = "pillow" },
     { name = "pyparsing" },
@@ -4980,7 +5025,7 @@ dependencies = [
     { name = "mcp-types" },
     { name = "opentelemetry-api" },
     { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" } },
-    { name = "pyjwt", extra = ["crypto"], marker = "(extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra != 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents') or (extra != 'extra-8-manimvox-docs' and extra != 'extra-8-manimvox-f5' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pyjwt", extra = ["crypto"], marker = "extra == 'extra-8-manimvox-openai-agents' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5')" },
     { name = "python-multipart" },
     { name = "pywin32", marker = "sys_platform == 'win32'" },
     { name = "sse-starlette" },
@@ -5321,8 +5366,8 @@ version = "3.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "moderngl" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pillow" },
     { name = "pyglet" },
     { name = "pyglm" },
@@ -5337,8 +5382,8 @@ name = "monotonic-alignment-search"
 version = "0.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/d8/dc/4b0b2c0a7aab41b398c21f3cd7097b99a5792e39cf1e1ccc8093861f6772/monotonic_alignment_search-0.2.1.tar.gz", hash = "sha256:54935e3c5cb82497e5ac81167ef20e95bf62e8b46402eb2936da5e92612b0765", size = 163247, upload-time = "2025-10-15T22:55:32.536Z" }
 wheels = [
@@ -5741,7 +5786,7 @@ dependencies = [
     { name = "defusedxml" },
     { name = "joblib" },
     { name = "regex", version = "2026.1.15", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "regex", version = "2026.9.29", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "regex", version = "2026.9.29", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "tqdm" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e0/e6/fe51d2bb1a3b446f59c5c8165999a9fee208bc346af90a7cbf7657bc0d75/nltk-3.10.3.tar.gz", hash = "sha256:bb9327a461c3811c2fa4900e03840401f2126adfb30c0072827c433bd2444ea4", size = 5137152, upload-time = "2026-08-12T23:46:37.258Z" }
@@ -5767,8 +5812,8 @@ version = "0.68.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "llvmlite" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/4e/cd/e8280f9ffa30fea9fabc5341223701231fcc5d53a31f51419d42d4bec3a6/numba-0.68.0.tar.gz", hash = "sha256:8a781de54b980b98f43bff7f1093701b5f07c80d031c7cfa8a87493d8bf73f2d", size = 2855363, upload-time = "2026-09-30T15:05:44.721Z" }
 wheels = [
@@ -6185,11 +6230,11 @@ version = "1.31.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "flatbuffers" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "packaging" },
     { name = "protobuf", version = "6.33.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "protobuf", version = "7.36.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "protobuf", version = "7.36.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 wheels = [
     { url = "https://files.pythonhosted.org/packages/a7/e7/61b2768393646bd12e31eeb71958193f4e02c98c4980cf9289d19bbb4a8f/onnxruntime-1.31.0-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:cbf1a7f6470ddfe9dbc781966af8ce4a10e1858d75a93f93cc6b9367c9587870", size = 20871717, upload-time = "2026-10-09T04:18:03.504Z" },
@@ -6281,12 +6326,12 @@ resolution-markers = [
     "python_full_version < '3.11.5' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "anyio", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "httpx2", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "jiter", version = "0.17.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "sniffio", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "typing-extensions", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "anyio", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
+    { name = "httpx2", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
+    { name = "jiter", version = "0.17.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
+    { name = "sniffio", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/34/8d/ff5a4348116f667d04c90c12104028de2d5dc31e7bacfb9b18fcc8a7f0d1/openai-3.33.0.tar.gz", hash = "sha256:1865f5ce6a5c2f28a926303cb97f2489dba5ee7c7b7a45910d48466c10a187c4", size = 2230912, upload-time = "2026-10-17T00:30:21.045Z" }
 wheels = [
@@ -7541,10 +7586,10 @@ resolution-markers = [
     "python_full_version < '3.11.5' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "annotated-types", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic-core", version = "2.50.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "typing-extensions", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "typing-inspection", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "annotated-types", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
+    { name = "pydantic-core", version = "2.50.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
+    { name = "typing-inspection", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7c/0b/8e10b2e693af8ec54346a14caf36221334775975a747c9ceaa3f8371d96d/pydantic-2.14.1.tar.gz", hash = "sha256:94f478203dd03404682a1ada216965651dd74b1d2d5ffd62e00e0837caab5c26", size = 900362, upload-time = "2026-10-11T18:37:55.396Z" }
 wheels = [
@@ -7562,7 +7607,7 @@ dependencies = [
     { name = "httpx2" },
     { name = "opentelemetry-api" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "pydantic-graph" },
     { name = "typing-inspection" },
 ]
@@ -7712,7 +7757,7 @@ resolution-markers = [
     "python_full_version < '3.11.5' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "typing-extensions", marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/a6/24/af4ec4be49fbc810f35b0bdcacc3d433b56bbfa469fd3bfd4ae116cd9bf1/pydantic_core-2.50.1.tar.gz", hash = "sha256:e50d7b94baac6c7d09927fa5ca5800a0c7ee5015c7fcff65beb3a1931b5a6e09", size = 513515, upload-time = "2026-10-11T18:35:44.82Z" }
 wheels = [
@@ -7848,7 +7893,7 @@ dependencies = [
     { name = "anyio" },
     { name = "logfire-api" },
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "typing-inspection" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b5/09/f02d836a27cf943b30c0bd3a3d2a3818e98ca5d554acc35be414e694984d/pydantic_graph-2.57.0.tar.gz", hash = "sha256:f848857baab4030c44b30de0c3ba650749d60f2295a0723645fb325f92191cf1", size = 45831, upload-time = "2026-10-16T03:51:16.98Z" }
@@ -7862,7 +7907,7 @@ version = "2.16.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pydantic", version = "2.12.5", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pydantic", version = "2.14.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "python-dotenv" },
     { name = "typing-extensions" },
     { name = "typing-inspection" },
@@ -7968,7 +8013,7 @@ wheels = [
 
 [package.optional-dependencies]
 crypto = [
-    { name = "cryptography", marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra != 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents') or (extra != 'extra-8-manimvox-docs' and extra != 'extra-8-manimvox-f5' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "cryptography", marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or extra == 'extra-8-manimvox-openai-agents' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5')" },
 ]
 
 [[package]]
@@ -8005,7 +8050,7 @@ name = "pyobjc-framework-cocoa"
 version = "12.2.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "pyobjc-core", marker = "(sys_platform != 'emscripten' and sys_platform != 'win32') or (sys_platform == 'emscripten' and extra == 'extra-8-manimvox-crewai') or (sys_platform == 'win32' and extra == 'extra-8-manimvox-crewai')" },
+    { name = "pyobjc-core" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/75/76/49c6da2c6a831020b4854ba20079d5a1030474bffc776b7b73c2eeff8c15/pyobjc_framework_cocoa-12.2.2.tar.gz", hash = "sha256:c96c0ef69a71afbbb0e6a7d594b455c5fe47d62e0db376ee7a2b4b828c16ace9", size = 3132831, upload-time = "2026-08-11T19:44:02.288Z" }
 wheels = [
@@ -8098,7 +8143,7 @@ name = "pytest"
 version = "9.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
     { name = "iniconfig" },
     { name = "packaging" },
     { name = "pluggy" },
@@ -8155,11 +8200,11 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cyclopts" },
     { name = "matplotlib" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "pillow" },
     { name = "pooch" },
-    { name = "pyobjc-framework-cocoa", marker = "sys_platform == 'darwin' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "pyobjc-framework-cocoa", marker = "sys_platform == 'darwin'" },
     { name = "pyvista-validation" },
     { name = "scooby" },
     { name = "typing-extensions" },
@@ -8175,9 +8220,9 @@ name = "pyvista-validation"
 version = "0.2.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/b5/c5/d800d91bae144a71fbae31fcb6b3279c55179acf93639e3443ae87373782/pyvista_validation-0.2.2.tar.gz", hash = "sha256:af234130a3b34b3e1af49584d75b41fafc694752b2958b36e9dbfd9f188e6a0c", size = 554920, upload-time = "2026-09-06T08:42:14.076Z" }
 wheels = [
@@ -8299,7 +8344,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
     { name = "rpds-py" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/22/f5/df4e9027acead3ecc63e50fe1e36aca1523e1719559c499951bb4b53188f/referencing-0.37.0.tar.gz", hash = "sha256:44aefc3142c5b842538163acb373e24cce6632bd54bdb01b21ad5863489f50d8", size = 78036, upload-time = "2025-10-13T15:30:48.871Z" }
 wheels = [
@@ -8631,8 +8676,8 @@ resolution-markers = [
     "python_full_version < '3.11.5' and sys_platform != 'emscripten' and sys_platform != 'win32'",
 ]
 dependencies = [
-    { name = "markdown-it-py", marker = "extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents' or extra != 'extra-8-manimvox-crewai'" },
-    { name = "pygments", marker = "extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents' or extra != 'extra-8-manimvox-crewai'" },
+    { name = "markdown-it-py", marker = "extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
+    { name = "pygments", marker = "extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ab/3a/0316b28d0761c6734d6bc14e770d85506c986c85ffb239e688eeaab2c2bc/rich-13.9.4.tar.gz", hash = "sha256:439594978a49a09530cff7ebc4b5c7103ef57baf48d5ea3184f21d9a2befa098", size = 223149, upload-time = "2024-11-01T16:43:57.873Z" }
 wheels = [
@@ -8665,7 +8710,7 @@ version = "2.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pygments" },
-    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents' or extra != 'extra-8-manimvox-crewai'" },
+    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "rich", version = "14.3.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-crewai'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/cf/0e/faf7c7e36630561e3e9611730c47510cd972dd5fde8f95941ff78f76accd/rich_rst-2.2.0.tar.gz", hash = "sha256:b1e6a67f8f694a6f36035624bf73e2b1a0a4be13edaf3ba5e654d9758b61073a", size = 326270, upload-time = "2026-09-27T19:12:42.163Z" }
@@ -8924,10 +8969,10 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "joblib" },
     { name = "narwhals" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
+    { name = "scipy", version = "1.17.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "scipy", version = "1.18.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "threadpoolctl" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/d2/eb/eaf5e07fcc0da7149b0e084f24e54edd7441b9a89ce7e034032ae97fe3a0/scikit_learn-1.9.1.tar.gz", hash = "sha256:629cada3e33e2b9bf376cdc7614a47a4140b8aedc1d836579e359736fbd82977", size = 7786908, upload-time = "2026-09-10T18:34:04.679Z" }
@@ -8997,7 +9042,7 @@ resolution-markers = [
     "python_full_version < '3.11.5' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7a/97/5a3609c4f8d58b039179648e62dd220f89864f56f7357f5d4f45c29eb2cc/scipy-1.17.1.tar.gz", hash = "sha256:95d8e012d8cb8816c226aef832200b1d45109ed4464303e997c5b13122b297c0", size = 30573822, upload-time = "2026-02-23T00:26:24.851Z" }
 wheels = [
@@ -9091,7 +9136,7 @@ resolution-markers = [
     "python_full_version == '3.12.*' and sys_platform != 'emscripten' and sys_platform != 'win32' and extra != 'extra-8-manimvox-crewai' and extra != 'extra-8-manimvox-openai-agents'",
 ]
 dependencies = [
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" } },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/7e/74/66de6258867beb2ef08f35f9f2ac017a52cacd5081714d239ff1a442d458/scipy-1.18.1.tar.gz", hash = "sha256:52c4b7422442aba924d03ad4019852b08a92e64ea187b933135687bfe2747307", size = 30781235, upload-time = "2026-08-21T23:28:50.599Z" }
 wheels = [
@@ -9171,8 +9216,8 @@ name = "screeninfo"
 version = "0.8.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "cython", marker = "sys_platform == 'darwin' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "pyobjc-framework-cocoa", marker = "sys_platform == 'darwin' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "cython", marker = "sys_platform == 'darwin'" },
+    { name = "pyobjc-framework-cocoa", marker = "sys_platform == 'darwin'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ec/bb/e69e5e628d43f118e0af4fc063c20058faa8635c95a1296764acc8167e27/screeninfo-0.8.1.tar.gz", hash = "sha256:9983076bcc7e34402a1a9e4d7dabf3729411fd2abb3f3b4be7eba73519cd2ed1", size = 10666, upload-time = "2022-09-09T11:35:23.419Z" }
 wheels = [
@@ -9366,8 +9411,8 @@ version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cffi" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "typing-extensions" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/d2/db/949331952a6fb1c5b12e9de80fd08747966c2039d1a61db4764fbd3981c2/soundfile-0.14.0.tar.gz", hash = "sha256:ba1c1a2d618bca5c406647c83b89f07cc8810fa506a50622a6993ba130c1de11", size = 47842, upload-time = "2026-06-06T08:58:47.869Z" }
@@ -9444,8 +9489,8 @@ name = "soxr"
 version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ed/11/27cebce4a108f77afea7c80545115536b45e3f11ebfb914f638fdd9ba847/soxr-1.1.0.tar.gz", hash = "sha256:9f228ae21c78fa9359ca98d8a5e8e91f30639e438e574133dace62c5b5309e44", size = 173067, upload-time = "2026-05-03T00:15:18.214Z" }
 wheels = [
@@ -9564,8 +9609,8 @@ name = "sse-starlette"
 version = "3.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "anyio", marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra != 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents') or (extra != 'extra-8-manimvox-docs' and extra != 'extra-8-manimvox-f5' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "starlette", marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra != 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents') or (extra != 'extra-8-manimvox-docs' and extra != 'extra-8-manimvox-f5' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "anyio", marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or extra == 'extra-8-manimvox-openai-agents' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5')" },
+    { name = "starlette", marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or extra == 'extra-8-manimvox-openai-agents' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e4/be/0123026f719d1a7936f214a88b553bb5701e04ff2511147c1dab0c5035eb/sse_starlette-3.5.0.tar.gz", hash = "sha256:75de713aa8a9441513cc283220826da079d982770965b951e9437720e8bafdb2", size = 36794, upload-time = "2026-09-28T17:48:14.7Z" }
 wheels = [
@@ -9578,7 +9623,7 @@ version = "1.8.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "anyio" },
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.13'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/e9/0c/6efb252d091ecccd7d62048ae11f0ea35cd75a4fbaeea5e30f9c3bf91d10/starlette-1.8.0.tar.gz", hash = "sha256:1565dc0b35d5737a271ed1e0e04e949f4e81198799f216d2667b0a0fb9cf9522", size = 2730457, upload-time = "2026-10-13T07:54:39.53Z" }
 wheels = [
@@ -9632,12 +9677,12 @@ dependencies = [
     { name = "absl-py" },
     { name = "grpcio" },
     { name = "markdown" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "packaging" },
     { name = "pillow" },
     { name = "protobuf", version = "6.33.6", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "protobuf", version = "7.36.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "protobuf", version = "7.36.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "setuptools" },
     { name = "tensorboard-data-server" },
     { name = "werkzeug" },
@@ -9688,7 +9733,7 @@ version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "regex", version = "2026.1.15", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "regex", version = "2026.9.29", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "regex", version = "2026.9.29", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "requests" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/66/62/167a842aa0429d45f5e797354fd4343a96f6043d67d0513c675c7b8d36e6/tiktoken-0.14.0.tar.gz", hash = "sha256:231dec90efcdccf1b565a1416107736f1e09b1a08fe736ef9d6363e626d03874", size = 38898, upload-time = "2026-08-17T19:49:49.514Z" }
@@ -10042,7 +10087,7 @@ name = "tqdm"
 version = "4.70.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0d/ea/b2a5bd54b28a324dae8211928b2d730b6547500342c7e6c6dea08bd0a485/tqdm-4.70.1.tar.gz", hash = "sha256:cefd0eca11b2a37a3aee776544d4f4ae913f02688135b5556b8788dfa474afc4", size = 171846, upload-time = "2026-09-11T07:25:16.601Z" }
 wheels = [
@@ -10055,12 +10100,12 @@ version = "5.20.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "huggingface-hub" },
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
     { name = "packaging" },
     { name = "pyyaml" },
     { name = "regex", version = "2026.1.15", source = { registry = "https://pypi.org/simple" }, marker = "(python_full_version < '3.14' and extra == 'extra-8-manimvox-crewai') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "regex", version = "2026.9.29", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "regex", version = "2026.9.29", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.14' or extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "safetensors" },
     { name = "tokenizers" },
     { name = "tqdm" },
@@ -10085,8 +10130,8 @@ name = "trimesh"
 version = "5.1.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
+    { name = "numpy", version = "2.5.4", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.12'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/ab/bf/a7efaef127e0f1a228a03e5d00c04f5aeb2c25a60adb4d47003d4d0855bc/trimesh-5.1.1.tar.gz", hash = "sha256:56070be44cd97ac87544c9bd3da4b7a298c6f728e83183aeb1f3524d673d5fac", size = 874580, upload-time = "2026-10-02T21:06:07.704Z" }
 wheels = [
@@ -10137,8 +10182,8 @@ version = "0.27.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-doc" },
-    { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-docs') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-f5') or (extra == 'extra-8-manimvox-crewai' and extra == 'extra-8-manimvox-openai-agents')" },
-    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents' or extra != 'extra-8-manimvox-crewai'" },
+    { name = "colorama", marker = "sys_platform == 'win32'" },
+    { name = "rich", version = "13.9.4", source = { registry = "https://pypi.org/simple" }, marker = "extra != 'extra-8-manimvox-crewai' or extra == 'extra-8-manimvox-docs' or extra == 'extra-8-manimvox-f5' or extra == 'extra-8-manimvox-openai-agents'" },
     { name = "rich", version = "14.3.4", source = { registry = "https://pypi.org/simple" }, marker = "extra == 'extra-8-manimvox-crewai'" },
     { name = "shellingham" },
 ]
@@ -11093,7 +11138,6 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/20/b3/0e3f822ab105f503504a0149a9cce6da59fa9626e9c68243c66b02e51efb/zensical-0.0.71-cp311-abi3-macosx_10_12_x86_64.whl", hash = "sha256:57cad23c56a98d87a5eefa7948a98b6ecb479dc99fd7af312cd146555f55f060", size = 18136451, upload-time = "2026-10-16T14:19:12.764Z" },
     { url = "https://files.pythonhosted.org/packages/5a/75/71dbdc5106a4153b8daed4b0161965dce9e3333b9e27bd9cf4470dac07bf/zensical-0.0.71-cp311-abi3-macosx_11_0_arm64.whl", hash = "sha256:81c069cc667946e0a505cc01b99d5ba44883c57f51b95bd5a38003007c5cb6cd", size = 17670227, upload-time = "2026-10-16T14:19:15.679Z" },
     { url = "https://files.pythonhosted.org/packages/84/bd/86f0d0ae73ce27d72bb49575c2a91da9d686916cf06980b03b2b480ab688/zensical-0.0.71-cp311-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:bcae388415698cac874e662e667fc0683833cec747607c89037b7e9ad9828830", size = 18167627, upload-time = "2026-10-16T14:19:18.043Z" },
-    { url = "https://files.pythonhosted.org/packages/5d/31/ce1812644068b0080fa3be630a6d10411867af5557b0c7dda7d5d3ae7cc7/zensical-0.0.71-cp311-abi3-manylinux_2_17_armv7l.manylinux2014_armv7l.whl", hash = "sha256:0b34f58a7f565d956651baf90389aafca5c37a407a72768f30293e415589b932", size = 18108972, upload-time = "2026-10-16T14:19:20.88Z" },
     { url = "https://files.pythonhosted.org/packages/d2/f4/4f341c2dfd6fc7cf79c87287b835916570a4333e9dfef19374ba0ed8d842/zensical-0.0.71-cp311-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fc8ed534717b61f285dc217f165f901f8b8a6142ef37cdd5544976cd99b5720c", size = 18651322, upload-time = "2026-10-16T14:19:23.773Z" },
     { url = "https://files.pythonhosted.org/packages/2e/12/4e3c0430d5646509967e82340df51d9d83c5a5fc232302fd094d938171d5/zensical-0.0.71-cp311-abi3-musllinux_1_2_aarch64.whl", hash = "sha256:1e9e39aefdca4b3383b43014e117b27a1ca9f9ac4b25eefa9195099e5a566e2f", size = 18341323, upload-time = "2026-10-16T14:19:26.505Z" },
     { url = "https://files.pythonhosted.org/packages/61/14/797afbdbeaadd671c44cd3d9740d1f67ecda70a931133c155542a4d6b5cf/zensical-0.0.71-cp311-abi3-musllinux_1_2_x86_64.whl", hash = "sha256:d22b8924e5145d94bf85b81bd2a8afaeb32e78c8a1ddeb7f4201fc8902547221", size = 18908964, upload-time = "2026-10-16T14:19:29.382Z" },

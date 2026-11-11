@@ -48,7 +48,12 @@ class Transition:
 @dataclass(frozen=True)
 class Clip:
     """A piece of footage (`path`), or a rendered episode of this project (`episode`), from `start` to `end`
-    seconds of the file (`end=None`: to its end)."""
+    seconds of the file (`end=None`: to its end).
+
+    With a transcript of the file (`manimvox edit probe FILE --transcribe`): `from_words` and `to_words` set the
+    start and end by what is said (searched between `start` and `end`, never cutting inside a word);
+    `cut_silences` removes pauses longer than that many seconds; `cut_fillers` removes "um", "uh" and the like;
+    `captions` captions what the speaker says. A clip with cuts plays as several pieces, joined by cuts."""
     path: str | None = None
     start: float = 0.0
     end: float | None = None
@@ -60,6 +65,15 @@ class Clip:
     crop: tuple[float, float, float, float] | None = None  # x, y, w, h in the source's pixels
     effects: tuple[Ref, ...] = ()  # fn(rgb, t) -> rgb, in order; t is seconds into the segment
     transition: Transition = field(default_factory=Transition)
+    from_words: str | None = None
+    to_words: str | None = None
+    cut_silences: float | None = None
+    cut_fillers: bool = False
+    captions: bool = False
+
+    @property
+    def needs_transcript(self) -> bool:
+        return bool(self.from_words or self.to_words or self.cut_silences or self.cut_fillers or self.captions)
 
 
 @dataclass(frozen=True)
@@ -294,6 +308,14 @@ def _refs(where: str, v) -> tuple[Ref, ...]:
     return tuple(_ref(f"{where}[{i}]", x) for i, x in enumerate(v))
 
 
+def _words(where: str, v) -> str | None:
+    if v is None:
+        return None
+    if not (isinstance(v, str) and re.search(r"\w", v) and len(v) <= 200):
+        raise ValueError(f"{where} must be words said in the clip, up to 200 characters, got {v!r}")
+    return v
+
+
 def _transition(where: str, v) -> Transition:
     if v is None:
         return Transition()
@@ -343,7 +365,7 @@ def _segment(where: str, raw) -> Segment:
     effects = _refs(f"{where}.effects", raw.get("effects"))
     if lead in ("clip", "episode"):
         _unknown(where, raw, (lead, "start", "end", "speed", "volume", "mute", "fit", "crop", "effects",
-                              "transition"))
+                              "transition", "from_words", "to_words", "cut_silences", "cut_fillers", "captions"))
         start = _num(f"{where}.start", raw.get("start", 0.0), 0)
         end = raw.get("end")
         end = None if end is None else _num(f"{where}.end", end, above=start)
@@ -359,7 +381,13 @@ def _segment(where: str, raw) -> Segment:
                     start=start, end=end, speed=_num(f"{where}.speed", raw.get("speed", 1.0), *SPEED),
                     volume=_num(f"{where}.volume", raw.get("volume", 0.0), *DB),
                     mute=_bool(f"{where}.mute", raw.get("mute", False)), fit=fit, crop=crop, effects=effects,
-                    transition=tr)
+                    transition=tr,
+                    from_words=_words(f"{where}.from_words", raw.get("from_words")),
+                    to_words=_words(f"{where}.to_words", raw.get("to_words")),
+                    cut_silences=None if raw.get("cut_silences") is None else _num(
+                        f"{where}.cut_silences", raw["cut_silences"], 0.2, 10),
+                    cut_fillers=_bool(f"{where}.cut_fillers", raw.get("cut_fillers", False)),
+                    captions=_bool(f"{where}.captions", raw.get("captions", False)))
     if lead == "image":
         _unknown(where, raw, ("image", "seconds", "move", "fit", "effects", "transition"))
         move = raw.get("move")

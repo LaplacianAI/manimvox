@@ -200,7 +200,7 @@ class _Layer:
 
 class _Render:
     def __init__(self, root: Path, tl: Timeline, lengths, theme, scale: float, voice_lines, target: float | None,
-                 say: Callable[[str], None]):
+                 say: Callable[[str], None], transcripts: dict | None = None):
         from .._cairo import hex_rgb
 
         self.root, self.tl, self.theme, self.scale, self.say = Path(root), tl, theme, scale, say
@@ -209,7 +209,9 @@ class _Render:
         self.placed = place(tl, lengths)
         self.total = max(p.at + p.seconds for p in self.placed)
         self.voice_lines = voice_lines  # [(Say, path, seconds)]
-        self.cues = [Cue(a.at, a.at + secs, a.text) for a, _p, secs in voice_lines]
+        self.cues = [Cue(a.at, a.at + secs, a.text) for a, _p, secs in voice_lines]  # narration
+        self.speech = self._speech(transcripts or {})  # what the speakers in the footage say, as captions
+        self.captions = sorted(self.cues + self.speech, key=lambda c: c.start)
         self.target = target
         self.notes: list[str] = []
         self._cards: dict = {}
@@ -265,7 +267,39 @@ class _Render:
             raise EditError(f"{where}: manim failed for {name}:\n{tail}")
         return found[0]
 
+    def _speech(self, transcripts: dict) -> list[Cue]:
+        """Captions of the words spoken in captioned clips, at their times on the output."""
+        from .transcribe import caption_cues
+
+        # Each word goes to the captioned piece it overlaps most: word times drift, so a word whose sound was
+        # kept can have a time that only partly falls in its piece, and a word over a cut is shown once.
+        best: dict[tuple[int, int], tuple[float, tuple]] = {}
+        for p in self.placed:
+            tr = transcripts.get(p.index)
+            if tr is None:
+                continue
+            seg = p.segment
+            end = seg.start + p.seconds * seg.speed
+            for k, w in enumerate(tr.words):
+                lo, hi = max(w.start, seg.start), min(w.end, end)
+                if hi <= lo:
+                    continue
+                key = (id(tr), k)
+                if key not in best or hi - lo > best[key][0]:
+                    best[key] = (hi - lo, (p.at + (lo - seg.start) / seg.speed, p.at + (hi - seg.start) / seg.speed,
+                                           w.text))
+        words = sorted(v[1] for v in best.values())
+        return [Cue(a, b, text) for a, b, text in caption_cues(words)]
+
     # ---- sound
+
+    def _duck(self, cues: list[Cue], t0: float, t1: float) -> np.ndarray:
+        """The gain from t0 to t1 of sound that dips while `cues` are spoken."""
+        n, margin = samples(t1 - t0), 1.0
+        wide = duck_curve(samples(t1 - t0 + 2 * margin), [Cue(c.start - (t0 - margin), c.end - (t0 - margin), "")
+                                                          for c in cues], self.tl.duck_db)
+        duck = wide[samples(margin):samples(margin) + n]
+        return np.pad(duck, (0, n - duck.shape[0]), constant_values=1.0)
 
     def _gain(self, key, read) -> float:
         """The levelling gain (dB) of one piece of footage sound, measured once over the whole piece."""
@@ -338,17 +372,16 @@ class _Render:
                 env = envelope(n_all, ("fade", o.fade) if o.fade else ("cut", 0), ("fade", o.fade) if o.fade
                                else ("cut", 0), i0, i0 + x.shape[1])
                 add_at(footage, x * env * db(g + o.volume), lo - t0)
-        # everything but the narration and the sound files dips while someone speaks
-        margin = 1.0
-        wide = duck_curve(samples(t1 - t0 + 2 * margin), [Cue(c.start - (t0 - margin), c.end - (t0 - margin), "")
-                                                          for c in self.cues], self.tl.duck_db)
-        duck = wide[samples(margin):samples(margin) + n]
-        duck = np.pad(duck, (0, n - duck.shape[0]), constant_values=1.0)
-        out = footage * duck
+        # the footage dips under the narration; the music dips under the narration and the speakers alike
+        out = footage * self._duck(self.cues, t0, t1)
+        music_duck = None
         for a in self.tl.audio:
             if isinstance(a, Music):
+                if music_duck is None:
+                    music_duck = self._duck(self.captions, t0, t1)
                 music = self._music(a.path)
-                out += bed_window(music, a.at, a.until if a.until is not None else self.total, t0, t1, a.volume) * duck
+                out += bed_window(music, a.at, a.until if a.until is not None else self.total, t0, t1,
+                                  a.volume) * music_duck
             elif isinstance(a, Sound):
                 path = resolve_path(self.root, a.path)
                 end = a.end if a.end is not None else None
@@ -430,7 +463,7 @@ class _Render:
                     if layers[i].active(t):
                         layers[i].draw(frame, t)
                 if burn:
-                    for j, c in enumerate(self.cues):
+                    for j, c in enumerate(self.captions):
                         if c.start <= t < c.end:
                             if j not in captions:
                                 captions.clear()
@@ -482,6 +515,7 @@ def render_edit(root: Path, name: str, *, voice: str | None = None, confirm: Cal
     if not rep.ok:
         raise EditError(f"edits/{stem} has {len(rep.findings)} problem(s); fix them first "
                         f"(manimvox check edit {stem}):\n" + "\n".join(f"  {f}" for f in rep.findings))
+    tl = rep.timeline  # clips cut by their transcripts, as the pieces they keep
     total = rep.seconds
     t0 = 0.0 if start is None else float(start)
     t1 = total if end is None else min(float(end), total)
@@ -515,7 +549,8 @@ def render_edit(root: Path, name: str, *, voice: str | None = None, confirm: Cal
                             f"({total:.2f} s); start it by {max(0.0, total - sa - 0.3):.1f} s")
 
     scale = min(1.0, DRAFT_HEIGHT / tl.size[1]) if draft else 1.0
-    r = _Render(root, tl, rep.lengths, Theme.from_dict(pr.theme), scale, lines, pr.loudness, say)
+    r = _Render(root, tl, rep.lengths, Theme.from_dict(pr.theme), scale, lines, pr.loudness, say, rep.transcripts)
+    notes += rep.cuts
     whole = start is None and end is None
     if whole and not draft:
         dst = root / "out" / f"{stem}.mp4"
@@ -532,9 +567,9 @@ def render_edit(root: Path, name: str, *, voice: str | None = None, confirm: Cal
     finally:
         tmp.unlink(missing_ok=True)
     srt = None
-    if tl.captions != "none" and r.cues:
+    if tl.captions != "none" and r.captions:
         srt_path = dst.with_suffix(".srt")
-        shown = [c for c in r.cues if c.end > t0 and c.start < t1]
+        shown = [c for c in r.captions if c.end > t0 and c.start < t1]
         srt_path.write_text(_srt(shown, t0), encoding="utf-8")
         srt = str(srt_path)
     shots = []

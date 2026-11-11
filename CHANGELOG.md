@@ -18,6 +18,12 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
   - **Memory:** sound is mixed 30 seconds at a time as the frames go out, so memory does not grow with the film.
   - **Fast checks:** `--draft` renders at 480p with a fast encoder; `--from`/`--to` renders one window of the film, matching the full render.
   - **Refusals:** it refuses an edit with `check edit` findings, and narration lines that overlap or run past the end, saying where to move them.
+- **Cutting by what is said**, with the `transcribe` extra (faster-whisper, on this computer; the model is downloaded once, after asking: `small` is 486 MB, `base` 148 MB).
+  - `manimvox edit probe FILE --transcribe` (tool: `transcribe_media`) writes the transcript as phrases with their times, `[002.52-005.36] the words`, and as every word with its time. Transcripts are cached by the file's checksum, so the same footage is never transcribed twice.
+  - A clip can start and end at words (`from_words`, `to_words`), drop pauses longer than a limit (`cut_silences`) and drop "um", "uh" and the like (`cut_fillers`). Cuts fall only between words. Word times from speech-to-text drift (the base model put words up to 0.45 s early), so each cut edge is then moved to 0.15 s outside the speech measured in the sound itself; no word is clipped. A phrase said more than once is refused, with each time it is said.
+  - `captions: true` captions what the speaker says, at its place on the film; music dips under the speaker as it does under narration, and the speaker's own sound does not.
+  - `check edit` lists the pieces each clip keeps.
+  - The sound is decoded by manimvox and handed to faster-whisper as samples: faster-whisper 1.2's own decoder passes PyAV an argument PyAV 19 removed.
 
 ## [0.7.0] - 2026-11-10
 

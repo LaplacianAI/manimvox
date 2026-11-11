@@ -3,10 +3,10 @@ field, and says what is wrong in the item's own terms (seconds of the file, pixe
 from __future__ import annotations
 
 import itertools
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
-from .load import episode_video, frame_source, resolve_path, resolve_ref
+from .load import episode_video, frame_source, resolve_path, resolve_ref, source_path
 from .probe import Media, MediaError, probe
 from .timeline import (
     Clip,
@@ -22,9 +22,11 @@ from .timeline import (
     Text,
     Timeline,
     Title,
+    Transition,
     duration,
     place,
 )
+from .transcribe import TranscribeError, Transcript, cached, pieces, snap, speech_runs
 
 SLACK = 0.05  # seconds a time may run past a file's end: container lengths are rounded
 
@@ -35,6 +37,9 @@ class EditReport:
     plan: list[str] = field(default_factory=list)  # where each segment lands on the output
     lengths: list[float | None] = field(default_factory=list)  # each segment's source length, where known
     seconds: float = 0.0
+    timeline: Timeline | None = None  # the edit as rendered: clips cut by their transcripts become their pieces
+    transcripts: dict[int, Transcript] = field(default_factory=dict)  # segment index -> transcript, to caption
+    cuts: list[str] = field(default_factory=list)  # what cutting by transcript kept, one line per clip
 
     @property
     def ok(self) -> bool:
@@ -95,9 +100,71 @@ def _hook(report: EditReport, root: Path, where: str, ref, kind: str):
     return obj
 
 
+_PLAIN = {"from_words": None, "to_words": None, "cut_silences": None, "cut_fillers": False}
+
+
+def _resolve(root: Path, tl: Timeline, rep: EditReport) -> Timeline:
+    """Clips that cut by their transcript, as the plain pieces they keep, the first with the clip's own
+    transition and the rest joined by cuts. A clip whose transcript is missing is a finding."""
+    segs = []
+    for i, seg in enumerate(tl.segments):
+        if not (isinstance(seg, Clip) and seg.needs_transcript):
+            segs.append(seg)
+            continue
+        where = f"segments[{i}] ({_name(seg)})"
+        try:
+            path = source_path(root, seg)
+        except Exception:  # noqa: BLE001 - an unknown episode: the file checks below report it
+            segs.append(replace(seg, **_PLAIN))
+            continue
+        if not path.is_file():
+            segs.append(replace(seg, **_PLAIN))
+            continue
+        tr = cached(root, path)
+        if tr is None:
+            shown = seg.path if seg.path is not None else str(path)
+            rep.findings.append(f"{where}: no transcript of {path.name} yet: manimvox edit probe {shown} --transcribe")
+            segs.append(replace(seg, **_PLAIN))
+            continue
+        if not (seg.from_words or seg.to_words or seg.cut_silences or seg.cut_fillers):
+            if seg.captions:
+                rep.transcripts[len(segs)] = tr
+            segs.append(seg)
+            continue
+        try:
+            kept = pieces(f"segments[{i}]", tr, seg.start, seg.end, seg.from_words, seg.to_words,
+                          seg.cut_silences, seg.cut_fillers)
+        except TranscribeError as e:
+            rep.findings.append(str(e))
+            segs.append(replace(seg, **_PLAIN))
+            continue
+        try:  # word times drift: move each edge to just outside the speech measured in the sound
+            from .sound import envelope_db
+
+            lo, hi = seg.start, seg.end if seg.end is not None else tr.seconds
+            a0 = max(lo, kept[0][0] - 1.0)
+            runs = speech_runs(envelope_db(path, a0, min(hi, kept[-1][1] + 1.0)), a0)
+            kept = snap(kept, tr.words, runs, lo, hi, fixed_lo=not seg.from_words and kept[0][0] <= lo + 1e-6,
+                        fixed_hi=not seg.to_words and seg.end is not None and kept[-1][1] >= hi - 1e-6) or kept
+        except Exception as e:  # noqa: BLE001 - an unreadable sound: keep the transcript's edges, and say so
+            rep.cuts.append(f"{where}: cut edges not checked against the sound ({type(e).__name__}: {e})")
+        span = (seg.end if seg.end is not None else tr.seconds) - seg.start
+        total = sum(b - a for a, b in kept)
+        rep.cuts.append(f"{where}: keeps {len(kept)} piece{'s' if len(kept) != 1 else ''}, {total:.2f} s of "
+                        f"{span:.2f} s: " + ", ".join(f"{a:.2f}-{b:.2f}" for a, b in kept))
+        for k, (a, b) in enumerate(kept):
+            if seg.captions:
+                rep.transcripts[len(segs)] = tr
+            segs.append(replace(seg, **_PLAIN, start=a, end=b,
+                                transition=seg.transition if k == 0 else Transition()))
+    return replace(tl, segments=tuple(segs))
+
+
 def check_edit(root: Path, tl: Timeline) -> EditReport:
     root = Path(root)
     rep = EditReport()
+    tl = _resolve(root, tl, rep)
+    rep.timeline = tl
     media = _Media(root, rep)
     W, H = tl.size
     lengths: list[float | None] = []

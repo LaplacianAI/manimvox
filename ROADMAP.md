@@ -81,11 +81,11 @@ Real objects and real data, used with their licences respected.
 
 Bring your own recordings, edit them into a finished video, and mix them with explainer scenes. Everything runs on your machine.
 
-- [ ] **An edit timeline.** Describe a video in `edits/<name>.json` or in Python, with both checked the same way. On the main track: pieces of your footage (trimmed, cropped, at a steady speed with the pitch kept), rendered episodes, stills and title cards, joined by a cut, a crossfade or a dip. Over them: images, picture-in-picture and lower-third text in the theme.
-- [ ] **Open to code at every level.** Any layer can be your own Python: a function that draws each frame, pixel by pixel or with Cairo; a Manim scene laid over the footage with a transparent background; an effect applied to every frame of a piece, such as a colour grade. A MoviePy clip or effect chain (MoviePy installed beside manimvox) can be used as a piece or a layer.
-- [ ] **Sound.** The footage's own sound, narration lines in the project voice at set times, music that dips under speech, extra sound files, and one loudness level for the whole video. Captions as an `.srt` file or burned in.
-- [ ] **Fast, flat-memory rendering.** Frames stream through, so an hour of 4K fits. A 480p draft, and a render of just one window (`--from`, `--to`) to check a fix in seconds. Contact sheets to review the result.
-- [ ] **See before you cut: `manimvox edit probe`.** Length, size, sound and contact sheets of any file. With the opt-in `transcribe` extra (faster-whisper, local, asks before downloading the model): the words with their times, cuts by words, pauses and "um"s removed, and captions of the speaker.
+- [x] **An edit timeline.** Describe a video in `edits/<name>.json` or in Python, with both checked the same way. On the main track: pieces of your footage (trimmed, cropped, at a steady speed with the pitch kept), rendered episodes, stills and title cards, joined by a cut, a crossfade or a dip. Over them: images, picture-in-picture and lower-third text in the theme.
+- [x] **Open to code at every level.** Any layer can be your own Python: a function that draws each frame, pixel by pixel or with Cairo; a Manim scene laid over the footage with a transparent background; an effect applied to every frame of a piece, such as a colour grade. A MoviePy clip or effect chain (MoviePy installed beside manimvox) can be used as a piece or a layer.
+- [x] **Sound.** The footage's own sound, narration lines in the project voice at set times, music that dips under speech, extra sound files, and one loudness level for the whole video. Captions as an `.srt` file or burned in.
+- [x] **Fast, flat-memory rendering.** Frames stream through, so an hour of 4K fits. A 480p draft, and a render of just one window (`--from`, `--to`) to check a fix in seconds. Contact sheets to review the result.
+- [x] **See before you cut: `manimvox edit probe`.** Length, size, sound and contact sheets of any file. With the opt-in `transcribe` extra (faster-whisper, local, asks before downloading the model): the words with their times, cuts by words, pauses and "um"s removed, and captions of the speaker.
 - [ ] **Footage inside explainers.** `from_video` with no 2-minute limit, and `sound=True` to keep a clip's sound in the episode.
 - [ ] **A `manimvox-edit` skill, a docs page and a gallery video.**
 
