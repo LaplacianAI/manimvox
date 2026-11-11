@@ -1,0 +1,9 @@
+{
+  "title": "DNA packing in 3D: Opus 5.5",
+  "date": "2026-11-12",
+  "example": "dna-packing",
+  "report": "benchmarks/dna-models.md",
+  "agent": "agent-run.json",
+  "review": "accurate and carefully sourced, with a strong callback ending; sparse, small pictures, a near-empty opening, and an unclear sister-chromatid X",
+  "review_rank": 2
+}

@@ -1,0 +1,12 @@
+{
+  "audience": "A general audience with school biology: they know DNA is a double helix and that cells have a nucleus, but not how it is packed. (chosen by the agent: the request names no audience, and 'explain how' suggests newcomers)",
+  "takeaway": "That a chromosome is DNA wound and folded in stages: the helix wraps around histone spools, the beads fold into loops, and the loops gather around an axis, about ten thousand times shorter. (chosen by the agent: this is the packing the request asks about)",
+  "feeling": "Curious, a puzzle being solved: a length that cannot fit, then made to fit, stage by stage. (chosen by the agent)",
+  "angle": "Zoom out level by level, from one helix to one chromosome, with the length shrinking at each stage. (chosen by the agent: the request asks for 3D graphics, and depth is the idea at each level)",
+  "opening": "A surprising number: two metres of DNA beside a nucleus ten to twenty microns across. (chosen by the agent)",
+  "ending": "Answer the opening, calling back to its scene: the same two-metre thread, now a chromosome. (chosen by the agent)",
+  "tone": "A documentary narrator: calm, plain, exact. (chosen by the agent)",
+  "look": "Dark and minimal, a microscope-like dark field with a few saturated colours, one per level of packing. (chosen by the agent)",
+  "length": "About 1 minute, as the request says.",
+  "voice": "The default offline voice, kokoro:af_heart, as the request says."
+}

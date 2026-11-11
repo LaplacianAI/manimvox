@@ -1,0 +1,42 @@
+{
+  "manimvox": "0.7.0",
+  "series": "How DNA packs into a chromosome",
+  "tagline": "Two metres of thread, wound and looped",
+  "voice": "kokoro:af_heart",
+  "speed": 1.0,
+  "loudness": -16.0,
+  "pron": [],
+  "theme": {
+    "source": "mood from the topic, no brand: a dark fluorescence-microscope stage; DNA blue and teal, histones orange, condensin pink by common textbook convention; one warm yellow accent",
+    "bg": "#0B1020",
+    "panel": "#151C33",
+    "panel2": "#1F2847",
+    "line": "#34406B",
+    "ink": "#E8ECF5",
+    "muted": "#9AA6C4",
+    "accent": "#FFC857",
+    "ok": "#7BD88F",
+    "warn": "#FFB454",
+    "error": "#FF6B6B",
+    "blue": "#4FB3FF",
+    "orange": "#FF8A4C",
+    "violet": "#A78BFA",
+    "pink": "#F472B6",
+    "teal": "#2DD4BF",
+    "named": {
+      "dna": "#4FB3FF",
+      "dna_two": "#2DD4BF",
+      "histone": "#FF8A4C",
+      "condensin": "#F472B6",
+      "chromatid": "#8B7CF6"
+    }
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_dna_packing",
+      "cls": "Ep01",
+      "title": "How DNA packs into a chromosome"
+    }
+  ]
+}

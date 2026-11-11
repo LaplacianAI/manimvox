@@ -8,6 +8,7 @@ Every run's records are in [`benchmarks/runs/`](https://github.com/LaplacianAI/m
 
 | Run | Date | What it compares |
 |---|---|---|
+| [DNA packing in 3D: Opus 5.5 and Fable 5.2](dna-models.md) | 2026-11-12 | Two models, one prompt: a one-minute 3D explainer made by Claude Code with Opus 5.5 and with Fable 5.2 |
 | [UPI payments: three voices](upi-voices.md) | 2026-10-23 | Sarvam AI, Gnani.ai and ElevenLabs, on one episode made by Claude Code with Sonnet 5.5 |
 
 ## Leaderboard

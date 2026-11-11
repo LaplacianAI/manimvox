@@ -1,0 +1,39 @@
+1
+00:00:00,000 --> 00:00:05,909
+Each of your cells holds about two metres of DNA, in a nucleus six thousandths of a millimetre wide.
+
+2
+00:00:07,633 --> 00:00:12,796
+So how does two metres of DNA pack into tiny chromosomes? Wind it, then loop it.
+
+3
+00:00:14,300 --> 00:00:15,388
+First, wind it.
+
+4
+00:00:16,367 --> 00:00:23,151
+DNA's twisted ladder, the double helix, wraps almost twice around a spool of eight proteins called histones.
+
+5
+00:00:23,833 --> 00:00:29,977
+Each wrapped spool is a nucleosome. Spool after spool, the DNA becomes beads on a string.
+
+6
+00:00:31,700 --> 00:00:33,727
+But that string is still far too long.
+
+7
+00:00:35,400 --> 00:00:42,035
+So before a cell divides, proteins called condensins pull it into loops, packed around a central scaffold.
+
+8
+00:00:42,733 --> 00:00:48,280
+Loop upon loop, the DNA becomes about ten thousand times shorter. That is a chromosome.
+
+9
+00:00:52,433 --> 00:00:56,743
+Wound on histone spools, then looped: about 10,000 times shorter.
+
+10
+00:00:58,433 --> 00:01:02,295
+To go deeper, read about chromatin in OpenStax Biology.

@@ -1,0 +1,32 @@
+{
+ "harness": "Claude Code",
+ "harness_version": "2.1.322 (sub-agent)",
+ "permission_mode": "the parent session's (auto mode)",
+ "prompt": "Make a short video, about a minute, explaining how a DNA double helix packs into a chromosome, with 3D graphics. You may search and fetch the web for sources. Use the default voice.",
+ "started": "2026-11-12",
+ "api_duration_s": null,
+ "turns": null,
+ "cost_usd": null,
+ "cost_by_model": null,
+ "result": "success",
+ "note": "Run as a sub-agent of another Claude Code session, which reports total tokens, tool calls and wall time, but no cost, turns or token breakdown. The two runs ran at the same time on one machine, so their renders shared the CPU.",
+ "model": "claude-fable-5-2",
+ "duration_s": 1066.2,
+ "tokens": {
+  "total": 198016
+ },
+ "tool_calls": {
+  "total": 47
+ },
+ "renders": {
+  "drafts": 3,
+  "final": 1
+ },
+ "video": {
+  "seconds": 65.3,
+  "size": "1920x1080",
+  "fps": 30,
+  "spoken_words": 126
+ },
+ "final_message": "**Model ID:** claude-fable-5-2\n\n**Final MP4:** `out/ep01_dna_packing.mp4` — 65.3 s, 1920x1080, 30 fps, H.264 + AAC, voice `kokoro:af_heart` (the default). Subtitles are beside it: `out/ep01_dna_packing.srt`.\n\n**Checks:** both passed.\n- Layout: `layout check: ok` on all three drafts and on a re-check after the final.\n- Audio: `audio check: ok (10 lines, all audible)` on the render and on a re-check.\n- I also read the contact sheets of the final render (every 5 s).\n\n**Renders:** 1 final render, after 3 drafts.\n\n**What the video is:** workflow `manimvox-concept`, an `Episode3D` with two cardless chapters (\"Wind it\", \"Loop it\"), 126 spoken words.\n- It opens on a turning 3D double helix with `2 m` of DNA against a `6 µm` nucleus.\n- Chapter 1 wraps the thread 1.67 turns round eight histone spheres (the nucleosome), then shows seven beads on a string.\n- Chapter 2 grows loops out of a condensin scaffold, then swaps them for an X-shaped chromosome that turns while the camera tilts.\n- It ends with the opening question answered above the chromosome: \"Wound on histone spools, then looped: about 10,000 times shorter.\"\n\n**Claims I couldn't fully verify:**\n- Every spoken and on-screen claim has a `[SOURCE]` line in `FACTS.md`, but the sources are mostly Wikipedia (Cell nucleus, DNA, Nucleosome, Chromatin, Chromosome, Condensin), plus OpenStax Biology 2e §14.2 and genome.gov. The textbook sources I tried first were unreadable: NCBI Bookshelf (Alberts) returned a browser check and Nature Scitable a login redirect.\n- The quotes in `research/notes.md` are as returned by the fetch tool's summarising model, not re-read character by character against the pages.\n- \"About ten thousand times shorter\" rests on one Wikipedia sentence (Chromosome).\n- \"147 base pairs\": Wikipedia's Chromatin page says 147, its Nucleosome page says 146. On screen it reads \"about 147\".\n- \"Condensins pull it into loops, packed around a central scaffold\" compresses two sourced statements (condensin extrudes loops; loops attach to a protein scaffold that includes condensin). The underlying model is itself described in the source as \"thought to be\".\n- The 3D shapes are schematic and labelled \"schematic, not to scale\" on screen. The eight-sphere histone core, the 34 loops, the winding direction and the chromosome shape are my drawings, not molecular data.\n- The 30-nm fibre is deliberately left out, because its presence in living cells is debated (recorded as `[OPEN]` in `FACTS.md`).\n\n**What went wrong along the way:**\n- **Sources:** the first web fetch (NCBI) and one more (Nature) failed, which is why the sourcing fell back mostly to Wikipedia.\n- **Project location:** I ran `manimvox new .` in the working folder itself rather than a subfolder, so the project files sit beside `.claude/`.\n- **Draft 1, chromosome:** the chromatid surfaces closed to a zero-radius tip, which threw stray faces across the whole frame. Fixed by keeping a small tip radius.\n- **Draft 1, blank seam:** the chapter 2 seam line was spoken over an empty stage after the whip. I moved it to a bridge over the beads and made the next scene open on the string.\n- **Draft 2:** the chromosome was too small; enlarged in draft 3.\n- **Still imperfect in the final:**\n  - About one second of empty stage remains around 0:34–0:35, between the whip and the string being drawn (visible on the final contact sheet). I did not re-render for it.\n  - The chromatid tips look bluntly cut rather than rounded.\n  - The sphere shading is Manim's flat white-wash, so it looks a little blotchy.\n- **Kit workaround:** I import `Lighting` from `manimvox.kit.shading`, which is not in the documented cheat sheet, and attach it to stroke pieces so the 3D camera depth-sorts them without recolouring. No kit files were edited.\n- **Departures from the skill's defaults:**\n  - The camera stays near flat. Objects turn about their own axes and the camera tilts only once (over the chromosome), because the kit resets the camera to flat at every seam.\n  - 3D is used in every scene, against the skill's \"one or two scenes\", because the request asked for 3D graphics.\n  - There is no on-screen \"read next\" plate, since it would have covered the kept chromosome; the pointer to OpenStax is spoken only.\n  - The script is 126 words against the length table's 100–120.\n- **Decisions made with no one to ask:** every brief answer is marked \"(chosen by the agent)\" in `BRIEF.md`. The storyline is \"one thread, followed down\"; the two not taken (\"the packing contest\", \"the chromosome taken apart\") are in `DIRECTION.md`. I reworded the opening question from \"fit in the nucleus\" to \"pack into tiny chromosomes\", so the 10,000-fold figure, which applies to the condensed chromosome, answers it honestly.\n- **Cut for length:** the 30-nm fibre, linker DNA, histone H1, histone names, sister chromatids and centromere, and the recap. \"46 chromosomes\" is on screen only."
+}

@@ -1,0 +1,39 @@
+1
+00:00:00,000 --> 00:00:06,059
+Each human cell holds about two metres of DNA, in a nucleus just ten to twenty microns across.
+
+2
+00:00:06,733 --> 00:00:11,533
+So how does that thread pack into chromosomes? In two moves: spools, then loops.
+
+3
+00:00:13,600 --> 00:00:17,056
+Up close, the thread is a double helix, two nanometres wide.
+
+4
+00:00:17,733 --> 00:00:24,859
+It wraps almost twice around a spool of eight histone proteins. Spool and DNA together make a nucleosome.
+
+5
+00:00:25,533 --> 00:00:30,995
+Repeated along the strand like beads on a string, nucleosomes make it about seven times shorter.
+
+6
+00:00:32,667 --> 00:00:34,373
+But that is still far too long.
+
+7
+00:00:35,633 --> 00:00:41,969
+Before a cell divides, protein rings called condensin pull the string into loops along a central axis.
+
+8
+00:00:42,667 --> 00:00:47,445
+Stacked loops thicken the axis into a chromosome: two copies, joined in the middle.
+
+9
+00:00:53,033 --> 00:00:57,129
+Spools, then loops: about ten thousand times shorter than the bare thread.
+
+10
+00:00:58,800 --> 00:01:02,533
+To read more, start with Nature Scitable on DNA packaging.

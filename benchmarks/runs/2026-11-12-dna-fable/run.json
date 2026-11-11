@@ -1,0 +1,9 @@
+{
+  "title": "DNA packing in 3D: Fable 5.2",
+  "date": "2026-11-12",
+  "example": "dna-packing",
+  "report": "benchmarks/dna-models.md",
+  "agent": "agent-run.json",
+  "review": "bold, full-frame 3D: a clear spool, beads, loops and a solid turning chromosome; about 1 s of empty stage at 0:34; sources mostly Wikipedia",
+  "review_rank": 1
+}

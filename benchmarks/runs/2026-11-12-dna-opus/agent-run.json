@@ -1,0 +1,33 @@
+{
+ "harness": "Claude Code",
+ "harness_version": "2.1.322 (sub-agent)",
+ "permission_mode": "the parent session's (auto mode)",
+ "prompt": "Make a short video, about a minute, explaining how a DNA double helix packs into a chromosome, with 3D graphics. You may search and fetch the web for sources. Use the default voice.",
+ "started": "2026-11-12",
+ "api_duration_s": null,
+ "turns": null,
+ "cost_usd": null,
+ "cost_by_model": null,
+ "result": "success",
+ "note": "Run as a sub-agent of another Claude Code session, which reports total tokens, tool calls and wall time, but no cost, turns or token breakdown. The two runs ran at the same time on one machine, so their renders shared the CPU.",
+ "model": "claude-opus-5-5",
+ "duration_s": 593.4,
+ "tokens": {
+  "total": 168678
+ },
+ "tool_calls": {
+  "total": 53
+ },
+ "renders": {
+  "drafts": 2,
+  "final": 1
+ },
+ "video": {
+  "seconds": 65.5,
+  "size": "1920x1080",
+  "fps": 30,
+  "spoken_words": 137,
+  "wpm": 173
+ },
+ "final_message": "The video is done: 65.5 seconds, and both checks passed.\n\n- **Model ID:** claude-opus-5-5\n- **Final MP4:** dna-packing/out/ep01_dna_packing.mp4, 65.5 s, 1080p at 30 fps. Subtitles are beside it at dna-packing/out/ep01_dna_packing.srt.\n- **Checks:** `layout check: ok` on both drafts, and the final render printed `audio check: ok (10 lines, all audible)`. The voice is the default, `kokoro:af_heart`, which was already downloaded, so nothing was installed or fetched. Speech runs at 173 words a minute, just inside the 150–175 target.\n- **Renders:** three in all, two drafts and one final. I looked at the contact sheets of both drafts and of the final.\n\n**What the video shows** (workflow: manimvox-concept). Nobody could be asked, so I made every brief choice myself and marked it in `BRIEF.md`. Of the three storylines in `DIRECTION.md` I took the recommended one, \"the zoom-out\". The other two were \"the suitcase\" (a packing analogy) and \"the microscope\" (going from chromosome down to helix).\n1. **Opening, no title card:** a thread labelled \"≈ 2 m of DNA per cell\" runs past a small nucleus labelled \"10–20 µm\". It asks: \"How does two metres of DNA pack into chromosomes?\"\n2. **Spools, in 3D:** a double helix 2 nm wide, with the camera tilting. Then a spool of 8 histone spheres with about 1.7 turns of DNA around it, labelled ≈ 147 base pairs, one nucleosome. Then beads on a string, \"≈ 7× shorter\".\n3. **Loops, in 3D:** condensin rings pull the string into loops round a vertical axis, and the camera slowly orbits. Two sister chromatids then cross, joined at the centromere.\n4. **Ending:** back to the opening thread and nucleus. The thread collapses into small chromosomes, labelled \"≈ 10,000× shorter\", followed by the answer and a pointer to read Nature Scitable.\n\n**Sources** are listed in `FACTS.md`, all labelled [SOURCE]: Nature Scitable on DNA packaging, Wikipedia's Nucleosome and Chromatin pages, Paul, Hochwagen and Ercan (2018) on condensin, a Lancaster University glossary for the 2 nm width, and the genome.gov glossary entry for chromatid.\n\n**Claims I couldn't fully verify:**\n- **147 base pairs:** the sources disagree slightly. Wikipedia's Chromatin page says about 147, its Nucleosome page says 146 or 147, and Scitable says about 146. The screen shows \"≈ 147 bp\".\n- **10,000 to 1:** this comes from Scitable alone, and Scitable says it varies by chromosome. No other source I could reach confirmed it.\n- **2 nm width:** this comes from a university glossary, not a primary source. I couldn't open the NCBI textbook (blocked by a captcha) or the JCB and Pressbooks pages (403 errors).\n- **Condensin as rings:** this rests on a figure caption in Wikipedia's Chromatin article (\"condensin rings\").\n- **The 30 nm fibre:** its existence in living cells is debated, so the video neither draws nor mentions it. Recorded as [OPEN] in `FACTS.md`.\n- **\"Before a cell divides\":** this is my plain-words version of \"mitotic chromosomes\".\n\nAll pictures are diagrams and are marked \"not to scale\" on screen.\n\n**What went wrong along the way:**\n- **Histones were invisible in the first draft.** None of the 3D spheres or cylinders appeared, only the lines. I traced it to the grain background texture: in a 3D episode it is drawn on top of solid 3D shapes. I removed the texture and recorded why in `series.json` and `DIRECTION.md`. This is a manimvox kit bug worth fixing; the drawing order is in `src/manimvox/kit/shading.py`.\n- **Loose ending fixed:** the first draft collapsed all two metres of DNA into one chromosome, which is wrong because the two metres is spread across many chromosomes. I changed the question to \"chromosomes\" and drew several small ones inside the nucleus. The title still says \"a chromosome\", which is a small mismatch.\n- **The sister-chromatid X is weak.** I widened the angle once, but it still reads more as a thick rod with two crossing axes than a clear X.\n- **The script runs over its word target:** 137 spoken words against the guideline of 100–120 for a one-minute video. The length still came in at 65.5 s, so I didn't trim it.\n- **Some silent frames:** the ending's thread collapse plays for about 2.6 s with no narration, and the cut into the Spools chapter has a short empty frame.\n- **Cut for length:** the 30 nm fibre, histone H1, linker DNA lengths, and the separate roles of the two condensins."
+}

@@ -103,3 +103,21 @@ def test_the_committed_runs_build(tmp_path):
         (docs / "gallery" / page.name).write_text(page.read_text(encoding="utf-8"), encoding="utf-8")
     lb.write_docs(docs, lb.load_runs())
     assert "## Leaderboard" in (docs / ".generated" / "leaderboard-upi.md").read_text(encoding="utf-8")
+
+
+def test_a_reviewers_order_outranks_speed_and_a_missing_cost_is_shown(tmp_path, docs):
+    runs = tmp_path / "runs"
+    fast, better = _agent(None, model="m-fast"), _agent(None, model="m-better")
+    fast["duration_s"], better["duration_s"], better["turns"] = 60.0, 600.0, None  # a sub-agent reports no cost or turns
+    _run(runs, "a", "upi", agent=fast)
+    _run(runs, "b", "upi", agent=better)
+    for name, rank in (("a", 2), ("b", 1)):
+        manifest = runs / name / "run.json"
+        d = json.loads(manifest.read_text(encoding="utf-8"))
+        d["review"], d["review_rank"] = f"note {name}", rank
+        manifest.write_text(json.dumps(d), encoding="utf-8")
+    lb.write_docs(docs, lb.load_runs(runs))
+    upi = (docs / ".generated" / "leaderboard-upi.md").read_text(encoding="utf-8")
+    harness = upi[upi.index("### Harness"):upi.index("### Model")]
+    assert harness.index("m-better") < harness.index("m-fast") and "note b" in harness
+    assert "not recorded" in harness and "$" not in upi

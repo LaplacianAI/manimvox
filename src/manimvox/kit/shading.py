@@ -81,6 +81,8 @@ class LitCamera(ThreeDCamera):
         for i, m in enumerate(mobjects):
             if i not in flat and getattr(m, "shade_in_3d", False):
                 keys[i] = np.dot(m.get_z_index_reference_point(), rot.T)[2]
+            elif i not in flat and m.z_index < 0:  # a backdrop, such as the theme's ground: behind every solid
+                keys[i] = -np.inf
         return [mobjects[i] for i in np.argsort(keys, kind="stable")]
 
     def display_multiple_non_background_colored_vmobjects(self, vmobjects, pixel_array):
