@@ -83,6 +83,14 @@ def _cmd_edit(args) -> int:
     print(f"{r.path}: {r.description}")
     if r.sheets:
         print(f"sheets: {', '.join(r.sheets)}")
+    if args.transcribe:
+        from .tools import _transcribe_media
+
+        t = _transcribe_media(str(Path.cwd()), r.path, args.model, args.language, _confirm(args))
+        print(f"transcript: {t.words} words, {t.language}, faster-whisper {t.model}"
+              + (" (cached)" if t.cached else ""))
+        print(f"phrases: {t.text}")
+        print(f"words: {t.words_json}")
     return 0
 
 
@@ -486,6 +494,11 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--every", type=float, default=None, help="seconds between sampled frames (default: about 18 "
                    "frames over the whole video)")
     a.add_argument("--no-sheets", action="store_true", help="no contact sheets")
+    a.add_argument("--transcribe", action="store_true", help="also transcribe what is said, with each word's time "
+                   "(the transcribe extra; runs on this computer)")
+    a.add_argument("--model", default="small", help="tiny, base, small (default), medium or large-v3")
+    a.add_argument("--language", default=None, help="the spoken language, such as en (default: detected)")
+    a.add_argument("-y", "--yes", **yes)
     a = sub.add_parser("render", help="render edits/NAME to out/NAME.mp4 (or a draft, or one window of it)")
     a.add_argument("name")
     a.add_argument("--draft", action="store_true", help="480p and a fast encoder, into build/edit/NAME/")

@@ -52,6 +52,44 @@ def read_span(path: Path, start: float = 0.0, end: float | None = None) -> np.nd
     return fit_length(x, want) if want is not None else x
 
 
+def envelope_db(path: Path, start: float = 0.0, end: float | None = None, hop: float = 0.01,
+                rate: int = 16000) -> np.ndarray:
+    """Loudness in dB every `hop` seconds of `path` from `start` to `end`: the sound decoded at `rate` Hz mono
+    and measured as it streams, so a long file never sits in memory. Frame k covers start + k * hop."""
+    step = max(1, round(hop * rate))
+    out: list[float] = []
+    rest = np.zeros(0, np.float32)
+    with av.open(str(path)) as c:
+        if not c.streams.audio:
+            return np.zeros(0)
+        s = c.streams.audio[0]
+        res = av.AudioResampler(format="flt", layout="mono", rate=rate)
+        if start > 0:
+            c.seek(max(0, int(start / s.time_base)), stream=s, backward=True)
+        skip, first = 0, True
+        want = None if end is None else round((end - start) / hop)
+        for frame in c.decode(s):
+            if first:
+                t0 = float(frame.pts * s.time_base) if frame.pts is not None else 0.0
+                skip = max(0, round((start - t0) * rate))
+                first = False
+            for r in res.resample(frame):
+                x = r.to_ndarray().reshape(-1)
+                if skip:
+                    cut = min(skip, x.shape[0])
+                    x, skip = x[cut:], skip - cut
+                rest = np.concatenate([rest, x])
+                n = rest.shape[0] // step
+                if n:
+                    blocks = rest[:n * step].reshape(n, step)
+                    out.extend(20 * np.log10(np.sqrt(np.mean(blocks.astype(np.float64) ** 2, axis=1)) + 1e-9))
+                    rest = rest[n * step:]
+            if want is not None and len(out) >= want:
+                break
+    db = np.asarray(out)
+    return db[:want] if want is not None else db
+
+
 def fit_length(x: np.ndarray, n: int) -> np.ndarray:
     if x.shape[1] >= n:
         return x[:, :n]

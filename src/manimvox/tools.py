@@ -767,7 +767,7 @@ def _check_edit(project: str, name: str | None) -> CheckResult:
     rep = check_edit(root, tl)
     secs = round(rep.seconds, 2)
     summary = (f"edit check: ok ({secs:g} s)" if rep.ok else f"edit check: {len(rep.findings)} finding(s)")
-    return CheckResult(rep.ok, "edit", summary, rep.findings, rep.plan)
+    return CheckResult(rep.ok, "edit", summary, rep.findings, rep.cuts + rep.plan)
 
 
 @dataclass(frozen=True)
@@ -809,6 +809,69 @@ def probe_media(project: str, path: str, every: float | None = None, sheets: boo
             raise ValueError("every must be greater than 0")
         out = [str(s) for s in contact_sheets(Path(m.path), root / "sheets" / "probe" / Path(m.path).stem, every=step)]
     return MediaResult(True, m.path, m.kind, m.seconds, m.width, m.height, m.fps, m.audio, m.describe(), out)
+
+
+@dataclass(frozen=True)
+class TranscriptResult:
+    ok: bool
+    path: str
+    language: str
+    model: str
+    words: int
+    seconds: float
+    text: str  # build/edit/transcripts/<file>.txt: one line per phrase, [start-end] words
+    words_json: str  # build/edit/transcripts/<file>.json: every word with its start, end and confidence
+    cached: bool
+    preview: list[str]
+
+
+def _transcribe_media(project: str, path: str, model: str, language: str | None,
+                      confirm: Callable[[str], bool]) -> TranscriptResult:
+    import json
+
+    from .edit.load import resolve_path
+    from .edit.probe import probe
+    from .edit.transcribe import packed, transcribe
+    from .project import find_project
+
+    root = find_project(Path(project).expanduser())
+    full = resolve_path(root, path)
+    m = probe(full)
+    if not (m.kind == "audio" or m.audio):
+        raise ValueError(f"{full.name} has no sound to transcribe")
+    tr, hit = transcribe(root, full, model, language, confirm)
+    out = root / "build" / "edit" / "transcripts"
+    out.mkdir(parents=True, exist_ok=True)
+    text = packed(tr)
+    (out / f"{full.stem}.txt").write_text(text + "\n", encoding="utf-8")
+    (out / f"{full.stem}.json").write_text(json.dumps(tr.to_json(), indent=1), encoding="utf-8")
+    return TranscriptResult(True, str(full), tr.language, tr.model, len(tr.words), tr.seconds,
+                            str(out / f"{full.stem}.txt"), str(out / f"{full.stem}.json"), hit,
+                            text.splitlines()[:40])
+
+
+@_tool
+def transcribe_media(project: str, path: str, model: str = "small", language: str | None = None,
+                     allow_download: bool = False) -> TranscriptResult:
+    """Transcribe what is said in a video or sound file, on this computer, with each word's time, so a clip can
+    be cut by words (from_words, to_words), its pauses and "um"s removed (cut_silences, cut_fillers), and the
+    speaker captioned (captions). Needs the transcribe extra. Cached: the same file is never transcribed twice.
+
+    Args:
+        project: The project folder, or any folder inside it.
+        path: The file, relative to the project or absolute.
+        model: tiny (78 MB), base (148 MB), small (486 MB, the default), medium (1.5 GB) or large-v3 (3.1 GB).
+            Larger is more accurate and slower.
+        language: The spoken language as a code such as en or hi (default: detected). Give en for English, so
+            "um"s are kept for cut_fillers.
+        allow_download: Let it download the model; ask the user first, and say its size.
+    """
+    from .edit.transcribe import TranscribeError
+
+    try:
+        return _transcribe_media(project, path, model, language, _consent(allow_download))
+    except TranscribeError as e:
+        raise ToolError(_for_a_model(str(e))) from e
 
 
 @dataclass(frozen=True)
@@ -878,8 +941,8 @@ def render_edit(project: str, name: str, draft: bool = False, start: float | Non
 
 TOOLS = (new_project, brief_questions, write_brief, draft, render, check, contact_sheet, voices, prepare_voice,
          list_blocks, add_block, join, index, package, doctor, fetch_asset, list_assets, probe_media, new_edit,
-         render_edit)
-# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets and `edit new` is new_edit and `edit probe` is probe_media
+         render_edit, transcribe_media)
+# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets and `edit new` is new_edit and `edit probe` is probe_media (with --transcribe, transcribe_media)
 COMMANDS = {"new": "new_project", "brief": "write_brief", "draft": "draft", "render": "render", "check": "check", "sheets": "contact_sheet", "voices": "voices",
             "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor",
             "assets": "fetch_asset", "edit": "render_edit"}
