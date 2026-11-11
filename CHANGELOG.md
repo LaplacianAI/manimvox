@@ -4,6 +4,15 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+
+- **The edit timeline** (`manimvox.edit`), the first part of editing your own footage. An edit is `edits/<name>.json`, or `edits/<name>.py` that sets `timeline`, and both are checked the same way.
+  - On the main track: clips of footage (trimmed, cropped, at a steady speed), rendered episodes, stills and title cards, joined by a cut, a fade or a dip.
+  - Over the picture: images, text, picture-in-picture, graphics drawn by code (`Draw`) and Manim scenes (`Scene`).
+  - Sound: narration lines, a music bed and sound files.
+  - Any segment can be made by code (`Frames`, with `frames(fn, seconds)` or `from_moviepy(clip)`) and changed frame by frame (`effects`). A hook is `"path.py:name"` in JSON, or the function itself in Python.
+- **`manimvox edit new NAME FILE...`** starts an edit from videos and images; **`manimvox edit probe FILE`** says what a file holds and writes contact sheets of a video; **`manimvox check edit NAME`** checks an edit against its files (times past a file's end, crops and boxes outside the picture, hooks that do not import) and shows where each piece lands. Tools: `new_edit`, `probe_media`, and `check` with `what="edit"`. Rendering an edit comes next.
+
 ## [0.7.0] - 2026-11-10
 
 ### Added

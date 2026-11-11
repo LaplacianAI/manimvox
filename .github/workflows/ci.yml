@@ -38,11 +38,11 @@ jobs:
           python-version: ${{ matrix.python }}
       - name: System libraries (Linux; EGL and OSMesa let VTK render with no display)
         if: runner.os == 'Linux'
-        run: >-
-          sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
-          libegl1 libosmesa6
+        timeout-minutes: 10
+        run: bash .github/scripts/apt.sh libcairo2-dev libpango1.0-dev pkg-config python3-dev libegl1 libosmesa6
       - name: System libraries (macOS)
         if: runner.os == 'macOS'
+        timeout-minutes: 10
         run: brew install cairo pkg-config
       - name: Software OpenGL (Windows runners have no GPU; Windows' own OpenGL is too old for VTK)
         if: runner.os == 'Windows'
@@ -69,9 +69,11 @@ jobs:
           python-version: "3.12"
       - name: System libraries (Linux)
         if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
+        timeout-minutes: 10
+        run: bash .github/scripts/apt.sh libcairo2-dev libpango1.0-dev pkg-config python3-dev
       - name: System libraries (macOS)
         if: runner.os == 'macOS'
+        timeout-minutes: 10
         run: brew install cairo pkg-config
       - run: bash .github/scripts/report.sh uv sync --extra dev --extra kokoro
         shell: bash
@@ -86,7 +88,9 @@ jobs:
       - uses: astral-sh/setup-uv@v7
         with:
           python-version: "3.12"
-      - run: sudo apt-get update && sudo apt-get install -y libcairo2-dev libpango1.0-dev pkg-config python3-dev
+      - name: System libraries
+        timeout-minutes: 10
+        run: bash .github/scripts/apt.sh libcairo2-dev libpango1.0-dev pkg-config python3-dev
       - name: Framework adapters
         run: >-
           bash .github/scripts/report.sh uv run --extra dev --extra agno --extra langchain --extra pydantic-ai --extra openai-agents

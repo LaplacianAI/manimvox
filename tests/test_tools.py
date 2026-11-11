@@ -50,7 +50,7 @@ def test_check_theme_reports_failures_as_a_result(project):
 
 
 def test_check_rejects_an_unknown_check(project):
-    with pytest.raises(ToolError, match="theme, layout or audio"):
+    with pytest.raises(ToolError, match="theme, layout, audio or edit"):
         tools.check(str(project), "colour")
 
 
@@ -129,7 +129,7 @@ def test_every_command_has_a_tool_or_is_shell_only():
 
     names = {f.__name__ for f in tools.TOOLS}
     assert set(build_parser()._sub.choices) == set(tools.COMMANDS) | tools.SHELL_ONLY
-    assert set(tools.COMMANDS.values()) <= names and len(names) == len(tools.TOOLS) == 17
+    assert set(tools.COMMANDS.values()) <= names and len(names) == len(tools.TOOLS) == 19
 
 
 def test_list_blocks():
