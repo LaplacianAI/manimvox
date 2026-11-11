@@ -216,6 +216,7 @@ class Timeline:
     fps: float = 30.0
     captions: str = "srt"  # srt: out/<name>.srt; burn: also drawn into the picture; none
     duck_db: float = -12.0  # how far the footage's sound and the music drop under narration
+    spellings: tuple[tuple[str, str], ...] = ()  # (heard, written) fixes for speaker captions: names, jargon
 
     def to_dict(self, root: Path | None = None) -> dict:
         """The edit as JSON values. Function hooks are written "path.py:name" relative to `root` (the project);
@@ -466,7 +467,17 @@ def _audio(where: str, raw) -> Audio:
                  None if end is None else _num(f"{where}.end", end, above=start))
 
 
-TOP_KEYS = ("version", "size", "fps", "captions", "duck_db", "segments", "overlays", "audio")
+TOP_KEYS = ("version", "size", "fps", "captions", "duck_db", "spellings", "segments", "overlays", "audio")
+
+
+def _spellings(v) -> tuple[tuple[str, str], ...]:
+    """{"heard": "written"}: speech-to-text mishears names and terms; captions show the written form."""
+    if isinstance(v, (list, tuple)) and all(isinstance(x, (list, tuple)) and len(x) == 2 for x in v):
+        v = dict(v)  # a Timeline built in Python: (heard, written) pairs
+    if not isinstance(v, dict) or not all(isinstance(k, str) and k.strip() and isinstance(w, str) and len(k) <= 100
+                                          and len(w) <= 100 for k, w in v.items()):
+        raise ValueError(f'spellings must be {{"heard": "written", ...}}, as text, got {v!r}')
+    return tuple((k, w) for k, w in v.items())
 
 
 def parse(raw) -> Timeline:
@@ -499,6 +510,7 @@ def parse(raw) -> Timeline:
         fps=_num("fps", raw.get("fps", 30), 1, 120),
         captions=_choice("captions", raw.get("captions", "srt"), CAPTIONS),
         duck_db=_num("duck_db", raw.get("duck_db", -12.0), -60, 0),
+        spellings=_spellings(raw.get("spellings", {})),
     )
     if tl.segments[0].transition.kind != "cut":
         raise ValueError("segments[0].transition: the first segment has nothing before it to fade from")
@@ -590,7 +602,7 @@ def to_dict(tl: Timeline, root: Path | None = None, keep_functions: bool = False
             continue
         v = getattr(tl, f.name)
         if (tuple(v) if isinstance(v, list) else v) != _default(f):
-            out[f.name] = list(v) if isinstance(v, (tuple, list)) else v
+            out[f.name] = dict(v) if f.name == "spellings" else list(v) if isinstance(v, (tuple, list)) else v
     for key in ("segments", "overlays", "audio"):
         items = getattr(tl, key)
         if items or key == "segments":

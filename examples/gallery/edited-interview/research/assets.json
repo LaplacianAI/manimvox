@@ -1,0 +1,18 @@
+{
+  "assets": [
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "page": "https://commons.wikimedia.org/wiki/File:Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "file": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "sha256": "0c3f339a6e2f365ef3d9488add802aa4e3ad8c57d661c909b990f0162982f169",
+      "bytes": 42293765,
+      "licence": "CC-BY-3.0",
+      "licence_stated": "",
+      "licence_detected": "CC BY 3.0",
+      "licence_basis": "detected from Wikimedia Commons",
+      "credit": "UNESCO-IHE Archive, \"Interview Prof Joyeeta Gupta on strengthening water governance education and research\" (2013), Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "non_commercial": false,
+      "fetched": "2026-11-11"
+    }
+  ]
+}

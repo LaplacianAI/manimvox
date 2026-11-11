@@ -1,0 +1,98 @@
+{
+  "version": 1,
+  "size": [
+    1280,
+    720
+  ],
+  "fps": 25,
+  "captions": "burn",
+  "duck_db": -15,
+  "spellings": {
+    "Joita": "Joyeeta",
+    "UNESCO I had to interrupt": "UNESCO-IHE",
+    "UNESCO IT": "UNESCO-IHE",
+    "UNESCO IHE": "UNESCO-IHE"
+  },
+  "segments": [
+    {
+      "title": "An interview, edited",
+      "lines": [
+        "Prof Joyeeta Gupta on a new water research partnership",
+        "Recorded at UNESCO-IHE, 2013"
+      ],
+      "seconds": 3.5
+    },
+    {
+      "clip": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "start": 2,
+      "end": 12.5,
+      "from_words": "I'm Joita Gupta",
+      "to_words": "had to interrupt",
+      "cut_silences": 0.5,
+      "cut_fillers": true,
+      "captions": true,
+      "transition": "fade"
+    },
+    {
+      "title": "What is your role today at UNESCO-IHE?",
+      "seconds": 2.4,
+      "transition": "dip"
+    },
+    {
+      "clip": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "start": 18,
+      "end": 50,
+      "from_words": "My role is",
+      "to_words": "memorandum of understanding",
+      "cut_silences": 0.5,
+      "cut_fillers": true,
+      "captions": true,
+      "transition": "dip"
+    },
+    {
+      "episode": "ep01",
+      "transition": "fade"
+    },
+    {
+      "title": "Which research areas will you focus on?",
+      "seconds": 2.4,
+      "transition": "dip"
+    },
+    {
+      "clip": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "start": 106,
+      "end": 137,
+      "from_words": "looking at urban water",
+      "to_words": "works out in practice",
+      "cut_silences": 0.5,
+      "cut_fillers": true,
+      "captions": true,
+      "transition": "dip"
+    },
+    {
+      "title": "Edited with manimvox",
+      "lines": [
+        "Footage: UNESCO-IHE Archive, 2013, CC BY 3.0, via Wikimedia Commons",
+        "Cut by her own words, captioned, with a narrated diagram"
+      ],
+      "seconds": 4,
+      "transition": "fade"
+    }
+  ],
+  "overlays": [
+    {
+      "text": "Joyeeta Gupta",
+      "sub": "Professor of Environment and Development in the Global South, University of Amsterdam",
+      "kind": "lower-third",
+      "at": 3.8,
+      "until": 9.5,
+      "fade": 0.4
+    }
+  ],
+  "audio": [
+    {
+      "music": "build/pad.wav",
+      "volume": -6
+    }
+  ]
+}
