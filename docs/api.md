@@ -44,6 +44,12 @@ What an episode imports, and the tools an agent framework calls. Everything here
 
 ::: manimvox.scenes.screen
 
+## Editing your own footage
+
+::: manimvox.edit
+    options:
+      members: [Timeline, Clip, Image, Title, Frames, Transition, Picture, Text, Inset, Draw, Scene, Say, Music, Sound, frames, from_moviepy]
+
 ## Tools for agents
 
 ::: manimvox.tools

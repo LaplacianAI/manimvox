@@ -29,6 +29,8 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
   - A word is captioned by its last 0.15 s: speech-to-text folds the pause before a word into its time, so a word just after a cut was captioned though its sound was cut.
   - A rendered episode used as a segment goes in at its own level: its narration is levelled when it renders, and was being raised a second time.
 - **Gallery: *An interview, edited*.** A real 2013 interview (UNESCO-IHE Archive, CC BY 3.0) cut by its own words into an 85-second film with captions, a lower third, question cards, a narrated diagram and a music bed, from one edit file. Made by Claude Code; making it found the four problems fixed above.
+- **The `manimvox-edit` skill**, the twelfth: it takes an agent from your footage to a finished film (probe and read the transcript, ask what the film is for, write the edit, check it, review a draft, render, report with credits). The `manimvox` skill sends requests to edit recordings to it.
+- **Docs:** *Editing your own footage*, the edit file reference (every field), and `manimvox.edit` in the Python API.
 - **Footage inside explainers.** `from_video` reads a recording of any length from the file as it plays, instead of holding up to 3600 frames in memory. `from_video(..., sound=True, volume=)` keeps the recording's sound: it is heard when the clip plays in the episode, levelled to the narration's loudness and at the clip's playing speed, also on a re-render that Manim serves from its cache.
 
 ## [0.7.0] - 2026-11-10

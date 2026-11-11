@@ -87,7 +87,7 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 - [x] **Fast, flat-memory rendering.** Frames stream through, so an hour of 4K fits. A 480p draft, and a render of just one window (`--from`, `--to`) to check a fix in seconds. Contact sheets to review the result.
 - [x] **See before you cut: `manimvox edit probe`.** Length, size, sound and contact sheets of any file. With the opt-in `transcribe` extra (faster-whisper, local, asks before downloading the model): the words with their times, cuts by words, pauses and "um"s removed, and captions of the speaker.
 - [x] **Footage inside explainers.** `from_video` with no 2-minute limit, and `sound=True` to keep a clip's sound in the episode.
-- [ ] **A `manimvox-edit` skill, a docs page and a gallery video.**
+- [x] **A `manimvox-edit` skill, a docs page and a gallery video.** The skill takes an agent from probing the footage to the final render; [Editing your own footage](https://laplacianai.github.io/manimvox/editing/) and the edit file reference document it; *An interview, edited* shows it.
 
 ## 0.8.5: editing, further
 

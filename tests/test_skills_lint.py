@@ -75,7 +75,7 @@ def test_no_skill_ships_scripts(d):
     assert not (d / "scripts").exists(), f"{d.name} has a scripts/ folder"
 
 
-def test_exactly_the_eleven_skills():
+def test_exactly_the_twelve_skills():
     assert sorted(d.name for d in DIRS) == sorted(sk.SKILL_NAMES)
 
 

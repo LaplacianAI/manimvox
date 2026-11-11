@@ -1,0 +1,1 @@
+--8<-- "skills/manimvox-edit/references/edit-file.md"
