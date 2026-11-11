@@ -33,6 +33,7 @@ SLACK = 0.05  # seconds a time may run past a file's end: container lengths are 
 class EditReport:
     findings: list[str] = field(default_factory=list)
     plan: list[str] = field(default_factory=list)  # where each segment lands on the output
+    lengths: list[float | None] = field(default_factory=list)  # each segment's source length, where known
     seconds: float = 0.0
 
     @property
@@ -145,6 +146,7 @@ def check_edit(root: Path, tl: Timeline) -> EditReport:
             _hook(rep, root, f"{where}.effects[{k}]", fx, "function")
         lengths.append(length)
 
+    rep.lengths = lengths
     placed = place(tl, lengths)
     for prev, p in itertools.pairwise(placed):
         if p.overlap and p.overlap > min(prev.seconds, p.seconds) + 1e-9:

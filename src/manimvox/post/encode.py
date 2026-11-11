@@ -57,18 +57,23 @@ class Writer:
     """RGB frames in through `add`, float stereo audio in through `audio`. After each frame, queued audio is
     encoded up to the video's time; `sync` pads or cuts the queue so the audio ends where the video does."""
 
-    def __init__(self, dst: Path, size: tuple[int, int], fps, crf: int = 18):
+    def __init__(self, dst: Path, size: tuple[int, int], fps, crf: int = 18, preset: str = "medium"):
         self.fps = Fraction(fps).limit_denominator(1001)
         self.c = av.open(str(dst), "w")
         self.v = self.c.add_stream("libx264", rate=self.fps)
         self.v.width, self.v.height = size
         self.v.pix_fmt = "yuv420p"
-        self.v.options = {"crf": str(crf), "preset": "medium"}
+        self.v.options = {"crf": str(crf), "preset": preset}
         self.a = self.c.add_stream("aac", rate=RATE, layout="stereo")
         self.a.bit_rate = 192_000
         self.frames = 0
         self.written = 0  # audio samples encoded
         self._queue = np.zeros((2, 0), np.float32)
+
+    @property
+    def queued_until(self) -> float:
+        """Seconds of sound handed in so far (encoded or waiting)."""
+        return (self.written + self._queue.shape[1]) / RATE
 
     def _video_samples(self) -> int:
         return round(self.frames * RATE / self.fps)

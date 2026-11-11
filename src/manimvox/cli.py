@@ -57,6 +57,19 @@ def _cmd_sheets(args) -> int:
 def _cmd_edit(args) -> int:
     from .tools import new_edit, probe_media
 
+    if args.action == "render":
+        from .tools import _render_edit
+
+        r = _render_edit(str(Path.cwd()), args.name, args.voice, _confirm(args), args.draft, args.start, args.end,
+                         print)
+        for line in r.notes:
+            print(line)
+        print(f"video: {r.video}  ({r.seconds:g} s, {r.size[0]}x{r.size[1]})")
+        if r.srt:
+            print(f"captions: {r.srt}")
+        if r.sheets:
+            print(f"sheets: {', '.join(r.sheets)}")
+        return 0
     if args.action == "new":
         r = new_edit(str(Path.cwd()), args.name, [str(Path(f).resolve()) for f in args.files])
         print(f"edit: {r.path}")
@@ -473,6 +486,15 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--every", type=float, default=None, help="seconds between sampled frames (default: about 18 "
                    "frames over the whole video)")
     a.add_argument("--no-sheets", action="store_true", help="no contact sheets")
+    a = sub.add_parser("render", help="render edits/NAME to out/NAME.mp4 (or a draft, or one window of it)")
+    a.add_argument("name")
+    a.add_argument("--draft", action="store_true", help="480p and a fast encoder, into build/edit/NAME/")
+    a.add_argument("--from", dest="start", type=float, default=None, metavar="SECONDS",
+                   help="render only from this second of the film")
+    a.add_argument("--to", dest="end", type=float, default=None, metavar="SECONDS",
+                   help="render only up to this second of the film")
+    a.add_argument("--voice", help="engine:voice for the narration, instead of the project's")
+    a.add_argument("-y", "--yes", **yes)
     s.set_defaults(func=_cmd_edit)
 
     s = p._sub.add_parser("skills", help="install, check, update or remove the agent skills")
