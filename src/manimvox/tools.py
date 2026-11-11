@@ -149,12 +149,14 @@ def check(project: str, what: str, episode: str | None = None) -> CheckResult:
 
     Args:
         project: The project folder, or any folder inside it.
-        what: brief, theme, layout or audio.
-        episode: The episode, for layout and audio: ep01, 1, or its file stem.
+        what: brief, theme, layout, audio or edit (an edit in edits/ against its files).
+        episode: The episode, for layout and audio: ep01, 1, or its file stem. For edit, the edit's name.
     """
     what = what.strip().lower()
-    if what not in ("brief", "theme", "layout", "audio"):
-        raise ValueError(f"check must be brief, theme, layout or audio, got {what!r}")
+    if what not in ("brief", "theme", "layout", "audio", "edit"):
+        raise ValueError(f"check must be brief, theme, layout, audio or edit, got {what!r}")
+    if what == "edit":
+        return _check_edit(project, episode)
     pr = _open(project)
     if what == "brief":
         from .brief import check_brief
@@ -749,10 +751,96 @@ def list_assets(project: str) -> AssetsResult:
     return AssetsResult(True, assets.load(find_project(Path(project).expanduser())))
 
 
+def _check_edit(project: str, name: str | None) -> CheckResult:
+    from .edit.check import check_edit
+    from .edit.load import edit_path, load
+    from .project import find_project
+
+    if not name:
+        raise ValueError("check edit needs the edit's name (edits/<name>.json or .py)")
+    root = find_project(Path(project).expanduser())
+    edit_path(root, name)  # a missing edit is an error, not a finding
+    try:
+        tl = load(root, name)
+    except ValueError as e:
+        return CheckResult(False, "edit", "edit check: 1 finding", [str(e)])
+    rep = check_edit(root, tl)
+    secs = round(rep.seconds, 2)
+    summary = (f"edit check: ok ({secs:g} s)" if rep.ok else f"edit check: {len(rep.findings)} finding(s)")
+    return CheckResult(rep.ok, "edit", summary, rep.findings, rep.plan)
+
+
+@dataclass(frozen=True)
+class MediaResult:
+    ok: bool
+    path: str
+    kind: str
+    seconds: float | None
+    width: int | None
+    height: int | None
+    fps: float | None
+    audio: bool
+    description: str
+    sheets: list[str]
+
+
+@_tool
+def probe_media(project: str, path: str, every: float | None = None, sheets: bool = True) -> MediaResult:
+    """Say what a video, sound or image file holds (length, size, frame rate, sound) and, for a video, write
+    contact sheets of it to sheets/probe/<file>/, so cut points can be picked by looking.
+
+    Args:
+        project: The project folder, or any folder inside it.
+        path: The file, relative to the project or absolute.
+        every: Seconds between sampled frames (default: about 18 frames over the whole video).
+        sheets: Write contact sheets of a video.
+    """
+    from .checks.sheets import contact_sheets
+    from .edit.load import resolve_path
+    from .edit.probe import probe
+    from .project import find_project
+
+    root = find_project(Path(project).expanduser())
+    m = probe(resolve_path(root, path))
+    out = []
+    if sheets and m.kind == "video" and m.seconds:
+        step = every if every is not None else max(0.5, round(m.seconds / 18, 1))
+        if not step > 0:
+            raise ValueError("every must be greater than 0")
+        out = [str(s) for s in contact_sheets(Path(m.path), root / "sheets" / "probe" / Path(m.path).stem, every=step)]
+    return MediaResult(True, m.path, m.kind, m.seconds, m.width, m.height, m.fps, m.audio, m.describe(), out)
+
+
+@dataclass(frozen=True)
+class EditResult:
+    ok: bool
+    path: str
+    next: str
+
+
+@_tool
+def new_edit(project: str, name: str, files: list[str]) -> EditResult:
+    """Start edits/<name>.json from videos and images, one after another, joined by cuts. Then edit the JSON
+    (or replace it with edits/<name>.py) and check it with check(project, "edit", name).
+
+    Args:
+        project: The project folder, or any folder inside it.
+        name: The edit's name: letters, digits, - and _.
+        files: Videos and images in order, relative to the project or absolute.
+    """
+    from .edit.load import new_edit as start
+    from .project import find_project
+
+    root = find_project(Path(project).expanduser())
+    p = start(root, name, files, base=root)
+    return EditResult(True, str(p), f"probe each file (probe_media), set start and end, then check(project, "
+                                    f"'edit', {Path(p).stem!r})")
+
+
 TOOLS = (new_project, brief_questions, write_brief, draft, render, check, contact_sheet, voices, prepare_voice,
-         list_blocks, add_block, join, index, package, doctor, fetch_asset, list_assets)
-# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets
+         list_blocks, add_block, join, index, package, doctor, fetch_asset, list_assets, probe_media, new_edit)
+# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets and `edit new` is new_edit
 COMMANDS = {"new": "new_project", "brief": "write_brief", "draft": "draft", "render": "render", "check": "check", "sheets": "contact_sheet", "voices": "voices",
             "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor",
-            "assets": "fetch_asset"}
+            "assets": "fetch_asset", "edit": "probe_media"}
 SHELL_ONLY = frozenset({"skills"})  # installs skills into coding agents; a framework agent reads skills_path() instead

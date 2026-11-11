@@ -1,6 +1,6 @@
 ---
 name: manimvox-cli
-description: "The manimvox command line and how to read its output: doctor, new, brief, draft, render, check brief|theme|layout|audio, voices, add, assets, join, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
+description: "The manimvox command line and how to read its output: doctor, new, brief, draft, render, check brief|theme|layout|audio|edit, voices, add, assets, edit, join, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
 license: MIT
 ---
 
@@ -48,10 +48,13 @@ Ask the user before installing anything: a system package, manimvox itself, or a
 | `manimvox check theme` | none | nothing | 1 on any failure | `check` |
 | `manimvox check layout EP` | none | nothing | 1 on findings | `check` |
 | `manimvox check audio EP` | none | nothing | 1 if a line is silent | `check` |
+| `manimvox check edit NAME` | none | nothing; prints where each piece of `edits/NAME` lands | 1 on findings (a time past a file's end, a crop or box outside the picture, a hook that does not import) | `check` with `what="edit"` |
 | `manimvox voices [ENGINE]` | `--prepare ENGINE[:VOICE]`, `-y` | model files in the cache | 1 on a voice error | `voices`; `--prepare` is `prepare_voice` |
 | `manimvox add [BLOCK ...]` | `--list`, `--force` | `blocks/<block>.py`, `blocks/__init__.py` | 1 on an unknown block or one already in the project without `--force` | `add_block`; `--list` is `list_blocks` |
 | `manimvox assets add URL` | `--licence ID`, `--credit TEXT`, `--name FILE`, `--non-commercial`, `-y` / `--yes` | `research/assets/<file>`, `research/assets.json`, an entry under `## Assets` in `FACTS.md` | 1 on a refused licence, a checksum mismatch, a file already there that differs, or no `--yes` with no terminal | `fetch_asset` (downloads only with `yes=true`; without it the result holds what to ask the user) |
 | `manimvox assets list` | none | nothing | 1 outside a project | `list_assets` |
+| `manimvox edit new NAME FILE...` | none | `edits/NAME.json`: the videos and images in order, joined by cuts | 1 if the edit exists or a file is neither a video nor an image | `new_edit` |
+| `manimvox edit probe FILE` | `--every SECONDS`, `--no-sheets` | `sheets/probe/<file>/s_NN.png` for a video | 1 if the file is missing or unreadable | `probe_media` |
 | `manimvox join [EP ...]` | `-o OUT.mp4`, `--no-cards` | `out/<Series>.mp4` and `.srt` (title card, then the episodes in order, each with its own end card) | 1 if an episode is not rendered or the frame rates differ | `join` |
 | `manimvox index` | none | `out/index.html` | 1 on error | `index` |
 | `manimvox package` | none | `share/<Name>/`, `share/<Name>-720p/` and a zip of each | 1 on error | `package` |

@@ -54,6 +54,25 @@ def _cmd_sheets(args) -> int:
     return 0
 
 
+def _cmd_edit(args) -> int:
+    from .tools import new_edit, probe_media
+
+    if args.action == "new":
+        r = new_edit(str(Path.cwd()), args.name, [str(Path(f).resolve()) for f in args.files])
+        print(f"edit: {r.path}")
+        print(f"next: look at each file (manimvox edit probe FILE), set start and end, then "
+              f"manimvox check edit {Path(r.path).stem}")
+        return 0
+    if args.every is not None and not args.every > 0:
+        print("manimvox: --every must be greater than 0", file=sys.stderr)
+        return 2
+    r = probe_media(str(Path.cwd()), str(Path(args.file).resolve()), args.every, sheets=not args.no_sheets)
+    print(f"{r.path}: {r.description}")
+    if r.sheets:
+        print(f"sheets: {', '.join(r.sheets)}")
+    return 0
+
+
 def _cmd_render(args) -> int:
     from .tools import _render
 
@@ -84,7 +103,8 @@ def _cmd_check(args) -> int:
     from .tools import check
 
     if args.what not in ("theme", "brief") and not args.episode:
-        print(f"manimvox: check {args.what} needs an episode", file=sys.stderr)
+        need = "the edit's name" if args.what == "edit" else "an episode"
+        print(f"manimvox: check {args.what} needs {need}", file=sys.stderr)
         return 2
     r = check(str(Path.cwd()), args.what, args.episode)
     if r.check == "audio":
@@ -398,8 +418,8 @@ def build_parser() -> argparse.ArgumentParser:
     s.set_defaults(func=_cmd_sheets)
 
     s = p._sub.add_parser("check", help="run one check")
-    s.add_argument("what", choices=["brief", "theme", "layout", "audio"])
-    s.add_argument("episode", nargs="?")
+    s.add_argument("what", choices=["brief", "theme", "layout", "audio", "edit"])
+    s.add_argument("episode", nargs="?", help="the episode (layout, audio) or the edit's name (edit)")
     s.set_defaults(func=_cmd_check)
 
     s = p._sub.add_parser("index", help="playlist page out/index.html from the rendered episodes")
@@ -442,6 +462,18 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("-y", "--yes", **yes)
     sub.add_parser("list", help="list the assets fetched into this project")
     s.set_defaults(func=_cmd_assets)
+
+    s = p._sub.add_parser("edit", help="edit your own footage: start an edit, or look at a file before cutting it")
+    sub = s.add_subparsers(dest="action", metavar="<action>", required=True)
+    a = sub.add_parser("new", help="start edits/NAME.json from videos and images, joined by cuts")
+    a.add_argument("name")
+    a.add_argument("files", nargs="+", metavar="file")
+    a = sub.add_parser("probe", help="what a video, sound or image holds, with contact sheets of a video")
+    a.add_argument("file")
+    a.add_argument("--every", type=float, default=None, help="seconds between sampled frames (default: about 18 "
+                   "frames over the whole video)")
+    a.add_argument("--no-sheets", action="store_true", help="no contact sheets")
+    s.set_defaults(func=_cmd_edit)
 
     s = p._sub.add_parser("skills", help="install, check, update or remove the agent skills")
     sub = s.add_subparsers(dest="action", metavar="<action>", required=True)
