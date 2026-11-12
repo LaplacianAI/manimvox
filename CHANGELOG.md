@@ -4,6 +4,8 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-12
+
 ### Added
 
 - **The edit timeline** (`manimvox.edit`), the first part of editing your own footage. An edit is `edits/<name>.json`, or `edits/<name>.py` that sets `timeline`, and both are checked the same way.
@@ -140,7 +142,8 @@ The first release.
 - **For agents:** eleven agent skills, the CLI as typed tools, adapters for eight Python agent frameworks, and plugin manifests for Claude Code, Codex, Cursor and Gemini CLI.
 - CI on Linux, macOS and Windows; releases published to PyPI with trusted publishing.
 
-[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/LaplacianAI/manimvox/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/LaplacianAI/manimvox/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/LaplacianAI/manimvox/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/LaplacianAI/manimvox/compare/v0.4.1...v0.5.0

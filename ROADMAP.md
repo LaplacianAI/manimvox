@@ -2,7 +2,7 @@
 
 manimvox lets an AI agent make high-quality educational videos at low cost, with a person directing. Each release below moves one step closer to that goal. Items are planned, not promised; order and scope may change. Discuss any of them in [GitHub issues](https://github.com/LaplacianAI/manimvox/issues).
 
-**Released:** 0.7.0 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows. Every change is in the [changelog](https://github.com/LaplacianAI/manimvox/blob/main/CHANGELOG.md).
+**Released:** 0.8.0 (alpha), on [PyPI](https://pypi.org/project/manimvox/), tested on Linux, macOS and Windows. Every change is in the [changelog](https://github.com/LaplacianAI/manimvox/blob/main/CHANGELOG.md).
 
 ## Released
 
@@ -71,13 +71,7 @@ Real objects and real data, used with their licences respected.
 - [x] **Fixes found making the videos:** an ending with nothing new to show spoke over a blank frame; a running stream did not fade out with the picture; labels can now sit in a row above or below a wide subject.
 - [x] **Gallery:** *What lets a loaded wheel turn so freely?* (a real bearing, cut open), *Why is the same page faster the second time?* and *Which site am I on?* (a real screenshot), made by Claude Code and rebuilt after review.
 
-## Next
-
-- [ ] **More gallery videos:** a paper video next.
-- [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
-- [ ] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it.
-
-## 0.8: your own footage
+### 0.8: your own footage
 
 Bring your own recordings, edit them into a finished video, and mix them with explainer scenes. Everything runs on your machine.
 
@@ -88,6 +82,14 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 - [x] **See before you cut: `manimvox edit probe`.** Length, size, sound and contact sheets of any file. With the opt-in `transcribe` extra (faster-whisper, local, asks before downloading the model): the words with their times, cuts by words, pauses and "um"s removed, and captions of the speaker.
 - [x] **Footage inside explainers.** `from_video` with no 2-minute limit, and `sound=True` to keep a clip's sound in the episode.
 - [x] **A `manimvox-edit` skill, a docs page and a gallery video.** The skill takes an agent from probing the footage to the final render; [Editing your own footage](https://laplacianai.github.io/manimvox/editing/) and the edit file reference document it; *An interview, edited* shows it.
+- [x] **Fixes found making the videos:** in a 3D episode, the theme's ground no longer covers the solids.
+- [x] **Gallery and benchmark:** *How does two metres of DNA pack into a chromosome?*, in 3D, made from one prompt by Claude Opus 5.5 and Claude Fable 5.2, with the leaderboard ranking by a reviewer's order of the videos.
+
+## Next
+
+- [ ] **More gallery videos:** a paper video next.
+- [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
+- [ ] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it.
 
 ## 0.8.5: editing, further
 
