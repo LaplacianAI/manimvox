@@ -12,6 +12,7 @@ The whole film is one file, `edits/NAME.json` or `edits/NAME.py`, that you or yo
 | Tighten | remove pauses longer than a limit, and "um", "uh" and the like |
 | Join | clips, rendered episodes, stills that move slowly, and title cards, with a cut, a fade or a dip |
 | Frame | crop, fill or letterbox; speed from 0.25x to 4x with the pitch kept |
+| Grade | exposure, white balance, lift, gamma and gain, contrast, saturation, and a `.cube` LUT, per segment |
 | Lay over | lower thirds and labels in the theme, pictures, picture-in-picture, graphics drawn by code, Manim scenes |
 | Sound | each clip levelled, narration lines in the project voice, a music bed that dips under speech, sound effects |
 | Captions | of the speaker and the narration, as an `.srt` file or burned in, with misheard names corrected |
@@ -87,6 +88,16 @@ Speech-to-text gets the words right, but its word times drift, sometimes by near
 
 `manimvox check edit` prints every piece each clip keeps, so you can read the cut against the transcript before rendering anything. Names are often misheard: copy the phrase as the transcript spells it, and add `"spellings": {"heard": "written"}` so the captions show the right spelling.
 
+## Colour
+
+A segment's `grade` corrects or styles its colour:
+
+```json
+{"clip": "footage/talk.mp4", "grade": {"exposure": 0.3, "temperature": 0.15, "saturation": 1.1}}
+```
+
+Exposure and white balance (`temperature`, `tint`) come first, then `lift`, `gamma` and `gain` for the shadows, mid-tones and highlights, then `contrast` and `saturation`. A `"lut": "looks/film.cube"` is applied last, as a look over the rest. Only the picture is graded; letterbox bars keep the theme's background. In Python, `Clip(..., grade=Grade(exposure=0.3))`. Every key is in [The edit file](edit-file.md#segments).
+
 ## Sound
 
 - **Footage:** each clip is levelled to the project's loudness. A quiet clip is raised by at most 12 dB, so room tone never roars.
@@ -101,7 +112,7 @@ Speech-to-text gets the words right, but its word times drift, sometimes by near
 
 Write the edit in Python, or name a function as `"path.py:name"` in JSON, and any layer can be your own code:
 
-- `effects=[fn]` on a segment changes every frame: `fn(rgb, t)` returns the frame. Use it for a colour grade, a blur or a redaction.
+- `effects=[fn]` on a segment changes every frame: `fn(rgb, t)` returns the frame. Use it for a blur, a redaction or a look `grade` can't make.
 - `Draw(fn, at=, until=)` draws graphics each frame: `fn(t)` returns a PIL image or an RGBA array. Use it for a progress bar, an arrow or a chart that grows.
 - `Frames(source)` is a segment made by code: `frames(fn, seconds)`, or a MoviePy clip through `from_moviepy(clip)`. Install MoviePy yourself if you want it.
 - `Scene(cls, at=)` lays a Manim scene over the footage with a transparent background. Use it for an equation, a diagram or a highlight.

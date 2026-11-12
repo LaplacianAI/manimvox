@@ -211,6 +211,18 @@ def check_edit(root: Path, tl: Timeline) -> EditReport:
                 rep.findings.append(f"{where}: {e}")
         for k, fx in enumerate(getattr(seg, "effects", ())):
             _hook(rep, root, f"{where}.effects[{k}]", fx, "function")
+        grade = getattr(seg, "grade", None)
+        if grade is not None and grade.lut is not None:
+            from .grade import read_cube
+
+            lut = resolve_path(root, grade.lut)
+            if not lut.is_file():
+                rep.findings.append(f"{where}.grade.lut: no file {grade.lut}")
+            else:
+                try:
+                    read_cube(lut)
+                except ValueError as e:
+                    rep.findings.append(f"{where}.grade.lut: {e}")
         lengths.append(length)
 
     rep.lengths = lengths

@@ -36,16 +36,32 @@ A fade or dip overlaps two segments by `seconds`, so the film is that much short
 
 | Lead | Other keys |
 |---|---|
-| `clip`: a video file | `start` (0), `end` (the file's end), `speed` (0.25 to 4, pitch kept), `volume` (0), `mute` (false), `fit`, `crop` (`[x, y, w, h]` in the source's pixels; needs `fit: "crop"`), `effects`, `from_words`, `to_words`, `cut_silences` (0.2 to 10 s), `cut_fillers` (false), `captions` (false) |
+| `clip`: a video file | `start` (0), `end` (the file's end), `speed` (0.25 to 4, pitch kept), `volume` (0), `mute` (false), `fit`, `crop` (`[x, y, w, h]` in the source's pixels; needs `fit: "crop"`), `grade`, `effects`, `from_words`, `to_words`, `cut_silences` (0.2 to 10 s), `cut_fillers` (false), `captions` (false) |
 | `episode`: a rendered episode of this project, such as `"ep01"` | the same keys as `clip` |
-| `image`: a still | `seconds` (4), `move` (`"push"`, `"pull"`, `"left"`, `"right"`), `fit` (`"contain"` or `"cover"`), `effects` |
+| `image`: a still | `seconds` (4), `move` (`"push"`, `"pull"`, `"left"`, `"right"`), `fit` (`"contain"` or `"cover"`), `grade`, `effects` |
 | `title`: the theme's title card | `lines` (up to 4, each up to 80 characters), `seconds` (3) |
-| `frames`: `"path.py:name"`, a frame source made by code | `seconds` (the source's length), `fit`, `effects` |
+| `frames`: `"path.py:name"`, a frame source made by code | `seconds` (the source's length), `fit`, `grade`, `effects` |
 
 `fit` sets how footage fills the frame:
 - `"contain"` (the default) letterboxes it;
 - `"cover"` fills the frame and trims the edges;
 - `"crop"` shows the `crop` region, scaled to fill.
+
+`grade` sets a segment's colour, before its `effects` run. Only the picture is graded; letterbox bars keep the theme's background. Every key is optional and neutral at its default:
+
+| Key | Default | Range | Meaning |
+|---|---|---|---|
+| `exposure` | `0` | −4 to 4 | brighter or darker, in stops |
+| `temperature` | `0` | −1 to 1 | warmer (+) or cooler (−) |
+| `tint` | `0` | −1 to 1 | magenta (+) or green (−) |
+| `lift` | `0` | −0.5 to 0.5 | raises (+) or crushes (−) the shadows |
+| `gamma` | `1` | 0.2 to 5 | above 1 brightens the mid-tones |
+| `gain` | `1` | 0 to 4 | scales the highlights |
+| `contrast` | `1` | 0 to 3 | about mid-grey; 1 is unchanged |
+| `saturation` | `1` | 0 to 3 | 0 is black and white |
+| `lut` | none | | a 3D `.cube` file, applied last, as a look over the rest |
+
+`lift`, `gamma` and `gain` take one number or `[r, g, b]`. Exposure and white balance work in linear light; the others work on the display values, in the order listed. For example, `"grade": {"exposure": 0.3, "temperature": 0.15, "saturation": 1.1}` lifts and warms a dull indoor take.
 
 These clip keys need a transcript, which `manimvox edit probe FILE --transcribe` makes:
 - `from_words` and `to_words`: phrases from the transcript, searched between `start` and `end`;
