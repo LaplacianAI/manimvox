@@ -94,7 +94,7 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 ## 0.8.5: editing, further
 
 - [ ] **A visual timeline** to see and adjust an edit, starting with an OpenTimelineIO export that opens in Kdenlive or Resolve.
-- [ ] **Colour grading.**
+- [x] **Colour grading.** Exposure, white balance, lift, gamma and gain, contrast and saturation per segment, and `.cube` LUTs.
 - [ ] **Stabilisation** of shaky footage.
 - [ ] **Green screen.**
 - [ ] **Speed ramps:** the speed changing within one piece.

@@ -43,6 +43,7 @@ from .timeline import (
     Clip,
     Draw,
     Frames,
+    Grade,
     Image,
     Inset,
     Music,
@@ -91,6 +92,7 @@ class _Segment:
     def __init__(self, r: _Render, p: Placed):
         self.r, self.p, self.seg = r, p, p.segment
         self.effects = [r.hook(fx, f"segments[{p.index}].effects") for fx in getattr(self.seg, "effects", ())]
+        self.look = r.look(getattr(self.seg, "grade", None), f"segments[{p.index}].grade")
         self.reader = None
         self.still = None
         self.source = None
@@ -102,7 +104,7 @@ class _Segment:
 
             with PILImage.open(resolve_path(r.root, seg.path)) as img:
                 a = to_array(img, alpha=True)
-            self.still = fit_array(a, r.W, r.H, seg.fit, r.bg)
+            self.still = fit_array(a, r.W, r.H, seg.fit, r.bg, self.look)
         elif isinstance(seg, Frames):
             self.source = frame_source(r.root, seg.source)
 
@@ -110,13 +112,13 @@ class _Segment:
         seg, r = self.seg, self.r
         u = min(max(0.0, u), max(0.0, self.p.seconds - 1e-6))
         if isinstance(seg, Clip):
-            rgb = fit_frame(self.reader.at(seg.start + u * seg.speed), r.W, r.H, seg.fit, seg.crop, r.bg)
+            rgb = fit_frame(self.reader.at(seg.start + u * seg.speed), r.W, r.H, seg.fit, seg.crop, r.bg, self.look)
         elif isinstance(seg, Image):
             rgb = moving(self.still, seg.move, u / seg.seconds if seg.seconds else 1.0, r.W, r.H)
         elif isinstance(seg, Title):
             rgb = r.card(seg, smooth(u / CARD_ANIM) if u < CARD_ANIM else 1.0)
         else:
-            rgb = fit_array(to_array(self.source.get_frame(u), alpha=True), r.W, r.H, seg.fit, r.bg)
+            rgb = fit_array(to_array(self.source.get_frame(u), alpha=True), r.W, r.H, seg.fit, r.bg, self.look)
         for fx in self.effects:
             out = to_array(fx(rgb, u))
             if out.shape != rgb.shape:
@@ -215,6 +217,7 @@ class _Render:
         self.target = target
         self.notes: list[str] = []
         self._cards: dict = {}
+        self._grades: dict = {}  # grade lookup tables, by grade
         self._gains: dict = {}
         self._made: dict[int, object] = {}  # Frames sources' sound, read once
 
@@ -225,6 +228,23 @@ class _Render:
             return resolve_ref(self.root, ref)
         except ValueError as e:
             raise EditError(f"{where}: {e}") from e
+
+    def look(self, g, where: str):
+        """The function that grades a picture by `g`, or None; each table is built once per render."""
+        if g is None or g == Grade():
+            return None
+        if g not in self._grades:
+            from .grade import apply_table, build_table, read_cube
+
+            try:
+                cube = None if g.lut is None else read_cube(resolve_path(self.root, g.lut))
+            except ValueError as e:
+                raise EditError(f"{where}.lut: {e}") from e
+            if len(self._grades) >= 3:  # a table is 48 MB: keep the few segments around a seam
+                self._grades.pop(next(iter(self._grades)))
+            table = build_table(g, cube)
+            self._grades[g] = lambda a, table=table: apply_table(table, a)
+        return self._grades[g]
 
     def card(self, seg: Title, progress: float) -> np.ndarray:
         key = (seg.text, seg.lines, round(progress, 3))

@@ -46,6 +46,28 @@ class Transition:
 
 
 @dataclass(frozen=True)
+class Grade:
+    """A colour grade for a segment's picture, applied before its effects; every control is neutral at its
+    default. `exposure` is in stops; `contrast` and `saturation` multiply (1: unchanged); `temperature` warms (+)
+    or cools (-) and `tint` turns magenta (+) or green (-), from -1 to 1; `lift`, `gamma` and `gain` move the
+    shadows, mid-tones and highlights, each one number or [r, g, b]; `lut` is a 3D `.cube` file, applied last."""
+    exposure: float = 0.0
+    contrast: float = 1.0
+    saturation: float = 1.0
+    temperature: float = 0.0
+    tint: float = 0.0
+    lift: float | tuple[float, float, float] = 0.0
+    gamma: float | tuple[float, float, float] = 1.0
+    gain: float | tuple[float, float, float] = 1.0
+    lut: str | None = None
+
+
+GRADE_RANGES = {"exposure": (-4.0, 4.0), "contrast": (0.0, 3.0), "saturation": (0.0, 3.0),
+                "temperature": (-1.0, 1.0), "tint": (-1.0, 1.0), "lift": (-0.5, 0.5), "gamma": (0.2, 5.0),
+                "gain": (0.0, 4.0)}
+
+
+@dataclass(frozen=True)
 class Clip:
     """A piece of footage (`path`), or a rendered episode of this project (`episode`), from `start` to `end`
     seconds of the file (`end=None`: to its end).
@@ -65,6 +87,7 @@ class Clip:
     crop: tuple[float, float, float, float] | None = None  # x, y, w, h in the source's pixels
     effects: tuple[Ref, ...] = ()  # fn(rgb, t) -> rgb, in order; t is seconds into the segment
     transition: Transition = field(default_factory=Transition)
+    grade: Grade | None = None
     from_words: str | None = None
     to_words: str | None = None
     cut_silences: float | None = None
@@ -85,6 +108,7 @@ class Image:
     fit: str = "contain"
     effects: tuple[Ref, ...] = ()
     transition: Transition = field(default_factory=Transition)
+    grade: Grade | None = None
 
 
 @dataclass(frozen=True)
@@ -105,6 +129,7 @@ class Frames:
     fit: str = "contain"
     effects: tuple[Ref, ...] = ()
     transition: Transition = field(default_factory=Transition)
+    grade: Grade | None = None
 
 
 Segment = Clip | Image | Title | Frames
@@ -331,6 +356,31 @@ def _transition(where: str, v) -> Transition:
                       _num(f"{where}.seconds", v.get("seconds", 0.5), hi=10, above=0))
 
 
+def _grade(where: str, v) -> Grade | None:
+    if v is None:
+        return None
+    if isinstance(v, Grade):
+        v = {f.name: getattr(v, f.name) for f in fields(Grade)}
+    if not isinstance(v, dict):
+        raise ValueError(f'{where} must be an object such as {{"exposure": 0.3, "saturation": 1.1}}, got {v!r}')  # noqa: TRY004 - edit errors are ValueError
+    names = [f.name for f in fields(Grade)]
+    _unknown(where, v, names)
+    out: dict = {}
+    for name, (lo, hi) in GRADE_RANGES.items():
+        if name not in v:
+            continue
+        x = v[name]
+        if name in ("lift", "gamma", "gain") and isinstance(x, (list, tuple)):
+            if len(x) != 3:
+                raise ValueError(f"{where}.{name} must be a number or [r, g, b], got {x!r}")
+            out[name] = tuple(_num(f"{where}.{name}[{i}]", c, lo, hi) for i, c in enumerate(x))
+        else:
+            out[name] = _num(f"{where}.{name}", x, lo, hi)
+    if v.get("lut") is not None:
+        out["lut"] = _path(f"{where}.lut", v["lut"])
+    return Grade(**out)
+
+
 def _unknown(where: str, raw: dict, known) -> None:
     extra = sorted(set(raw) - set(known))
     if extra:
@@ -364,9 +414,10 @@ def _segment(where: str, raw) -> Segment:
     lead = _lead(where, raw, SEGMENT_LEADS)
     tr = _transition(f"{where}.transition", raw.get("transition"))
     effects = _refs(f"{where}.effects", raw.get("effects"))
+    grade = _grade(f"{where}.grade", raw.get("grade")) if lead != "title" else None
     if lead in ("clip", "episode"):
         _unknown(where, raw, (lead, "start", "end", "speed", "volume", "mute", "fit", "crop", "effects",
-                              "transition", "from_words", "to_words", "cut_silences", "cut_fillers", "captions"))
+                              "transition", "grade", "from_words", "to_words", "cut_silences", "cut_fillers", "captions"))
         start = _num(f"{where}.start", raw.get("start", 0.0), 0)
         end = raw.get("end")
         end = None if end is None else _num(f"{where}.end", end, above=start)
@@ -382,7 +433,7 @@ def _segment(where: str, raw) -> Segment:
                     start=start, end=end, speed=_num(f"{where}.speed", raw.get("speed", 1.0), *SPEED),
                     volume=_num(f"{where}.volume", raw.get("volume", 0.0), *DB),
                     mute=_bool(f"{where}.mute", raw.get("mute", False)), fit=fit, crop=crop, effects=effects,
-                    transition=tr,
+                    transition=tr, grade=grade,
                     from_words=_words(f"{where}.from_words", raw.get("from_words")),
                     to_words=_words(f"{where}.to_words", raw.get("to_words")),
                     cut_silences=None if raw.get("cut_silences") is None else _num(
@@ -390,19 +441,19 @@ def _segment(where: str, raw) -> Segment:
                     cut_fillers=_bool(f"{where}.cut_fillers", raw.get("cut_fillers", False)),
                     captions=_bool(f"{where}.captions", raw.get("captions", False)))
     if lead == "image":
-        _unknown(where, raw, ("image", "seconds", "move", "fit", "effects", "transition"))
+        _unknown(where, raw, ("image", "seconds", "move", "fit", "effects", "transition", "grade"))
         move = raw.get("move")
         return Image(_path(f"{where}.image", raw["image"]),
                      _num(f"{where}.seconds", raw.get("seconds", 4.0), hi=600, above=0),
                      None if move is None else _choice(f"{where}.move", move, MOVES),
-                     _choice(f"{where}.fit", raw.get("fit", "contain"), ("contain", "cover")), effects, tr)
+                     _choice(f"{where}.fit", raw.get("fit", "contain"), ("contain", "cover")), effects, tr, grade)
     if lead == "frames":
-        _unknown(where, raw, ("frames", "seconds", "fit", "effects", "transition"))
+        _unknown(where, raw, ("frames", "seconds", "fit", "effects", "transition", "grade"))
         secs = raw.get("seconds")
         src = raw["frames"]  # from Python, a frame source itself (frames(...), a MoviePy clip) as well as a ref
         return Frames(src if hasattr(src, "get_frame") else _ref(f"{where}.frames", src),
                       None if secs is None else _num(f"{where}.seconds", secs, hi=3600, above=0),
-                      _choice(f"{where}.fit", raw.get("fit", "contain"), ("contain", "cover")), effects, tr)
+                      _choice(f"{where}.fit", raw.get("fit", "contain"), ("contain", "cover")), effects, tr, grade)
     _unknown(where, raw, ("title", "lines", "seconds", "transition"))
     lines = raw.get("lines", [])
     if isinstance(lines, str):
@@ -563,6 +614,9 @@ def _plain(name: str, v, root, keep: bool):
         return v if (keep or isinstance(v, str)) else ref_of(v, root)
     if isinstance(v, Transition):
         return v.kind if v.seconds == 0.5 else {"kind": v.kind, "seconds": v.seconds}
+    if isinstance(v, Grade):
+        return {f.name: list(x) if isinstance(x, tuple) else x for f in fields(Grade)
+                if (x := getattr(v, f.name)) != f.default}
     if isinstance(v, (tuple, list)):
         return list(v)
     return v

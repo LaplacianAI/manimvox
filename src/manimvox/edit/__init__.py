@@ -12,7 +12,8 @@ An edit is `edits/<name>.json`, or `edits/<name>.py` that sets `timeline`:
     )
 
 Any layer can be code: `Frames(source)` for a segment made by code (a MoviePy clip, or `frames(fn, seconds)`), `Draw(fn, ...)` for graphics drawn each frame, `Scene(cls, ...)` for a Manim scene over
-the footage, and `effects=[fn, ...]` on a segment to change every frame (a colour grade, a blur).
+the footage, and `effects=[fn, ...]` on a segment to change every frame (a blur, a vignette). `grade=Grade(...)` grades a
+segment's colour: exposure, white balance, contrast, saturation, lift, gamma and gain, and a `.cube` LUT.
 """
 from __future__ import annotations
 
@@ -25,6 +26,7 @@ from .timeline import (
     Clip,
     Draw,
     Frames,
+    Grade,
     Image,
     Inset,
     Music,
@@ -110,6 +112,6 @@ def from_moviepy(clip) -> MoviePySource:
     return MoviePySource(clip)
 
 
-__all__ = ["Audio", "Clip", "Draw", "FrameSource", "Frames", "Image", "Inset", "MoviePySource", "Music", "Overlay",
+__all__ = ["Audio", "Clip", "Draw", "FrameSource", "Frames", "Grade", "Image", "Inset", "MoviePySource", "Music", "Overlay",
            "Picture", "Say", "Scene", "Segment", "Sound", "Text", "Timeline", "Title", "Transition", "frames",
            "from_moviepy"]

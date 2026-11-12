@@ -4,6 +4,10 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+
+- **Colour grading in an edit.** `grade` on a clip, image or frames segment (`Grade` in Python): `exposure`, `temperature`, `tint`, `lift`, `gamma`, `gain`, `contrast`, `saturation`, and a 3D `.cube` LUT applied last. The grade is built once into a lookup table, so each frame is graded in one pass; letterbox bars keep the theme's background. `manimvox check edit` reports a missing or malformed LUT.
+
 ## [0.8.0] - 2026-11-12
 
 ### Added

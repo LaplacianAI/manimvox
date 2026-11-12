@@ -56,6 +56,7 @@ The full field list is in [references/edit-file.md](references/edit-file.md). Th
 - **Caption.** `"captions": true` on a clip captions what the speaker says. The edit's `"captions"` is `"srt"` (a file beside the video, the default), `"burn"` (drawn into the picture as well) or `"none"`. Speech-to-text mishears names: add `"spellings": {"heard": "written"}` at the top of the edit, using the transcript's own spelling as the key.
 - **Join.** A segment's `"transition"` is `"cut"` (the default), `"fade"` or `"dip"` (through the theme's background). A fade or dip overlaps two segments by `seconds` (0.5 by default). The first segment has nothing to fade from, so it must be a cut.
 - **Frame.** `{"title": ..., "lines": [...]}` for a card, such as a question asked off camera, a chapter or the credits. `{"image": ..., "move": "push"}` for a still that moves slowly. `{"episode": "ep01"}` for a rendered explainer from this project.
+- **Grade.** `"grade": {"exposure": 0.3, "temperature": 0.15}` on a clip, image or frames segment corrects its colour; `"lut": "looks/a.cube"` adds a look last. Grade every clip from one camera alike, and match a second camera to the first by eye on the contact sheets. Prefer `grade` to a code effect: it is checked, and fast.
 - **Over the picture.** Overlays run from `at` to `until`, in seconds of the output. Use `{"text": "Name", "sub": "Role", "kind": "lower-third"}` when someone first speaks, `{"image": ..., "box": [x, y, width]}` for a logo or a picture beside the speaker, and `{"clip": ..., "box": [...]}` for picture-in-picture. Boxes are output pixels from the top left.
 - **Sound.** Each clip's sound is levelled. `{"say": "...", "at": 12}` adds a narration line in the project's voice. `{"music": "path", "volume": -16}` is a bed under the whole film, which dips by the edit's `duck_db` (default −12) whenever anyone speaks; only one is allowed. `{"sound": "path", "at": ...}` places an effect or a recorded voice-over.
 
@@ -65,7 +66,7 @@ Times for overlays and `say` are seconds of the **finished** film, which changes
 
 Write `edits/NAME.py` instead, setting `timeline = Timeline(...)` from `manimvox.edit`, when the edit needs any of these:
 
-- `effects=[fn]` on a segment: `fn(rgb, t) -> rgb` for every frame, such as a colour grade, a blur, a redaction box or a vignette;
+- `effects=[fn]` on a segment: `fn(rgb, t) -> rgb` for every frame, such as a blur, a redaction box or a vignette;
 - `Draw(fn, at=, until=)`: graphics drawn each frame, where `fn(t)` returns a PIL image or an RGBA array, such as a progress bar, an arrow that follows something or a chart that grows;
 - `Frames(source)`: a segment made by code, either `frames(fn, seconds)` or `from_moviepy(clip)` when MoviePy is installed beside manimvox;
 - `Scene(cls, at=)`: a Manim scene laid transparently over the footage, such as an equation, a diagram or a highlight.

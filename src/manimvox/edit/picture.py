@@ -82,8 +82,11 @@ def _fit_size(sw: int, sh: int, w: int, h: int, cover: bool) -> tuple[int, int]:
     return max(2, round(sw * k)), max(2, round(sh * k))
 
 
-def place(a: np.ndarray, w: int, h: int, bg: tuple[int, int, int]) -> np.ndarray:
-    """A picture already scaled to fit: centred on a `bg` canvas (contain) or cut to the frame (cover)."""
+def place(a: np.ndarray, w: int, h: int, bg: tuple[int, int, int], look=None) -> np.ndarray:
+    """A picture already scaled to fit: centred on a `bg` canvas (contain) or cut to the frame (cover). `look`
+    (an array function, such as a grade) changes the picture itself, never the background around it."""
+    if look is not None:
+        a = look(a)
     ph, pw = a.shape[:2]
     if a.shape[2] == 4:  # transparency over the background
         canvas = np.empty((ph, pw, 3), np.uint8)
@@ -102,22 +105,22 @@ def place(a: np.ndarray, w: int, h: int, bg: tuple[int, int, int]) -> np.ndarray
     return out
 
 
-def fit_frame(frame: av.VideoFrame, w: int, h: int, fit: str, crop, bg) -> np.ndarray:
+def fit_frame(frame: av.VideoFrame, w: int, h: int, fit: str, crop, bg, look=None) -> np.ndarray:
     """A decoded video frame at the output size: letterboxed (contain), filled (cover), or a region of it in the
     source's pixels (crop) scaled to fit. FFmpeg's scaler does the resizing."""
     if fit == "crop":
         x, y, cw, ch = (round(v) for v in crop)
         rgb = frame.to_ndarray(format="rgb24")[y:y + ch, x:x + cw]
         tw, th = _fit_size(rgb.shape[1], rgb.shape[0], w, h, cover=False)
-        return place(resize(rgb, tw, th), w, h, bg)
+        return place(resize(rgb, tw, th), w, h, bg, look)
     tw, th = _fit_size(frame.width, frame.height, w, h, cover=fit == "cover")
-    return place(frame.reformat(width=tw, height=th, format="rgb24").to_ndarray(), w, h, bg)
+    return place(frame.reformat(width=tw, height=th, format="rgb24").to_ndarray(), w, h, bg, look)
 
 
-def fit_array(a: np.ndarray, w: int, h: int, fit: str, bg) -> np.ndarray:
+def fit_array(a: np.ndarray, w: int, h: int, fit: str, bg, look=None) -> np.ndarray:
     """An image or a made frame (RGB or RGBA) at the output size, letterboxed or filled."""
     tw, th = _fit_size(a.shape[1], a.shape[0], w, h, cover=fit == "cover")
-    return place(resize(a, tw, th), w, h, bg)
+    return place(resize(a, tw, th), w, h, bg, look)
 
 
 def blend(frame: np.ndarray, rgba: np.ndarray, x: int, y: int, opacity: float = 1.0) -> None:
