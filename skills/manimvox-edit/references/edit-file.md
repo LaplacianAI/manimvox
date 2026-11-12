@@ -77,9 +77,20 @@ All overlays take `at` and `until` (seconds of the output) and `fade` (seconds; 
 |---|---|
 | `text` | `kind`: `"lower-third"` (the default; `sub` is the role line), `"title"` (centred) or `"label"` (needs `pos: [x, y]`) |
 | `image`: a picture over the film | `box: [x, y, width]` (required; the height follows the image) |
-| `clip`: picture-in-picture | `box` (required), `start` (in its file), `volume` (silent unless given) |
+| `clip`: picture-in-picture, or a keyed subject | `box` (the whole frame, fitted, without it), `start` (in its file), `volume` (silent unless given), `key` |
 | `draw`: `"path.py:name"` | `box` (optional: the whole frame without it) |
 | `scene`: `"path.py:Class"`, a Manim scene | `until` is optional (the scene's own length), `box` |
+
+`key` on a `clip` overlay makes a green or blue screen transparent, so the main track shows through behind the subject. It is `true` or `"auto"` (the backing's colour is sampled from the frame's border), `"green"`, `"blue"`, `"#rrggbb"`, or an object:
+
+| Key | Default | Range | Meaning |
+|---|---|---|---|
+| `color` | `"auto"` | | the backing's colour |
+| `similarity` | `0.12` | 0 to 0.6 | how close to it a pixel must be to go fully |
+| `softness` | `0.08` | 0 to 0.5 | how far past that the edge fades in; 0 is a hard edge |
+| `spill` | `0.6` | 0 to 1 | how much of the backing's colour cast is taken out of the subject |
+
+Raise `similarity` when patches of the screen remain; lower it when the subject's edges are eaten.
 
 ## Audio
 

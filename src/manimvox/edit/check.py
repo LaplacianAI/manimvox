@@ -261,7 +261,8 @@ def check_edit(root: Path, tl: Timeline) -> EditReport:
             m = media.get(where, o.path, ("video",), "a video")
             inside(where, o.until)
             if m is not None:
-                boxed(where, o.box, o.box[2] * m.height / m.width)
+                if o.box is not None:
+                    boxed(where, o.box, o.box[2] * m.height / m.width)
                 if o.start + (o.until - o.at) > m.seconds + SLACK:
                     rep.findings.append(f"{where}: showing {o.until - o.at:g} s from {o.start:g} s runs past the "
                                         f"file's end ({m.seconds:.2f} s)")

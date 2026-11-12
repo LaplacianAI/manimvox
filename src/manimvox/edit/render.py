@@ -152,6 +152,7 @@ class _Layer:
             self.fixed = text_layer(o, r.W, r.H, r.theme, s)
         elif isinstance(o, Inset):
             self.reader = Reader(resolve_path(r.root, o.path))
+            self.key_rgb = None  # the key colour, found on the first frame drawn
         elif isinstance(o, Draw):
             self.fn = r.hook(o.fn, f"overlays[{i}].draw")
         elif isinstance(o, Scene):
@@ -173,10 +174,21 @@ class _Layer:
             x, y, rgba = self.fixed
         elif isinstance(o, Inset):
             f = self.reader.at(o.start + u)
-            w = max(2, round(o.box[2] * s))
-            h = max(2, round(w * f.height / f.width))
+            if o.box is None:  # fitted to the whole frame, centred
+                k = min(_r.W / f.width, _r.H / f.height)
+                w, h = max(2, round(f.width * k)), max(2, round(f.height * k))
+                x, y = (_r.W - w) // 2, (_r.H - h) // 2
+            else:
+                w = max(2, round(o.box[2] * s))
+                h = max(2, round(w * f.height / f.width))
+                x, y = round(o.box[0] * s), round(o.box[1] * s)
             rgba = f.reformat(width=w, height=h, format="rgba").to_ndarray()
-            x, y = round(o.box[0] * s), round(o.box[1] * s)
+            if o.key is not None:
+                from .key import key_color, keyed
+
+                if self.key_rgb is None:
+                    self.key_rgb = key_color(o.key, rgba)
+                rgba = keyed(rgba, o.key, self.key_rgb)
         elif isinstance(o, Draw):
             rgba = to_array(self.fn(u), alpha=True)
             x, y, rgba = self._boxed(rgba)
