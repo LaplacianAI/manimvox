@@ -41,6 +41,7 @@ A fade or dip overlaps two segments by `seconds`, so the film is that much short
 | `image`: a still | `seconds` (4), `move` (`"push"`, `"pull"`, `"left"`, `"right"`), `fit` (`"contain"` or `"cover"`), `grade`, `effects` |
 | `title`: the theme's title card | `lines` (up to 4, each up to 80 characters), `seconds` (3) |
 | `frames`: `"path.py:name"`, a frame source made by code | `seconds` (the source's length), `fit`, `grade`, `effects` |
+| `multicam`: 2 to 9 videos of one moment | `cuts`, `camera` (0), `start` (0), `end` (the sound camera's end), `sound` (0), `offsets`, `volume` (0), `mute` (false), `fit` (`"contain"` or `"cover"`), `grade` |
 
 `fit` sets how footage fills the frame:
 - `"contain"` (the default) letterboxes it;
@@ -48,6 +49,12 @@ A fade or dip overlaps two segments by `seconds`, so the film is that much short
 - `"crop"` shows the `crop` region, scaled to fill.
 
 `speed` as a ramp is a list of `[seconds of the file, speed]` keyframes, at least two, rising in time: `"speed": [[12, 1], [12.6, 0.3], [14, 0.3], [14.5, 1]]` slows to 0.3x as something happens at 12.6 s of the file, holds, and comes back to normal speed. The speed eases from one keyframe to the next and holds before the first and after the last. The sound keeps its pitch throughout. Mute a clip if a slowed moment sounds wrong.
+
+A `multicam` switches between cameras that recorded the same moment. Its times (`start`, `end` and each cut's) are seconds of the **first** camera's file. `cuts` is a list of `[seconds, camera]`, rising: the picture starts on `camera` and switches at each cut. The sound is camera `sound`'s throughout, so it never jumps at a cut. `offsets` gives where each camera's file starts on the first camera's clock (`[0, 1.37]`: the second camera started 1.37 s later); leave it out and `check edit` finds it from the sound, printing what it found. Cameras numbered from 0, in the order listed:
+
+```json
+{"multicam": ["footage/wide.mp4", "footage/close.mp4"], "start": 4, "end": 64, "cuts": [[12.5, 1], [30, 0]]}
+```
 
 `stabilize` on a clip holds shaky footage steady. It is `true`, or `{"smooth": 1, "zoom": "auto"}`:
 - `smooth` (0.1 to 10 s, default 1) is how long a stretch of the camera's path is averaged. Longer is steadier, but slow moves such as a pan are flattened too.

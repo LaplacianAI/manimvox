@@ -12,6 +12,7 @@ The whole film is one file, `edits/NAME.json` or `edits/NAME.py`, that you or yo
 | Tighten | remove pauses longer than a limit, and "um", "uh" and the like |
 | Join | clips, rendered episodes, stills that move slowly, and title cards, with a cut, a fade or a dip |
 | Frame | crop, fill or letterbox; speed from 0.25x to 4x with the pitch kept, steady or ramping within a clip |
+| Several cameras | recordings of one moment lined up by their sound, cut between, with one camera's sound throughout |
 | Steady | shaky footage stabilised, slow moves such as a pan kept, zoomed just enough to hide the edges |
 | Grade | exposure, white balance, lift, gamma and gain, contrast, saturation, and a `.cube` LUT, per segment |
 | Lay over | lower thirds and labels in the theme, pictures, picture-in-picture, a speaker shot on a green screen, graphics drawn by code, Manim scenes |
@@ -98,6 +99,22 @@ A clip's `speed` can change within it. Give keyframes in seconds of the file, an
 ```
 
 This plays at normal speed, slows to 0.3x as the jump lands at 12.6 s, holds, and speeds back up. The sound keeps its pitch. `manimvox check edit` prints how long the ramped clip lasts on the finished film. In Python, `Clip(..., speed=((12, 1), (12.6, 0.3), (14, 0.3), (14.5, 1)))`.
+
+## Several cameras
+
+Recordings of one moment, from two or more cameras or a camera and a sound recorder, line up by their sound:
+
+```text
+manimvox edit sync footage/wide.mp4 footage/close.mp4
+```
+
+It prints where each file starts on the first file's clock, with a confidence. A `multicam` segment then cuts between the cameras:
+
+```json
+{"multicam": ["footage/wide.mp4", "footage/close.mp4"], "start": 4, "end": 64, "cuts": [[12.5, 1], [30, 0]]}
+```
+
+Times are seconds of the first camera's file. The picture starts on camera 0, cuts to camera 1 at 12.5 s and back at 30 s. The sound stays on camera `sound` (0 by default), so it never jumps at a cut. Without `offsets`, `manimvox check edit` finds them from the sound and prints them; if the sound doesn't match clearly, it says so rather than guessing, and you give `"offsets": [0, 1.37]` by hand. A clap on camera at the start makes sync certain. In Python, `Multicam(("wide.mp4", "close.mp4"), cuts=((12.5, 1), (30, 0)))`.
 
 ## Stabilisation
 

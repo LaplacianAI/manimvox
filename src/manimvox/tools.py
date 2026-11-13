@@ -875,6 +875,51 @@ def transcribe_media(project: str, path: str, model: str = "small", language: st
 
 
 @dataclass(frozen=True)
+class SyncResult:
+    ok: bool
+    files: list[str]
+    offsets: list[float | None]  # where each file starts on the first file's clock; None where it could not be found
+    confidence: list[float | None]
+    problems: list[str]
+
+
+@_tool
+def sync_media(project: str, files: list[str]) -> SyncResult:
+    """Line up recordings of one moment (several cameras, or a camera and a separate sound recorder) by their sound:
+    where each file starts on the first file's clock, in seconds, with a confidence (the match's peak over the
+    next-best). Use the offsets in a multicam segment, or leave them out and `check` finds the same ones.
+
+    Args:
+        project: The project folder, or any folder inside it.
+        files: Two or more files, relative to the project or absolute; the first is the clock.
+    """
+    from .edit.load import resolve_path
+    from .edit.sync import SyncError, find_offset
+    from .project import find_project
+
+    if len(files) < 2:
+        raise ValueError("give at least two files to line up")
+    root = find_project(Path(project).expanduser())
+    paths = [resolve_path(root, f) for f in files]
+    for f in paths:
+        if not f.is_file():
+            raise FileNotFoundError(f"no file {f}")
+    offs: list[float | None] = [0.0]
+    conf: list[float | None] = [None]
+    problems = []
+    for f in paths[1:]:
+        try:
+            o = find_offset(root, paths[0], f)
+            offs.append(o.seconds)
+            conf.append(o.confidence)
+        except SyncError as e:
+            offs.append(None)
+            conf.append(None)
+            problems.append(str(e))
+    return SyncResult(not problems, [str(f) for f in paths], offs, conf, problems)
+
+
+@dataclass(frozen=True)
 class EditResult:
     ok: bool
     path: str
@@ -941,8 +986,8 @@ def render_edit(project: str, name: str, draft: bool = False, start: float | Non
 
 TOOLS = (new_project, brief_questions, write_brief, draft, render, check, contact_sheet, voices, prepare_voice,
          list_blocks, add_block, join, index, package, doctor, fetch_asset, list_assets, probe_media, new_edit,
-         render_edit, transcribe_media)
-# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets and `edit new` is new_edit and `edit probe` is probe_media (with --transcribe, transcribe_media)
+         render_edit, transcribe_media, sync_media)
+# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets and `edit new` is new_edit and `edit probe` is probe_media (with --transcribe, transcribe_media) and `edit sync` is sync_media
 COMMANDS = {"new": "new_project", "brief": "write_brief", "draft": "draft", "render": "render", "check": "check", "sheets": "contact_sheet", "voices": "voices",
             "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor",
             "assets": "fetch_asset", "edit": "render_edit"}

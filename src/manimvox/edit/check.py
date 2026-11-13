@@ -14,6 +14,7 @@ from .timeline import (
     Frames,
     Image,
     Inset,
+    Multicam,
     Music,
     Picture,
     Say,
@@ -57,6 +58,8 @@ def _name(seg) -> str:
         return f"image {seg.path}"
     if isinstance(seg, Title):
         return f"title {seg.text!r}"
+    if isinstance(seg, Multicam):
+        return f"multicam {seg.cameras[0]} and {len(seg.cameras) - 1} more"
     src = seg.source
     return f"frames {src if isinstance(src, str) else getattr(src, '__name__', type(src).__name__)}"
 
@@ -103,11 +106,34 @@ def _hook(report: EditReport, root: Path, where: str, ref, kind: str):
 _PLAIN = {"from_words": None, "to_words": None, "cut_silences": None, "cut_fillers": False}
 
 
+def _synced(root: Path, where: str, seg: Multicam, rep: EditReport) -> Multicam:
+    """A multicam with each camera's offset found from the sound (all 0 where it cannot be: a finding says so)."""
+    from .sync import SyncError, find_offset
+
+    paths = [resolve_path(root, c) for c in seg.cameras]
+    if not all(p.is_file() for p in paths):
+        return replace(seg, offsets=(0.0,) * len(paths))  # the file checks report what is missing
+    offs = [0.0]
+    for k, p in enumerate(paths[1:], 1):
+        try:
+            o = find_offset(root, paths[0], p)
+            offs.append(o.seconds)
+            rep.cuts.append(f"{where}: camera {k} ({seg.cameras[k]}) starts at {o.seconds:+.3f} s on camera 0's "
+                            f"clock (confidence {o.confidence:g})")
+        except SyncError as e:
+            rep.findings.append(f"{where}.offsets: {e}")
+            offs.append(0.0)
+    return replace(seg, offsets=tuple(offs))
+
+
 def _resolve(root: Path, tl: Timeline, rep: EditReport) -> Timeline:
     """Clips that cut by their transcript, as the plain pieces they keep, the first with the clip's own
     transition and the rest joined by cuts. A clip whose transcript is missing is a finding."""
     segs = []
     for i, seg in enumerate(tl.segments):
+        if isinstance(seg, Multicam) and seg.offsets is None:
+            segs.append(_synced(root, f"segments[{i}] ({_name(seg)})", seg, rep))
+            continue
         if not (isinstance(seg, Clip) and seg.needs_transcript):
             segs.append(seg)
             continue
@@ -198,6 +224,25 @@ def check_edit(root: Path, tl: Timeline) -> EditReport:
                     if x + w > m.width + 0.5 or y + h > m.height + 0.5:
                         rep.findings.append(f"{where}: crop {list(seg.crop)} reaches outside the "
                                             f"{m.width}x{m.height} picture")
+        elif isinstance(seg, Multicam):
+            ms = [media.get(f"{where}.multicam[{k}]", c, ("video",), "a video") for k, c in enumerate(seg.cameras)]
+            if all(m is not None for m in ms):
+                offs = seg.offsets or (0.0,) * len(ms)
+                ranges = [(o, o + m.seconds) for o, m in zip(offs, ms, strict=True)]
+                if not ms[seg.sound].audio and not seg.mute:
+                    rep.findings.append(f"{where}: camera {seg.sound}, the sound camera, has no sound; "
+                                        "choose another with sound, or mute")
+                end = seg.end if seg.end is not None else ranges[seg.sound][1]
+                length = end
+                lo, hi = ranges[seg.sound]
+                if not seg.mute and (seg.start < lo - SLACK or end > hi + SLACK):
+                    rep.findings.append(f"{where}: the sound camera {seg.sound} runs from {lo:.2f} s to {hi:.2f} s "
+                                        f"on camera 0's clock, not the whole {seg.start:g} s to {end:g} s")
+                for a, b, c in seg.spans(end):
+                    lo, hi = ranges[c]
+                    if a < lo - SLACK or b > hi + SLACK:
+                        rep.findings.append(f"{where}: camera {c} is shown from {a:g} s to {b:g} s, but its file "
+                                            f"covers {lo:.2f} s to {hi:.2f} s on camera 0's clock")
         elif isinstance(seg, Image):
             media.get(where, seg.path, ("image",), "an image")
         elif isinstance(seg, Frames):
