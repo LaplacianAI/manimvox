@@ -2,7 +2,7 @@
 
 Give manimvox your recordings (an interview, a talk, a screen recording, a demo) and it edits them into a finished video. It cuts by what is said, removes the "um"s and long pauses, joins pieces with titles, images and explainer episodes, puts names, pictures and graphics over the picture, and mixes the sound with narration and music. Everything runs on your computer.
 
-The whole film is one file, `edits/NAME.json` or `edits/NAME.py`, that you or your agent can read, check and change. [*An interview, edited*](gallery/edited-interview.md) was made this way from one edit file.
+The whole film is one file, `edits/NAME.json` or `edits/NAME.py`, that you or your agent can read, check and change. [*An interview, edited*](gallery/edited-interview.md) was made this way from one edit file. [*Your footage, edited*](gallery/editing-tour.md) is a 20-minute tutorial on every tool on this page, chapter by chapter, made end to end by an AI agent with manimvox.
 
 ## What you can do
 
@@ -99,7 +99,7 @@ A clip's `speed` can change within it. Give keyframes in seconds of the file, an
 {"clip": "footage/jump.mp4", "start": 10, "end": 16, "speed": [[12, 1], [12.6, 0.3], [14, 0.3], [14.5, 1]]}
 ```
 
-This plays at normal speed, slows to 0.3x as the jump lands at 12.6 s, holds, and speeds back up. The sound keeps its pitch. `manimvox check edit` prints how long the ramped clip lasts on the finished film. In Python, `Clip(..., speed=((12, 1), (12.6, 0.3), (14, 0.3), (14.5, 1)))`.
+This plays at normal speed, slows to 0.3x as the jump lands at 12.6 s, holds, and speeds back up. The sound keeps its pitch. `manimvox check edit` prints how long the ramped clip lasts on the finished film. Keyframes are seconds of the file, the same clock as `start` and `end`. If every keyframe lies outside the clip, as when they are written in the film's seconds, `check edit` says so instead of playing the clip at one speed. In Python, `Clip(..., speed=((12, 1), (12.6, 0.3), (14, 0.3), (14.5, 1)))`.
 
 ## Several cameras
 

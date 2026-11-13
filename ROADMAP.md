@@ -100,7 +100,13 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 - [x] **Speed ramps:** the speed changing within one piece, eased between keyframes, with the pitch kept.
 - [x] **Multi-camera sync:** several recordings of one moment lined up by their sound, and a multicam segment that cuts between them with one sound throughout.
 - [x] **Uncut pieces copied without re-encoding,** for faster renders and no loss of quality: for an edit that is one untouched clip. Copied and re-encoded H.264 decode wrongly in one file, so mixing them waits for re-encoding just the frames around each cut with the camera's own settings.
-- [x] **The `manimvox-edit` skill, the docs and a gallery video** cover every tool: *Your footage, edited* uses each of 0.8.0 and 0.8.5 once, on real footage.
+- [x] **The `manimvox-edit` skill, the docs and a gallery video** cover every tool. *Your footage, edited* is manimvox explaining itself: a 20-minute tutorial on every editing tool in 0.8.0 and 0.8.5, made end to end by an AI agent with manimvox. Each tool is explained, shown in the edit file and on real footage, before and after, with its common mistake. The page has chapters that seek the video.
+- [x] **Fixes found making it:**
+  - `check edit` reports speed keyframes that all lie outside the clip.
+  - MP4s are written with their index first, so long films play and seek before the download ends.
+  - Frames are read past damaged packets.
+  - `key: "auto"` finds the screen on a low-angle shot.
+  - Commons credits drop the uploader's talk link.
 
 ## Later
 
