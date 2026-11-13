@@ -1,0 +1,122 @@
+name: Newest dependencies
+
+# Weekly, the tests run against the newest version of every dependency that pyproject.toml allows: what a user
+# gets from `pip install manimvox` today, rather than what uv.lock pins. A release upstream that breaks manimvox
+# (as Pillow 13 did) shows up here first. When this fails, an issue is opened, or updated if one is open,
+# listing what changed since the lock.
+
+on:
+  schedule:
+    - cron: "17 6 * * 1"  # Mondays, 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: latest-deps
+  cancel-in-progress: true
+
+env:
+  FAST: "not slow and not kokoro and not piper"
+  PYTHONUTF8: "1"
+  EXTRAS: "--extra dev --extra kokoro --extra pyvista"
+
+jobs:
+  test:
+    name: newest (${{ matrix.os }}, py${{ matrix.python }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-latest, python: "3.11"}
+          - {os: ubuntu-latest, python: "3.13"}
+          - {os: macos-latest, python: "3.13"}
+          - {os: windows-latest, python: "3.13"}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: System libraries (Linux; EGL and OSMesa let VTK render with no display)
+        if: runner.os == 'Linux'
+        timeout-minutes: 10
+        run: bash .github/scripts/apt.sh libcairo2-dev libpango1.0-dev pkg-config python3-dev libegl1 libosmesa6
+      - name: System libraries (macOS)
+        if: runner.os == 'macOS'
+        timeout-minutes: 10
+        run: brew install cairo pkg-config
+      - name: Software OpenGL (Windows runners have no GPU; Windows' own OpenGL is too old for VTK)
+        if: runner.os == 'Windows'
+        uses: pyvista/setup-headless-display-action@v4
+      - name: Resolve the newest allowed versions
+        shell: bash
+        run: |
+          uv export --frozen --no-hashes --no-emit-project $EXTRAS -q > locked.txt
+          bash .github/scripts/report.sh uv lock --upgrade
+          uv export --frozen --no-hashes --no-emit-project $EXTRAS -q > latest.txt
+          uv run --no-project python .github/scripts/upgrades.py locked.txt latest.txt | tee upgrades.md >> "$GITHUB_STEP_SUMMARY"
+      - run: bash .github/scripts/report.sh uv sync $EXTRAS
+        shell: bash
+      - run: bash .github/scripts/report.sh uv run pytest -m "$FAST" -q -rs
+        shell: bash
+      - name: Keep what changed, for the issue
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upgrades-${{ matrix.os }}-py${{ matrix.python }}
+          path: upgrades.md
+          if-no-files-found: ignore
+
+  render:
+    name: newest render (ubuntu)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: astral-sh/setup-uv@v7
+        with:
+          python-version: "3.13"
+      - name: System libraries
+        timeout-minutes: 10
+        run: bash .github/scripts/apt.sh libcairo2-dev libpango1.0-dev pkg-config python3-dev
+      - name: Resolve the newest allowed versions
+        run: bash .github/scripts/report.sh uv lock --upgrade
+      - run: bash .github/scripts/report.sh uv sync --extra dev --extra kokoro
+      - name: Render tests (every block's demo against its preview)
+        run: bash .github/scripts/report.sh uv run pytest -m slow -q -rs
+
+  report:
+    name: open or update the issue
+    needs: [test, render]
+    if: failure() && github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: upgrades-*
+          merge-multiple: false
+      - name: Open the issue, or comment on the open one
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RUN: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          title="Newest dependencies break manimvox"
+          {
+            echo "The weekly run against the newest allowed dependencies failed: $RUN"
+            echo
+            echo "Each failing step's reason is in the run's annotations. What changed since \`uv.lock\`:"
+            echo
+            first=$(ls -d upgrades-*/ 2>/dev/null | head -n 1)
+            if [ -n "$first" ]; then cat "$first/upgrades.md"; else echo "(not recorded)"; fi
+            echo
+            echo "Fix manimvox, or cap the package in pyproject.toml with a comment saying why, then refresh uv.lock."
+          } > body.md
+          number=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number')
+          if [ -n "$number" ]; then
+            gh issue comment "$number" --body-file body.md
+          else
+            gh issue create --title "$title" --body-file body.md
+          fi
