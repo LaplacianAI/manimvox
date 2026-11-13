@@ -4,6 +4,8 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.8.5] - 2026-11-13
+
 ### Added
 
 - **Colour grading in an edit.** `grade` on a clip, image or frames segment (`Grade` in Python): `exposure`, `temperature`, `tint`, `lift`, `gamma`, `gain`, `contrast`, `saturation`, and a 3D `.cube` LUT applied last. The grade is built once into a lookup table, so each frame is graded in one pass; letterbox bars keep the theme's background. `manimvox check edit` reports a missing or malformed LUT.
@@ -161,7 +163,8 @@ The first release.
 - **For agents:** eleven agent skills, the CLI as typed tools, adapters for eight Python agent frameworks, and plugin manifests for Claude Code, Codex, Cursor and Gemini CLI.
 - CI on Linux, macOS and Windows; releases published to PyPI with trusted publishing.
 
-[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.8.5...HEAD
+[0.8.5]: https://github.com/LaplacianAI/manimvox/compare/v0.8.0...v0.8.5
 [0.8.0]: https://github.com/LaplacianAI/manimvox/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/LaplacianAI/manimvox/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/LaplacianAI/manimvox/compare/v0.5.0...v0.6.0
