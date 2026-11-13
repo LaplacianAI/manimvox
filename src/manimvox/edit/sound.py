@@ -242,3 +242,42 @@ def limit_stereo(x: np.ndarray, ceiling_db: float = -1.0) -> np.ndarray:
     need = np.minimum(1.0, ceiling / np.maximum(peak, 1e-12))
     gain = _smooth_below(_smooth_below(need, max(1, int(LOOKAHEAD * RATE))), max(1, int(RELEASE * RATE)))
     return (x * np.minimum(gain, need)).astype(np.float32)
+
+
+RAMP_BLOCK = 0.25  # s of output: a ramp's sound is stretched this much at a time, each block at its own speed
+RAMP_XFADE = 0.03  # s: neighbouring blocks overlap and crossfade by this much
+
+
+def ramp_span(path: Path, clock, u0: float, u1: float) -> np.ndarray:
+    """The sound from `u0` to `u1` seconds into a clip whose speed ramps (`clock`: timeline.Clock), its pitch kept.
+    Blocks sit on a grid from the segment's start, so any window of the film gives the same samples as the whole."""
+    n = samples(u1 - u0)
+    k0, k1 = math.floor(u0 / RAMP_BLOCK), math.ceil(u1 / RAMP_BLOCK)
+    top = clock.seconds
+    lo_s = max(0.0, clock.source(max(0.0, k0 * RAMP_BLOCK)) - 1.0)
+    hi_s = clock.source(min(top, k1 * RAMP_BLOCK + RAMP_XFADE)) + 1.0
+    src = read_span(path, lo_s, hi_s)  # once, with a second either side for atempo to settle in
+    xf = samples(RAMP_XFADE)
+    out = np.zeros((2, samples((k1 - k0) * RAMP_BLOCK) + xf), np.float32)
+    for k in range(k0, k1):
+        a, b = k * RAMP_BLOCK, min(top, (k + 1) * RAMP_BLOCK + RAMP_XFADE)
+        if b <= a:
+            break
+        sa, sb = clock.source(a), clock.source(b)
+        speed = min(4.0, max(0.25, (sb - sa) / (b - a)))
+        pad = 0.25 * speed
+        r0, r1 = max(lo_s, sa - pad), sb + pad
+        x = src[:, samples(r0 - lo_s):samples(r1 - lo_s)]
+        x = stretch(x, speed) if abs(speed - 1.0) > 1e-3 else x
+        m = samples(b - a)
+        x = fit_length(x[:, samples((sa - r0) / speed):], m)
+        w = np.ones(m, np.float32)
+        if k > 0:
+            w[:min(xf, m)] = np.linspace(0, 1, min(xf, m), dtype=np.float32)
+        ov = min(m, samples(b - (k + 1) * RAMP_BLOCK)) if b > (k + 1) * RAMP_BLOCK else 0
+        if ov:  # the part the next block fades in over
+            w[m - ov:] *= np.linspace(1, 0, ov, dtype=np.float32)
+        i = samples((k - k0) * RAMP_BLOCK)
+        out[:, i:i + m] += x[:, :out.shape[1] - i] * w[:out.shape[1] - i]
+    i = samples(u0 - k0 * RAMP_BLOCK)
+    return fit_length(out[:, i:i + n], n)
