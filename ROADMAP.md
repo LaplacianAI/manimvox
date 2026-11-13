@@ -106,7 +106,7 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 
 - [ ] **More gallery videos:** a paper video next.
 - [ ] **More benchmark runs:** other harnesses (Codex, Cursor, Gemini CLI) and models on the same prompts, and more voices, including Hindi narration. Runs are made by hand for now: each costs model and voice API fees.
-- [ ] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it.
+- [x] **CI against the newest dependencies,** weekly, besides the locked ones, so a dependency release that breaks manimvox (as Pillow 13 did) is caught before users meet it. A failure opens an issue listing what changed since `uv.lock`.
 
 ## Later
 
