@@ -145,7 +145,42 @@ class Frames:
     grade: Grade | None = None
 
 
-Segment = Clip | Image | Title | Frames
+@dataclass(frozen=True)
+class Multicam:
+    """Several cameras' recordings of one moment, switched between. Its times (`start`, `end`, and each cut's) are
+    seconds of the first camera's file; `offsets` say where each camera's file starts on that clock, found from
+    the sound by `check edit` when not given. The picture starts on `camera` and switches at each cut
+    `(seconds, camera)`; the sound is camera `sound`'s throughout, so it never jumps at a cut."""
+    cameras: tuple[str, ...]
+    cuts: tuple[tuple[float, int], ...] = ()
+    camera: int = 0
+    start: float = 0.0
+    end: float | None = None  # default: the end of the sound camera's file
+    sound: int = 0
+    offsets: tuple[float, ...] | None = None
+    volume: float = 0.0
+    mute: bool = False
+    fit: str = "contain"
+    grade: Grade | None = None
+    transition: Transition = field(default_factory=Transition)
+
+    def camera_at(self, t: float) -> int:
+        """The camera shown at `t` seconds of the first camera's clock."""
+        cam = self.camera
+        for at, c in self.cuts:
+            if at > t + 1e-9:
+                break
+            cam = c
+        return cam
+
+    def spans(self, end: float) -> list[tuple[float, float, int]]:
+        """(from, to, camera) for each stretch of the picture, from `start` to `end`."""
+        edges = [self.start] + [at for at, _ in self.cuts] + [end]
+        cams = [self.camera] + [c for _, c in self.cuts]
+        return [(a, b, c) for a, b, c in zip(edges, edges[1:], cams, strict=False) if b > a]
+
+
+Segment = Clip | Image | Title | Frames | Multicam
 
 
 # ---------------------------------------------------------------- over the main track
@@ -489,7 +524,7 @@ def _span(where: str, raw) -> tuple[float, float]:
 # ---------------------------------------------------------------- parsing an item
 # Each item is an object led by one key that says what it is and holds its main value: {"clip": "a.mp4", ...}.
 
-SEGMENT_LEADS = ("clip", "episode", "image", "title", "frames")
+SEGMENT_LEADS = ("clip", "episode", "image", "title", "frames", "multicam")
 OVERLAY_LEADS = ("image", "text", "clip", "draw", "scene")
 AUDIO_LEADS = ("say", "music", "sound")
 
@@ -524,6 +559,8 @@ def _segment(where: str, raw) -> Segment:
                         f"{where}.cut_silences", raw["cut_silences"], 0.2, 10),
                     cut_fillers=_bool(f"{where}.cut_fillers", raw.get("cut_fillers", False)),
                     captions=_bool(f"{where}.captions", raw.get("captions", False)))
+    if lead == "multicam":
+        return _multicam(where, raw, tr, grade)
     if lead == "image":
         _unknown(where, raw, ("image", "seconds", "move", "fit", "effects", "transition", "grade"))
         move = raw.get("move")
@@ -547,6 +584,47 @@ def _segment(where: str, raw) -> Segment:
     return Title(_text(f"{where}.title", raw["title"], 80),
                  tuple(_text(f"{where}.lines[{i}]", s, 80) for i, s in enumerate(lines)),
                  _num(f"{where}.seconds", raw.get("seconds", 3.0), hi=30, above=0), tr)
+
+
+def _multicam(where: str, raw, tr: Transition, grade: Grade | None) -> Multicam:
+    _unknown(where, raw, ("multicam", "cuts", "camera", "start", "end", "sound", "offsets", "volume", "mute", "fit",
+                          "grade", "transition"))
+    cams = raw["multicam"]
+    if not (isinstance(cams, (list, tuple)) and 2 <= len(cams) <= 9):
+        raise ValueError(f"{where}.multicam must be a list of 2 to 9 video files, got {cams!r}")
+    cams = tuple(_path(f"{where}.multicam[{i}]", c) for i, c in enumerate(cams))
+
+    def index(name: str, v) -> int:
+        if not (isinstance(v, int) and not isinstance(v, bool) and 0 <= v < len(cams)):
+            raise ValueError(f"{name} must be a camera's number, 0 to {len(cams) - 1}, got {v!r}")
+        return v
+
+    start = _num(f"{where}.start", raw.get("start", 0.0))
+    end = raw.get("end")
+    end = None if end is None else _num(f"{where}.end", end, above=start)
+    cuts_raw = raw.get("cuts", [])
+    if not (isinstance(cuts_raw, (list, tuple)) and all(isinstance(c, (list, tuple)) and len(c) == 2
+                                                        for c in cuts_raw)):
+        raise ValueError(f"{where}.cuts must be a list of [seconds, camera], got {cuts_raw!r}")
+    cuts, last = [], start
+    for i, (at, c) in enumerate(cuts_raw):
+        at = _num(f"{where}.cuts[{i}][0]", at, above=last)
+        if end is not None and at >= end:
+            raise ValueError(f"{where}.cuts[{i}] at {at:g} s is at or past the end ({end:g} s)")
+        cuts.append((at, index(f"{where}.cuts[{i}][1]", c)))
+        last = at
+    offs = raw.get("offsets")
+    if offs is not None:
+        if not (isinstance(offs, (list, tuple)) and len(offs) == len(cams)):
+            raise ValueError(f"{where}.offsets must give one number per camera ({len(cams)}), got {offs!r}")
+        offs = tuple(_num(f"{where}.offsets[{i}]", o) for i, o in enumerate(offs))
+        if offs[0] != 0:
+            raise ValueError(f"{where}.offsets[0] must be 0: times are on the first camera's clock")
+    return Multicam(cams, tuple(cuts), index(f"{where}.camera", raw.get("camera", 0)), start, end,
+                    index(f"{where}.sound", raw.get("sound", 0)), offs,
+                    _num(f"{where}.volume", raw.get("volume", 0.0), *DB),
+                    _bool(f"{where}.mute", raw.get("mute", False)),
+                    _choice(f"{where}.fit", raw.get("fit", "contain"), ("contain", "cover")), grade, tr)
 
 
 def _overlay(where: str, raw) -> Overlay:
@@ -666,9 +744,9 @@ def validate(tl: Timeline) -> Timeline:
 
 # ---------------------------------------------------------------- writing
 
-LEADS = {Clip: "clip", Image: "image", Title: "title", Frames: "frames", Picture: "image", Text: "text",
+LEADS = {Clip: "clip", Image: "image", Title: "title", Frames: "frames", Multicam: "multicam", Picture: "image", Text: "text",
          Inset: "clip", Draw: "draw", Scene: "scene", Say: "say", Music: "music", Sound: "sound"}
-MAIN = {Clip: "path", Image: "path", Title: "text", Frames: "source", Picture: "path", Text: "text",
+MAIN = {Clip: "path", Image: "path", Title: "text", Frames: "source", Multicam: "cameras", Picture: "path", Text: "text",
         Inset: "path", Draw: "fn", Scene: "scene", Say: "text", Music: "path", Sound: "path"}
 HOOKS = {"source", "fn", "scene", "effects"}
 
@@ -834,6 +912,9 @@ def seconds_of(seg: Segment, length: float | None) -> float:
         return Clock(seg.start, end, seg.speed).seconds if end is not None else 0.0
     if isinstance(seg, Frames):
         return seg.seconds if seg.seconds is not None else (length or 0.0)
+    if isinstance(seg, Multicam):
+        end = seg.end if seg.end is not None else length
+        return max(0.0, end - seg.start) if end is not None else 0.0
     return seg.seconds
 
 

@@ -14,7 +14,7 @@ import os
 import subprocess
 import sys
 from collections.abc import Callable
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 
 import numpy as np
@@ -59,6 +59,7 @@ from .timeline import (
     Grade,
     Image,
     Inset,
+    Multicam,
     Music,
     Picture,
     Placed,
@@ -122,6 +123,8 @@ class _Segment:
             self.still = fit_array(a, r.W, r.H, seg.fit, r.bg, self.look)
         elif isinstance(seg, Frames):
             self.source = frame_source(r.root, seg.source)
+        elif isinstance(seg, Multicam):
+            self.cams: dict[int, Reader] = {}
 
     def frame(self, u: float) -> np.ndarray:
         seg, r = self.seg, self.r
@@ -137,6 +140,12 @@ class _Segment:
             rgb = moving(self.still, seg.move, u / seg.seconds if seg.seconds else 1.0, r.W, r.H)
         elif isinstance(seg, Title):
             rgb = r.card(seg, smooth(u / CARD_ANIM) if u < CARD_ANIM else 1.0)
+        elif isinstance(seg, Multicam):
+            t = seg.start + u
+            c = seg.camera_at(t)
+            if c not in self.cams:
+                self.cams[c] = Reader(resolve_path(r.root, seg.cameras[c]))
+            rgb = fit_frame(self.cams[c].at(t - seg.offsets[c]), r.W, r.H, seg.fit, None, r.bg, self.look)
         else:
             rgb = fit_array(to_array(self.source.get_frame(u), alpha=True), r.W, r.H, seg.fit, r.bg, self.look)
         for fx in self.effects:
@@ -150,6 +159,8 @@ class _Segment:
     def close(self) -> None:
         if self.reader is not None:
             self.reader.close()
+        for cam in getattr(self, "cams", {}).values():
+            cam.close()
 
 
 # ---------------------------------------------------------------- layers over the picture
@@ -400,6 +411,11 @@ class _Render:
 
     def _segment_sound(self, p: Placed, lo: float, hi: float) -> np.ndarray | None:
         seg = p.segment
+        if isinstance(seg, Multicam):  # the sound camera's sound throughout, as one clip of its file
+            off = seg.offsets[seg.sound]
+            seg = Clip(path=seg.cameras[seg.sound], start=max(0.0, seg.start - off), end=seg.start - off + p.seconds,
+                       volume=seg.volume, mute=seg.mute, transition=seg.transition)
+            p = replace(p, segment=seg)
         n = samples(hi - lo)
         if isinstance(seg, Clip):
             if seg.mute:

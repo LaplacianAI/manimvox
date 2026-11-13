@@ -98,7 +98,7 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 - [x] **Stabilisation** of shaky footage, measured once and cached, with pans kept and the zoom just enough to hide the edges.
 - [x] **Green screen.** A keyed overlay over the main track, with a soft edge and spill removed.
 - [x] **Speed ramps:** the speed changing within one piece, eased between keyframes, with the pitch kept.
-- [ ] **Multi-camera sync:** several recordings of one moment lined up by their sound.
+- [x] **Multi-camera sync:** several recordings of one moment lined up by their sound, and a multicam segment that cuts between them with one sound throughout.
 - [ ] **Uncut pieces copied without re-encoding,** for faster renders and no loss of quality.
 
 ## Later

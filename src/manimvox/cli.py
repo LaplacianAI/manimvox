@@ -70,6 +70,23 @@ def _cmd_edit(args) -> int:
         if r.sheets:
             print(f"sheets: {', '.join(r.sheets)}")
         return 0
+    if args.action == "sync":
+        from .tools import sync_media
+
+        r = sync_media(str(Path.cwd()), [str(Path(f).resolve()) for f in args.files])
+        for k, (f, o, c) in enumerate(zip(r.files, r.offsets, r.confidence, strict=True)):
+            name = Path(f).name
+            if k == 0:
+                print(f"camera 0: {name}, the clock")
+            elif o is not None:
+                print(f"camera {k}: {name} starts at {o:+.3f} s (confidence {c:g})")
+            else:
+                print(f"camera {k}: {name} not lined up")
+        for line in r.problems:
+            print(f"manimvox: {line}", file=sys.stderr)
+        if r.ok:
+            print(f'offsets: {r.offsets}  (for "offsets" in a multicam segment)')
+        return 0 if r.ok else 1
     if args.action == "new":
         r = new_edit(str(Path.cwd()), args.name, [str(Path(f).resolve()) for f in args.files])
         print(f"edit: {r.path}")
@@ -499,6 +516,9 @@ def build_parser() -> argparse.ArgumentParser:
     a.add_argument("--model", default="small", help="tiny, base, small (default), medium or large-v3")
     a.add_argument("--language", default=None, help="the spoken language, such as en (default: detected)")
     a.add_argument("-y", "--yes", **yes)
+    a = sub.add_parser("sync", help="line up recordings of one moment by their sound: where each starts on the "
+                       "first file's clock")
+    a.add_argument("files", nargs="+", metavar="file")
     a = sub.add_parser("render", help="render edits/NAME to out/NAME.mp4 (or a draft, or one window of it)")
     a.add_argument("name")
     a.add_argument("--draft", action="store_true", help="480p and a fast encoder, into build/edit/NAME/")

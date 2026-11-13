@@ -30,6 +30,7 @@ from .timeline import (
     Image,
     Inset,
     Key,
+    Multicam,
     Music,
     Overlay,
     Picture,
@@ -114,6 +115,6 @@ def from_moviepy(clip) -> MoviePySource:
     return MoviePySource(clip)
 
 
-__all__ = ["Audio", "Clip", "Draw", "FrameSource", "Frames", "Grade", "Image", "Inset", "Key", "MoviePySource", "Music", "Overlay",
+__all__ = ["Audio", "Clip", "Draw", "FrameSource", "Frames", "Grade", "Image", "Inset", "Key", "MoviePySource", "Multicam", "Music", "Overlay",
            "Picture", "Say", "Scene", "Segment", "Sound", "Stabilize", "Text", "Timeline", "Title", "Transition", "frames",
            "from_moviepy"]
