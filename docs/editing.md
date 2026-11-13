@@ -19,6 +19,7 @@ The whole film is one file, `edits/NAME.json` or `edits/NAME.py`, that you or yo
 | Sound | each clip levelled, narration lines in the project voice, a music bed that dips under speech, sound effects |
 | Captions | of the speaker and the narration, as an `.srt` file or burned in, with misheard names corrected |
 | Check | every time, box and hook checked against the files before anything renders; a 480p draft, or just one window of the film |
+| Open elsewhere | the edit as an OpenTimelineIO timeline, to see and adjust in Kdenlive, DaVinci Resolve or another editor |
 
 ## Start an edit
 
@@ -167,6 +168,21 @@ Write the edit in Python, or name a function as `"path.py:name"` in JSON, and an
 - `Scene(cls, at=)` lays a Manim scene over the footage with a transparent background. Use it for an equation, a diagram or a highlight.
 
 There's a worked example in [The edit file](edit-file.md#code).
+
+## Opening the edit in another editor
+
+```text
+manimvox edit export interview
+```
+
+This writes `out/interview.otio`, an OpenTimelineIO timeline. Kdenlive, DaVinci Resolve and other editors that read OTIO open it, to see the edit laid out and adjust it by hand.
+
+- **Your files stay your files.** Pieces of footage, rendered episodes and plain stills are clips of their own files, trimmed as in the edit. A steady speed is a speed effect, and fades and dips are dissolves.
+- **What only manimvox can draw is drawn first.** Title cards, frames made by code, and any piece that is graded, stabilised, cropped, filled, moved or ramped are rendered to short files in `build/edit/interview/otio/` and placed instead. Every overlay is rendered as ProRes 4444 with its transparency, on a video track of its own.
+- **Sound** goes on audio tracks: the footage's, any picture-in-picture's, the narration, the music and the sound files.
+- **Levels and ducking aren't in OTIO.** Each clip plays at its own level, with the gain manimvox would use kept in its metadata. Compare with the rendered film's sound.
+
+Changes you make in the other editor stay there; they don't come back into the edit file.
 
 ## Footage inside an explainer
 

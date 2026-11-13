@@ -70,6 +70,14 @@ def _cmd_edit(args) -> int:
         if r.sheets:
             print(f"sheets: {', '.join(r.sheets)}")
         return 0
+    if args.action == "export":
+        from .tools import _export_edit
+
+        r = _export_edit(str(Path.cwd()), args.name, args.voice, _confirm(args), print)
+        for line in r.notes:
+            print(line)
+        print(f"timeline: {r.path}")
+        return 0
     if args.action == "sync":
         from .tools import sync_media
 
@@ -515,6 +523,11 @@ def build_parser() -> argparse.ArgumentParser:
                    "(the transcribe extra; runs on this computer)")
     a.add_argument("--model", default="small", help="tiny, base, small (default), medium or large-v3")
     a.add_argument("--language", default=None, help="the spoken language, such as en (default: detected)")
+    a.add_argument("-y", "--yes", **yes)
+    a = sub.add_parser("export", help="write edits/NAME as an OpenTimelineIO timeline, out/NAME.otio, for "
+                       "Kdenlive, DaVinci Resolve and other editors")
+    a.add_argument("name")
+    a.add_argument("--voice", help="engine:voice for the narration, instead of the project's")
     a.add_argument("-y", "--yes", **yes)
     a = sub.add_parser("sync", help="line up recordings of one moment by their sound: where each starts on the "
                        "first file's clock")
