@@ -17,6 +17,7 @@ from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from pathlib import Path
 
+import av
 import numpy as np
 
 from ..post.audio import RATE, duck_curve, read_audio
@@ -643,8 +644,10 @@ def voice_lines(pr, tl: Timeline, voice: str | None, confirm, say, total: float,
 
 def render_edit(root: Path, name: str, *, voice: str | None = None, confirm: Callable[[str], bool] = lambda m: False,
                 draft: bool = False, start: float | None = None, end: float | None = None,
-                say: Callable[[str], None] | None = None, sheets: bool = True) -> EditRender:
-    """Render the edit `name`; see the module docstring for where it goes."""
+                say: Callable[[str], None] | None = None, sheets: bool = True, copy: bool = False) -> EditRender:
+    """Render the edit `name`; see the module docstring for where it goes. `copy`: when the edit is one untouched
+    clip, copy its picture instead of re-encoding it (see edit.copy); otherwise, and if the copy fails its check,
+    encode as usual and say why in the notes."""
     from ..checks.sheets import contact_sheets
     from ..kit.theme import Theme
     from ..project import load_project
@@ -681,12 +684,34 @@ def render_edit(root: Path, name: str, *, voice: str | None = None, confirm: Cal
     dst.parent.mkdir(parents=True, exist_ok=True)
     tmp = dst.with_name(dst.stem + ".part.mp4")
     burn = tl.captions == "burn"
-    say(f"render: {t1 - t0:.1f} s at {r.W}x{r.H}, {tl.fps:g} fps{' (draft)' if draft else ''} ...")
-    try:
-        r.run(tmp, t0, t1, draft, burn, lambda done, of: say(f"  {done:.0f} of {of:.0f} s"))
-        os.replace(tmp, dst)
-    finally:
-        tmp.unlink(missing_ok=True)
+    copied = False
+    if copy and (draft or not whole):
+        notes.append("copy: only the final render of the whole film is copied; this one is encoded")
+    elif copy:
+        from .copy import copyable, write_copied
+
+        src, why = copyable(root, tl, rep.lengths)
+        if src is None:
+            notes.append(f"copy: not copied, because {why}; encoded instead")
+        else:
+            seg = tl.segments[0]
+            say(f"render: copying the picture of {src.name}, mixing the sound ...")
+            try:
+                copied = write_copied(r, src, tmp, seg.start, seg.end, round(total * tl.fps))
+            except (av.error.FFmpegError, OSError) as e:
+                notes.append(f"copy: the copy failed ({e}); encoded instead")
+            if copied:
+                os.replace(tmp, dst)
+                notes.append(f"copy: the picture is {src.name}'s own, not re-encoded")
+            elif not any(n.startswith("copy: the copy failed") for n in notes):
+                notes.append("copy: the copied picture did not decode to the film's frames; encoded instead")
+    if not copied:
+        say(f"render: {t1 - t0:.1f} s at {r.W}x{r.H}, {tl.fps:g} fps{' (draft)' if draft else ''} ...")
+        try:
+            r.run(tmp, t0, t1, draft, burn, lambda done, of: say(f"  {done:.0f} of {of:.0f} s"))
+            os.replace(tmp, dst)
+        finally:
+            tmp.unlink(missing_ok=True)
     srt = None
     if tl.captions != "none" and r.captions:
         srt_path = dst.with_suffix(".srt")

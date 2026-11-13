@@ -61,7 +61,7 @@ def _cmd_edit(args) -> int:
         from .tools import _render_edit
 
         r = _render_edit(str(Path.cwd()), args.name, args.voice, _confirm(args), args.draft, args.start, args.end,
-                         print)
+                         print, args.copy)
         for line in r.notes:
             print(line)
         print(f"video: {r.video}  ({r.seconds:g} s, {r.size[0]}x{r.size[1]})")
@@ -539,6 +539,8 @@ def build_parser() -> argparse.ArgumentParser:
                    help="render only from this second of the film")
     a.add_argument("--to", dest="end", type=float, default=None, metavar="SECONDS",
                    help="render only up to this second of the film")
+    a.add_argument("--copy", action="store_true", help="when the edit is one untouched clip, copy its picture "
+                   "instead of re-encoding it; otherwise encode, and say why")
     a.add_argument("--voice", help="engine:voice for the narration, instead of the project's")
     a.add_argument("-y", "--yes", **yes)
     s.set_defaults(func=_cmd_edit)

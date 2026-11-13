@@ -169,6 +169,23 @@ Write the edit in Python, or name a function as `"path.py:name"` in JSON, and an
 
 There's a worked example in [The edit file](edit-file.md#code).
 
+## Copying an untouched clip
+
+When the edit is one clip that nothing changes, its picture can be copied instead of re-encoded: the camera's own quality, in seconds.
+
+```text
+manimvox edit render interview --copy
+```
+
+The sound is mixed and encoded as usual, so narration, music, levelling and ducking all still work. The picture is copied only when every one of these holds; otherwise the film is encoded, and the notes say which one failed:
+
+- the edit's main track is one clip, at one speed, with no crop, fill, grade, stabilisation or effects;
+- there are no overlays, and captions aren't burned in;
+- the file is H.264 or HEVC at the edit's size and frame rate;
+- the clip starts on a keyframe, and ends on one or at the file's end.
+
+Copied and re-encoded video can't share one file: a player decodes the copied part against the wrong settings and shows a wrong picture, with no error. So it's all or nothing. After copying, manimvox decodes the result and counts its frames, and encodes instead if anything is off. Drafts and windows (`--draft`, `--from`, `--to`) are always encoded.
+
 ## Opening the edit in another editor
 
 ```text
