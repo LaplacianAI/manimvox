@@ -68,6 +68,15 @@ GRADE_RANGES = {"exposure": (-4.0, 4.0), "contrast": (0.0, 3.0), "saturation": (
 
 
 @dataclass(frozen=True)
+class Stabilize:
+    """Shaky footage held steady: the camera's path is smoothed over `smooth` seconds (longer: steadier, but slow
+    moves are flattened too), and the picture zoomed in by `zoom` ("auto": just enough to hide the moving edges,
+    at most 1.5) so the edges never show."""
+    smooth: float = 1.0
+    zoom: float | str = "auto"
+
+
+@dataclass(frozen=True)
 class Clip:
     """A piece of footage (`path`), or a rendered episode of this project (`episode`), from `start` to `end`
     seconds of the file (`end=None`: to its end).
@@ -91,6 +100,7 @@ class Clip:
     effects: tuple[Ref, ...] = ()  # fn(rgb, t) -> rgb, in order; t is seconds into the segment
     transition: Transition = field(default_factory=Transition)
     grade: Grade | None = None
+    stabilize: Stabilize | None = None
     from_words: str | None = None
     to_words: str | None = None
     cut_silences: float | None = None
@@ -393,6 +403,21 @@ def _speed(where: str, v) -> float | tuple[tuple[float, float], ...]:
     return keys
 
 
+def _stabilize(where: str, v) -> Stabilize | None:
+    if v is None or v is False:
+        return None
+    if v is True:
+        return Stabilize()
+    if isinstance(v, Stabilize):
+        v = {"smooth": v.smooth, "zoom": v.zoom}
+    if not isinstance(v, dict):
+        raise ValueError(f'{where} must be true or {{"smooth": seconds, "zoom": "auto" or 1 to 1.5}}, got {v!r}')  # noqa: TRY004 - edit errors are ValueError
+    _unknown(where, v, ("smooth", "zoom"))
+    zoom = v.get("zoom", "auto")
+    return Stabilize(_num(f"{where}.smooth", v.get("smooth", 1.0), 0.1, 10),
+                     "auto" if zoom == "auto" else _num(f"{where}.zoom", zoom, 1, 1.5))
+
+
 def _grade(where: str, v) -> Grade | None:
     if v is None:
         return None
@@ -476,7 +501,7 @@ def _segment(where: str, raw) -> Segment:
     grade = _grade(f"{where}.grade", raw.get("grade")) if lead != "title" else None
     if lead in ("clip", "episode"):
         _unknown(where, raw, (lead, "start", "end", "speed", "volume", "mute", "fit", "crop", "effects",
-                              "transition", "grade", "from_words", "to_words", "cut_silences", "cut_fillers", "captions"))
+                              "transition", "grade", "stabilize", "from_words", "to_words", "cut_silences", "cut_fillers", "captions"))
         start = _num(f"{where}.start", raw.get("start", 0.0), 0)
         end = raw.get("end")
         end = None if end is None else _num(f"{where}.end", end, above=start)
@@ -492,7 +517,7 @@ def _segment(where: str, raw) -> Segment:
                     start=start, end=end, speed=_speed(f"{where}.speed", raw.get("speed", 1.0)),
                     volume=_num(f"{where}.volume", raw.get("volume", 0.0), *DB),
                     mute=_bool(f"{where}.mute", raw.get("mute", False)), fit=fit, crop=crop, effects=effects,
-                    transition=tr, grade=grade,
+                    transition=tr, grade=grade, stabilize=_stabilize(f"{where}.stabilize", raw.get("stabilize")),
                     from_words=_words(f"{where}.from_words", raw.get("from_words")),
                     to_words=_words(f"{where}.to_words", raw.get("to_words")),
                     cut_silences=None if raw.get("cut_silences") is None else _num(
@@ -675,6 +700,9 @@ def _plain(name: str, v, root, keep: bool):
         return v if (keep or isinstance(v, str)) else ref_of(v, root)
     if isinstance(v, Transition):
         return v.kind if v.seconds == 0.5 else {"kind": v.kind, "seconds": v.seconds}
+    if isinstance(v, Stabilize):
+        return True if v == Stabilize() else {f.name: getattr(v, f.name) for f in fields(Stabilize)
+                                              if getattr(v, f.name) != f.default}
     if isinstance(v, Key):
         out = {f.name: x for f in fields(Key) if (x := getattr(v, f.name)) != f.default}
         return out.get("color", True) if set(out) <= {"color"} else out

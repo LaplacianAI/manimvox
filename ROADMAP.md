@@ -95,7 +95,7 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 
 - [ ] **A visual timeline** to see and adjust an edit, starting with an OpenTimelineIO export that opens in Kdenlive or Resolve.
 - [x] **Colour grading.** Exposure, white balance, lift, gamma and gain, contrast and saturation per segment, and `.cube` LUTs.
-- [ ] **Stabilisation** of shaky footage.
+- [x] **Stabilisation** of shaky footage, measured once and cached, with pans kept and the zoom just enough to hide the edges.
 - [x] **Green screen.** A keyed overlay over the main track, with a soft edge and spill removed.
 - [x] **Speed ramps:** the speed changing within one piece, eased between keyframes, with the pitch kept.
 - [ ] **Multi-camera sync:** several recordings of one moment lined up by their sound.

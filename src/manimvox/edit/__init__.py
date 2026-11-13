@@ -37,6 +37,7 @@ from .timeline import (
     Scene,
     Segment,
     Sound,
+    Stabilize,
     Text,
     Timeline,
     Title,
@@ -114,5 +115,5 @@ def from_moviepy(clip) -> MoviePySource:
 
 
 __all__ = ["Audio", "Clip", "Draw", "FrameSource", "Frames", "Grade", "Image", "Inset", "Key", "MoviePySource", "Music", "Overlay",
-           "Picture", "Say", "Scene", "Segment", "Sound", "Text", "Timeline", "Title", "Transition", "frames",
+           "Picture", "Say", "Scene", "Segment", "Sound", "Stabilize", "Text", "Timeline", "Title", "Transition", "frames",
            "from_moviepy"]

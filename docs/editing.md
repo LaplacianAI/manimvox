@@ -12,6 +12,7 @@ The whole film is one file, `edits/NAME.json` or `edits/NAME.py`, that you or yo
 | Tighten | remove pauses longer than a limit, and "um", "uh" and the like |
 | Join | clips, rendered episodes, stills that move slowly, and title cards, with a cut, a fade or a dip |
 | Frame | crop, fill or letterbox; speed from 0.25x to 4x with the pitch kept, steady or ramping within a clip |
+| Steady | shaky footage stabilised, slow moves such as a pan kept, zoomed just enough to hide the edges |
 | Grade | exposure, white balance, lift, gamma and gain, contrast, saturation, and a `.cube` LUT, per segment |
 | Lay over | lower thirds and labels in the theme, pictures, picture-in-picture, a speaker shot on a green screen, graphics drawn by code, Manim scenes |
 | Sound | each clip levelled, narration lines in the project voice, a music bed that dips under speech, sound effects |
@@ -97,6 +98,16 @@ A clip's `speed` can change within it. Give keyframes in seconds of the file, an
 ```
 
 This plays at normal speed, slows to 0.3x as the jump lands at 12.6 s, holds, and speeds back up. The sound keeps its pitch. `manimvox check edit` prints how long the ramped clip lasts on the finished film. In Python, `Clip(..., speed=((12, 1), (12.6, 0.3), (14, 0.3), (14.5, 1)))`.
+
+## Stabilisation
+
+`"stabilize": true` on a clip holds shaky footage steady:
+
+```json
+{"clip": "footage/walk.mp4", "stabilize": {"smooth": 2}}
+```
+
+manimvox measures how each frame moved and turned against the one before, smooths that path over `smooth` seconds, and moves each frame by the difference. Slow moves, such as a pan, are kept. The picture is zoomed in just enough to keep the moved edges out of view, up to 1.5x; give `"zoom": 1.1` to set it yourself. The first render measures the footage; later renders and drafts reuse the measurement. The render's notes say how much it corrected and how far it zoomed. In Python, `Clip(..., stabilize=Stabilize(smooth=2))`.
 
 ## Colour
 
