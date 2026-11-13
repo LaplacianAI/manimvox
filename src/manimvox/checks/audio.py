@@ -10,6 +10,7 @@ import numpy as np
 
 RATE = 8000
 SILENT_RMS = 60  # of 32768; speech sits in the thousands
+PACE_MAX = 175  # words a minute; above this, narration sounds rushed
 _CUE = re.compile(r"(\d+):(\d+):(\d+),(\d+) --> (\d+):(\d+):(\d+),(\d+)\n(.+?)(?:\n\n|\Z)", re.DOTALL)
 
 
@@ -25,6 +26,7 @@ class AudioReport:
     total: int
     silent: list[Cue] = field(default_factory=list)
     error: str | None = None
+    pace: float | None = None
 
     @property
     def ok(self) -> bool:
@@ -49,6 +51,18 @@ def read_cues(srt: Path) -> list[Cue]:
         out.append(Cue(g[0] * 3600 + g[1] * 60 + g[2] + g[3] / 1000,
                        g[4] * 3600 + g[5] * 60 + g[6] + g[7] / 1000, " ".join(m.group(9).split())))
     return out
+
+
+def words_per_minute(cues: list[Cue]) -> float | None:
+    """Speech rate: words in the cues divided by the time they cover, in minutes."""
+    words = 0
+    seconds = 0.0
+    for c in cues:
+        words += len(c.text.split())
+        seconds += (c.end - c.start)
+    if seconds == 0:
+        return None
+    return (words/seconds)*60
 
 
 def _pcm(video: Path) -> np.ndarray | None:
@@ -83,4 +97,4 @@ def check_audio(video: Path, srt: Path) -> AudioReport:
         rms = float(np.sqrt((span ** 2).mean())) if len(span) else 0.0
         if rms < SILENT_RMS:
             silent.append(c)
-    return AudioReport(len(cues), silent)
+    return AudioReport(len(cues), silent, pace=words_per_minute(cues))

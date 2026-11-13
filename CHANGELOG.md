@@ -4,6 +4,10 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+### Added
+
+- **`manimvox check audio` reports the narration's pace.** It prints `pace: N words a minute` (the words in the `.srt` divided by the sum of its cue durations), and above 175 adds a warning with a lower `speed` to set in `series.json`, aiming for about 165. The warning does not fail the check.
+
 ## [0.8.5] - 2026-11-13
 
 ### Added

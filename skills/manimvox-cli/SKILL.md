@@ -89,7 +89,7 @@ Fix every finding, then draft again. A draft that exits `0` only proves the code
 
 **Contact sheets.** `draft` writes `sheets/<stem>/s_01.png`, `s_02.png`, and so on. Each is a 3 by 3 grid of frames taken every `--every` seconds, left to right, top to bottom, so sheet 1 holds the first 9 samples. Use `--every 5` to survey and `--every 1` to look closely at a busy scene. Old sheets for the episode are replaced on each draft.
 
-**Audio check.** After `render`, `audio check: ok  (N lines, all audible)` is the finish line. `audio check: FAILED  K of N lines are silent` lists each silent line with its time and text. Run `manimvox check audio EP` to re-check, then render again; if the same line stays silent, reword it. Other failures say a file is missing or has no audio track: render again.
+**Audio check.** After `render`, `audio check: ok  (N lines, all audible)` is the finish line. `audio check: FAILED  K of N lines are silent` lists each silent line with its time and text. Run `manimvox check audio EP` to re-check, then render again; if the same line stays silent, reword it. Other failures say a file is missing or has no audio track: render again. `check audio` also prints `pace: N words a minute`, the words in the `.srt` divided by the sum of its cue durations; above 175 it adds a warning with a lower `speed` to set in `series.json`. The warning does not fail the check.
 
 **Render errors.** When Manim fails, manimvox prints `manim failed for <stem>:` and the last 25 lines of Manim's output. The real error is usually the last line (a `NameError`, `TypeError`, or a kit message). Fix the episode file and run the command again. Voice errors are one line; see [manimvox-voice](../manimvox-voice/SKILL.md).
 

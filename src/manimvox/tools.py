@@ -183,7 +183,7 @@ def check(project: str, what: str, episode: str | None = None) -> CheckResult:
         data = load_layout(pr.build_dir / ep.stem / "layout.json")
         found = [str(f) for f in check_layout(data)]
         return CheckResult(not found, "layout", _layout_summary(found), found, variety_notes(data))
-    from .checks.audio import check_audio
+    from .checks.audio import PACE_MAX, check_audio
 
     srt = pr.out_dir / f"{ep.stem}.srt"
     video = pr.out_dir / f"{ep.stem}.mp4"
@@ -194,6 +194,11 @@ def check(project: str, what: str, episode: str | None = None) -> CheckResult:
         video = built_path(pr, ep, "final")
         notes.append(f"note: checking the narration-only render {video}; out/{ep.stem}.mp4 has the music mixed in")
     rep = check_audio(video, srt)
+    if rep.pace is not None:
+        notes.append(f"pace: {round(rep.pace)} words a minute")
+        if rep.pace > PACE_MAX:
+            suggested = round(pr.speed * 165 / rep.pace, 2)
+            notes.append(f"warning: faster than {PACE_MAX} words a minute; lower speed in series.json to {suggested}")
     summary, rows = _audio_lines(rep)
     return CheckResult(rep.ok, "audio", summary, rows, notes)
 
