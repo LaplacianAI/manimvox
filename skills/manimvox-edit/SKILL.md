@@ -100,6 +100,8 @@ manimvox edit render interview
 
 It writes `out/interview.mp4`, plus `out/interview.srt` when captions are on.
 
+When the edit is one untouched clip with new sound (narration, music, a tidied mix), add `--copy`: the picture is the camera's own, not re-encoded. Read the notes: if it says why it encoded instead, that is fine.
+
 If the person wants to adjust it by hand in Kdenlive, DaVinci Resolve or another editor, run `manimvox edit export interview` and give them `out/interview.otio`. Say that levels and ducking aren't carried over and that their changes there won't come back into the edit.
 
 Report:

@@ -957,18 +957,18 @@ class EditRenderResult:
 
 
 def _render_edit(project: str, name: str, voice: str | None, confirm: Callable[[str], bool], draft: bool,
-                 start: float | None, end: float | None, say: Say | None) -> EditRenderResult:
+                 start: float | None, end: float | None, say: Say | None, copy: bool = False) -> EditRenderResult:
     from .edit.render import render_edit as run
     from .project import find_project
 
     root = find_project(Path(project).expanduser())
-    r = run(root, name, voice=voice, confirm=confirm, draft=draft, start=start, end=end, say=say)
+    r = run(root, name, voice=voice, confirm=confirm, draft=draft, start=start, end=end, say=say, copy=copy)
     return EditRenderResult(True, r.video, r.srt, r.seconds, list(r.size), r.sheets, r.notes)
 
 
 @_tool
 def render_edit(project: str, name: str, draft: bool = False, start: float | None = None, end: float | None = None,
-                voice: str | None = None, allow_download: bool = False) -> EditRenderResult:
+                voice: str | None = None, allow_download: bool = False, copy: bool = False) -> EditRenderResult:
     """Render an edit (edits/<name>.json or .py) to out/<name>.mp4 and .srt, then write contact sheets of it to
     sheets/edit/<name>/. Check it first with check(project, "edit", name): a render refuses an edit with findings.
 
@@ -980,8 +980,10 @@ def render_edit(project: str, name: str, draft: bool = False, start: float | Non
         end: Render only up to this second of the film.
         voice: engine:voice for the narration lines, instead of the project's.
         allow_download: Let the voice download its model; ask the user first.
+        copy: When the edit is one untouched clip, copy its picture instead of re-encoding it (its own quality,
+            much faster); any other edit is encoded as usual, and the notes say why.
     """
-    return _render_edit(project, name, voice, _consent(allow_download), draft, start, end, None)
+    return _render_edit(project, name, voice, _consent(allow_download), draft, start, end, None, copy)
 
 
 @dataclass(frozen=True)

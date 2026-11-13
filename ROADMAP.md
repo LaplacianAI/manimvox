@@ -99,7 +99,7 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 - [x] **Green screen.** A keyed overlay over the main track, with a soft edge and spill removed.
 - [x] **Speed ramps:** the speed changing within one piece, eased between keyframes, with the pitch kept.
 - [x] **Multi-camera sync:** several recordings of one moment lined up by their sound, and a multicam segment that cuts between them with one sound throughout.
-- [ ] **Uncut pieces copied without re-encoding,** for faster renders and no loss of quality.
+- [x] **Uncut pieces copied without re-encoding,** for faster renders and no loss of quality: for an edit that is one untouched clip. Copied and re-encoded H.264 decode wrongly in one file, so mixing them waits for re-encoding just the frames around each cut with the camera's own settings.
 
 ## Later
 
