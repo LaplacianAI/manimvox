@@ -38,9 +38,22 @@ from .picture import (
     text_layer,
     to_array,
 )
-from .sound import add_at, bed_window, db, envelope, fit_length, levelling_db, limit_stereo, read_span, samples, stretch
+from .sound import (
+    add_at,
+    bed_window,
+    db,
+    envelope,
+    fit_length,
+    levelling_db,
+    limit_stereo,
+    ramp_span,
+    read_span,
+    samples,
+    stretch,
+)
 from .timeline import (
     Clip,
+    Clock,
     Draw,
     Frames,
     Grade,
@@ -99,6 +112,7 @@ class _Segment:
         seg = self.seg
         if isinstance(seg, Clip):
             self.reader = Reader(source_path(r.root, seg))
+            self.clock = r.clock(p)
         elif isinstance(seg, Image):
             from PIL import Image as PILImage
 
@@ -112,7 +126,7 @@ class _Segment:
         seg, r = self.seg, self.r
         u = min(max(0.0, u), max(0.0, self.p.seconds - 1e-6))
         if isinstance(seg, Clip):
-            rgb = fit_frame(self.reader.at(seg.start + u * seg.speed), r.W, r.H, seg.fit, seg.crop, r.bg, self.look)
+            rgb = fit_frame(self.reader.at(self.clock.source(u)), r.W, r.H, seg.fit, seg.crop, r.bg, self.look)
         elif isinstance(seg, Image):
             rgb = moving(self.still, seg.move, u / seg.seconds if seg.seconds else 1.0, r.W, r.H)
         elif isinstance(seg, Title):
@@ -221,6 +235,8 @@ class _Render:
         self.W, self.H = ceil_even(tl.size[0] * scale), ceil_even(tl.size[1] * scale)
         self.bg = tuple(round(c * 255) for c in hex_rgb(theme["bg"]))
         self.placed = place(tl, lengths)
+        self.lengths = list(lengths)
+        self._clocks: dict[int, object] = {}
         self.total = max(p.at + p.seconds for p in self.placed)
         self.voice_lines = voice_lines  # [(Say, path, seconds)]
         self.cues = [Cue(a.at, a.at + secs, a.text) for a, _p, secs in voice_lines]  # narration
@@ -257,6 +273,14 @@ class _Render:
             table = build_table(g, cube)
             self._grades[g] = lambda a, table=table: apply_table(table, a)
         return self._grades[g]
+
+    def clock(self, p: Placed):
+        """A placed clip's time, from the second shown to the second of its file."""
+        if p.index not in self._clocks:
+            seg = p.segment
+            end = seg.end if seg.end is not None else self.lengths[p.index]
+            self._clocks[p.index] = Clock(seg.start, end if end is not None else seg.start + p.seconds, seg.speed)
+        return self._clocks[p.index]
 
     def card(self, seg: Title, progress: float) -> np.ndarray:
         key = (seg.text, seg.lines, round(progress, 3))
@@ -310,8 +334,8 @@ class _Render:
             tr = transcripts.get(p.index)
             if tr is None:
                 continue
-            seg = p.segment
-            end = seg.start + p.seconds * seg.speed
+            seg, clock = p.segment, self.clock(p)
+            end = clock.source(p.seconds)
             for k, w in enumerate(tr.words):
                 # A word after a pause is given a start too early (the pause is folded into it), so its sound is
                 # at its end: judge which piece it is in by its last 0.15 s.
@@ -321,7 +345,7 @@ class _Render:
                 lo, hi = max(w.start, seg.start), min(w.end, end)
                 key = (id(tr), k)
                 if key not in best or hi - lo > best[key][0]:
-                    best[key] = (hi - lo, (p.at + (lo - seg.start) / seg.speed, p.at + (hi - seg.start) / seg.speed,
+                    best[key] = (hi - lo, (p.at + clock.output(lo), p.at + clock.output(hi),
                                            w.text))
         words = sorted(v[1] for v in best.values())
         return [Cue(a, b, respell(text, self.tl.spellings)) for a, b, text in caption_cues(words)]
@@ -353,15 +377,19 @@ class _Render:
             if seg.mute:
                 return None
             path = source_path(self.root, seg)
-            s0, s1 = seg.start + (lo - p.at) * seg.speed, seg.start + (hi - p.at) * seg.speed
-            pad = 0.25 * seg.speed if seg.speed != 1 else 0.0  # atempo settles in: read a little either side
-            a0 = max(0.0, s0 - pad)
-            x = read_span(path, a0, s1 + pad)
-            x = stretch(x, seg.speed)
-            x = fit_length(x[:, samples((s0 - a0) / seg.speed):], n)
+            clock = self.clock(p)
+            if clock.ramp:
+                x = ramp_span(path, clock, lo - p.at, hi - p.at)
+            else:
+                s0, s1 = clock.source(lo - p.at), clock.source(hi - p.at)
+                pad = 0.25 * seg.speed if seg.speed != 1 else 0.0  # atempo settles in: read a little either side
+                a0 = max(0.0, s0 - pad)
+                x = read_span(path, a0, s1 + pad)
+                x = stretch(x, seg.speed)
+                x = fit_length(x[:, samples((s0 - a0) / seg.speed):], n)
             if seg.episode is not None:  # a rendered episode's narration is levelled already, line by line
                 return x * db(seg.volume)
-            end = seg.end if seg.end is not None else seg.start + p.seconds * seg.speed
+            end = clock.end
             g = self._gain((f"segments[{p.index}] ({seg.path})", str(path), seg.start, end),
                            lambda: read_span(path, seg.start, end))
             return x * db(g + seg.volume)

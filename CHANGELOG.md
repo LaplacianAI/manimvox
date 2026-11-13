@@ -8,6 +8,7 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 - **Colour grading in an edit.** `grade` on a clip, image or frames segment (`Grade` in Python): `exposure`, `temperature`, `tint`, `lift`, `gamma`, `gain`, `contrast`, `saturation`, and a 3D `.cube` LUT applied last. The grade is built once into a lookup table, so each frame is graded in one pass; letterbox bars keep the theme's background. `manimvox check edit` reports a missing or malformed LUT.
 - **Green screen in an edit.** `key` on a `clip` overlay (`Key` in Python) makes a green or blue screen transparent, so the main track shows behind the subject: `"auto"` samples the backing from the frame's border, with `similarity`, `softness` (a soft edge) and `spill` (the screen's colour cast taken out of the subject). A `clip` overlay without a `box` is fitted to the whole frame.
+- **Speed ramps in an edit.** A clip's `speed` may be keyframes, `[[seconds of the file, speed], ...]`, eased from one to the next: the picture follows the ramp frame by frame, the sound keeps its pitch (stretched in quarter-second blocks, each at its own speed, crossfaded), and captions, the clip's length and `check edit` follow it too. A clip at one speed renders as before.
 
 ## [0.8.0] - 2026-11-12
 

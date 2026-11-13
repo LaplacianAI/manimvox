@@ -97,7 +97,7 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 - [x] **Colour grading.** Exposure, white balance, lift, gamma and gain, contrast and saturation per segment, and `.cube` LUTs.
 - [ ] **Stabilisation** of shaky footage.
 - [x] **Green screen.** A keyed overlay over the main track, with a soft edge and spill removed.
-- [ ] **Speed ramps:** the speed changing within one piece.
+- [x] **Speed ramps:** the speed changing within one piece, eased between keyframes, with the pitch kept.
 - [ ] **Multi-camera sync:** several recordings of one moment lined up by their sound.
 - [ ] **Uncut pieces copied without re-encoding,** for faster renders and no loss of quality.
 

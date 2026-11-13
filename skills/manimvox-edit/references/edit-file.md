@@ -36,7 +36,7 @@ A fade or dip overlaps two segments by `seconds`, so the film is that much short
 
 | Lead | Other keys |
 |---|---|
-| `clip`: a video file | `start` (0), `end` (the file's end), `speed` (0.25 to 4, pitch kept), `volume` (0), `mute` (false), `fit`, `crop` (`[x, y, w, h]` in the source's pixels; needs `fit: "crop"`), `grade`, `effects`, `from_words`, `to_words`, `cut_silences` (0.2 to 10 s), `cut_fillers` (false), `captions` (false) |
+| `clip`: a video file | `start` (0), `end` (the file's end), `speed` (0.25 to 4, pitch kept, or a ramp), `volume` (0), `mute` (false), `fit`, `crop` (`[x, y, w, h]` in the source's pixels; needs `fit: "crop"`), `grade`, `effects`, `from_words`, `to_words`, `cut_silences` (0.2 to 10 s), `cut_fillers` (false), `captions` (false) |
 | `episode`: a rendered episode of this project, such as `"ep01"` | the same keys as `clip` |
 | `image`: a still | `seconds` (4), `move` (`"push"`, `"pull"`, `"left"`, `"right"`), `fit` (`"contain"` or `"cover"`), `grade`, `effects` |
 | `title`: the theme's title card | `lines` (up to 4, each up to 80 characters), `seconds` (3) |
@@ -46,6 +46,8 @@ A fade or dip overlaps two segments by `seconds`, so the film is that much short
 - `"contain"` (the default) letterboxes it;
 - `"cover"` fills the frame and trims the edges;
 - `"crop"` shows the `crop` region, scaled to fill.
+
+`speed` as a ramp is a list of `[seconds of the file, speed]` keyframes, at least two, rising in time: `"speed": [[12, 1], [12.6, 0.3], [14, 0.3], [14.5, 1]]` slows to 0.3x as something happens at 12.6 s of the file, holds, and comes back to normal speed. The speed eases from one keyframe to the next and holds before the first and after the last. The sound keeps its pitch throughout. Mute a clip if a slowed moment sounds wrong.
 
 `grade` sets a segment's colour, before its `effects` run. Only the picture is graded; letterbox bars keep the theme's background. Every key is optional and neutral at its default:
 

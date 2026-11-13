@@ -11,7 +11,7 @@ The whole film is one file, `edits/NAME.json` or `edits/NAME.py`, that you or yo
 | Cut by words | start and end a clip at phrases from its transcript; cuts fall between words, never inside one |
 | Tighten | remove pauses longer than a limit, and "um", "uh" and the like |
 | Join | clips, rendered episodes, stills that move slowly, and title cards, with a cut, a fade or a dip |
-| Frame | crop, fill or letterbox; speed from 0.25x to 4x with the pitch kept |
+| Frame | crop, fill or letterbox; speed from 0.25x to 4x with the pitch kept, steady or ramping within a clip |
 | Grade | exposure, white balance, lift, gamma and gain, contrast, saturation, and a `.cube` LUT, per segment |
 | Lay over | lower thirds and labels in the theme, pictures, picture-in-picture, a speaker shot on a green screen, graphics drawn by code, Manim scenes |
 | Sound | each clip levelled, narration lines in the project voice, a music bed that dips under speech, sound effects |
@@ -87,6 +87,16 @@ A clip's `start` and `end` are seconds of its own file; `from_words` and `to_wor
 Speech-to-text gets the words right, but its word times drift, sometimes by nearly half a second. So manimvox uses the transcript only to choose what to keep. It then moves each cut to just outside the speech it measures in the sound itself, 0.15 s clear of the nearest word. Cuts that would remove less than 0.3 s are not made, because they only make the picture jump.
 
 `manimvox check edit` prints every piece each clip keeps, so you can read the cut against the transcript before rendering anything. Names are often misheard: copy the phrase as the transcript spells it, and add `"spellings": {"heard": "written"}` so the captions show the right spelling.
+
+## Speed ramps
+
+A clip's `speed` can change within it. Give keyframes in seconds of the file, and the speed eases between them:
+
+```json
+{"clip": "footage/jump.mp4", "start": 10, "end": 16, "speed": [[12, 1], [12.6, 0.3], [14, 0.3], [14.5, 1]]}
+```
+
+This plays at normal speed, slows to 0.3x as the jump lands at 12.6 s, holds, and speeds back up. The sound keeps its pitch. `manimvox check edit` prints how long the ramped clip lasts on the finished film. In Python, `Clip(..., speed=((12, 1), (12.6, 0.3), (14, 0.3), (14.5, 1)))`.
 
 ## Colour
 

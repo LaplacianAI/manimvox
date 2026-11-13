@@ -75,12 +75,15 @@ class Clip:
     With a transcript of the file (`manimvox edit probe FILE --transcribe`): `from_words` and `to_words` set the
     start and end by what is said (searched between `start` and `end`, never cutting inside a word);
     `cut_silences` removes pauses longer than that many seconds; `cut_fillers` removes "um", "uh" and the like;
-    `captions` captions what the speaker says. A clip with cuts plays as several pieces, joined by cuts."""
+    `captions` captions what the speaker says. A clip with cuts plays as several pieces, joined by cuts.
+
+    `speed` is one speed for the whole clip, or a ramp: keyframes `((s, speed), ...)` at `s` seconds of the file,
+    eased from one to the next and held before the first and after the last. The sound keeps its pitch."""
     path: str | None = None
     start: float = 0.0
     end: float | None = None
     episode: str | None = None
-    speed: float = 1.0  # 0.25 to 4; the sound keeps its pitch
+    speed: float | tuple[tuple[float, float], ...] = 1.0  # 0.25 to 4, or a ramp: ((s, speed), ...); pitch kept
     volume: float = 0.0  # dB on the clip's own sound
     mute: bool = False
     fit: str = "contain"  # contain: letterbox; cover: fill and trim the edges; crop: show `crop`, scaled to fill
@@ -374,6 +377,22 @@ def _transition(where: str, v) -> Transition:
                       _num(f"{where}.seconds", v.get("seconds", 0.5), hi=10, above=0))
 
 
+def _speed(where: str, v) -> float | tuple[tuple[float, float], ...]:
+    if not isinstance(v, (list, tuple)):
+        return _num(where, v, *SPEED)
+    if len(v) < 2 or not all(isinstance(k, (list, tuple)) and len(k) == 2 for k in v):
+        raise ValueError(f"{where} must be a number from {SPEED[0]:g} to {SPEED[1]:g}, or a ramp of at least two "
+                         f"[seconds of the file, speed] keyframes, got {v!r}")
+    keys = tuple((_num(f"{where}[{i}][0]", s, 0), _num(f"{where}[{i}][1]", k, *SPEED)) for i, (s, k) in enumerate(v))
+    for i in range(1, len(keys)):
+        if keys[i][0] <= keys[i - 1][0]:
+            raise ValueError(f"{where}[{i}]: keyframe times must rise, got {keys[i][0]:g} s after "
+                             f"{keys[i - 1][0]:g} s")
+    if all(k == keys[0][1] for _, k in keys):
+        return keys[0][1]  # the same speed throughout: not a ramp
+    return keys
+
+
 def _grade(where: str, v) -> Grade | None:
     if v is None:
         return None
@@ -470,7 +489,7 @@ def _segment(where: str, raw) -> Segment:
             raise ValueError(f"{where}.crop needs x and y of at least 0 and w and h above 0, got {list(crop)}")
         return Clip(path=_path(f"{where}.clip", raw["clip"]) if lead == "clip" else None,
                     episode=_text(f"{where}.episode", raw["episode"], 80) if lead == "episode" else None,
-                    start=start, end=end, speed=_num(f"{where}.speed", raw.get("speed", 1.0), *SPEED),
+                    start=start, end=end, speed=_speed(f"{where}.speed", raw.get("speed", 1.0)),
                     volume=_num(f"{where}.volume", raw.get("volume", 0.0), *DB),
                     mute=_bool(f"{where}.mute", raw.get("mute", False)), fit=fit, crop=crop, effects=effects,
                     transition=tr, grade=grade,
@@ -722,12 +741,69 @@ class Placed:
     overlap: float
 
 
+class Clock:
+    """A clip's time: `source(u)` is the second of the file shown `u` seconds into the segment, `output(s)` the
+    other way, and `seconds` the segment's length. One speed is exact arithmetic; a ramp is the integral of 1/speed
+    over the file's time, tabulated once."""
+
+    STEPS = 200_000  # most points in a ramp's table
+
+    def __init__(self, start: float, end: float, speed):
+        self.start, self.end, self.speed = start, end, speed
+        self.ramp = isinstance(speed, tuple)
+        if not self.ramp:
+            self.seconds = max(0.0, (end - start) / speed)
+            return
+        import numpy as np
+
+        n = max(2, min(self.STEPS, math.ceil((end - start) / 0.002) + 1))
+        self._s = np.linspace(start, end, n)
+        inv = 1.0 / self.rate(self._s)
+        self._u = np.concatenate([[0.0], np.cumsum((inv[1:] + inv[:-1]) / 2 * np.diff(self._s))])
+        self.seconds = float(self._u[-1])
+
+    def rate(self, s):
+        """The speed at `s` seconds of the file (a number or an array)."""
+        import numpy as np
+
+        if not self.ramp:
+            return self.speed
+        t = np.array([k[0] for k in self.speed])
+        v = np.array([k[1] for k in self.speed])
+        s = np.asarray(s, float)
+        i = np.clip(np.searchsorted(t, s, side="right") - 1, 0, len(t) - 2)
+        f = np.clip((s - t[i]) / (t[i + 1] - t[i]), 0.0, 1.0)
+        return v[i] + (v[i + 1] - v[i]) * f * f * (3 - 2 * f)  # eased in and out
+
+    def source(self, u):
+        if not self.ramp:
+            return self.start + u * self.speed
+        import numpy as np
+
+        out = np.interp(u, self._u, self._s)
+        return float(out) if np.ndim(out) == 0 else out
+
+    def output(self, s):
+        if not self.ramp:
+            return (s - self.start) / self.speed
+        import numpy as np
+
+        out = np.interp(s, self._s, self._u)
+        return float(out) if np.ndim(out) == 0 else out
+
+
+def clock_of(seg: Clip, length: float | None) -> Clock | None:
+    """The clip's clock, given its file's length (needed only when it plays to the end); None if neither is known."""
+    end = seg.end if seg.end is not None else length
+    return None if end is None else Clock(seg.start, end, seg.speed)
+
+
 def seconds_of(seg: Segment, length: float | None) -> float:
     """How long a segment lasts on the output. `length` is its source's length: the file, for a clip without
     an end, or the frame source, for frames without `seconds`."""
     if isinstance(seg, Clip):
         end = seg.end if seg.end is not None else length
-        return max(0.0, (end - seg.start) / seg.speed) if end is not None else 0.0
+        return Clock(seg.start, end, seg.speed).seconds if end is not None else 0.0
     if isinstance(seg, Frames):
         return seg.seconds if seg.seconds is not None else (length or 0.0)
     return seg.seconds
