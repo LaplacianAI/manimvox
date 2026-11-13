@@ -14,17 +14,27 @@ from .timeline import Key
 CB = np.array([-0.168736, -0.331264, 0.5], np.float32)  # BT.601, as FFmpeg's chromakey measures
 CR = np.array([0.5, -0.418688, -0.081312], np.float32)
 BORDER = 4  # px: "auto" samples the backing from a ring this deep round the frame
+SCREEN = 0.08  # how far green (or blue) must stand above the other two channels for a pixel to count as backing
+SCREEN_SHARE = 0.05  # at least this share of the border must be backing, or the whole border is used
 
 
 def key_color(k: Key, rgb: np.ndarray) -> np.ndarray:
-    """The key colour as RGB in 0..1: given, or for "auto" the median of the frame's border."""
+    """The key colour as RGB in 0..1: given, or for "auto" the median of the clearly green (or blue) pixels round
+    the frame's border, falling back to the whole border when there are too few."""
     if k.color != "auto":
         h = k.color.lstrip("#")
         return np.array([int(h[i:i + 2], 16) for i in (0, 2, 4)], np.float32) / 255.0
     b, rgb = BORDER, rgb[..., :3]
     ring = np.concatenate([rgb[:b].reshape(-1, 3), rgb[-b:].reshape(-1, 3), rgb[:, :b].reshape(-1, 3),
-                           rgb[:, -b:].reshape(-1, 3)])
-    return np.median(ring, axis=0).astype(np.float32) / 255.0
+                           rgb[:, -b:].reshape(-1, 3)]).astype(np.float32) / 255.0
+    # A shot often has the subject, the floor or the grass along part of its border, so the backing is the border's
+    # clearly green or clearly blue pixels (whichever there are more of), not the border as a whole.
+    r, g, bl = ring[:, 0], ring[:, 1], ring[:, 2]
+    groups = [ring[g - np.maximum(r, bl) > SCREEN], ring[bl - np.maximum(r, g) > SCREEN]]
+    screen = max(groups, key=len)
+    if len(screen) >= SCREEN_SHARE * len(ring):
+        return np.median(screen, axis=0).astype(np.float32)
+    return np.median(ring, axis=0).astype(np.float32)
 
 
 def keyed(rgb: np.ndarray, k: Key, color: np.ndarray) -> np.ndarray:

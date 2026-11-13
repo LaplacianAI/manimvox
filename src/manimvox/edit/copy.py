@@ -17,6 +17,7 @@ import av
 import numpy as np
 
 from ..post.audio import RATE
+from ..post.encode import FASTSTART
 from .load import source_path
 from .timeline import Clip, Grade, Timeline
 
@@ -69,7 +70,7 @@ def copyable(root: Path, tl: Timeline, lengths) -> tuple[Path | None, str]:
 def write_copied(r, src: Path, dst: Path, start: float, end: float | None, frames: int) -> bool:
     """The film to `dst`: `src`'s video packets from `start` up to `end`, and the mix `r.mix` gives, as AAC.
     True if the copy decodes to exactly `frames` frames; otherwise `dst` is removed and False returned."""
-    out = av.open(str(dst), "w")
+    out = av.open(str(dst), "w", options=FASTSTART)
     try:
         with av.open(str(src)) as c:
             vin = c.streams.video[0]

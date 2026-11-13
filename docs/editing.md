@@ -146,7 +146,7 @@ A `clip` overlay with a `key` stands a subject shot on a green or blue screen ov
  "overlays": [{"clip": "footage/speaker-green.mp4", "at": 0, "until": 60, "key": "auto"}]}
 ```
 
-Without a `box`, the overlay is fitted to the whole frame. `"auto"` samples the screen's colour from the frame's border, so the subject shouldn't touch the edge on the first frame shown; otherwise give `"green"`, `"blue"` or a `"#rrggbb"`. Tune it with `similarity`, `softness` and `spill`, listed in [The edit file](edit-file.md#overlays). In Python, `Inset(..., key=Key("green"))`.
+Without a `box`, the overlay is fitted to the whole frame. `"auto"` takes the screen's colour from the clearly green (or blue) pixels round the frame's border, so the ground or the subject may touch the edge; if the screen doesn't reach the border at all, give `"green"`, `"blue"` or a `"#rrggbb"`. Tune it with `similarity`, `softness` and `spill`, listed in [The edit file](edit-file.md#overlays). In Python, `Inset(..., key=Key("green"))`.
 
 ## Sound
 

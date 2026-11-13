@@ -1,0 +1,13 @@
+{
+  "segments": [
+    {"title": "An interview", "seconds": 4},
+    {"clip": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+     "start": 2.5, "end": 12, "transition": "fade"}
+  ],
+  "overlays": [
+    {"text": "Prof Joyeeta Gupta", "sub": "University of Amsterdam and UNESCO-IHE", "at": 4.1, "until": 9}
+  ],
+  "audio": [
+    {"music": "build/pad.wav", "volume": -26}
+  ]
+}

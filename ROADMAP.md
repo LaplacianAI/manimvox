@@ -100,6 +100,7 @@ Bring your own recordings, edit them into a finished video, and mix them with ex
 - [x] **Speed ramps:** the speed changing within one piece, eased between keyframes, with the pitch kept.
 - [x] **Multi-camera sync:** several recordings of one moment lined up by their sound, and a multicam segment that cuts between them with one sound throughout.
 - [x] **Uncut pieces copied without re-encoding,** for faster renders and no loss of quality: for an edit that is one untouched clip. Copied and re-encoded H.264 decode wrongly in one file, so mixing them waits for re-encoding just the frames around each cut with the camera's own settings.
+- [x] **The `manimvox-edit` skill, the docs and a gallery video** cover every tool: *Your footage, edited* uses each of 0.8.0 and 0.8.5 once, on real footage.
 
 ## Later
 

@@ -15,6 +15,21 @@ from .options import PostError
 AAC_FRAME = 1024
 
 
+# The index (moov) before the media, so a browser starts playing before it has the whole file
+FASTSTART = {"movflags": "+faststart"}
+
+
+def decode_video(c, stream) -> Iterator[av.VideoFrame]:
+    """The frames of `stream`, in order, past any packet the decoder rejects: footage with a few damaged packets
+    (common in long Ogg/Theora and phone files) plays on from the next good one, as FFmpeg's own player does,
+    instead of stopping the whole read."""
+    for packet in c.demux(stream):
+        try:
+            yield from stream.decode(packet)
+        except (av.error.InvalidDataError, av.error.ArgumentError):
+            continue
+
+
 def video_info(path: Path) -> tuple[int, int, Fraction]:
     """Width, height and frame rate of the first video stream."""
     try:
@@ -44,7 +59,7 @@ def frames(path: Path, size: tuple[int, int] | None = None) -> Iterator[tuple[fl
     try:
         with av.open(str(path)) as c:
             s = c.streams.video[0]
-            for f in c.decode(s):
+            for f in decode_video(c, s):
                 t = float(f.pts * s.time_base) if f.pts is not None else 0.0
                 if size and (f.width, f.height) != size:
                     f = f.reformat(width=size[0], height=size[1])
@@ -59,7 +74,7 @@ class Writer:
 
     def __init__(self, dst: Path, size: tuple[int, int], fps, crf: int = 18, preset: str = "medium"):
         self.fps = Fraction(fps).limit_denominator(1001)
-        self.c = av.open(str(dst), "w")
+        self.c = av.open(str(dst), "w", options=FASTSTART)
         self.v = self.c.add_stream("libx264", rate=self.fps)
         self.v.width, self.v.height = size
         self.v.pix_fmt = "yuv420p"

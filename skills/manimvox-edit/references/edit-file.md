@@ -48,7 +48,7 @@ A fade or dip overlaps two segments by `seconds`, so the film is that much short
 - `"cover"` fills the frame and trims the edges;
 - `"crop"` shows the `crop` region, scaled to fill.
 
-`speed` as a ramp is a list of `[seconds of the file, speed]` keyframes, at least two, rising in time: `"speed": [[12, 1], [12.6, 0.3], [14, 0.3], [14.5, 1]]` slows to 0.3x as something happens at 12.6 s of the file, holds, and comes back to normal speed. The speed eases from one keyframe to the next and holds before the first and after the last. The sound keeps its pitch throughout. Mute a clip if a slowed moment sounds wrong.
+`speed` as a ramp is a list of `[seconds of the file, speed]` keyframes, at least two, rising in time: `"speed": [[12, 1], [12.6, 0.3], [14, 0.3], [14.5, 1]]` slows to 0.3x as something happens at 12.6 s of the file, holds, and comes back to normal speed. The speed eases from one keyframe to the next and holds before the first and after the last. The sound keeps its pitch throughout. Mute a clip if a slowed moment sounds wrong. Keyframes are seconds of the file, like `start` and `end`: `check edit` says so when every keyframe lies outside the clip.
 
 A `multicam` switches between cameras that recorded the same moment. Its times (`start`, `end` and each cut's) are seconds of the **first** camera's file. `cuts` is a list of `[seconds, camera]`, rising: the picture starts on `camera` and switches at each cut. The sound is camera `sound`'s throughout, so it never jumps at a cut. `offsets` gives where each camera's file starts on the first camera's clock (`[0, 1.37]`: the second camera started 1.37 s later); leave it out and `check edit` finds it from the sound, printing what it found. Cameras numbered from 0, in the order listed:
 
@@ -96,7 +96,7 @@ All overlays take `at` and `until` (seconds of the output) and `fade` (seconds; 
 | `draw`: `"path.py:name"` | `box` (optional: the whole frame without it) |
 | `scene`: `"path.py:Class"`, a Manim scene | `until` is optional (the scene's own length), `box` |
 
-`key` on a `clip` overlay makes a green or blue screen transparent, so the main track shows through behind the subject. It is `true` or `"auto"` (the backing's colour is sampled from the frame's border), `"green"`, `"blue"`, `"#rrggbb"`, or an object:
+`key` on a `clip` overlay makes a green or blue screen transparent, so the main track shows through behind the subject. It is `true` or `"auto"` (the backing's colour is taken from the clearly green or blue pixels round the frame's border), `"green"`, `"blue"`, `"#rrggbb"`, or an object:
 
 | Key | Default | Range | Meaning |
 |---|---|---|---|

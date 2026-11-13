@@ -12,6 +12,14 @@ Finished videos made with manimvox, most of them by an AI agent. Each one shows 
 
     **Made by Claude Code** (Sonnet 5.5) from one prompt · screen recordings · Gnani voice · start here
 
+- **[Your footage, edited](editing-tour.md)**
+
+    ---
+
+    manimvox, explaining itself: a 20-minute tutorial on every editing tool in 0.8.0 and 0.8.5, made end to end by an AI agent with manimvox. Four broken recordings, thirteen chapters, each tool explained, shown on real footage, before and after, and its common mistake.
+
+    **Made by Claude Code** (Opus 5.5) · 14 narrated explainers and one edit file · chapters · Kokoro voice
+
 - **[An interview, edited](edited-interview.md)**
 
     ---

@@ -13,6 +13,7 @@ import av
 
 from .checks.audio import read_cues
 from .kit.theme import DEFAULTS, Theme
+from .post.encode import FASTSTART
 from .project import Project, ProjectError
 
 
@@ -121,7 +122,7 @@ v.onended=()=>{{if(cur+1<eps.length)load(cur+1,true);}};if(eps.length)load(0,fal
 
 def transcode_720(src: Path, dst: Path) -> None:
     """H.264 720p + AAC 96 kb/s copy of a rendered episode, through PyAV (no system ffmpeg)."""
-    with av.open(str(src)) as inp, av.open(str(dst), "w") as out:
+    with av.open(str(src)) as inp, av.open(str(dst), "w", options=FASTSTART) as out:
         vin = inp.streams.video[0]
         ain = inp.streams.audio[0] if inp.streams.audio else None
         h = 720

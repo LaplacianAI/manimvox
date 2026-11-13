@@ -45,6 +45,17 @@ def test_auto_finds_the_backing_from_the_border():
     assert out[0, 0, 3] == 0 and out[30, 40, 3] == 255
 
 
+def test_auto_finds_the_screen_when_the_ground_fills_most_of_the_border():
+    """A low-angle shot: the screen is only the top third, ground runs along the bottom and both sides."""
+    a = np.zeros((60, 80, 3), np.uint8)
+    a[:] = (90, 75, 55)  # earth and grass
+    a[:20, 10:70] = (80, 196, 142)  # a mint-green screen, touching the top edge only
+    c = key_color(Key(), a)
+    assert np.allclose(c * 255, (80, 196, 142), atol=1)
+    out = keyed(a, Key(), c)
+    assert out[5, 40, 3] == 0 and out[50, 40, 3] == 255
+
+
 def test_the_edge_is_soft_over_the_softness():
     ramp = np.zeros((1, 11, 3), np.uint8)
     for i in range(11):  # from the backing to grey, step by step

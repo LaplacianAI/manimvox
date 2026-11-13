@@ -11,6 +11,7 @@ from PIL import Image as PILImage
 
 from .._cairo import hex_rgb, surface_rgba
 from ..post.draw import _face, _rounded
+from ..post.encode import decode_video
 from .timeline import Text
 
 
@@ -34,7 +35,7 @@ class Reader:
 
     def _seek(self, s: float) -> None:
         self.c.seek(max(0, int(s / self.s.time_base)), stream=self.s, backward=True, any_frame=False)
-        self._gen = self.c.decode(self.s)
+        self._gen = decode_video(self.c, self.s)
         self.cur, self.nxt = None, next(self._gen, None)
 
     def at(self, s: float) -> av.VideoFrame:
