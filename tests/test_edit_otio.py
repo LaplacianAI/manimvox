@@ -4,6 +4,8 @@ overlays drawn with their transparency, and the sound tracks."""
 import json
 import shutil
 from pathlib import Path
+from urllib.parse import urlparse
+from urllib.request import url2pathname
 
 import av
 import numpy as np
@@ -52,6 +54,11 @@ def export(project, data=EDIT, name="cut"):
     return r, otio.adapters.read_from_file(r.path)
 
 
+def local(url: str) -> Path:
+    """The file a file:// URL names, on any system (file:///C:/... on Windows)."""
+    return Path(url2pathname(urlparse(url).path))
+
+
 def frames(item) -> int:
     return round(item.duration().value)
 
@@ -91,7 +98,7 @@ def test_overlays_keep_their_transparency(project):
     _r, tl = export(project)
     layer = next(c for c in tl.tracks[1] if isinstance(c, otio.schema.Clip))
     assert layer.range_in_parent().start_time.value == pytest.approx(0.5 * FPS)
-    with av.open(Path(layer.media_reference.target_url.replace("file://", ""))) as c:
+    with av.open(str(local(layer.media_reference.target_url))) as c:
         s = c.streams.video[0]
         assert s.codec_context.name == "prores" and "a" in s.codec_context.pix_fmt  # ProRes 4444 with alpha
         fr = [f.to_ndarray(format="rgba") for f in c.decode(s)]
@@ -105,7 +112,7 @@ def test_sound_goes_on_its_own_tracks(project):
     by = {t.name: t for t in tl.tracks}
     said = next(c for c in by["Narration"] if isinstance(c, otio.schema.Clip))
     assert said.range_in_parent().start_time.value == pytest.approx(0.2 * FPS)
-    assert Path(said.media_reference.target_url.replace("file://", "")).is_file()
+    assert local(said.media_reference.target_url).is_file()
     knock = next(c for c in by["Sounds 1"] if isinstance(c, otio.schema.Clip))
     assert knock.range_in_parent().start_time.value == 30 and frames(knock) == 5
     foot = [c for c in by["Footage sound"] if isinstance(c, otio.schema.Clip)]
@@ -129,7 +136,7 @@ def test_the_tool_exports_and_refuses_an_edit_with_findings(project):
     (project / "edits").mkdir(exist_ok=True)
     (project / "edits" / "cut.json").write_text(json.dumps(EDIT))
     r = tools.export_edit(str(project), "cut", voice="fake:tone")
-    assert r.ok and r.path.endswith("out/cut.otio")
+    assert r.ok and Path(r.path).resolve() == (project / "out" / "cut.otio").resolve()
     (project / "edits" / "bad.json").write_text(json.dumps({"segments": [{"clip": "footage/none.mp4"}]}))
     with pytest.raises(tools.ToolError, match="fix them first"):
         tools.export_edit(str(project), "bad")
