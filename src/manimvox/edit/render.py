@@ -113,6 +113,7 @@ class _Segment:
         if isinstance(seg, Clip):
             self.reader = Reader(source_path(r.root, seg))
             self.clock = r.clock(p)
+            self.steady = r.steady(p, self.reader.width) if seg.stabilize is not None else None
         elif isinstance(seg, Image):
             from PIL import Image as PILImage
 
@@ -126,7 +127,12 @@ class _Segment:
         seg, r = self.seg, self.r
         u = min(max(0.0, u), max(0.0, self.p.seconds - 1e-6))
         if isinstance(seg, Clip):
-            rgb = fit_frame(self.reader.at(self.clock.source(u)), r.W, r.H, seg.fit, seg.crop, r.bg, self.look)
+            s = self.clock.source(u)
+            look = self.look
+            if self.steady is not None:  # graded, then held steady: an uncovered edge stays the background
+                steady, grade = self.steady, self.look
+                look = lambda a: steady.warp(grade(a) if grade else a, s, r.bg)
+            rgb = fit_frame(self.reader.at(s), r.W, r.H, seg.fit, seg.crop, r.bg, look)
         elif isinstance(seg, Image):
             rgb = moving(self.still, seg.move, u / seg.seconds if seg.seconds else 1.0, r.W, r.H)
         elif isinstance(seg, Title):
@@ -237,6 +243,7 @@ class _Render:
         self.placed = place(tl, lengths)
         self.lengths = list(lengths)
         self._clocks: dict[int, object] = {}
+        self._steady: dict[int, object] = {}
         self.total = max(p.at + p.seconds for p in self.placed)
         self.voice_lines = voice_lines  # [(Say, path, seconds)]
         self.cues = [Cue(a.at, a.at + secs, a.text) for a, _p, secs in voice_lines]  # narration
@@ -281,6 +288,27 @@ class _Render:
             end = seg.end if seg.end is not None else self.lengths[p.index]
             self._clocks[p.index] = Clock(seg.start, end if end is not None else seg.start + p.seconds, seg.speed)
         return self._clocks[p.index]
+
+    def steady(self, p: Placed, width: int):
+        """A stabilised clip's corrections, measured once per render (and cached on disk between renders)."""
+        if p.index not in self._steady:
+            from .stabilize import Steady, measure
+
+            seg, clock = p.segment, self.clock(p)
+            try:
+                cam = measure(self.root, source_path(self.root, seg), clock.start, clock.end, self.say)
+            except ValueError as e:
+                raise EditError(f"segments[{p.index}].stabilize: {e}") from e
+            span = width / seg.crop[2] if seg.fit == "crop" else 1.0
+            st = Steady(cam, seg.stabilize, span)
+            note = (f"segments[{p.index}]: stabilised, correcting up to {st.largest * span * 100:.1f}% of the "
+                    f"width, zoomed {st.zoom:.2f}x")
+            if st.wanted > st.zoom + 1e-6:
+                note += (f"; holding it fully steady needs {st.wanted:.2f}x, so the edges show at times: "
+                         "lower stabilize.smooth, or cut the shakiest part")
+            self.notes.append(note)
+            self._steady[p.index] = st
+        return self._steady[p.index]
 
     def card(self, seg: Title, progress: float) -> np.ndarray:
         key = (seg.text, seg.lines, round(progress, 3))

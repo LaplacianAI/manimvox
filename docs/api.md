@@ -48,7 +48,7 @@ What an episode imports, and the tools an agent framework calls. Everything here
 
 ::: manimvox.edit
     options:
-      members: [Timeline, Clip, Image, Title, Frames, Transition, Grade, Picture, Text, Inset, Key, Draw, Scene, Say, Music, Sound, frames, from_moviepy]
+      members: [Timeline, Clip, Image, Title, Frames, Transition, Grade, Stabilize, Picture, Text, Inset, Key, Draw, Scene, Say, Music, Sound, frames, from_moviepy]
 
 ## Tools for agents
 
