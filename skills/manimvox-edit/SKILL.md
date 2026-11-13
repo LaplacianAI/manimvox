@@ -100,6 +100,8 @@ manimvox edit render interview
 
 It writes `out/interview.mp4`, plus `out/interview.srt` when captions are on.
 
+If the person wants to adjust it by hand in Kdenlive, DaVinci Resolve or another editor, run `manimvox edit export interview` and give them `out/interview.otio`. Say that levels and ducking aren't carried over and that their changes there won't come back into the edit.
+
 Report:
 - the path, the length and the size;
 - what was cut and why, in a sentence or two;

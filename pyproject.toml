@@ -62,7 +62,8 @@ haystack = ["haystack-ai>=3.4,<3.5"]
 google-adk = ["google-adk>=2.12,<2.13"]
 # the documentation site: `uv run --extra docs zensical serve`
 docs = ["zensical>=0.0.71,<0.1", "mkdocstrings-python>=1.18,<3"]
-dev = ["pytest>=8", "ruff>=0.6", "matplotlib>=3.8,<4", "plotly>=6.1,<8", "trimesh>=4.5,<6", "fast-simplification>=0.1.9,<1"]
+dev = ["pytest>=8", "ruff>=0.6", "matplotlib>=3.8,<4", "plotly>=6.1,<8", "trimesh>=4.5,<6", "fast-simplification>=0.1.9,<1",
+       "opentimelineio>=0.17,<0.19"]  # opentimelineio: only to read back the .otio export in tests
 
 [project.urls]
 Homepage = "https://github.com/LaplacianAI/manimvox"

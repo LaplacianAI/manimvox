@@ -984,10 +984,43 @@ def render_edit(project: str, name: str, draft: bool = False, start: float | Non
     return _render_edit(project, name, voice, _consent(allow_download), draft, start, end, None)
 
 
+@dataclass(frozen=True)
+class EditExportResult:
+    ok: bool
+    path: str  # out/<name>.otio
+    rendered: list[str]  # pieces only manimvox can draw, made into files the timeline points at
+    notes: list[str]
+
+
+def _export_edit(project: str, name: str, voice: str | None, confirm: Callable[[str], bool],
+                 say: Say | None) -> EditExportResult:
+    from .edit.otio import export_edit as run
+    from .project import find_project
+
+    r = run(find_project(Path(project).expanduser()), name, voice=voice, confirm=confirm, say=say)
+    return EditExportResult(True, r.path, r.rendered, r.notes)
+
+
+@_tool
+def export_edit(project: str, name: str, voice: str | None = None, allow_download: bool = False) -> EditExportResult:
+    """Write an edit as an OpenTimelineIO timeline, out/<name>.otio, to see and adjust it in Kdenlive, DaVinci
+    Resolve or another editor that reads OTIO. Footage, episodes and plain stills are clips of their own files;
+    title cards, code-made frames, graded or otherwise changed pieces and every overlay are drawn into files in
+    build/edit/<name>/otio/ first. Check the edit first with check(project, "edit", name).
+
+    Args:
+        project: The project folder, or any folder inside it.
+        name: The edit's name.
+        voice: engine:voice for the narration lines, instead of the project's.
+        allow_download: Let the voice download its model; ask the user first.
+    """
+    return _export_edit(project, name, voice, _consent(allow_download), None)
+
+
 TOOLS = (new_project, brief_questions, write_brief, draft, render, check, contact_sheet, voices, prepare_voice,
          list_blocks, add_block, join, index, package, doctor, fetch_asset, list_assets, probe_media, new_edit,
-         render_edit, transcribe_media, sync_media)
-# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets and `edit new` is new_edit and `edit probe` is probe_media (with --transcribe, transcribe_media) and `edit sync` is sync_media
+         render_edit, transcribe_media, sync_media, export_edit)
+# the tool for each command a skill may name; `voices --prepare` is prepare_voice and `add --list` is list_blocks and `assets list` is list_assets and `edit new` is new_edit and `edit probe` is probe_media (with --transcribe, transcribe_media) and `edit sync` is sync_media and `edit export` is export_edit
 COMMANDS = {"new": "new_project", "brief": "write_brief", "draft": "draft", "render": "render", "check": "check", "sheets": "contact_sheet", "voices": "voices",
             "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor",
             "assets": "fetch_asset", "edit": "render_edit"}

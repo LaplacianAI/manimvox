@@ -197,7 +197,8 @@ class _Layer:
     def active(self, t: float) -> bool:
         return self.o.at <= t < (self.until if self.until is not None else math.inf)
 
-    def draw(self, frame: np.ndarray, t: float) -> None:
+    def pixels(self, t: float) -> tuple[int, int, np.ndarray, float]:
+        """The layer at `t` seconds of the film: where it goes (x, y), its RGBA pixels, and its opacity."""
         o, _r, s = self.o, self.r, self.r.scale
         u = t - o.at
         level = fade_level(t, o.at, self.until, o.fade)
@@ -227,6 +228,10 @@ class _Layer:
             f = self.reader.at(u)
             rgba = f.reformat(format="rgba").to_ndarray()
             x, y, rgba = self._boxed(rgba)
+        return x, y, rgba, level
+
+    def draw(self, frame: np.ndarray, t: float) -> None:
+        x, y, rgba, level = self.pixels(t)
         blend(frame, rgba, x, y, level)
 
     def _boxed(self, rgba: np.ndarray) -> tuple[int, int, np.ndarray]:
@@ -606,6 +611,36 @@ def _clock(t: float) -> str:
     return f"{int(t // 60)}m{t % 60:04.1f}s".replace(".", "_")
 
 
+def voice_lines(pr, tl: Timeline, voice: str | None, confirm, say, total: float, notes: list[str]) -> list:
+    """Each `say` line spoken in the project's voice: [(Say, wav path, seconds)], in order. Refuses lines that
+    overlap or run past the film's end, saying where to move them."""
+    lines = []
+    says = sorted((a for a in tl.audio if isinstance(a, Say)), key=lambda a: a.at)
+    if says:
+        from ..voice import get_engine, resolve_voice
+        from ..voice.cache import synth_cached
+        from ..voice.pron import spoken_form
+
+        spec = resolve_voice(voice, pr.voice, os.environ)
+        eng = get_engine(spec.engine)
+        eng.prepare(spec.voice, confirm, pr.root)
+        if eng.online:
+            notes.append(f"note: narration text is sent to {eng.online} ({spec})")
+        say(f"voice: {len(says)} line(s) in {spec} ...")
+        for a in says:
+            path, secs = synth_cached(spec, spoken_form(a.text, pr.pron), pr.speed, pr.cache_dir, pr.loudness)
+            lines.append((a, path, secs))
+        for (a, _, sa), (b, _, _) in itertools.pairwise(lines):
+            if b.at < a.at + sa - 0.05:
+                raise EditError(f"the line {b.text[:40]!r} at {b.at:g} s starts before {a.text[:40]!r} ends at "
+                                f"{a.at + sa:.2f} s; move it to {a.at + sa + 0.3:.1f} s or later")
+        a, _, sa = lines[-1]
+        if a.at + sa > total + SLACK:
+            raise EditError(f"the line {a.text[:40]!r} runs to {a.at + sa:.2f} s, past the film's end "
+                            f"({total:.2f} s); start it by {max(0.0, total - sa - 0.3):.1f} s")
+    return lines
+
+
 def render_edit(root: Path, name: str, *, voice: str | None = None, confirm: Callable[[str], bool] = lambda m: False,
                 draft: bool = False, start: float | None = None, end: float | None = None,
                 say: Callable[[str], None] | None = None, sheets: bool = True) -> EditRender:
@@ -632,30 +667,7 @@ def render_edit(root: Path, name: str, *, voice: str | None = None, confirm: Cal
         raise EditError(f"the window {t0:g} s to {t1:g} s is empty; the film is {total:.2f} s long")
 
     notes: list[str] = []
-    lines = []
-    says = sorted((a for a in tl.audio if isinstance(a, Say)), key=lambda a: a.at)
-    if says:
-        from ..voice import get_engine, resolve_voice
-        from ..voice.cache import synth_cached
-        from ..voice.pron import spoken_form
-
-        spec = resolve_voice(voice, pr.voice, os.environ)
-        eng = get_engine(spec.engine)
-        eng.prepare(spec.voice, confirm, pr.root)
-        if eng.online:
-            notes.append(f"note: narration text is sent to {eng.online} ({spec})")
-        say(f"voice: {len(says)} line(s) in {spec} ...")
-        for a in says:
-            path, secs = synth_cached(spec, spoken_form(a.text, pr.pron), pr.speed, pr.cache_dir, pr.loudness)
-            lines.append((a, path, secs))
-        for (a, _, sa), (b, _, _) in itertools.pairwise(lines):
-            if b.at < a.at + sa - 0.05:
-                raise EditError(f"the line {b.text[:40]!r} at {b.at:g} s starts before {a.text[:40]!r} ends at "
-                                f"{a.at + sa:.2f} s; move it to {a.at + sa + 0.3:.1f} s or later")
-        a, _, sa = lines[-1]
-        if a.at + sa > total + SLACK:
-            raise EditError(f"the line {a.text[:40]!r} runs to {a.at + sa:.2f} s, past the film's end "
-                            f"({total:.2f} s); start it by {max(0.0, total - sa - 0.3):.1f} s")
+    lines = voice_lines(pr, tl, voice, confirm, say, total, notes)
 
     scale = min(1.0, DRAFT_HEIGHT / tl.size[1]) if draft else 1.0
     r = _Render(root, tl, rep.lengths, Theme.from_dict(pr.theme), scale, lines, pr.loudness, say, rep.transcripts)
