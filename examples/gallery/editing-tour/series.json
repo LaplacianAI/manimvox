@@ -1,0 +1,115 @@
+{
+  "manimvox": "0.8.0",
+  "series": "Your footage, edited",
+  "tagline": "Every editing tool in manimvox, on real footage",
+  "voice": "kokoro:af_heart",
+  "speed": 1.0,
+  "loudness": -16.0,
+  "pron": [],
+  "theme": {
+    "source": "calm deep blue with a teal accent, quiet behind real footage; calm style for thin strokes and space",
+    "style": "calm",
+    "bg": "#0E1822",
+    "panel": "#16242F",
+    "panel2": "#1E2F3C",
+    "line": "#36505F",
+    "ink": "#E6EEF2",
+    "muted": "#93A7B4",
+    "accent": "#4FC3C9",
+    "ok": "#7CC8A0",
+    "warn": "#E8C468",
+    "error": "#EF6F7E",
+    "blue": "#6CA8F0",
+    "orange": "#F0A070",
+    "violet": "#B39DDB",
+    "pink": "#F48FB1",
+    "teal": "#4FC3C9",
+    "named": {}
+  },
+  "episodes": [
+    {
+      "n": 1,
+      "stem": "ep01_bench",
+      "cls": "Ep01",
+      "title": "The edit file"
+    },
+    {
+      "n": 2,
+      "stem": "ep02_cut",
+      "cls": "Ep02",
+      "title": "Cut by what is said"
+    },
+    {
+      "n": 3,
+      "stem": "ep03_captions",
+      "cls": "Ep03",
+      "title": "Captions and spellings"
+    },
+    {
+      "n": 4,
+      "stem": "ep04_join",
+      "cls": "Ep04",
+      "title": "Joining pieces"
+    },
+    {
+      "n": 5,
+      "stem": "ep05_frame",
+      "cls": "Ep05",
+      "title": "Frame and speed"
+    },
+    {
+      "n": 6,
+      "stem": "ep06_over",
+      "cls": "Ep06",
+      "title": "Over the picture"
+    },
+    {
+      "n": 7,
+      "stem": "ep07_code",
+      "cls": "Ep07",
+      "title": "Your own code"
+    },
+    {
+      "n": 8,
+      "stem": "ep08_sound",
+      "cls": "Ep08",
+      "title": "Sound"
+    },
+    {
+      "n": 9,
+      "stem": "ep09_grade",
+      "cls": "Ep09",
+      "title": "Colour"
+    },
+    {
+      "n": 10,
+      "stem": "ep10_key",
+      "cls": "Ep10",
+      "title": "Green screen"
+    },
+    {
+      "n": 11,
+      "stem": "ep11_steady",
+      "cls": "Ep11",
+      "title": "Steady"
+    },
+    {
+      "n": 12,
+      "stem": "ep12_cameras",
+      "cls": "Ep12",
+      "title": "Two cameras"
+    },
+    {
+      "n": 13,
+      "stem": "ep13_render",
+      "cls": "Ep13",
+      "title": "Render and share"
+    },
+    {
+      "n": 14,
+      "stem": "ep14_end",
+      "cls": "Ep14",
+      "title": "Back to the four recordings"
+    }
+  ]
+}

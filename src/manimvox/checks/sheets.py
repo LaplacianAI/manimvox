@@ -6,6 +6,8 @@ from pathlib import Path
 import av
 from PIL import Image
 
+from ..post.encode import decode_video
+
 PAD = 6
 
 
@@ -19,7 +21,7 @@ def _samples(video: Path, every: float, width: int) -> list[Image.Image]:
             raise ValueError(f"no video frames in {video}")
         stream = container.streams.video[0]
         frames, next_t = [], 0.0
-        for frame in container.decode(stream):
+        for frame in decode_video(container, stream):
             t = float(frame.pts * stream.time_base) if frame.pts is not None else 0.0
             if t + 1e-6 >= next_t:
                 img = frame.to_image()

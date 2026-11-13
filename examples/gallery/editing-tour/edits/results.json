@@ -1,0 +1,414 @@
+{
+  "captions": "burn",
+  "duck_db": -18,
+  "spellings": {
+    "Joita": "Joyeeta",
+    "UNESCO I had to interrupt": "UNESCO-IHE",
+    "UNESCO IT": "UNESCO-IHE",
+    "UNESCO IHE": "UNESCO-IHE"
+  },
+  "segments": [
+    {
+      "clip": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "start": 0,
+      "end": 12.5,
+      "from_words": "Can you briefly",
+      "to_words": "had to interrupt",
+      "cut_silences": 0.5
+    },
+    {
+      "clip": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "start": 12.5,
+      "end": 23,
+      "from_words": "what is your role",
+      "to_words": "two institutions together",
+      "cut_silences": 0.5,
+      "cut_fillers": true
+    },
+    {
+      "clip": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "start": 0,
+      "end": 12.5,
+      "from_words": "Can you briefly",
+      "to_words": "had to interrupt",
+      "cut_silences": 0.5,
+      "captions": true,
+      "transition": "cut"
+    },
+    {
+      "frames": "fx.py:countdown",
+      "transition": "cut"
+    },
+    {
+      "title": "Your footage, edited",
+      "lines": [
+        "Every editing tool in manimvox",
+        "on real footage"
+      ],
+      "seconds": 3.5,
+      "transition": "dip"
+    },
+    {
+      "image": "build/towers.png",
+      "seconds": 5,
+      "move": "push",
+      "transition": "fade"
+    },
+    {
+      "clip": "research/assets/Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "start": 29,
+      "end": 40,
+      "speed": [
+        [
+          31,
+          1
+        ],
+        [
+          32,
+          0.3
+        ],
+        [
+          35.5,
+          0.3
+        ],
+        [
+          36.5,
+          1
+        ]
+      ],
+      "volume": -8,
+      "transition": "cut"
+    },
+    {
+      "clip": "research/assets/Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "start": 29,
+      "end": 38,
+      "speed": [
+        [
+          31,
+          1
+        ],
+        [
+          32,
+          0.3
+        ],
+        [
+          35.5,
+          0.3
+        ],
+        [
+          36.5,
+          1
+        ]
+      ],
+      "volume": -8,
+      "transition": "cut"
+    },
+    {
+      "clip": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "start": 2.79,
+      "end": 8.0,
+      "mute": true
+    },
+    {
+      "frames": "fx.py:countdown",
+      "transition": "cut"
+    },
+    {
+      "clip": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "start": 17.6,
+      "end": 23.0,
+      "mute": true,
+      "effects": [
+        "fx.py:vignette"
+      ]
+    },
+    {
+      "clip": "research/assets/Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "start": 29,
+      "end": 40,
+      "speed": [
+        [
+          31,
+          1
+        ],
+        [
+          32,
+          0.3
+        ],
+        [
+          35.5,
+          0.3
+        ],
+        [
+          36.5,
+          1
+        ]
+      ],
+      "volume": -8,
+      "transition": "cut"
+    },
+    {
+      "clip": "research/assets/Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "start": 3,
+      "end": 13,
+      "grade": {
+        "exposure": 0.15,
+        "temperature": 0.1,
+        "contrast": 1.15,
+        "saturation": 1.2,
+        "lut": "looks/film.cube"
+      },
+      "volume": -8,
+      "transition": "cut"
+    },
+    {
+      "image": "build/mountain.png",
+      "seconds": 5,
+      "move": "push",
+      "transition": "cut"
+    },
+    {
+      "clip": "research/assets/Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "start": 12,
+      "end": 28,
+      "stabilize": {
+        "smooth": 2
+      },
+      "volume": -8,
+      "transition": "cut"
+    },
+    {
+      "multicam": [
+        "research/assets/Urilift,_Göteborg,_Kungsportsplatsen_-_angle_1.webm",
+        "research/assets/Urilift,_Göteborg,_Kungsportsplatsen_-_angle_2.webm"
+      ],
+      "start": 8,
+      "end": 24,
+      "cuts": [
+        [
+          12,
+          1
+        ],
+        [
+          17,
+          0
+        ],
+        [
+          20.5,
+          1
+        ]
+      ],
+      "sound": 0,
+      "volume": -8,
+      "transition": "cut"
+    },
+    {
+      "clip": "research/assets/Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "start": 29,
+      "end": 40,
+      "speed": [
+        [
+          31,
+          1
+        ],
+        [
+          32,
+          0.3
+        ],
+        [
+          35.5,
+          0.3
+        ],
+        [
+          36.5,
+          1
+        ]
+      ],
+      "volume": -8,
+      "transition": "cut"
+    },
+    {
+      "image": "build/mountain.png",
+      "seconds": 3,
+      "transition": "cut"
+    },
+    {
+      "clip": "research/assets/Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "start": 12,
+      "end": 28,
+      "stabilize": {
+        "smooth": 10
+      },
+      "transition": "cut"
+    },
+    {
+      "clip": "research/assets/Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "start": 29,
+      "end": 40,
+      "speed": [
+        [
+          31,
+          1
+        ],
+        [
+          32,
+          0.3
+        ],
+        [
+          35.5,
+          0.3
+        ],
+        [
+          36.5,
+          1
+        ]
+      ],
+      "volume": -8,
+      "stabilize": {
+        "smooth": 2
+      },
+      "grade": {
+        "exposure": 0.15,
+        "temperature": 0.1,
+        "contrast": 1.15,
+        "saturation": 1.2,
+        "lut": "looks/film.cube"
+      },
+      "transition": "cut"
+    }
+  ],
+  "overlays": [
+    {
+      "draw": "fx.py:speed_meter",
+      "at": 37.79,
+      "until": 58.39,
+      "box": [
+        1340,
+        920,
+        520
+      ],
+      "fade": 0.3
+    },
+    {
+      "clip": "research/assets/Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "start": 29,
+      "at": 58.59,
+      "until": 67.89,
+      "box": [
+        60,
+        60,
+        520
+      ]
+    },
+    {
+      "text": "as filmed",
+      "kind": "label",
+      "pos": [
+        72,
+        370
+      ],
+      "at": 58.59,
+      "until": 67.89
+    },
+    {
+      "draw": "fx.py:speed_meter",
+      "at": 58.59,
+      "until": 77.19,
+      "box": [
+        1340,
+        920,
+        520
+      ],
+      "fade": 0.3
+    },
+    {
+      "scene": "scenes.py:Falling",
+      "at": 62.59
+    },
+    {
+      "image": "build/badge.png",
+      "at": 77.59,
+      "until": 82.39,
+      "box": [
+        1500,
+        40,
+        380
+      ]
+    },
+    {
+      "text": "Prof Joyeeta Gupta",
+      "sub": "University of Amsterdam and UNESCO-IHE",
+      "at": 77.79,
+      "until": 82.39
+    },
+    {
+      "clip": "research/assets/Chroma_key_demonstration.ogv",
+      "start": 72,
+      "at": 121.2,
+      "until": 126.2,
+      "key": "auto",
+      "fade": 0
+    },
+    {
+      "clip": "research/assets/Chroma_key_demonstration.ogv",
+      "start": 72,
+      "at": 179.0,
+      "until": 182.0,
+      "key": {
+        "color": "auto",
+        "similarity": 0.5
+      },
+      "fade": 0
+    }
+  ],
+  "audio": [
+    {
+      "say": "A dip into a title card, then a still that slowly pushes in.",
+      "at": 30.29
+    },
+    {
+      "say": "The towers fall at three tenths of their speed, with the sound kept at pitch.",
+      "at": 38.19
+    },
+    {
+      "say": "The footage as filmed, in a box, labelled, with a gauge and a ring drawn over it.",
+      "at": 58.99
+    },
+    {
+      "say": "A countdown made by code, and the interview with a vignette on every frame.",
+      "at": 82.9
+    },
+    {
+      "music": "build/pad.wav",
+      "volume": -18,
+      "at": 90.4,
+      "until": 111.2
+    },
+    {
+      "say": "A whoosh as time slows, the crowd kept low, the music dipping under every line.",
+      "at": 91.0
+    },
+    {
+      "sound": "build/whoosh.wav",
+      "at": 93.6,
+      "volume": -6
+    },
+    {
+      "say": "The same footage with the haze lifted and a warm film look.",
+      "at": 111.7
+    },
+    {
+      "say": "Feet and a hand on a rock, with a mountain where the green sheet was.",
+      "at": 121.5
+    },
+    {
+      "say": "The demolition, held steady.",
+      "at": 126.8
+    },
+    {
+      "say": "Wide, close, and back, with one soundtrack throughout.",
+      "at": 142.8
+    }
+  ]
+}

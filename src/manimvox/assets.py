@@ -142,6 +142,14 @@ def _json(url: str, service: str):
         raise AssetError(f"{service} sent something that is not JSON: {url}") from None
 
 
+_TALK = re.compile(r"\s*\(?\s*<a[^>]*User_talk:[^>]*>.*?</a>\s*\)?", re.DOTALL)
+
+
+def _artist(text: str) -> str:
+    """A Commons Artist field as plain text, without the "(talk)" or "(leave a reply)" link a signature adds."""
+    return _strip_html(_TALK.sub("", text or ""))
+
+
 def _strip_html(text: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", text or ""))).strip()
 
@@ -214,7 +222,7 @@ def _wikimedia(url: str, p: urllib.parse.ParseResult) -> Source | None:
         return _strip_html((ext.get(k) or {}).get("value", ""))
 
     lic = val("LicenseShortName") or val("License")
-    artist = val("Artist") or val("Credit") or "Unknown author"
+    artist = _artist((ext.get("Artist") or {}).get("value", "")) or val("Credit") or "Unknown author"
     name = title.split(":", 1)[1].replace(" ", "_")
     page = f"https://commons.wikimedia.org/wiki/{urllib.parse.quote(title.replace(' ', '_'), safe=':')}"
     date = val("DateTimeOriginal") or val("DateTime")

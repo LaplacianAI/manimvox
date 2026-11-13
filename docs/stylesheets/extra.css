@@ -1,0 +1,58 @@
+/* Long gallery films: the video, then its chapters as a list that seeks it (javascripts/chapters.js). */
+.mvx-film video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #0e1822;
+  border-radius: 0.4rem;
+}
+
+.md-typeset ol.mvx-chapters {
+  list-style: none;
+  margin: 0.8rem 0 1.2rem;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+  gap: 0.25rem 0.8rem;
+  counter-reset: none;
+}
+
+.md-typeset ol.mvx-chapters li {
+  margin: 0;
+  padding: 0;
+}
+
+.md-typeset ol.mvx-chapters a {
+  display: flex;
+  gap: 0.6rem;
+  align-items: baseline;
+  padding: 0.35rem 0.6rem;
+  border-left: 3px solid transparent;
+  border-radius: 0.2rem;
+  color: var(--md-typeset-color);
+  text-decoration: none;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.md-typeset ol.mvx-chapters a:hover,
+.md-typeset ol.mvx-chapters a:focus-visible {
+  background: var(--md-accent-fg-color--transparent);
+}
+
+.md-typeset ol.mvx-chapters a[aria-current="true"] {
+  border-left-color: var(--md-accent-fg-color);
+  background: var(--md-accent-fg-color--transparent);
+  font-weight: 600;
+}
+
+.md-typeset ol.mvx-chapters .t {
+  font-family: var(--md-code-font-family);
+  font-size: 0.85em;
+  color: var(--md-default-fg-color--light);
+  min-width: 2.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-typeset ol.mvx-chapters a { transition: none; }
+}

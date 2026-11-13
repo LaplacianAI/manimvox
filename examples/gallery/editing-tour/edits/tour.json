@@ -1,0 +1,112 @@
+{
+  "captions": "none",
+  "segments": [
+    {
+      "episode": "ep01"
+    },
+    {
+      "episode": "ep02",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep03",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep04",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep05",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep06",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep07",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep08",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep09",
+      "transition": {
+        "kind": "dip",
+        "seconds": 0.8
+      }
+    },
+    {
+      "episode": "ep10",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep11",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep12",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep13",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "episode": "ep14",
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      }
+    },
+    {
+      "title": "Made with manimvox",
+      "seconds": 7,
+      "transition": {
+        "kind": "fade",
+        "seconds": 0.5
+      },
+      "lines": [
+        "Footage: UNESCO-IHE Archive (CC BY 3.0), Laerol (CC BY-SA 4.0),",
+        "Pixelmaniac pictures (public domain), Albin Olsson (CC BY-SA 3.0)",
+        "Made by Claude Code with manimvox. Voice: Kokoro. Music synthesised."
+      ]
+    }
+  ]
+}

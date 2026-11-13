@@ -1,0 +1,74 @@
+{
+  "assets": [
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Chroma_key_demonstration.ogv",
+      "page": "https://commons.wikimedia.org/wiki/File:Chroma_key_demonstration.ogv",
+      "file": "research/assets/Chroma_key_demonstration.ogv",
+      "sha256": "e8e5f70c51a647c31feb3bf47cbdfd8a550bce5e13f7bfa43819133969e5a35b",
+      "bytes": 96293584,
+      "licence": "PD",
+      "licence_stated": "",
+      "licence_detected": "Public domain",
+      "licence_basis": "detected from Wikimedia Commons",
+      "credit": "Pixelmaniac pictures, \"Chroma key demonstration\" (2014), Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Chroma_key_demonstration.ogv",
+      "non_commercial": false,
+      "fetched": "2026-11-13"
+    },
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "page": "https://commons.wikimedia.org/wiki/File:Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "file": "research/assets/Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "sha256": "543dca432f55832d6956213ede457537207f8f742c294bb6d391baa6f0219513",
+      "bytes": 83373073,
+      "licence": "CC-BY-SA-4.0",
+      "licence_stated": "",
+      "licence_detected": "CC BY-SA 4.0",
+      "licence_basis": "detected from Wikimedia Commons",
+      "credit": "Laerol, \"Dundee Alexander Street Hilltown Multis Demolition 2011\" (2011), Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Dundee_Alexander_Street_Hilltown_Multis_Demolition_2011.webm",
+      "non_commercial": false,
+      "fetched": "2026-11-13"
+    },
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Urilift,_G%C3%B6teborg,_Kungsportsplatsen_-_angle_1.webm",
+      "page": "https://commons.wikimedia.org/wiki/File:Urilift%2C_G%C3%B6teborg%2C_Kungsportsplatsen_-_angle_1.webm",
+      "file": "research/assets/Urilift,_Göteborg,_Kungsportsplatsen_-_angle_1.webm",
+      "sha256": "1e6788e915588d252f2a7b3a4eff249d160de92255ed79c88b5b13fba4b954e9",
+      "bytes": 46426225,
+      "licence": "CC-BY-SA-3.0",
+      "licence_stated": "",
+      "licence_detected": "CC BY-SA 3.0",
+      "licence_basis": "detected from Wikimedia Commons",
+      "credit": "Albin Olsson, \"Urilift, Göteborg, Kungsportsplatsen - angle 1\" (2014), Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Urilift%2C_G%C3%B6teborg%2C_Kungsportsplatsen_-_angle_1.webm",
+      "non_commercial": false,
+      "fetched": "2026-11-13"
+    },
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Urilift,_G%C3%B6teborg,_Kungsportsplatsen_-_angle_2.webm",
+      "page": "https://commons.wikimedia.org/wiki/File:Urilift%2C_G%C3%B6teborg%2C_Kungsportsplatsen_-_angle_2.webm",
+      "file": "research/assets/Urilift,_Göteborg,_Kungsportsplatsen_-_angle_2.webm",
+      "sha256": "3cd2b6ae0f2e9f707beefd7d3526440ed5d12aeb3d09c48dde8617b655903ef7",
+      "bytes": 37366975,
+      "licence": "CC-BY-SA-3.0",
+      "licence_stated": "",
+      "licence_detected": "CC BY-SA 3.0",
+      "licence_basis": "detected from Wikimedia Commons",
+      "credit": "Albin Olsson, \"Urilift, Göteborg, Kungsportsplatsen - angle 2\" (2014), Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Urilift%2C_G%C3%B6teborg%2C_Kungsportsplatsen_-_angle_2.webm",
+      "non_commercial": false,
+      "fetched": "2026-11-13"
+    },
+    {
+      "url": "https://commons.wikimedia.org/wiki/File:Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "page": "https://commons.wikimedia.org/wiki/File:Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "file": "research/assets/Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "sha256": "0c3f339a6e2f365ef3d9488add802aa4e3ad8c57d661c909b990f0162982f169",
+      "bytes": 42293765,
+      "licence": "CC-BY-3.0",
+      "licence_stated": "",
+      "licence_detected": "CC BY 3.0",
+      "licence_basis": "detected from Wikimedia Commons",
+      "credit": "UNESCO-IHE Archive, \"Interview Prof Joyeeta Gupta on strengthening water governance education and research\" (2013), Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Interview_Prof_Joyeeta_Gupta_on_strengthening_water_governance_education_and_research.webm",
+      "non_commercial": false,
+      "fetched": "2026-11-11"
+    }
+  ]
+}

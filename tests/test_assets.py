@@ -35,11 +35,11 @@ def zenodo(licence="cc-by-4.0", digest=MD5, files=None):
     }).encode()
 
 
-def commons(licence="CC BY-SA 4.0"):
+def commons(licence="CC BY-SA 4.0", artist='<a href="x">Ann Artist</a>'):
     sha1 = hashlib.sha1(DATA).hexdigest()
     return json.dumps({"query": {"pages": [{"imageinfo": [{
         "url": "https://upload.wikimedia.org/wikipedia/commons/a/ab/Heart.stl", "size": len(DATA), "sha1": sha1,
-        "extmetadata": {"LicenseShortName": {"value": licence}, "Artist": {"value": '<a href="x">Ann Artist</a>'},
+        "extmetadata": {"LicenseShortName": {"value": licence}, "Artist": {"value": artist},
                         "DateTimeOriginal": {"value": "2019-05-01"}}}]}]}}).encode()
 
 
@@ -124,6 +124,15 @@ def test_wikimedia_detection(project, net):
     assert p.licence == "CC-BY-SA-4.0" and p.licence_basis == "detected from Wikimedia Commons"
     assert p.credit.startswith('Ann Artist, "Heart" (2019), Wikimedia Commons')
     assert p.file == "research/assets/Heart.stl" and p.algo == "sha1"
+
+
+def test_a_commons_signature_loses_its_talk_link(project, net):
+    signed = ('<a href="//commons.wikimedia.org/wiki/User:Ann" title="User:Ann">Ann Artist</a> (<a href="//commons.'
+              'wikimedia.org/wiki/User_talk:Ann" title="User talk:Ann"><span class="signature-talk">leave a reply</span>'
+              '</a>)')
+    net["serve"](commons(artist=signed))
+    p = assets.plan(project, "https://commons.wikimedia.org/wiki/File:Heart.stl")
+    assert p.credit.startswith('Ann Artist, "Heart" (2019)')
 
 
 def test_contradicting_licence_refused(project, net):

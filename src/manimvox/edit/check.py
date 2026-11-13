@@ -219,6 +219,13 @@ def check_edit(root: Path, tl: Timeline) -> EditReport:
                                         f"({m.seconds:.2f} s)")
                 elif seg.end is not None and seg.end > m.seconds + SLACK:
                     rep.findings.append(f"{where}: end {seg.end:g} s is past the file's end ({m.seconds:.2f} s)")
+                if isinstance(seg.speed, tuple):
+                    end = seg.end if seg.end is not None else m.seconds
+                    first, last = seg.speed[0][0], seg.speed[-1][0]
+                    if last <= seg.start or first >= end:
+                        rep.findings.append(f"{where}: every speed keyframe ({first:g} to {last:g} s) is outside "
+                                            f"the clip's {seg.start:g} to {end:g} s, so its speed never changes; "
+                                            "keyframes are seconds of the file, like start and end")
                 if seg.crop is not None:
                     x, y, w, h = seg.crop
                     if x + w > m.width + 0.5 or y + h > m.height + 0.5:

@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "size": [
+    1920,
+    1080
+  ],
+  "fps": 30,
+  "segments": [
+    {
+      "episode": "ep01"
+    }
+  ],
+  "audio": [
+    {
+      "music": "build/pad.wav",
+      "volume": -26
+    }
+  ]
+}

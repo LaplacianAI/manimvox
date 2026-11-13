@@ -1,0 +1,484 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:08.576
+Here are four real recordings, and each one has a problem. The interview has long pauses, and the interviewer says um in the middle of a question.
+
+00:00:09.276 --> 00:00:16.081
+The demolition was filmed by a hand that shakes. The green-screen shoot has a bright green sheet where a mountain should be.
+
+00:00:16.809 --> 00:00:21.908
+And the street was filmed by two cameras, which have to be lined up before you can cut between them.
+
+00:00:23.209 --> 00:00:30.655
+How do you fix all four, and make one film of them, with nothing but a text file? By the end you'll be able to write that file yourself.
+
+00:00:31.376 --> 00:00:37.413
+We'll go one tool at a time: what it does, the line you write, the result, and the mistake people make with it.
+
+00:00:39.243 --> 00:00:47.819
+Everything starts with an edit file, a plain text file in your project's edits folder. You can write it in JSON, or in Python if you'd rather.
+
+00:00:49.119 --> 00:00:58.377
+It has three lists. Segments play one after another, like clips on a timeline. Overlays sit on top of the picture, and audio is everything you hear.
+
+00:00:59.077 --> 00:01:05.989
+Times for overlays and sound are seconds of the finished film. Times inside a clip are seconds of its own file.
+
+00:01:07.577 --> 00:01:17.689
+Before you cut anything, you look. The probe command tells you a file's length, size and sound, and writes contact sheets, grids of frames so you can see where things happen.
+
+00:01:18.377 --> 00:01:26.249
+Then check edit reads your file against the real footage, and says where every piece lands on the finished film, before anything is rendered.
+
+00:01:28.044 --> 00:01:31.841
+The mistake here is placing an overlay by a time in the raw file.
+
+00:01:32.511 --> 00:01:36.287
+Overlays use the film's clock, so read their times from check edit.
+
+00:01:37.977 --> 00:01:44.079
+So the file says what plays, what sits on top, and what you hear, and check edit tells you where it all lands.
+
+00:01:45.777 --> 00:01:47.463
+Next, cutting by what is said.
+
+00:01:49.400 --> 00:01:54.307
+Last chapter, you met the edit file and check edit. Now we use them on the interview.
+
+00:01:55.007 --> 00:02:06.121
+To cut an interview by hand, you scrub back and forth to find each word. Instead, manimvox can write down every word with its time, using speech-to-text that runs on your computer.
+
+00:02:06.821 --> 00:02:12.773
+Run probe with the transcribe option, and you get the transcript, every word with the second it was said.
+
+00:02:13.797 --> 00:02:22.587
+Now a clip can start and end at words. From words is the phrase it starts on, and to words the phrase it ends on, copied from the transcript.
+
+00:02:23.297 --> 00:02:32.769
+Speech-to-text gets the words right but the times a little wrong, so manimvox moves each cut to just outside the speech it hears, and never cuts inside a word.
+
+00:02:33.797 --> 00:02:38.683
+Cut silences removes every pause longer than the number you give, here half a second.
+
+00:02:39.397 --> 00:02:46.011
+And cut fillers removes the ums and uhs. Each clip with cuts plays as several pieces, joined by cuts.
+
+00:02:47.031 --> 00:02:51.681
+Here is the interview, cut by its own words, with the pauses and the um taken out.
+
+00:03:11.431 --> 00:03:16.551
+Twenty-one seconds of recording became seventeen, and every word she said is still there.
+
+00:03:18.464 --> 00:03:21.621
+The mistake is a phrase said twice between start and end.
+
+00:03:22.331 --> 00:03:28.027
+Check edit refuses it and says where each one is, so make the phrase longer or the window shorter.
+
+00:03:29.731 --> 00:03:32.547
+So you cut speech by what is said, not by scrubbing.
+
+00:03:33.264 --> 00:03:35.696
+But now you can't see what she says without sound.
+
+00:03:36.797 --> 00:03:38.504
+Next, captions and spellings.
+
+00:03:39.900 --> 00:03:44.999
+Last chapter, the interview was cut by its own words. Now we make those words readable.
+
+00:03:45.699 --> 00:03:53.549
+Captions true on a clip writes what the speaker says as captions, from the same transcript, at the times the words land in the cut film.
+
+00:03:54.265 --> 00:04:02.393
+At the top of the file, captions chooses where they go: a subtitle file beside the video, burned into the picture as well, or none.
+
+00:04:03.099 --> 00:04:06.875
+But speech-to-text mishears names. It hears her name as Joita.
+
+00:04:07.899 --> 00:04:14.213
+Spellings fixes that: each heard form, written as the transcript spells it, with the right spelling beside it.
+
+00:04:15.232 --> 00:04:26.475
+One more thing happens without asking. Her recording is quiet, so manimvox raises it to the project's loudness, but never by more than twelve decibels, so room noise never roars.
+
+00:04:27.599 --> 00:04:31.033
+Her captions now spell her name and her institute correctly.
+
+00:04:44.132 --> 00:04:46.756
+The mistake is writing the pair the wrong way round.
+
+00:04:47.465 --> 00:04:51.348
+The key is what the transcript heard, and the value is what you want shown.
+
+00:04:53.065 --> 00:04:57.097
+So captions come from the transcript, and spellings fix what it mishears.
+
+00:04:57.799 --> 00:04:59.356
+Next, joining the pieces.
+
+00:05:00.800 --> 00:05:06.731
+So far, one clip at a time. Now, how the pieces of a film join, and what else a piece can be.
+
+00:05:07.400 --> 00:05:12.371
+Each segment says how it begins after the one before: with a cut, a fade, or a dip.
+
+00:05:13.067 --> 00:05:14.389
+A cut is the default.
+
+00:05:15.067 --> 00:05:17.499
+A fade blends the two pictures and their sound.
+
+00:05:18.167 --> 00:05:22.284
+And a dip passes through the background colour, a gentle break between parts.
+
+00:05:22.967 --> 00:05:30.412
+A fade or a dip overlaps the two segments by its seconds, half a second unless you say, so the film gets that much shorter.
+
+00:05:31.500 --> 00:05:38.689
+Not every segment is footage. A title segment is a card in the project's theme, with up to four lines under the title.
+
+00:05:39.667 --> 00:05:45.640
+An image segment is a still, and move makes it push in, pull out, or pan, so a still never sits dead.
+
+00:05:46.633 --> 00:05:52.436
+And an episode segment drops in an explainer you rendered with manimvox, like the ones teaching you now.
+
+00:05:53.433 --> 00:05:59.065
+Inside an explainer, from video plays a recording with its own sound, levelled to the narration.
+
+00:06:11.733 --> 00:06:14.528
+The mistake is a fade on the very first segment.
+
+00:06:15.200 --> 00:06:18.293
+There's nothing before it to fade from, so it must be a cut.
+
+00:06:19.967 --> 00:06:25.791
+So segments join with a cut, a fade or a dip, and can be clips, cards, stills or explainers.
+
+00:06:26.467 --> 00:06:29.048
+But the demolition is too small, and too fast.
+
+00:06:30.548 --> 00:06:32.020
+Next, frame and speed.
+
+00:06:33.400 --> 00:06:39.715
+Last chapter joined pieces end to end. Now we change what's inside a piece: its shape, and its time.
+
+00:06:40.415 --> 00:06:44.703
+Footage rarely matches the film's shape, so fit says how it fills the frame.
+
+00:06:45.715 --> 00:06:47.720
+Contain letterboxes it, with bars.
+
+00:06:48.448 --> 00:06:50.965
+Cover fills the frame and trims the edges.
+
+00:06:51.981 --> 00:06:56.781
+And crop shows just the region you give, in the file's own pixels, scaled up to fill.
+
+00:06:58.581 --> 00:07:05.771
+Speed plays a clip faster or slower, from a quarter to four times, and the sound keeps its pitch, so voices don't squeak.
+
+00:07:06.781 --> 00:07:15.336
+But a moment can be slowed on its own. Give speed as keyframes, each a second of the file and a speed, and the speed eases from one to the next.
+
+00:07:16.048 --> 00:07:22.192
+Here it runs at normal speed, slows to three tenths as the towers fall, holds, and speeds up again.
+
+00:07:45.781 --> 00:07:52.032
+The fall took about four seconds. Slowed, it fills about thirteen, long enough to watch each tower go.
+
+00:07:53.248 --> 00:08:00.395
+The mistake is giving keyframes in the film's seconds. They're seconds of the clip's own file, the same clock as start and end.
+
+00:08:02.081 --> 00:08:07.095
+So fit shapes the picture, and speed changes time, steadily or around one moment.
+
+00:08:07.815 --> 00:08:09.777
+Next, what sits over the picture.
+
+00:08:12.000 --> 00:08:16.651
+So far, everything has been the picture itself. Now, the layer on top of it.
+
+00:08:17.351 --> 00:08:23.068
+Overlays sit on top of the picture, each from an at time to an until time on the film's clock.
+
+00:08:24.084 --> 00:08:30.911
+A text overlay is a lower third, with a name and a role, a centred title, or a label at a position you give.
+
+00:08:31.917 --> 00:08:41.197
+An image overlay places a picture, a logo or a diagram, in a box: x, y and width, in pixels of the film. The height follows the image.
+
+00:08:42.217 --> 00:08:48.212
+A clip overlay is picture-in-picture, a second video in a box, silent unless you give it a volume.
+
+00:08:49.217 --> 00:08:55.340
+A draw overlay is graphics made by your own code, a function given the time that returns a picture.
+
+00:08:56.345 --> 00:09:01.615
+And a scene overlay renders a Manim scene with a clear background and lays it over the footage.
+
+00:09:28.612 --> 00:09:33.839
+The mistake is a box that runs off the frame. Check edit catches it, and names the box.
+
+00:09:35.545 --> 00:09:41.199
+So overlays add words, pictures, a second video, your own drawing or a whole scene on top.
+
+00:09:41.912 --> 00:09:44.323
+But what if no file holds the picture you want?
+
+00:09:45.045 --> 00:09:46.283
+Next, your own code.
+
+00:09:48.600 --> 00:09:53.741
+Last chapter used a gauge drawn by code. Now, how to write code like that yourself.
+
+00:09:54.441 --> 00:09:59.305
+Then you make it. A frames segment is a piece of film made entirely by code.
+
+00:10:00.275 --> 00:10:07.229
+This countdown is a function that draws each frame from the time. Frames runs it for as many seconds as you give.
+
+00:10:08.241 --> 00:10:12.316
+If you use MoviePy, a MoviePy clip works as a frames segment too.
+
+00:10:13.341 --> 00:10:20.531
+And effects change every frame of a segment. This one darkens the corners of the interview a little, so the eye stays on her.
+
+00:10:21.636 --> 00:10:29.209
+In JSON you name the function as the file and its name, separated by a colon. In Python, you pass the function itself.
+
+00:10:39.803 --> 00:10:47.589
+The mistake is an effect that changes the frame's size. It must give back a frame the same size, or the render stops and says so.
+
+00:10:49.303 --> 00:10:52.695
+So when no file has the picture, your own code can draw it.
+
+00:10:53.369 --> 00:10:54.372
+Next, sound.
+
+00:10:56.500 --> 00:11:00.063
+Everything so far has been picture. Now, everything you hear.
+
+00:11:00.733 --> 00:11:02.973
+The audio list holds three kinds of sound.
+
+00:11:04.267 --> 00:11:11.179
+A say line is narration, spoken in your project's voice at a time you give. That's how every word you're hearing was made.
+
+00:11:11.867 --> 00:11:18.651
+A music bed plays under the film, looped, faded in and out, and it dips whenever anyone speaks, by duck decibels.
+
+00:11:20.833 --> 00:11:25.207
+And a sound places a file once: an effect, or a voice-over you recorded.
+
+00:11:26.400 --> 00:11:32.373
+Each clip keeps its own sound too, levelled, and pushed down under narration so the voice is always clear.
+
+00:11:56.833 --> 00:11:58.881
+The mistake is two lines that overlap.
+
+00:11:59.567 --> 00:12:03.428
+The render refuses, and tells you the earliest time the second can start.
+
+00:12:05.900 --> 00:12:08.865
+So you write sound like everything else: what, and when.
+
+00:12:09.533 --> 00:12:12.349
+That's every tool from version zero point eight.
+
+00:12:14.149 --> 00:12:16.475
+Next, colour, the first of the new tools.
+
+00:12:18.200 --> 00:12:20.888
+Welcome to the new tools. The first one is colour.
+
+00:12:21.600 --> 00:12:25.589
+The demolition looks hazy and flat. Grade corrects a segment's colour.
+
+00:12:26.889 --> 00:12:34.228
+Exposure brightens or darkens in stops. Temperature warms or cools, and tint moves between magenta and green.
+
+00:12:34.956 --> 00:12:41.932
+Lift, gamma and gain move the shadows, the mid-tones and the highlights. Contrast and saturation do what they say.
+
+00:12:42.656 --> 00:12:49.355
+And a LUT, a look-up table file that many cameras and colour tools use, adds a look on top, applied last.
+
+00:13:04.023 --> 00:13:05.239
+Before, and after.
+
+00:13:08.956 --> 00:13:12.369
+A common worry is that a grade tints the letterbox bars too.
+
+00:13:13.089 --> 00:13:15.351
+It doesn't: only the picture is graded.
+
+00:13:17.056 --> 00:13:20.832
+So grade fixes and styles colour, and a LUT adds a look.
+
+00:13:22.123 --> 00:13:24.683
+But the green-screen shoot needs more than colour.
+
+00:13:25.783 --> 00:13:27.105
+Next, green screen.
+
+00:13:29.200 --> 00:13:34.064
+Last chapter changed a picture's colours. Now we take one colour away entirely.
+
+00:13:34.767 --> 00:13:41.316
+A green screen is a bright sheet behind the subject, so the sheet can be made see-through and something else shown behind.
+
+00:13:42.416 --> 00:13:49.989
+Key on a clip overlay does that. Auto finds the screen's colour from the clearly green or blue pixels round the edge of the frame.
+
+00:13:52.316 --> 00:14:03.303
+Similarity is how close to the screen a pixel must be to vanish. Softness softens the edge, for hair and motion. Spill takes the screen's green glow off the subject.
+
+00:14:04.016 --> 00:14:09.499
+With no box, the clip overlay fills the frame, and the main track shows through where the screen was.
+
+00:14:17.983 --> 00:14:19.199
+Before, and after.
+
+00:14:22.916 --> 00:14:26.799
+The mistake is a similarity so high it eats the subject's edges.
+
+00:14:27.516 --> 00:14:29.692
+Raise it only until the screen is gone.
+
+00:14:31.416 --> 00:14:34.125
+So a key turns a green sheet into anywhere you like.
+
+00:14:36.049 --> 00:14:37.927
+Next, steadying a shaky camera.
+
+00:14:39.900 --> 00:14:43.975
+We've fixed the demolition's colour and its speed. What's left is the shake.
+
+00:14:44.700 --> 00:14:51.527
+Stabilize holds shaky footage steady. First it measures how each frame moved and turned against the one before.
+
+00:14:52.233 --> 00:14:58.335
+Then it smooths that path over a number of seconds. Slow moves, like a pan, stay. The shake is taken out.
+
+00:14:59.367 --> 00:15:05.063
+It moves each frame by the difference, and zooms in just enough that the moving edges stay out of view.
+
+00:15:06.067 --> 00:15:09.587
+The render tells you how much it corrected, and how far it zoomed.
+
+00:15:10.300 --> 00:15:13.052
+The measurement is saved, so the next render is quick.
+
+00:15:32.033 --> 00:15:33.249
+Before, and after.
+
+00:15:35.967 --> 00:15:38.313
+The mistake is smoothing over too long a time.
+
+00:15:39.033 --> 00:15:47.567
+Slow moves flatten, and it needs more zoom: ten seconds here zooms in 1.12 times, against 1.03 for two.
+
+00:15:48.300 --> 00:15:51.521
+If the edges would show, the note says so: lower smooth.
+
+00:15:53.233 --> 00:15:56.647
+So stabilize keeps the camera's moves and takes out its shake.
+
+00:15:57.367 --> 00:15:58.625
+Next, two cameras.
+
+00:16:00.600 --> 00:16:04.781
+Every recording so far came from one camera. The street came from two.
+
+00:16:05.500 --> 00:16:09.233
+Two cameras film the same moment, but they started at different times.
+
+00:16:09.933 --> 00:16:12.408
+To cut between them, they have to be lined up.
+
+00:16:13.433 --> 00:16:19.641
+Edit sync lines them up by their sound, and says where each starts on the first one's clock, and how sure it is.
+
+00:16:20.933 --> 00:16:30.960
+These two files carry the same soundtrack, so they line up at exactly zero. On separate recordings, sync finds the real offset to within a hundredth of a second.
+
+00:16:32.633 --> 00:16:35.257
+A multicam segment then cuts between them.
+
+00:16:36.567 --> 00:16:40.492
+Cuts are times on the first camera's clock, each with the camera to show.
+
+00:16:41.500 --> 00:16:45.852
+The sound stays on one camera throughout, so it never jumps when the picture does.
+
+00:17:05.333 --> 00:17:07.061
+The mistake is guessing an offset.
+
+00:17:07.767 --> 00:17:11.009
+Leave offsets out, and check edit finds them from the sound.
+
+00:17:11.733 --> 00:17:14.272
+If it isn't sure, it says so instead of guessing.
+
+00:17:16.000 --> 00:17:19.499
+So sync lines cameras up, and multicam cuts between them.
+
+00:17:20.200 --> 00:17:22.269
+Next, rendering and sharing the film.
+
+00:17:24.200 --> 00:17:28.317
+Every fix is now in the edit file. Last, getting the film out of it.
+
+00:17:29.017 --> 00:17:34.415
+To see your edit, render a draft first. It's small and quick, at four hundred and eighty lines.
+
+00:17:36.117 --> 00:17:40.299
+From and to render one stretch of the film, so you can check a fix in seconds.
+
+00:17:41.999 --> 00:17:44.665
+The final render writes the film and its captions.
+
+00:17:46.365 --> 00:17:54.237
+When the whole edit is one untouched clip with new sound, copy uses the clip's picture as it is: no loss, and done in seconds.
+
+00:17:56.532 --> 00:18:00.372
+On any other edit it encodes as usual, and the note says why.
+
+00:18:02.065 --> 00:18:10.023
+And export writes the edit as an Open Timeline file, which Kdenlive or DaVinci Resolve can open, to adjust by hand.
+
+00:18:11.699 --> 00:18:14.600
+The mistake is expecting copy on a changed clip.
+
+00:18:15.299 --> 00:18:19.715
+A grade, a crop or any change to the picture means it has to be encoded.
+
+00:18:21.399 --> 00:18:26.348
+So drafts and windows let you check fast, and copy and export carry the film further.
+
+00:18:27.032 --> 00:18:28.803
+Next, back to where we started.
+
+00:18:31.200 --> 00:18:32.843
+That's every tool in the box.
+
+00:18:33.567 --> 00:18:35.039
+Back to the four recordings.
+
+00:18:38.267 --> 00:18:48.635
+The interview, cut by its words and captioned. The demolition, held steady and slowed as it falls. The green sheet, now a mountain. The street, cut between two cameras.
+
+00:18:49.967 --> 00:18:57.156
+How do you fix all four, and make one film of them, with a text file? You write what each piece is, and manimvox does the rest.
+
+00:18:57.867 --> 00:19:04.459
+Every fix in this film is in that one file. Its source, and a guide to every field, are on the manimvox site.
+
+00:19:06.167 --> 00:19:15.980
+And every part of it, the explainers, the voice, the cuts and the fixes, was made by an AI agent with manimvox. This is manimvox, explaining itself.
+
+00:19:17.667 --> 00:19:22.189
+Read Editing your own footage next, and try one tool on a recording of your own.

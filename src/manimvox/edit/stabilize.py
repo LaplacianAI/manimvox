@@ -23,6 +23,7 @@ import av
 import numpy as np
 from PIL import Image as PILImage
 
+from ..post.encode import decode_video
 from .timeline import Stabilize
 
 WIDTH = 480  # px: frames are measured at this width
@@ -123,7 +124,7 @@ def measure(root: Path, path: Path, start: float, end: float, say=lambda line: N
         h = max(PATCH * 2, round(WIDTH * H / W / 2) * 2)
         c.seek(max(0, int(max(0.0, start - 1.0) / s.time_base)), stream=s, backward=True, any_frame=False)
         prev = None
-        for f in c.decode(s):
+        for f in decode_video(c, s):
             t = float(f.pts * s.time_base) if f.pts is not None else 0.0
             if t < start - 1e-6:
                 continue

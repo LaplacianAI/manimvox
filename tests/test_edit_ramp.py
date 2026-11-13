@@ -123,3 +123,21 @@ def test_a_window_of_a_ramp_matches_the_whole(project):
     a = int(1.0 * RATE)
     n = min(part.shape[0], int(0.9 * RATE))
     assert np.corrcoef(whole[a + 2000:a + n], part[2000:n])[0, 1] > 0.95
+
+
+@pytest.mark.parametrize("speed", [[[0.0, 1.0], [0.4, 0.5]], [[5.6, 1.0], [6.0, 0.5]]])
+def test_keyframes_outside_the_clip_are_a_finding(project, speed):
+    """Keyframes given in the film's seconds miss a clip that starts later in its file: the ramp never happens."""
+    from manimvox.edit.check import check_edit
+
+    rep = check_edit(project, parse({"segments": [{"clip": "footage/clock.mp4", "start": 0.5, "end": 5.5,
+                                                   "speed": speed}]}))
+    assert any("outside the clip's 0.5 to 5.5 s" in f and "seconds of the file" in f for f in rep.findings)
+
+
+def test_keyframes_that_reach_into_the_clip_are_fine(project):
+    from manimvox.edit.check import check_edit
+
+    rep = check_edit(project, parse({"segments": [{"clip": "footage/clock.mp4", "start": 0.5, "end": 5.5,
+                                                   "speed": [[0.0, 1.0], [1.0, 0.5]]}]}))
+    assert rep.ok, rep.findings
