@@ -1,3 +1,8 @@
+---
+description: "Which site am I on? A real browser window, named part by part, in a 40-second explainer."
+image: assets/which-site-poster.jpg
+---
+
 # Which site am I on?
 
 <video controls preload="metadata" width="100%" poster="../../assets/which-site-poster.jpg">

@@ -1,3 +1,8 @@
+---
+description: "manimvox, explaining itself: a 20-minute tutorial on every editing tool in manimvox, made end to end by an AI agent."
+image: assets/editing-tour-poster.jpg
+---
+
 # Your footage, edited
 
 <div class="mvx-film" markdown="0">

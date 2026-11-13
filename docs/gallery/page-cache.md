@@ -1,3 +1,8 @@
+---
+description: "Why is the same page faster the second time? One request through a browser, an app server, a cache and a database."
+image: assets/page-cache-poster.jpg
+---
+
 # Why is the same page faster the second time?
 
 <video controls preload="metadata" width="100%" poster="../../assets/page-cache-poster.jpg">

@@ -1,3 +1,8 @@
+---
+description: "A real 2013 interview cut by its own words into an 85-second film, all from one manimvox edit file."
+image: assets/edited-interview-poster.jpg
+---
+
 # An interview, edited
 
 <video controls preload="metadata" width="100%" poster="../../assets/edited-interview-poster.jpg">

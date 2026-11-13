@@ -1,3 +1,8 @@
+---
+description: "From an empty folder to a narrated video: a real install of manimvox, then a real Claude Code run. 2 minutes."
+image: assets/install-tutorial-poster.jpg
+---
+
 # Install manimvox and make a video
 
 <video controls preload="metadata" width="100%" poster="../../assets/install-tutorial-poster.jpg">
