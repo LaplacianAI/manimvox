@@ -13,7 +13,7 @@ The whole film is one file, `edits/NAME.json` or `edits/NAME.py`, that you or yo
 | Join | clips, rendered episodes, stills that move slowly, and title cards, with a cut, a fade or a dip |
 | Frame | crop, fill or letterbox; speed from 0.25x to 4x with the pitch kept |
 | Grade | exposure, white balance, lift, gamma and gain, contrast, saturation, and a `.cube` LUT, per segment |
-| Lay over | lower thirds and labels in the theme, pictures, picture-in-picture, graphics drawn by code, Manim scenes |
+| Lay over | lower thirds and labels in the theme, pictures, picture-in-picture, a speaker shot on a green screen, graphics drawn by code, Manim scenes |
 | Sound | each clip levelled, narration lines in the project voice, a music bed that dips under speech, sound effects |
 | Captions | of the speaker and the narration, as an `.srt` file or burned in, with misheard names corrected |
 | Check | every time, box and hook checked against the files before anything renders; a 480p draft, or just one window of the film |
@@ -97,6 +97,17 @@ A segment's `grade` corrects or styles its colour:
 ```
 
 Exposure and white balance (`temperature`, `tint`) come first, then `lift`, `gamma` and `gain` for the shadows, mid-tones and highlights, then `contrast` and `saturation`. A `"lut": "looks/film.cube"` is applied last, as a look over the rest. Only the picture is graded; letterbox bars keep the theme's background. In Python, `Clip(..., grade=Grade(exposure=0.3))`. Every key is in [The edit file](edit-file.md#segments).
+
+## Green screen
+
+A `clip` overlay with a `key` stands a subject shot on a green or blue screen over the main track:
+
+```json
+{"segments": [{"clip": "footage/slides.mp4"}],
+ "overlays": [{"clip": "footage/speaker-green.mp4", "at": 0, "until": 60, "key": "auto"}]}
+```
+
+Without a `box`, the overlay is fitted to the whole frame. `"auto"` samples the screen's colour from the frame's border, so the subject shouldn't touch the edge on the first frame shown; otherwise give `"green"`, `"blue"` or a `"#rrggbb"`. Tune it with `similarity`, `softness` and `spill`, listed in [The edit file](edit-file.md#overlays). In Python, `Inset(..., key=Key("green"))`.
 
 ## Sound
 

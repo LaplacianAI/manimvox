@@ -162,16 +162,34 @@ class Text:
 
 
 @dataclass(frozen=True)
+class Key:
+    """Green screen: `color` (hex, or "auto" to sample the backing from the frame's border) becomes transparent.
+    Pixels within `similarity` of it go fully, the next `softness` fade in, and `spill` (0 to 1) takes that much of
+    the backing's colour cast back out of the subject."""
+    color: str = "auto"
+    similarity: float = 0.12
+    softness: float = 0.08
+    spill: float = 0.6
+
+
+KEY_COLORS = {"green": "#00b140", "blue": "#0047bb"}  # the usual chroma-key paints
+HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+
+@dataclass(frozen=True)
 class Inset:
     """A second video over the picture (picture-in-picture), from `start` seconds of its file, shown from `at`
-    to `until` seconds of the output in `box` (x, y, width). Silent unless `volume` is given."""
+    to `until` seconds of the output in `box` (x, y, width), or fitted to the whole frame without one. Silent
+    unless `volume` is given. `key` makes its green (or blue) screen transparent, so the main track shows
+    through behind the subject."""
     path: str
     at: float
     until: float
-    box: tuple[float, float, float]
+    box: tuple[float, float, float] | None = None
     start: float = 0.0
     volume: float | None = None
     fade: float = 0.3
+    key: Key | None = None
 
 
 @dataclass(frozen=True)
@@ -381,6 +399,28 @@ def _grade(where: str, v) -> Grade | None:
     return Grade(**out)
 
 
+def _key(where: str, v) -> Key | None:
+    if v is None or v is False:
+        return None
+    if v is True:
+        return Key()
+    if isinstance(v, Key):
+        v = {f.name: getattr(v, f.name) for f in fields(Key)}
+    if isinstance(v, str):
+        v = {"color": v}
+    if not isinstance(v, dict):
+        raise ValueError(f'{where} must be true, "auto", "green", "blue", "#rrggbb" or {{"color": ..., '  # noqa: TRY004 - edit errors are ValueError
+                         f'"similarity": ...}}, got {v!r}')
+    _unknown(where, v, [f.name for f in fields(Key)])
+    color = v.get("color", "auto")
+    color = KEY_COLORS.get(color, color)
+    if not (color == "auto" or (isinstance(color, str) and HEX.match(color))):
+        raise ValueError(f'{where}.color must be "auto", "green", "blue" or "#rrggbb", got {color!r}')
+    return Key(color, _num(f"{where}.similarity", v.get("similarity", 0.12), 0, 0.6),
+               _num(f"{where}.softness", v.get("softness", 0.08), 0, 0.5),
+               _num(f"{where}.spill", v.get("spill", 0.6), 0, 1))
+
+
 def _unknown(where: str, raw: dict, known) -> None:
     extra = sorted(set(raw) - set(known))
     if extra:
@@ -483,11 +523,13 @@ def _overlay(where: str, raw) -> Overlay:
                     _text(f"{where}.sub", sub, 120) if sub else "",
                     None if pos is None else _tuple(f"{where}.pos", pos, 2, "[x, y] in output pixels"), fade)
     if lead == "clip":
-        _unknown(where, raw, ("clip", "at", "until", "box", "start", "volume", "fade"))
-        vol = raw.get("volume")
-        return Inset(_path(f"{where}.clip", raw["clip"]), *_span(where, raw), _box(f"{where}.box", raw.get("box")),
+        _unknown(where, raw, ("clip", "at", "until", "box", "start", "volume", "fade", "key"))
+        vol, box = raw.get("volume"), raw.get("box")
+        return Inset(_path(f"{where}.clip", raw["clip"]), *_span(where, raw),
+                     None if box is None else _box(f"{where}.box", box),
                      _num(f"{where}.start", raw.get("start", 0.0), 0),
-                     None if vol is None else _num(f"{where}.volume", vol, *DB), fade)
+                     None if vol is None else _num(f"{where}.volume", vol, *DB), fade,
+                     _key(f"{where}.key", raw.get("key")))
     box = raw.get("box")
     box = None if box is None else _box(f"{where}.box", box)
     if lead == "draw":
@@ -614,6 +656,9 @@ def _plain(name: str, v, root, keep: bool):
         return v if (keep or isinstance(v, str)) else ref_of(v, root)
     if isinstance(v, Transition):
         return v.kind if v.seconds == 0.5 else {"kind": v.kind, "seconds": v.seconds}
+    if isinstance(v, Key):
+        out = {f.name: x for f in fields(Key) if (x := getattr(v, f.name)) != f.default}
+        return out.get("color", True) if set(out) <= {"color"} else out
     if isinstance(v, Grade):
         return {f.name: list(x) if isinstance(x, tuple) else x for f in fields(Grade)
                 if (x := getattr(v, f.name)) != f.default}
