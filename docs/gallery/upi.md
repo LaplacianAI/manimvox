@@ -1,3 +1,8 @@
+---
+description: "How UPI payments work: one payment across two banks in seconds, four parties, five steps."
+image: assets/bench-upi-poster.jpg
+---
+
 # How UPI payments work
 
 <video controls preload="metadata" width="100%" poster="../../assets/bench-upi-poster.jpg">

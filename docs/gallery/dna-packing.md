@@ -1,3 +1,8 @@
+---
+description: "How two metres of DNA pack into a chromosome: one prompt, a 3D explainer by Fable 5.2 and by Opus 5.5, side by side."
+image: assets/dna-fable-poster.jpg
+---
+
 # How does two metres of DNA pack into a chromosome?
 
 === "Fable 5.2"

@@ -1,3 +1,8 @@
+---
+description: "What manimvox is, why the agent writes code instead of calling tools, and how to use it from a coding agent."
+image: assets/made-by-your-agent-poster.jpg
+---
+
 # Made by your agent
 
 <video controls preload="metadata" width="100%" poster="../../assets/made-by-your-agent-poster.jpg">

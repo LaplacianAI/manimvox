@@ -1,3 +1,8 @@
+---
+description: "How a hash map finds a key, in one minute: the key becomes a shelf number."
+image: assets/hash-map-poster.jpg
+---
+
 # How a hash map finds a key
 
 <video controls preload="metadata" width="100%" poster="../../assets/hash-map-poster.jpg">
