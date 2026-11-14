@@ -46,6 +46,7 @@ uv run --extra docs zensical serve
 - **Consent is not optional.** The skills ask before installing anything, downloading a model, fetching from the web or using an online voice; with no way to ask, the answer is no.
 - **Every claim a video makes has a source** in its project's `FACTS.md`. Gallery videos follow the same rule.
 - **Versions** in the manifests equal `manimvox.__version__`.
+- **Dependencies** are tested twice: every push against `uv.lock`, and every Monday against the newest versions `pyproject.toml` allows (`.github/workflows/latest-deps.yml`). When the weekly run fails, it opens an issue listing what changed since the lock. Fix manimvox, or cap the package in `pyproject.toml` with a comment saying why, then refresh the lock with `uv lock --upgrade-package NAME`.
 - `docs/specs` and `docs/plans` are local working notes: never commit them.
 
 ## Pull requests

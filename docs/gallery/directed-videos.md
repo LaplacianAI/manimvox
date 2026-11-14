@@ -1,3 +1,8 @@
+---
+description: "A one-minute walkthrough of a manimvox pull request, made with manimvox's pull-request workflow."
+image: assets/directed-videos-poster.jpg
+---
+
 # Directed videos, not templates
 
 <video controls preload="metadata" width="100%" poster="../../assets/directed-videos-poster.jpg">

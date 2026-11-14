@@ -1,3 +1,7 @@
+---
+social_title: "manimvox: explainer videos made by your AI agent"
+---
+
 # manimvox
 
 **Explainer videos made by your AI agent.**

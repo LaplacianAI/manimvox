@@ -6,6 +6,7 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ### Added
 
+- **A weekly CI run against the newest dependencies** (`.github/workflows/latest-deps.yml`). Every Monday the tests and render tests run with the newest version of each dependency that `pyproject.toml` allows, which is what `pip install manimvox` gets, on Linux, macOS and Windows, besides the locked versions every push already uses. The run's summary lists each package newer than `uv.lock`. A failure opens an issue, or comments on the open one, so a breaking release upstream (as Pillow 13 was) is caught before users meet it.
 - **`manimvox check audio` reports the narration's pace.** It prints `pace: N words a minute` (the words in the `.srt` divided by the sum of its cue durations), and above 175 adds a warning with a lower `speed` to set in `series.json`, aiming for about 165. The warning does not fail the check.
 
 ## [0.8.5] - 2026-11-13

@@ -1,3 +1,8 @@
+---
+description: "What lets a loaded wheel turn so freely? A real bearing cut open, in a one-minute manimvox explainer."
+image: assets/tapered-bearing-poster.jpg
+---
+
 # What lets a loaded wheel turn so freely?
 
 <video controls preload="metadata" width="100%" poster="../../assets/tapered-bearing-poster.jpg">

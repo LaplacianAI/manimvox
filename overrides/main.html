@@ -1,0 +1,29 @@
+{#- Link previews: Open Graph and Twitter Card tags on every page, so a link shared on X, LinkedIn, Slack or
+    Discord shows a title, a line and a picture. A page may set `description` and `image` (a path under docs/)
+    in its front matter, and `social_title` for a shorter card title; otherwise the site's own are used. -#}
+{% extends "base.html" %}
+{% block extrahead %}
+  {%- set meta = page.meta or {} -%}
+  {%- if page.url in ["", "./", "index.html"] or not page.title or page.title == config.site_name -%}
+    {%- set title = config.site_name ~ ": " ~ config.site_description -%}
+  {%- else -%}
+    {%- set title = page.title ~ " · " ~ config.site_name -%}
+  {%- endif -%}
+  {%- if meta.social_title %}{% set title = meta.social_title %}{% endif -%}
+  {%- set desc = meta.description or config.site_description -%}
+  {%- set image = config.site_url ~ (meta.image or "assets/social-preview.png") -%}
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="{{ config.site_name }}">
+  <meta property="og:title" content="{{ title }}">
+  <meta property="og:description" content="{{ desc }}">
+  {%- if page.canonical_url %}
+  <meta property="og:url" content="{{ page.canonical_url }}">
+  {%- endif %}
+  <meta property="og:image" content="{{ image }}">
+  <meta property="og:image:alt" content="{{ title }}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ title }}">
+  <meta name="twitter:description" content="{{ desc }}">
+  <meta name="twitter:image" content="{{ image }}">
+  <meta name="twitter:image:alt" content="{{ title }}">
+{% endblock %}

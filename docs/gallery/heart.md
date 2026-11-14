@@ -1,3 +1,8 @@
+---
+description: "Inside the heart: a real heart rebuilt from a CT scan, sliced open, with blood followed through it."
+image: assets/heart-poster.jpg
+---
+
 # Inside the heart
 
 <video controls preload="metadata" width="100%" poster="../../assets/heart-poster.jpg">
