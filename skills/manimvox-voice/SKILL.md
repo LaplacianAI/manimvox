@@ -96,7 +96,7 @@ If a word is mispronounced, fix it in the voice, not in the text on screen.
 
 ## Speed
 
-System voices often speak faster than the default (about 190 words a minute against about 170). Whenever you use one, chosen or as a fallback, check the speech rate after the render (words in the `.srt` divided by the sum of its cue durations; the check is in [narration](../manimvox-creative/references/narration.md#length)) and lower `speed` in `series.json` only if it is above 175 words a minute (0.9 first).
+System voices often speak faster than the default (about 190 words a minute against about 170). Whenever you use one, chosen or as a fallback, check the speech rate after the render (words in the `.srt` divided by the sum of its cue durations; the check is in [narration](../manimvox-creative/references/narration.md#length)) and lower `speed` in `series.json` only if it is above 175 words a minute, to the value `manimvox check audio EP` suggests.
 
 Every narration line is levelled to `loudness` in `series.json` (LUFS, −16 by default), so voices sound equally loud; leave it unless the user asks for a different level, and never set it to `null` to fix a quiet voice.
 

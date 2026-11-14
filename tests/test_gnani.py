@@ -74,6 +74,10 @@ def test_speed_outside_range_is_refused(speed, tmp_path):
         engine().synth("Hi.", "Kaveri", speed, tmp_path / "a.wav")
 
 
+def test_speed_range():
+    assert engine().speed_range("Kaveri") == (0.85, 1.15)
+
+
 def test_rejected_key_names_the_variable_not_the_key(server, tmp_path):
     server(403, error_body=b'{"success":false,"error":{"message":"bad key gn-SECRET"}}')
     with pytest.raises(VoiceError) as e:

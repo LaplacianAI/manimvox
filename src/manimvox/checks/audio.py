@@ -11,6 +11,7 @@ import numpy as np
 RATE = 8000
 SILENT_RMS = 60  # of 32768; speech sits in the thousands
 PACE_MAX = 175  # words a minute; above this, narration sounds rushed
+PACE_TARGET = 165  # words a minute the suggested speed aims for
 _CUE = re.compile(r"(\d+):(\d+):(\d+),(\d+) --> (\d+):(\d+):(\d+),(\d+)\n(.+?)(?:\n\n|\Z)", re.DOTALL)
 
 
@@ -63,6 +64,26 @@ def words_per_minute(cues: list[Cue]) -> float | None:
     if seconds == 0:
         return None
     return (words/seconds)*60
+
+
+def suggested_speed(speed: float, pace: float) -> float:
+    """The `speed` that brings `pace` (words a minute at `speed`) to PACE_TARGET, to two decimals."""
+    return round(speed * PACE_TARGET / pace, 2)
+
+
+def pace_warning(pace: float, speed: float, allowed: tuple[float, float] | None, voice: str) -> str | None:
+    """A warning above PACE_MAX with the speed to set, kept inside the speeds `voice` accepts (`allowed`):
+    a suggestion the voice refuses would only make the next render fail."""
+    if pace <= PACE_MAX:
+        return None
+    head = f"warning: faster than {PACE_MAX} words a minute"
+    want = suggested_speed(speed, pace)
+    lowest = allowed[0] if allowed else 0.0
+    if want >= lowest:
+        return f"{head}; lower speed in series.json to {want}"
+    if lowest < speed:
+        return f"{head}; lower speed in series.json to {lowest}, the slowest {voice} allows ({want} would reach {PACE_TARGET})"
+    return f"{head}; speed is already {speed}, the slowest {voice} allows; shorten the narration or use another voice"
 
 
 def _pcm(video: Path) -> np.ndarray | None:

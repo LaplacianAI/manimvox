@@ -65,6 +65,18 @@ def _layout_summary(found: list[str]) -> str:
     return "layout check: ok" if not found else f"layout check: {len(found)} finding(s)"
 
 
+def _speed_range(pr) -> tuple[str, tuple[float, float] | None]:
+    """The voice a plain `render` uses and the speeds it accepts (None: any). A voice that cannot be looked up
+    gives no range; render reports that voice's own error."""
+    from .voice import VoiceError, get_engine, resolve_voice
+
+    try:
+        spec = resolve_voice(None, pr.voice, os.environ)
+        return str(spec), get_engine(spec.engine).speed_range(spec.voice)
+    except VoiceError:
+        return pr.voice or "this voice", None
+
+
 def _audio_lines(rep) -> tuple[str, list[str]]:
     """The audio report's first line, and one row per silent line."""
     head, *rows = str(rep).splitlines()
@@ -183,7 +195,7 @@ def check(project: str, what: str, episode: str | None = None) -> CheckResult:
         data = load_layout(pr.build_dir / ep.stem / "layout.json")
         found = [str(f) for f in check_layout(data)]
         return CheckResult(not found, "layout", _layout_summary(found), found, variety_notes(data))
-    from .checks.audio import PACE_MAX, check_audio
+    from .checks.audio import check_audio, pace_warning
 
     srt = pr.out_dir / f"{ep.stem}.srt"
     video = pr.out_dir / f"{ep.stem}.mp4"
@@ -196,9 +208,10 @@ def check(project: str, what: str, episode: str | None = None) -> CheckResult:
     rep = check_audio(video, srt)
     if rep.pace is not None:
         notes.append(f"pace: {round(rep.pace)} words a minute")
-        if rep.pace > PACE_MAX:
-            suggested = round(pr.speed * 165 / rep.pace, 2)
-            notes.append(f"warning: faster than {PACE_MAX} words a minute; lower speed in series.json to {suggested}")
+        voice, allowed = _speed_range(pr)
+        warning = pace_warning(rep.pace, pr.speed, allowed, voice)
+        if warning:
+            notes.append(warning)
     summary, rows = _audio_lines(rep)
     return CheckResult(rep.ok, "audio", summary, rows, notes)
 

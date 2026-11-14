@@ -110,12 +110,15 @@ class SarvamEngine(VoiceEngine):
             raise VoiceError(f"{model} has no speaker '{speaker}'" + (f" (did you mean {', '.join(near)}?)" if near
                              else "") + "; see `manimvox voices sarvam`")
 
+    def speed_range(self, voice: str) -> tuple[float, float]:
+        return PACE.get(split_voice(voice)[0], DEFAULT_PACE)
+
     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
         model, speaker, lang = split_voice(voice)
         limit = MAX_CHARS.get(model, DEFAULT_MAX_CHARS)
         if len(text) > limit:
             raise VoiceError(f"a narration line is {len(text)} characters; Sarvam {model} takes at most {limit}")
-        lo, hi = PACE.get(model, DEFAULT_PACE)
+        lo, hi = self.speed_range(voice)
         if not lo <= speed <= hi:
             raise VoiceError(f"Sarvam {model} speaks at speed {lo}–{hi}; series.json has {speed}")
         key = self._key()

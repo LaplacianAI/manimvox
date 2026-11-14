@@ -114,8 +114,11 @@ class GnaniEngine(VoiceEngine):
             raise VoiceError(f"Gnani has no language '{lang}'" + (f" (did you mean {', '.join(near)}?)" if near
                              else f"; it has {', '.join(LANGUAGES)}"))
 
+    def speed_range(self, voice: str) -> tuple[float, float]:
+        return SPEED_RANGE
+
     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
-        lo, hi = SPEED_RANGE
+        lo, hi = self.speed_range(voice)
         if not lo <= speed <= hi:
             raise VoiceError(f"Gnani speaks at speed {lo}–{hi}; series.json has {speed}")
         key = self._key()

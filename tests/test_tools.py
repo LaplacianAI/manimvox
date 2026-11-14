@@ -92,6 +92,19 @@ def test_check_audio_warns_when_the_pace_is_too_fast(project):
     assert any("lower speed in series.json to 0.73" in n for n in r.notes)
 
 
+def test_check_audio_keeps_the_suggestion_inside_the_voices_speeds(project):
+    conf = json.loads((project / "series.json").read_text(encoding="utf-8"))
+    conf["voice"] = "gnani:Kaveri"  # accepts 0.85 to 1.15
+    (project / "series.json").write_text(json.dumps(conf), encoding="utf-8")
+    (project / "out").mkdir()
+    make_mp4(project / "out" / "ep01_hello.mp4", 5.0)
+    write_srt(project / "out" / "ep01_hello.srt",  # 12 words in 3.6 seconds: 200 a minute, 165 would need 0.82
+              [(0.2, 2.0, "one two three four five six"), (2.2, 4.0, "seven eight nine ten eleven twelve")])
+    r = tools.check(str(project), "audio", "ep01")
+    assert r.ok and "pace: 200 words a minute" in r.notes
+    assert any("lower speed in series.json to 0.85, the slowest gnani:Kaveri allows" in n for n in r.notes)
+
+
 def test_unknown_episode_is_a_tool_error(project):
     with pytest.raises(ToolError, match="available: ep01_hello"):
         tools.draft(str(project), "ep07")
