@@ -16,6 +16,18 @@ Finished videos made with manimvox, most of them by an AI agent. Each one shows 
     <span class="mvx-meta">Claude Code · Sonnet 5.5 · Gnani voice</span>
   </span>
 </a>
+<a class="mvx-card" href="pr-review/">
+  <span class="mvx-thumb">
+    <img src="../assets/thumbs/pr-review.jpg" alt="" width="768" height="432" loading="lazy" decoding="async">
+    <span class="mvx-play" aria-hidden="true"></span>
+    <span class="mvx-len"><span aria-hidden="true">2:14</span><span class="mvx-sr">, 2 minutes 14 seconds</span></span>
+  </span>
+  <span class="mvx-body">
+    <span class="mvx-title">A pull request, reviewed and fixed</span>
+    <span class="mvx-desc">The whole review loop of one manimvox PR: the issue, the change, a finding that would break the next render, the fix, and proof from real runs.</span>
+    <span class="mvx-meta">Claude Code · Sonnet 5.5 · Kokoro voice</span>
+  </span>
+</a>
 <a class="mvx-card" href="editing-tour/">
   <span class="mvx-thumb">
     <img src="../assets/thumbs/editing-tour.jpg" alt="" width="768" height="432" loading="lazy" decoding="async">

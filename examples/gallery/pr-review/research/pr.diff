@@ -1,0 +1,174 @@
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index fa7b026..1380fde 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -4,6 +4,10 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
+ 
+ ## [Unreleased]
+ 
++### Added
++
++- **`manimvox check audio` reports the narration's pace.** It prints `pace: N words a minute` (the words in the `.srt` divided by the sum of its cue durations), and above 175 adds a warning with a lower `speed` to set in `series.json`, aiming for about 165. The warning does not fail the check.
++
+ ## [0.8.5] - 2026-11-13
+ 
+ ### Added
+diff --git a/skills-manifest.json b/skills-manifest.json
+index 6d76368..8ee7ce3 100644
+--- a/skills-manifest.json
++++ b/skills-manifest.json
+@@ -14,7 +14,7 @@
+       "files": 2
+     },
+     "manimvox-cli": {
+-      "sha256": "54aafa31ee78b748fa9e8ec453cdc659c8db34a0690e7e4109c018e9fc8b82a3",
++      "sha256": "c79ae40b98931549d539c597aa63444f576870ae4092eacf4f1ce477d7f522c7",
+       "files": 1
+     },
+     "manimvox-concept": {
+@@ -26,7 +26,7 @@
+       "files": 2
+     },
+     "manimvox-creative": {
+-      "sha256": "bcb851ef83e4489e2b4b7955289532dd95d3e07677a2a11212912cb4b2d98671",
++      "sha256": "5bdc4c0860944899c5de7b0e4f5c61656bd33299e9c40c0ec97ab4ea01674181",
+       "files": 8
+     },
+     "manimvox-edit": {
+diff --git a/skills/manimvox-cli/SKILL.md b/skills/manimvox-cli/SKILL.md
+index c53b909..adf06a2 100644
+--- a/skills/manimvox-cli/SKILL.md
++++ b/skills/manimvox-cli/SKILL.md
+@@ -89,7 +89,7 @@ Fix every finding, then draft again. A draft that exits `0` only proves the code
+ 
+ **Contact sheets.** `draft` writes `sheets/<stem>/s_01.png`, `s_02.png`, and so on. Each is a 3 by 3 grid of frames taken every `--every` seconds, left to right, top to bottom, so sheet 1 holds the first 9 samples. Use `--every 5` to survey and `--every 1` to look closely at a busy scene. Old sheets for the episode are replaced on each draft.
+ 
+-**Audio check.** After `render`, `audio check: ok  (N lines, all audible)` is the finish line. `audio check: FAILED  K of N lines are silent` lists each silent line with its time and text. Run `manimvox check audio EP` to re-check, then render again; if the same line stays silent, reword it. Other failures say a file is missing or has no audio track: render again.
++**Audio check.** After `render`, `audio check: ok  (N lines, all audible)` is the finish line. `audio check: FAILED  K of N lines are silent` lists each silent line with its time and text. Run `manimvox check audio EP` to re-check, then render again; if the same line stays silent, reword it. Other failures say a file is missing or has no audio track: render again. `check audio` also prints `pace: N words a minute`, the words in the `.srt` divided by the sum of its cue durations; above 175 it adds a warning with a lower `speed` to set in `series.json`. The warning does not fail the check.
+ 
+ **Render errors.** When Manim fails, manimvox prints `manim failed for <stem>:` and the last 25 lines of Manim's output. The real error is usually the last line (a `NameError`, `TypeError`, or a kit message). Fix the episode file and run the command again. Voice errors are one line; see [manimvox-voice](../manimvox-voice/SKILL.md).
+ 
+diff --git a/skills/manimvox-creative/references/narration.md b/skills/manimvox-creative/references/narration.md
+index 7127706..e44e9d5 100644
+--- a/skills/manimvox-creative/references/narration.md
++++ b/skills/manimvox-creative/references/narration.md
+@@ -16,7 +16,7 @@ The voice is read aloud by a speech engine, so write for the ear. The rules belo
+ 
+ ## Length
+ 
+-Plan at 2.6 words a second, about 156 a minute. The draft uses that estimate; the final render uses the real audio length. Never hard-code a wait to match speech. After the render, check two numbers. Speech rate is the words in the `.srt` divided by the sum of its cue durations: 150 to 175 a minute. Above 175, lower `speed` in `series.json` (0.9 first); below 140, raise it toward 1.0. Overall rate is the words divided by the video's length: lower, because of pauses, cards and beats (about 120 to 150 for long videos, lower for very short ones). If the video runs long, cut words or beats, not the pauses after lines. Some system voices run near 190 and need `speed` below 1.
++Plan at 2.6 words a second, about 156 a minute. The draft uses that estimate; the final render uses the real audio length. Never hard-code a wait to match speech. After the render, check two numbers. Speech rate is the words in the `.srt` divided by the sum of its cue durations (`manimvox check audio EP` prints it as `pace`): 150 to 175 a minute. Above 175, lower `speed` in `series.json` (0.9 first); below 140, raise it toward 1.0. Overall rate is the words divided by the video's length: lower, because of pauses, cards and beats (about 120 to 150 for long videos, lower for very short ones). If the video runs long, cut words or beats, not the pauses after lines. Some system voices run near 190 and need `speed` below 1.
+ 
+ The [length table in script](script.md#when-the-time-is-short) is the one source for spoken words, chapters and total length at each running time (about 1 minute, about 3 minutes, 5 to 8 minutes). Under three minutes, keep the opening and the ending and cut ideas.
+ 
+diff --git a/src/manimvox/checks/audio.py b/src/manimvox/checks/audio.py
+index 86fab36..4f09ab0 100644
+--- a/src/manimvox/checks/audio.py
++++ b/src/manimvox/checks/audio.py
+@@ -10,6 +10,7 @@
+ 
+ RATE = 8000
+ SILENT_RMS = 60  # of 32768; speech sits in the thousands
++PACE_MAX = 175  # words a minute; above this, narration sounds rushed
+ _CUE = re.compile(r"(\d+):(\d+):(\d+),(\d+) --> (\d+):(\d+):(\d+),(\d+)\n(.+?)(?:\n\n|\Z)", re.DOTALL)
+ 
+ 
+@@ -25,6 +26,7 @@ class AudioReport:
+     total: int
+     silent: list[Cue] = field(default_factory=list)
+     error: str | None = None
++    pace: float | None = None
+ 
+     @property
+     def ok(self) -> bool:
+@@ -51,6 +53,18 @@ def read_cues(srt: Path) -> list[Cue]:
+     return out
+ 
+ 
++def words_per_minute(cues: list[Cue]) -> float | None:
++    """Speech rate: words in the cues divided by the time they cover, in minutes."""
++    words = 0
++    seconds = 0.0
++    for c in cues:
++        words += len(c.text.split())
++        seconds += (c.end - c.start)
++    if seconds == 0:
++        return None
++    return (words/seconds)*60
++
++
+ def _pcm(video: Path) -> np.ndarray | None:
+     with av.open(str(video)) as c:
+         if not c.streams.audio:
+@@ -83,4 +97,4 @@ def check_audio(video: Path, srt: Path) -> AudioReport:
+         rms = float(np.sqrt((span ** 2).mean())) if len(span) else 0.0
+         if rms < SILENT_RMS:
+             silent.append(c)
+-    return AudioReport(len(cues), silent)
++    return AudioReport(len(cues), silent, pace=words_per_minute(cues))
+diff --git a/src/manimvox/tools.py b/src/manimvox/tools.py
+index eb4f126..e0740ea 100644
+--- a/src/manimvox/tools.py
++++ b/src/manimvox/tools.py
+@@ -183,7 +183,7 @@ def check(project: str, what: str, episode: str | None = None) -> CheckResult:
+         data = load_layout(pr.build_dir / ep.stem / "layout.json")
+         found = [str(f) for f in check_layout(data)]
+         return CheckResult(not found, "layout", _layout_summary(found), found, variety_notes(data))
+-    from .checks.audio import check_audio
++    from .checks.audio import PACE_MAX, check_audio
+ 
+     srt = pr.out_dir / f"{ep.stem}.srt"
+     video = pr.out_dir / f"{ep.stem}.mp4"
+@@ -194,6 +194,11 @@ def check(project: str, what: str, episode: str | None = None) -> CheckResult:
+         video = built_path(pr, ep, "final")
+         notes.append(f"note: checking the narration-only render {video}; out/{ep.stem}.mp4 has the music mixed in")
+     rep = check_audio(video, srt)
++    if rep.pace is not None:
++        notes.append(f"pace: {round(rep.pace)} words a minute")
++        if rep.pace > PACE_MAX:
++            suggested = round(pr.speed * 165 / rep.pace, 2)
++            notes.append(f"warning: faster than {PACE_MAX} words a minute; lower speed in series.json to {suggested}")
+     summary, rows = _audio_lines(rep)
+     return CheckResult(rep.ok, "audio", summary, rows, notes)
+ 
+diff --git a/tests/test_tools.py b/tests/test_tools.py
+index 9078179..bdb11dc 100644
+--- a/tests/test_tools.py
++++ b/tests/test_tools.py
+@@ -8,6 +8,7 @@
+ from manimvox import tools
+ from manimvox.tools import ToolError
+ from tests.media import make_mp4
++from tests.test_audio import write_srt
+ 
+ FIXTURE = Path(__file__).parent / "fixtures" / "hello"
+ 
+@@ -69,6 +70,28 @@ def test_check_audio_reports_a_missing_render(project):
+     assert not r.ok and r.check == "audio" and r.summary.startswith("audio check: FAILED")
+ 
+ 
++def test_check_audio_prints_the_pace(project):
++    (project / "out").mkdir()
++    make_mp4(project / "out" / "ep01_hello.mp4", 4.0)
++    write_srt(project / "out" / "ep01_hello.srt",
++              [(0.2, 1.8, "one two three four"), (2.2, 3.8, "five six seven eight")])
++    r = tools.check(str(project), "audio", "ep01")
++    assert r.ok
++    assert "pace: 150 words a minute" in r.notes
++    assert not any(n.startswith("warning") for n in r.notes)
++
++
++def test_check_audio_warns_when_the_pace_is_too_fast(project):
++    (project / "out").mkdir()
++    make_mp4(project / "out" / "ep01_hello.mp4", 4.0)
++    write_srt(project / "out" / "ep01_hello.srt",
++              [(0.2, 1.8, "one two three four five six"), (2.2, 3.8, "seven eight nine ten eleven twelve")])
++    r = tools.check(str(project), "audio", "ep01")
++    assert r.ok  # a warning, not a failure
++    assert "pace: 225 words a minute" in r.notes
++    assert any("lower speed in series.json to 0.73" in n for n in r.notes)
++
++
+ def test_unknown_episode_is_a_tool_error(project):
+     with pytest.raises(ToolError, match="available: ep01_hello"):
+         tools.draft(str(project), "ep07")
