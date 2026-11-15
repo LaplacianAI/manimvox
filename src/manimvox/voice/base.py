@@ -98,6 +98,10 @@ class VoiceEngine:
         """Write a mono 16-bit WAV of `text` to `out`. Runs inside Manim (cwd = project root); never prompts."""
         raise NotImplementedError
 
+    def speed_range(self, voice: str) -> tuple[float, float] | None:
+        """The lowest and highest `speed` this voice accepts, or None when any speed above 0 works."""
+        return None
+
     def voice_key(self, voice: str) -> str:
         """What the audio cache keys on. Cloning engines hash the recording so a new one is not served stale lines."""
         return voice

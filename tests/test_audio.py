@@ -1,6 +1,6 @@
 import numpy as np
 
-from manimvox.checks.audio import check_audio, read_cues
+from manimvox.checks.audio import check_audio, pace_warning, read_cues, suggested_speed
 from tests.media import make_video
 
 RATE = 8000
@@ -62,3 +62,27 @@ def test_corrupt_video_is_an_error(tmp_path):
     bad.write_bytes(b"not a video")
     rep = check_audio(bad, write_srt(tmp_path / "v.srt", [(0.2, 1.8, "a")]))
     assert not rep.ok and "cannot read bad.mkv" in rep.error
+
+
+def test_suggested_speed_aims_for_the_target():
+    assert suggested_speed(1.0, 225) == 0.73
+    assert suggested_speed(0.9, 198) == 0.75
+
+
+def test_no_warning_at_or_below_the_limit():
+    assert pace_warning(175, 1.0, None, "kokoro:af_heart") is None
+
+
+def test_warning_suggests_a_speed_inside_the_range():
+    w = pace_warning(225, 1.0, (0.7, 1.2), "elevenlabs:abc")
+    assert w.endswith("lower speed in series.json to 0.73")
+
+
+def test_warning_stops_at_the_slowest_speed_the_voice_allows():
+    w = pace_warning(200, 1.0, (0.85, 1.15), "gnani:Kaveri")  # 165 would need 0.82
+    assert "lower speed in series.json to 0.85, the slowest gnani:Kaveri allows (0.82 would reach 165)" in w
+
+
+def test_warning_when_the_voice_is_already_at_its_slowest():
+    w = pace_warning(200, 0.85, (0.85, 1.15), "gnani:Kaveri")
+    assert "speed is already 0.85, the slowest gnani:Kaveri allows" in w and "series.json to" not in w

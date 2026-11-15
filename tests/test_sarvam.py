@@ -64,6 +64,11 @@ def test_prepare_accepts_any_v4_flash_persona():
     engine().prepare("bulbul:v4-flash/ishita_hi_devotional@hi-IN", lambda p: True, None)
 
 
+@pytest.mark.parametrize("voice, want", [("bulbul:v2/anushka", (0.3, 3.0)), ("shubh", (0.5, 2.0))])
+def test_speed_range_follows_the_model(voice, want):
+    assert engine().speed_range(voice) == want
+
+
 def test_synth_request(server, tmp_path):
     s = server(wav_reply(channels=2))
     engine().synth("Namaste.", "anushka@hi-IN", 1.2, tmp_path / "a.wav")

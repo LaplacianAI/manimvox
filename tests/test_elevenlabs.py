@@ -34,6 +34,10 @@ def test_speed_outside_range_is_refused(speed, tmp_path):
         el.ElevenLabsEngine(env=KEY).synth("hi", "abc", speed, tmp_path / "a.wav")
 
 
+def test_speed_range():
+    assert el.ElevenLabsEngine(env=KEY).speed_range("abc") == (0.7, 1.2)
+
+
 def test_synth_request(server, tmp_path):
     s = server(PCM)
     el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).synth("Hello.", "abc123", 1.1, tmp_path / "a.wav")

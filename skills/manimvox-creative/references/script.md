@@ -47,7 +47,7 @@ Do not end on a new fact, a bare list of uses, or "That is all X is."
 - So: estimated total = words ÷ 2.6 + 0.7 × lines + beats + 6 + 3 × chapters, in seconds.
 - `steps()` finishes its last animation shortly before the line ends, so put the reveal that matters last in the list.
 - A chapter card is a breath. Leave its `narration` empty when the previous chapter ended on a bridge, or give it a signpost under eight words ("So, who found what?").
-- After the render, check the pace with two numbers. **Speech rate** is the words in `out/epNN_*.srt` divided by the sum of its cue durations: aim for 150 to 175 words a minute. Above 175, lower `speed` in `series.json` (0.9 first); below 140, raise it toward 1.0. **Overall rate** is the same words divided by the video's length. It is lower because of pauses, cards and beats: about 120 to 150 for long videos, lower for very short ones. If the video runs long, cut words or beats, not the pauses after lines.
+- After the render, check the pace with two numbers. **Speech rate** is the words in `out/epNN_*.srt` divided by the sum of its cue durations, which `manimvox check audio EP` prints as `pace`: aim for 150 to 175 words a minute. Above 175, set `speed` in `series.json` to the value `check audio` suggests; below 140, raise it toward 1.0. **Overall rate** is the same words divided by the video's length. It is lower because of pauses, cards and beats: about 120 to 150 for long videos, lower for very short ones. If the video runs long, cut words or beats, not the pauses after lines.
 
 ## When the time is short
 

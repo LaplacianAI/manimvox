@@ -136,8 +136,11 @@ class ElevenLabsEngine(VoiceEngine):
                 raise VoiceError(f"no ElevenLabs voice '{vid}'; see `manimvox voices elevenlabs`") from None
             raise
 
+    def speed_range(self, voice: str) -> tuple[float, float]:
+        return SPEED_RANGE
+
     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
-        lo, hi = SPEED_RANGE
+        lo, hi = self.speed_range(voice)
         if not lo <= speed <= hi:
             raise VoiceError(f"ElevenLabs speaks at speed {lo}–{hi}; series.json has {speed}")
         model, vid = split_voice(voice)
