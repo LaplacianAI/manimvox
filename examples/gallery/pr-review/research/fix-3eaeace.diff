@@ -1,0 +1,385 @@
+commit 3eaeacee0285dd61239cf66336cf45358ec52f1d
+Author: Anubhav Uttam <21anubhavuttam@gmail.com>
+Date:   Sat Nov 14 14:21:40 2026 +0530
+
+    fix(check): keep the suggested speed inside the voice's range
+    
+    Review on #63: a suggestion below the voice's slowest speed (Gnani
+    0.85, ElevenLabs 0.7, Sarvam per model) would make the next render
+    fail with a VoiceError.
+    
+    - VoiceEngine.speed_range(voice) reports the speeds a voice accepts
+      (None: any); Gnani, ElevenLabs and Sarvam implement it, and their
+      synth checks use it, so each range is stated once.
+    - checks/audio.py holds the pace policy: PACE_TARGET = 165 next to
+      PACE_MAX, suggested_speed(), and pace_warning(), which clamps the
+      suggestion to the range and says when even the slowest speed won't
+      reach the target, or when speed is already at its slowest.
+    - tools.check looks up the voice a plain render uses (series.json,
+      then MANIMVOX_VOICE, then the default) for its range.
+    - Skills now say to use the speed check audio suggests instead of
+      "0.9 first"; manifest regenerated; CHANGELOG entry updated.
+    
+    Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 86d2e34..ddce25b 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -7,7 +7,7 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
+ ### Added
+ 
+ - **A weekly CI run against the newest dependencies** (`.github/workflows/latest-deps.yml`). Every Monday the tests and render tests run with the newest version of each dependency that `pyproject.toml` allows, which is what `pip install manimvox` gets, on Linux, macOS and Windows, besides the locked versions every push already uses. The run's summary lists each package newer than `uv.lock`. A failure opens an issue, or comments on the open one, so a breaking release upstream (as Pillow 13 was) is caught before users meet it.
+-- **`manimvox check audio` reports the narration's pace.** It prints `pace: N words a minute` (the words in the `.srt` divided by the sum of its cue durations), and above 175 adds a warning with a lower `speed` to set in `series.json`, aiming for about 165. The warning does not fail the check.
++- **`manimvox check audio` reports the narration's pace.** It prints `pace: N words a minute` (the words in the `.srt` divided by the sum of its cue durations), and above 175 adds a warning with a lower `speed` to set in `series.json`, aiming for about 165. The suggestion stays inside the speeds the voice accepts (Gnani, ElevenLabs and Sarvam refuse some), and says so when even the slowest is not enough; each engine now reports its range through `VoiceEngine.speed_range()`. The warning does not fail the check.
+ 
+ ## [0.8.5] - 2026-11-13
+ 
+diff --git a/skills-manifest.json b/skills-manifest.json
+index 8ee7ce3..4967c0a 100644
+--- a/skills-manifest.json
++++ b/skills-manifest.json
+@@ -14,7 +14,7 @@
+       "files": 2
+     },
+     "manimvox-cli": {
+-      "sha256": "c79ae40b98931549d539c597aa63444f576870ae4092eacf4f1ce477d7f522c7",
++      "sha256": "bc73f3f12940a8dc95b41d8cb04583883cd51b541d19c1f37c83da0d91b73acf",
+       "files": 1
+     },
+     "manimvox-concept": {
+@@ -26,7 +26,7 @@
+       "files": 2
+     },
+     "manimvox-creative": {
+-      "sha256": "5bdc4c0860944899c5de7b0e4f5c61656bd33299e9c40c0ec97ab4ea01674181",
++      "sha256": "f6066d80cd03bd2b5e511d53529019927ebef1b6f6185739b350a4f00805bac5",
+       "files": 8
+     },
+     "manimvox-edit": {
+@@ -46,7 +46,7 @@
+       "files": 1
+     },
+     "manimvox-voice": {
+-      "sha256": "5b3be5fab09ed90787e55e7f798125c8d321b1587c4f0344d604a97b6f2d2742",
++      "sha256": "c2686c0987f4465903855594b99ce8bab9c7541f8dfdfa029dd188ceb0b9c44d",
+       "files": 1
+     }
+   }
+diff --git a/skills/manimvox-cli/SKILL.md b/skills/manimvox-cli/SKILL.md
+index adf06a2..fe52d7a 100644
+--- a/skills/manimvox-cli/SKILL.md
++++ b/skills/manimvox-cli/SKILL.md
+@@ -89,7 +89,7 @@ Fix every finding, then draft again. A draft that exits `0` only proves the code
+ 
+ **Contact sheets.** `draft` writes `sheets/<stem>/s_01.png`, `s_02.png`, and so on. Each is a 3 by 3 grid of frames taken every `--every` seconds, left to right, top to bottom, so sheet 1 holds the first 9 samples. Use `--every 5` to survey and `--every 1` to look closely at a busy scene. Old sheets for the episode are replaced on each draft.
+ 
+-**Audio check.** After `render`, `audio check: ok  (N lines, all audible)` is the finish line. `audio check: FAILED  K of N lines are silent` lists each silent line with its time and text. Run `manimvox check audio EP` to re-check, then render again; if the same line stays silent, reword it. Other failures say a file is missing or has no audio track: render again. `check audio` also prints `pace: N words a minute`, the words in the `.srt` divided by the sum of its cue durations; above 175 it adds a warning with a lower `speed` to set in `series.json`. The warning does not fail the check.
++**Audio check.** After `render`, `audio check: ok  (N lines, all audible)` is the finish line. `audio check: FAILED  K of N lines are silent` lists each silent line with its time and text. Run `manimvox check audio EP` to re-check, then render again; if the same line stays silent, reword it. Other failures say a file is missing or has no audio track: render again. `check audio` also prints `pace: N words a minute`, the words in the `.srt` divided by the sum of its cue durations; above 175 it adds a warning with a lower `speed` to set in `series.json`, never slower than the voice accepts (when even that is not enough, it says so). The warning does not fail the check.
+ 
+ **Render errors.** When Manim fails, manimvox prints `manim failed for <stem>:` and the last 25 lines of Manim's output. The real error is usually the last line (a `NameError`, `TypeError`, or a kit message). Fix the episode file and run the command again. Voice errors are one line; see [manimvox-voice](../manimvox-voice/SKILL.md).
+ 
+diff --git a/skills/manimvox-creative/references/narration.md b/skills/manimvox-creative/references/narration.md
+index e44e9d5..9117cb5 100644
+--- a/skills/manimvox-creative/references/narration.md
++++ b/skills/manimvox-creative/references/narration.md
+@@ -16,7 +16,7 @@ The voice is read aloud by a speech engine, so write for the ear. The rules belo
+ 
+ ## Length
+ 
+-Plan at 2.6 words a second, about 156 a minute. The draft uses that estimate; the final render uses the real audio length. Never hard-code a wait to match speech. After the render, check two numbers. Speech rate is the words in the `.srt` divided by the sum of its cue durations (`manimvox check audio EP` prints it as `pace`): 150 to 175 a minute. Above 175, lower `speed` in `series.json` (0.9 first); below 140, raise it toward 1.0. Overall rate is the words divided by the video's length: lower, because of pauses, cards and beats (about 120 to 150 for long videos, lower for very short ones). If the video runs long, cut words or beats, not the pauses after lines. Some system voices run near 190 and need `speed` below 1.
++Plan at 2.6 words a second, about 156 a minute. The draft uses that estimate; the final render uses the real audio length. Never hard-code a wait to match speech. After the render, check two numbers. Speech rate is the words in the `.srt` divided by the sum of its cue durations (`manimvox check audio EP` prints it as `pace`): 150 to 175 a minute. Above 175, set `speed` in `series.json` to the value `check audio` suggests; below 140, raise it toward 1.0. Overall rate is the words divided by the video's length: lower, because of pauses, cards and beats (about 120 to 150 for long videos, lower for very short ones). If the video runs long, cut words or beats, not the pauses after lines. Some system voices run near 190 and need `speed` below 1.
+ 
+ The [length table in script](script.md#when-the-time-is-short) is the one source for spoken words, chapters and total length at each running time (about 1 minute, about 3 minutes, 5 to 8 minutes). Under three minutes, keep the opening and the ending and cut ideas.
+ 
+diff --git a/skills/manimvox-creative/references/script.md b/skills/manimvox-creative/references/script.md
+index e51eec0..2411a35 100644
+--- a/skills/manimvox-creative/references/script.md
++++ b/skills/manimvox-creative/references/script.md
+@@ -47,7 +47,7 @@ Do not end on a new fact, a bare list of uses, or "That is all X is."
+ - So: estimated total = words ÷ 2.6 + 0.7 × lines + beats + 6 + 3 × chapters, in seconds.
+ - `steps()` finishes its last animation shortly before the line ends, so put the reveal that matters last in the list.
+ - A chapter card is a breath. Leave its `narration` empty when the previous chapter ended on a bridge, or give it a signpost under eight words ("So, who found what?").
+-- After the render, check the pace with two numbers. **Speech rate** is the words in `out/epNN_*.srt` divided by the sum of its cue durations: aim for 150 to 175 words a minute. Above 175, lower `speed` in `series.json` (0.9 first); below 140, raise it toward 1.0. **Overall rate** is the same words divided by the video's length. It is lower because of pauses, cards and beats: about 120 to 150 for long videos, lower for very short ones. If the video runs long, cut words or beats, not the pauses after lines.
++- After the render, check the pace with two numbers. **Speech rate** is the words in `out/epNN_*.srt` divided by the sum of its cue durations, which `manimvox check audio EP` prints as `pace`: aim for 150 to 175 words a minute. Above 175, set `speed` in `series.json` to the value `check audio` suggests; below 140, raise it toward 1.0. **Overall rate** is the same words divided by the video's length. It is lower because of pauses, cards and beats: about 120 to 150 for long videos, lower for very short ones. If the video runs long, cut words or beats, not the pauses after lines.
+ 
+ ## When the time is short
+ 
+diff --git a/skills/manimvox-voice/SKILL.md b/skills/manimvox-voice/SKILL.md
+index 8435bac..86e3dbc 100644
+--- a/skills/manimvox-voice/SKILL.md
++++ b/skills/manimvox-voice/SKILL.md
+@@ -96,7 +96,7 @@ If a word is mispronounced, fix it in the voice, not in the text on screen.
+ 
+ ## Speed
+ 
+-System voices often speak faster than the default (about 190 words a minute against about 170). Whenever you use one, chosen or as a fallback, check the speech rate after the render (words in the `.srt` divided by the sum of its cue durations; the check is in [narration](../manimvox-creative/references/narration.md#length)) and lower `speed` in `series.json` only if it is above 175 words a minute (0.9 first).
++System voices often speak faster than the default (about 190 words a minute against about 170). Whenever you use one, chosen or as a fallback, check the speech rate after the render (words in the `.srt` divided by the sum of its cue durations; the check is in [narration](../manimvox-creative/references/narration.md#length)) and lower `speed` in `series.json` only if it is above 175 words a minute, to the value `manimvox check audio EP` suggests.
+ 
+ Every narration line is levelled to `loudness` in `series.json` (LUFS, −16 by default), so voices sound equally loud; leave it unless the user asks for a different level, and never set it to `null` to fix a quiet voice.
+ 
+diff --git a/src/manimvox/checks/audio.py b/src/manimvox/checks/audio.py
+index 4f09ab0..2303759 100644
+--- a/src/manimvox/checks/audio.py
++++ b/src/manimvox/checks/audio.py
+@@ -11,6 +11,7 @@ import numpy as np
+ RATE = 8000
+ SILENT_RMS = 60  # of 32768; speech sits in the thousands
+ PACE_MAX = 175  # words a minute; above this, narration sounds rushed
++PACE_TARGET = 165  # words a minute the suggested speed aims for
+ _CUE = re.compile(r"(\d+):(\d+):(\d+),(\d+) --> (\d+):(\d+):(\d+),(\d+)\n(.+?)(?:\n\n|\Z)", re.DOTALL)
+ 
+ 
+@@ -65,6 +66,26 @@ def words_per_minute(cues: list[Cue]) -> float | None:
+     return (words/seconds)*60
+ 
+ 
++def suggested_speed(speed: float, pace: float) -> float:
++    """The `speed` that brings `pace` (words a minute at `speed`) to PACE_TARGET, to two decimals."""
++    return round(speed * PACE_TARGET / pace, 2)
++
++
++def pace_warning(pace: float, speed: float, allowed: tuple[float, float] | None, voice: str) -> str | None:
++    """A warning above PACE_MAX with the speed to set, kept inside the speeds `voice` accepts (`allowed`):
++    a suggestion the voice refuses would only make the next render fail."""
++    if pace <= PACE_MAX:
++        return None
++    head = f"warning: faster than {PACE_MAX} words a minute"
++    want = suggested_speed(speed, pace)
++    lowest = allowed[0] if allowed else 0.0
++    if want >= lowest:
++        return f"{head}; lower speed in series.json to {want}"
++    if lowest < speed:
++        return f"{head}; lower speed in series.json to {lowest}, the slowest {voice} allows ({want} would reach {PACE_TARGET})"
++    return f"{head}; speed is already {speed}, the slowest {voice} allows; shorten the narration or use another voice"
++
++
+ def _pcm(video: Path) -> np.ndarray | None:
+     with av.open(str(video)) as c:
+         if not c.streams.audio:
+diff --git a/src/manimvox/tools.py b/src/manimvox/tools.py
+index e0740ea..0f55760 100644
+--- a/src/manimvox/tools.py
++++ b/src/manimvox/tools.py
+@@ -65,6 +65,18 @@ def _layout_summary(found: list[str]) -> str:
+     return "layout check: ok" if not found else f"layout check: {len(found)} finding(s)"
+ 
+ 
++def _speed_range(pr) -> tuple[str, tuple[float, float] | None]:
++    """The voice a plain `render` uses and the speeds it accepts (None: any). A voice that cannot be looked up
++    gives no range; render reports that voice's own error."""
++    from .voice import VoiceError, get_engine, resolve_voice
++
++    try:
++        spec = resolve_voice(None, pr.voice, os.environ)
++        return str(spec), get_engine(spec.engine).speed_range(spec.voice)
++    except VoiceError:
++        return pr.voice or "this voice", None
++
++
+ def _audio_lines(rep) -> tuple[str, list[str]]:
+     """The audio report's first line, and one row per silent line."""
+     head, *rows = str(rep).splitlines()
+@@ -183,7 +195,7 @@ def check(project: str, what: str, episode: str | None = None) -> CheckResult:
+         data = load_layout(pr.build_dir / ep.stem / "layout.json")
+         found = [str(f) for f in check_layout(data)]
+         return CheckResult(not found, "layout", _layout_summary(found), found, variety_notes(data))
+-    from .checks.audio import PACE_MAX, check_audio
++    from .checks.audio import check_audio, pace_warning
+ 
+     srt = pr.out_dir / f"{ep.stem}.srt"
+     video = pr.out_dir / f"{ep.stem}.mp4"
+@@ -196,9 +208,10 @@ def check(project: str, what: str, episode: str | None = None) -> CheckResult:
+     rep = check_audio(video, srt)
+     if rep.pace is not None:
+         notes.append(f"pace: {round(rep.pace)} words a minute")
+-        if rep.pace > PACE_MAX:
+-            suggested = round(pr.speed * 165 / rep.pace, 2)
+-            notes.append(f"warning: faster than {PACE_MAX} words a minute; lower speed in series.json to {suggested}")
++        voice, allowed = _speed_range(pr)
++        warning = pace_warning(rep.pace, pr.speed, allowed, voice)
++        if warning:
++            notes.append(warning)
+     summary, rows = _audio_lines(rep)
+     return CheckResult(rep.ok, "audio", summary, rows, notes)
+ 
+diff --git a/src/manimvox/voice/base.py b/src/manimvox/voice/base.py
+index db055b8..ff7a1fe 100644
+--- a/src/manimvox/voice/base.py
++++ b/src/manimvox/voice/base.py
+@@ -98,6 +98,10 @@ class VoiceEngine:
+         """Write a mono 16-bit WAV of `text` to `out`. Runs inside Manim (cwd = project root); never prompts."""
+         raise NotImplementedError
+ 
++    def speed_range(self, voice: str) -> tuple[float, float] | None:
++        """The lowest and highest `speed` this voice accepts, or None when any speed above 0 works."""
++        return None
++
+     def voice_key(self, voice: str) -> str:
+         """What the audio cache keys on. Cloning engines hash the recording so a new one is not served stale lines."""
+         return voice
+diff --git a/src/manimvox/voice/engines/elevenlabs.py b/src/manimvox/voice/engines/elevenlabs.py
+index d46edcd..a4620a0 100644
+--- a/src/manimvox/voice/engines/elevenlabs.py
++++ b/src/manimvox/voice/engines/elevenlabs.py
+@@ -136,8 +136,11 @@ class ElevenLabsEngine(VoiceEngine):
+                 raise VoiceError(f"no ElevenLabs voice '{vid}'; see `manimvox voices elevenlabs`") from None
+             raise
+ 
++    def speed_range(self, voice: str) -> tuple[float, float]:
++        return SPEED_RANGE
++
+     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
+-        lo, hi = SPEED_RANGE
++        lo, hi = self.speed_range(voice)
+         if not lo <= speed <= hi:
+             raise VoiceError(f"ElevenLabs speaks at speed {lo}–{hi}; series.json has {speed}")
+         model, vid = split_voice(voice)
+diff --git a/src/manimvox/voice/engines/gnani.py b/src/manimvox/voice/engines/gnani.py
+index 1d72421..9934d93 100644
+--- a/src/manimvox/voice/engines/gnani.py
++++ b/src/manimvox/voice/engines/gnani.py
+@@ -114,8 +114,11 @@ class GnaniEngine(VoiceEngine):
+             raise VoiceError(f"Gnani has no language '{lang}'" + (f" (did you mean {', '.join(near)}?)" if near
+                              else f"; it has {', '.join(LANGUAGES)}"))
+ 
++    def speed_range(self, voice: str) -> tuple[float, float]:
++        return SPEED_RANGE
++
+     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
+-        lo, hi = SPEED_RANGE
++        lo, hi = self.speed_range(voice)
+         if not lo <= speed <= hi:
+             raise VoiceError(f"Gnani speaks at speed {lo}–{hi}; series.json has {speed}")
+         key = self._key()
+diff --git a/src/manimvox/voice/engines/sarvam.py b/src/manimvox/voice/engines/sarvam.py
+index 8336c89..8c2ea74 100644
+--- a/src/manimvox/voice/engines/sarvam.py
++++ b/src/manimvox/voice/engines/sarvam.py
+@@ -110,12 +110,15 @@ class SarvamEngine(VoiceEngine):
+             raise VoiceError(f"{model} has no speaker '{speaker}'" + (f" (did you mean {', '.join(near)}?)" if near
+                              else "") + "; see `manimvox voices sarvam`")
+ 
++    def speed_range(self, voice: str) -> tuple[float, float]:
++        return PACE.get(split_voice(voice)[0], DEFAULT_PACE)
++
+     def synth(self, text: str, voice: str, speed: float, out: Path) -> None:
+         model, speaker, lang = split_voice(voice)
+         limit = MAX_CHARS.get(model, DEFAULT_MAX_CHARS)
+         if len(text) > limit:
+             raise VoiceError(f"a narration line is {len(text)} characters; Sarvam {model} takes at most {limit}")
+-        lo, hi = PACE.get(model, DEFAULT_PACE)
++        lo, hi = self.speed_range(voice)
+         if not lo <= speed <= hi:
+             raise VoiceError(f"Sarvam {model} speaks at speed {lo}–{hi}; series.json has {speed}")
+         key = self._key()
+diff --git a/tests/test_audio.py b/tests/test_audio.py
+index c5849d5..bac59de 100644
+--- a/tests/test_audio.py
++++ b/tests/test_audio.py
+@@ -1,6 +1,6 @@
+ import numpy as np
+ 
+-from manimvox.checks.audio import check_audio, read_cues
++from manimvox.checks.audio import check_audio, pace_warning, read_cues, suggested_speed
+ from tests.media import make_video
+ 
+ RATE = 8000
+@@ -62,3 +62,27 @@ def test_corrupt_video_is_an_error(tmp_path):
+     bad.write_bytes(b"not a video")
+     rep = check_audio(bad, write_srt(tmp_path / "v.srt", [(0.2, 1.8, "a")]))
+     assert not rep.ok and "cannot read bad.mkv" in rep.error
++
++
++def test_suggested_speed_aims_for_the_target():
++    assert suggested_speed(1.0, 225) == 0.73
++    assert suggested_speed(0.9, 198) == 0.75
++
++
++def test_no_warning_at_or_below_the_limit():
++    assert pace_warning(175, 1.0, None, "kokoro:af_heart") is None
++
++
++def test_warning_suggests_a_speed_inside_the_range():
++    w = pace_warning(225, 1.0, (0.7, 1.2), "elevenlabs:abc")
++    assert w.endswith("lower speed in series.json to 0.73")
++
++
++def test_warning_stops_at_the_slowest_speed_the_voice_allows():
++    w = pace_warning(200, 1.0, (0.85, 1.15), "gnani:Kaveri")  # 165 would need 0.82
++    assert "lower speed in series.json to 0.85, the slowest gnani:Kaveri allows (0.82 would reach 165)" in w
++
++
++def test_warning_when_the_voice_is_already_at_its_slowest():
++    w = pace_warning(200, 0.85, (0.85, 1.15), "gnani:Kaveri")
++    assert "speed is already 0.85, the slowest gnani:Kaveri allows" in w and "series.json to" not in w
+diff --git a/tests/test_elevenlabs.py b/tests/test_elevenlabs.py
+index 3413339..c05e63b 100644
+--- a/tests/test_elevenlabs.py
++++ b/tests/test_elevenlabs.py
+@@ -34,6 +34,10 @@ def test_speed_outside_range_is_refused(speed, tmp_path):
+         el.ElevenLabsEngine(env=KEY).synth("hi", "abc", speed, tmp_path / "a.wav")
+ 
+ 
++def test_speed_range():
++    assert el.ElevenLabsEngine(env=KEY).speed_range("abc") == (0.7, 1.2)
++
++
+ def test_synth_request(server, tmp_path):
+     s = server(PCM)
+     el.ElevenLabsEngine(env=KEY, sleep=lambda t: None).synth("Hello.", "abc123", 1.1, tmp_path / "a.wav")
+diff --git a/tests/test_gnani.py b/tests/test_gnani.py
+index bf13c6b..026f857 100644
+--- a/tests/test_gnani.py
++++ b/tests/test_gnani.py
+@@ -74,6 +74,10 @@ def test_speed_outside_range_is_refused(speed, tmp_path):
+         engine().synth("Hi.", "Kaveri", speed, tmp_path / "a.wav")
+ 
+ 
++def test_speed_range():
++    assert engine().speed_range("Kaveri") == (0.85, 1.15)
++
++
+ def test_rejected_key_names_the_variable_not_the_key(server, tmp_path):
+     server(403, error_body=b'{"success":false,"error":{"message":"bad key gn-SECRET"}}')
+     with pytest.raises(VoiceError) as e:
+diff --git a/tests/test_sarvam.py b/tests/test_sarvam.py
+index 57cfd8a..c9fd777 100644
+--- a/tests/test_sarvam.py
++++ b/tests/test_sarvam.py
+@@ -64,6 +64,11 @@ def test_prepare_accepts_any_v4_flash_persona():
+     engine().prepare("bulbul:v4-flash/ishita_hi_devotional@hi-IN", lambda p: True, None)
+ 
+ 
++@pytest.mark.parametrize("voice, want", [("bulbul:v2/anushka", (0.3, 3.0)), ("shubh", (0.5, 2.0))])
++def test_speed_range_follows_the_model(voice, want):
++    assert engine().speed_range(voice) == want
++
++
+ def test_synth_request(server, tmp_path):
+     s = server(wav_reply(channels=2))
+     engine().synth("Namaste.", "anushka@hi-IN", 1.2, tmp_path / "a.wav")
+diff --git a/tests/test_tools.py b/tests/test_tools.py
+index bdb11dc..d0a30af 100644
+--- a/tests/test_tools.py
++++ b/tests/test_tools.py
+@@ -92,6 +92,19 @@ def test_check_audio_warns_when_the_pace_is_too_fast(project):
+     assert any("lower speed in series.json to 0.73" in n for n in r.notes)
+ 
+ 
++def test_check_audio_keeps_the_suggestion_inside_the_voices_speeds(project):
++    conf = json.loads((project / "series.json").read_text(encoding="utf-8"))
++    conf["voice"] = "gnani:Kaveri"  # accepts 0.85 to 1.15
++    (project / "series.json").write_text(json.dumps(conf), encoding="utf-8")
++    (project / "out").mkdir()
++    make_mp4(project / "out" / "ep01_hello.mp4", 5.0)
++    write_srt(project / "out" / "ep01_hello.srt",  # 12 words in 3.6 seconds: 200 a minute, 165 would need 0.82
++              [(0.2, 2.0, "one two three four five six"), (2.2, 4.0, "seven eight nine ten eleven twelve")])
++    r = tools.check(str(project), "audio", "ep01")
++    assert r.ok and "pace: 200 words a minute" in r.notes
++    assert any("lower speed in series.json to 0.85, the slowest gnani:Kaveri allows" in n for n in r.notes)
++
++
+ def test_unknown_episode_is_a_tool_error(project):
+     with pytest.raises(ToolError, match="available: ep01_hello"):
+         tools.draft(str(project), "ep07")

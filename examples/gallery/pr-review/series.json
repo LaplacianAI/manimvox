@@ -1,0 +1,35 @@
+{
+  "manimvox": "0.8.5",
+  "series": "A pull request, reviewed and fixed",
+  "tagline": "manimvox#63 closes issue #21: the audio check reports narration pace",
+  "voice": "kokoro:af_heart",
+  "speed": 0.91,
+  "loudness": -16.0,
+  "pron": [
+    ["\\bGnani\\b", "Gyaani"]
+  ],
+  "theme": {
+    "source": "manimvox repository brand: ground #111417, blue #6CC4F0 and teal #5CC9B5 from docs/assets/logo.svg; remaining roles chosen to match for contrast",
+    "bg": "#111417",
+    "panel": "#1B2127",
+    "panel2": "#252D35",
+    "line": "#3B4650",
+    "code_bg": "#0C0F11",
+    "ink": "#E6EBEF",
+    "muted": "#9AA5AF",
+    "accent": "#6CC4F0",
+    "ok": "#5CC9B5",
+    "warn": "#E8B64A",
+    "error": "#F2796B",
+    "blue": "#6CC4F0",
+    "orange": "#F0955A",
+    "violet": "#A58DE0",
+    "pink": "#E27BB5",
+    "teal": "#5CC9B5",
+    "mark_svg": "assets/mark.svg",
+    "ground": {"kind": "grid", "amount": 0.35}
+  },
+  "episodes": [
+    {"n": 1, "stem": "ep01_review", "cls": "Ep01", "title": "A pull request, reviewed and fixed"}
+  ]
+}
