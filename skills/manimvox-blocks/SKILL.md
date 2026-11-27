@@ -54,6 +54,14 @@ Put that line under `from manimvox.kit import *` in the episode. Episodes run fr
 - The copied file belongs to the project: change sizes, colours or layout in it. After any change run `manimvox draft epNN` and read the contact sheets, or `manimvox check layout epNN` where you cannot view images.
 - Numbers in a block are claims like any other: each one comes from `FACTS.md`.
 
-## Write a new block
+## Make a new block
 
-For a component the list lacks, write a function in the project's own `blocks/` folder with the same rules. To contribute it to manimvox, see [references/writing-a-block.md](references/writing-a-block.md): the folder layout, `block.json`, the demo episode, the preview image and the checks.
+For a component the list lacks, make your own in the project. Nothing to install; this works today.
+
+1. Write a module in the project's `blocks/` folder, for example `blocks/timeline.py`: a docstring first, then `from manimvox.kit import *`. Import nothing else except the standard library and `numpy`.
+2. Reuse the kit's helpers (`T`, `P`, `box`, `chip`, `node`, `arrow`, `flow`) and theme colours (`ACCENT`, `INK`, `MUTED`, `OK`, `ERROR`); no hex colours.
+3. Build around the origin at a default size inside the safe stage (x from -6.6 to 6.6, y from -3.45 to 3.15). Return a `VGroup` with its parts as attributes, and raise `ValueError` with a clear message for input it cannot draw.
+4. Test it by rendering a small scene that uses it: `manimvox draft epNN`, then read the contact sheets, or run `manimvox check layout epNN` where you cannot view images.
+5. Import it in the episode like a copied block: `from blocks.timeline import timeline`.
+
+A block is plain Python run at render time, so only use blocks you trust. The full rules are in [references/writing-a-block.md](references/writing-a-block.md), which also covers a shared registry folder and contributing a block to manimvox: the folder layout, `block.json`, the demo episode, the preview image and the checks.
