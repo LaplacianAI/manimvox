@@ -132,11 +132,14 @@ def get_block(name: str, root: Path | None = None) -> Block:
 
 
 def all_blocks_multi(roots: Iterable[Path]) -> list[Block]:
-    """The blocks of every root, in root order. A name already found in an earlier root shadows the later ones."""
+    """The blocks of every root, in root order. A name already found in an earlier root shadows the later ones,
+    and a shadowed block.json is not read, so only a block that is listed has to be valid (raises ValueError)."""
     found: dict[str, Block] = {}
     for root in roots:
-        for b in all_blocks(root):
-            found.setdefault(b.name, b)
+        for d in sorted(Path(root).iterdir()):
+            if (d / "block.json").is_file() and d.name not in found:
+                b = read_block(d)
+                found[b.name] = b
     return list(found.values())
 
 
@@ -156,6 +159,15 @@ def add_block(project_root: Path, name: str, force: bool = False, root: Path | N
     return install_block(project_root, get_block(name, root), force)
 
 
+def _where(project_root: Path, source: Path) -> str:
+    """How a copied block's header names its registry folder: the path from the project when the folder lies
+    inside it, else just the folder's name, so no absolute local path lands in a file that may be committed."""
+    src, proj = Path(source).resolve(), Path(project_root).resolve()
+    if src != proj and src.is_relative_to(proj):
+        return src.relative_to(proj).as_posix()
+    return src.name or "a custom registry"
+
+
 def install_block(project_root: Path, b: Block, force: bool = False) -> Path:
     """Copy the block `b` to <project>/blocks/<module>.py; the header says where it came from if not the bundled registry."""
     d = Path(project_root) / "blocks"
@@ -169,7 +181,7 @@ def install_block(project_root: Path, b: Block, force: bool = False) -> Path:
     if is_bundled(b.source):
         head = f"# manimvox block {b.name!r}, copied from manimvox {__version__}.\n"
     else:
-        head = f"# manimvox block {b.name!r}, copied from {b.source.resolve()} (manimvox {__version__}).\n"
+        head = f"# manimvox block {b.name!r}, copied from {_where(project_root, b.source)} (manimvox {__version__}).\n"
     dest.write_text(head + src, encoding="utf-8")
     return dest
 
