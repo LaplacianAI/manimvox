@@ -104,7 +104,7 @@ def read_block(d: Path) -> Block:
         return v
 
     name = need("name", str)
-    if name != f.parent.name or not NAME.match(name):
+    if name != f.parent.name or not NAME.fullmatch(name):
         raise ValueError(f"{f}: name {name!r} must equal the folder name and use a-z, 0-9 and single hyphens")
     params = need("parameters", list)
     if not all(isinstance(p, dict) and isinstance(p.get("name"), str) and isinstance(p.get("description"), str)
@@ -143,7 +143,7 @@ def all_blocks_multi(roots: Iterable[Path]) -> list[Block]:
 def get_block_multi(name: str, roots: Iterable[Path]) -> Block:
     """Block `name` from the first root that has it. The name is checked against the name rule before any path
     is built, so `..` or a slash cannot reach outside a registry."""
-    if isinstance(name, str) and NAME.match(name):
+    if isinstance(name, str) and NAME.fullmatch(name):
         for root in roots:
             d = Path(root) / name
             if (d / "block.json").is_file():
