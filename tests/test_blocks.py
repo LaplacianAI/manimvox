@@ -263,9 +263,20 @@ def test_add_root_copies_and_says_where_from(tmp_path, monkeypatch, capsys):
     out = capsys.readouterr().out
     assert f"(from {team.resolve()})" in out and "from blocks.my_chart import" in out
     text = (d / "blocks" / "my_chart.py").read_text(encoding="utf-8")
-    assert text.splitlines()[0].startswith("# manimvox block 'my-chart', copied from ")
-    assert str(team.resolve()) in text.splitlines()[0]
+    assert text.splitlines()[0].startswith("# manimvox block 'my-chart', copied from team (manimvox ")
+    assert str(tmp_path) not in text.splitlines()[0]  # no absolute local path in a file that may be committed
     assert "def venn" in text
+
+
+def test_the_header_names_a_registry_inside_the_project_by_its_path_from_the_project(tmp_path, monkeypatch):
+    d = _project(tmp_path, monkeypatch)
+    inside = d / "shared" / "blocks"
+    inside.parent.mkdir()
+    shutil.copytree(_registry(tmp_path, "team", ("my-chart",)), inside)
+    assert main(["add", "my-chart", "--root", str(inside)]) == 0
+    first = (d / "blocks" / "my_chart.py").read_text(encoding="utf-8").splitlines()[0]
+    assert first.startswith("# manimvox block 'my-chart', copied from shared/blocks (manimvox ")
+    assert str(tmp_path) not in first
 
 
 def test_add_root_refuses_to_overwrite_without_force(tmp_path, monkeypatch, capsys):
@@ -301,7 +312,8 @@ def test_a_custom_block_may_shadow_a_bundled_one_and_says_so(tmp_path, monkeypat
     assert len(lines) == 1 and "the team's venn" in lines[0] and str(team.resolve()) in lines[0]
     assert main(["add", "venn", "--root", str(team), "--root", str(REG)]) == 0
     assert f"(from {team.resolve()})" in capsys.readouterr().out
-    assert str(team.resolve()) in (d / "blocks" / "venn.py").read_text(encoding="utf-8").splitlines()[0]
+    first = (d / "blocks" / "venn.py").read_text(encoding="utf-8").splitlines()[0]
+    assert "copied from team (" in first and str(tmp_path) not in first
 
 
 def test_add_reads_the_env_var_and_the_flag_beats_it(tmp_path, monkeypatch, capsys):
