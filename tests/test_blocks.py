@@ -1,4 +1,5 @@
 import ast
+import itertools
 import json
 import re
 import shutil
@@ -23,6 +24,7 @@ from manimvox.blocks import (
     render_demo,
 )
 from manimvox.cli import main
+from manimvox.kit import ACCENT, BLUE, ORANGE, PINK, TEAL, VIOLET
 from tests.test_skills_lint import BANNED
 
 REG = Path(__file__).resolve().parents[1] / "blocks"
@@ -39,7 +41,7 @@ def test_registry_is_the_starter_set():
     assert {b.name for b in BLOCKS} == {"venn", "bar-ranking", "bug-grid", "line-by-level", "log-scatter",
                                         "token-panel", "request-flow", "sequence-diagram", "code-diff", "surface-plot",
                                         "mesh-model", "kinetic-title", "end-card", "transitions-demo",
-                                        "labelled-diagram", "flow-stream"}
+                                        "labelled-diagram", "flow-stream", "donut"}
 
 
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
@@ -232,6 +234,161 @@ def test_bar_ranking_rejects_degenerate_input(tmp_path, monkeypatch, call):
     m = _import_block(tmp_path, monkeypatch, "bar-ranking")
     with pytest.raises(ValueError):
         call(m)
+
+
+DONUT_SIX = [("Meetings", 9), ("Focused work", 18), ("Code review", 6), ("Planning", 4), ("Support", 2.5),
+             ("Learning", 1.5)]
+
+
+@pytest.mark.parametrize("parts", [[("a", 3), ("b", 1)], DONUT_SIX], ids=["two", "six"])
+def test_donut_builds_ordered_slices_with_clear_labels(tmp_path, monkeypatch, parts):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut(parts, total_label="things")
+    assert len(chart.slices) == len(parts)
+    assert [round(float(s[0].get_fill_opacity())) for s in chart.slices] == [1] * len(parts)
+    # biggest first: the slices' arcs shrink, so each label's percentage falls
+    pct = [s[2][1].text for s in chart.slices]
+    assert pct == {2: ["75%", "25%"], 6: ["44%", "22%", "15%", "10%", "6%", "4%"]}[len(parts)]
+    kit = [ACCENT, BLUE, TEAL, ORANGE, VIOLET, PINK][:len(parts)]
+    assert [s[0].get_fill_color().to_hex().lower() for s in chart.slices] == [c.lower() for c in kit]
+    boxes = []
+    for s in chart.slices:
+        lab = s[2]
+        corners = [(x, y) for x in (lab.get_left()[0], lab.get_right()[0]) for y in (lab.get_bottom()[1], lab.get_top()[1])]
+        assert min(np.hypot(x, y) for x, y in corners) > 1.5
+        boxes.append((lab.get_left()[0], lab.get_right()[0], lab.get_bottom()[1], lab.get_top()[1]))
+    for i, a in enumerate(boxes):
+        for b in boxes[i + 1:]:
+            assert a[1] <= b[0] or b[1] <= a[0] or a[3] <= b[2] or b[3] <= a[2]
+    assert np.allclose(chart.centre_point.get_center(), 0)
+    assert chart.centre.width < 2 * (1.5 - 0.55)
+
+
+def _polyline_segments(line):
+    pts = line.get_start_anchors().tolist() + [line.get_end_anchors()[-1].tolist()]
+    return list(itertools.pairwise(pts))
+
+
+def _segments_cross(a, b):
+    def side(p, q, r):
+        return (q[0] - p[0]) * (r[1] - p[1]) - (q[1] - p[1]) * (r[0] - p[0])
+
+    (p1, p2), (p3, p4) = a, b
+    return side(p1, p2, p3) * side(p1, p2, p4) < 0 and side(p3, p4, p1) * side(p3, p4, p2) < 0
+
+
+def _crossings(chart):
+    lines = [_polyline_segments(s[1].line) for s in chart.slices]
+    return sum(_segments_cross(x, y) for i, a in enumerate(lines) for b in lines[i + 1:] for x in a for y in b)
+
+
+def _label_overlaps(chart):
+    boxes = [(s[2].get_left()[0], s[2].get_right()[0], s[2].get_bottom()[1], s[2].get_top()[1]) for s in chart.slices]
+    return [(i, j) for i, a in enumerate(boxes) for j, b in enumerate(boxes) if i < j
+            and not (a[1] <= b[0] or b[1] <= a[0] or a[3] <= b[2] or b[3] <= a[2])]
+
+
+@pytest.mark.parametrize("values", [[30, 1, 1, 1, 1, 30], [1000, 1, 1, 1, 1, 1], [5, 1, 1, 1, 1, 1], [1, 1, 1, 1, 1, 1]])
+@pytest.mark.parametrize("size", [18, 36])
+def test_donut_leader_lines_never_cross_and_labels_stay_on_stage(tmp_path, monkeypatch, values, size):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut([(f"slice {i}", v) for i, v in enumerate(values)], size=size)
+    assert _crossings(chart) == 0
+    assert _label_overlaps(chart) == []
+    for s in chart.slices:
+        assert -3.45 <= s[2].get_bottom()[1] and s[2].get_top()[1] <= 3.15
+        assert abs(s[2].get_left()[0]) <= 6.6 and abs(s[2].get_right()[0]) <= 6.6
+
+
+def test_donut_small_slices_read_less_than_one_percent(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut([("big", 1000), ("a", 1), ("b", 2), ("c", 4.9)])
+    assert [s[2][1].text for s in chart.slices] == ["99%", "<1%", "<1%", "<1%"]
+    chart = m.donut([("big", 100), ("a", 1)])
+    assert [s[2][1].text for s in chart.slices] == ["99%", "1%"]
+
+
+def test_donut_centre_total_shows_a_tiny_total(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    assert m.donut([("a", 0.003)]).centre[0].text == "0.003"
+    assert m.donut([("a", 1234.5), ("b", 1)]).centre[0].text == "1,235.5"
+
+
+def test_donut_single_slice_is_a_full_ring(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut([("only", 7)], total_label="things")
+    assert len(chart.slices) == 1
+    assert chart.slices[0][2][1].text == "100%"
+    assert chart.centre[0].text == "7"
+    assert chart.slices[0][0].width == pytest.approx(3.0, abs=0.05)
+    assert _crossings(chart) == 0
+
+
+def test_donut_grow_returns_an_animation_and_the_chart_can_be_rebuilt(tmp_path, monkeypatch):
+    from manim import Animation
+
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut(DONUT_SIX)
+    anim = m.grow(chart)
+    assert isinstance(anim, Animation)
+    anim.begin()
+    anim.interpolate(1)
+    anim.finish()
+    again = m.donut(DONUT_SIX)
+    assert [s[2][1].text for s in again.slices] == [s[2][1].text for s in chart.slices]
+    assert isinstance(m.grow(again, lag_ratio=0.3), Animation)
+
+
+def test_donut_accepts_numpy_numbers(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut([("a", np.int64(3)), ("b", np.float32(1)), ("c", np.int32(1)), ("d", np.float64(1))])
+    assert [s[2][1].text for s in chart.slices] == ["50%", "17%", "17%", "17%"]
+    assert chart.centre[0].text == "6"
+
+
+def test_donut_starts_at_twelve_and_goes_clockwise(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut([("a", 3), ("b", 1)])
+    big, small = (s[0] for s in chart.slices)
+    # three quarters clockwise from the top covers the right and the bottom; the last quarter is top left
+    assert small.get_center()[0] < 0 < small.get_center()[1]
+    assert big.get_right()[0] == pytest.approx(1.5, abs=0.05) and big.get_bottom()[1] == pytest.approx(-1.5, abs=0.05)
+    assert big.get_top()[1] == pytest.approx(1.5, abs=0.05)
+
+
+def test_donut_follows_the_chart_when_it_moves(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut(DONUT_SIX)
+    _move_and_scale(chart)
+    assert np.allclose(chart.centre_point.get_center(), chart.centre.get_center(), atol=1e-6)
+
+
+@pytest.mark.parametrize("call", [
+    lambda m: m.donut([]),
+    lambda m: m.donut([(str(i), 1) for i in range(7)]),
+    lambda m: m.donut([("a", 0)]),
+    lambda m: m.donut([("a", 1), ("b", -2)]),
+    lambda m: m.donut([(3, 1)]),
+    lambda m: m.donut([("a", 1)], thickness=2),
+    lambda m: m.donut([("a", 1)], size=0),
+    lambda m: m.donut([("a", 1), ("b", float("inf"))]),
+    lambda m: m.donut([("a", 1), ("b", float("nan"))]),
+    lambda m: m.donut([("a", np.float64("inf"))]),
+    lambda m: m.donut([("a", "3")]),
+    lambda m: m.donut([("a", True)]),
+    lambda m: m.donut([("a", 1)], radius=float("inf")),
+    lambda m: m.donut([("a", 1, 2)]),
+])
+def test_donut_rejects_degenerate_input(tmp_path, monkeypatch, call):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    with pytest.raises(ValueError):
+        call(m)
+
+
+def test_donut_names_a_non_finite_value_in_the_error(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    with pytest.raises(ValueError, match=r"finite.*inf.*'b'"):
+        m.donut([("a", 1), ("b", float("inf"))])
 
 
 @pytest.mark.parametrize("call", [
