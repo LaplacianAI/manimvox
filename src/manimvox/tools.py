@@ -411,6 +411,7 @@ class BlockInfo:
     description: str
     tags: list[str]
     import_line: str  # the line an episode uses after add_block
+    source: str  # the registry folder the block was read from
 
 
 @dataclass(frozen=True)
@@ -424,6 +425,7 @@ class AddedBlock:
     name: str
     path: str
     import_line: str
+    source: str  # the registry folder the block was copied from
 
 
 @dataclass(frozen=True)
@@ -477,40 +479,59 @@ class DoctorResult:
     rows: list[DoctorRow]
 
 
+def _roots(root: str | None) -> list[Path]:
+    """The registry folders for an explicit `root`: one folder or several joined by os.pathsep, first one winning.
+    No root means the bundled registry; the MANIMVOX_BLOCKS variable belongs to the command and is not read here."""
+    from .blocks import blocks_path, registry_roots
+
+    parts = [p for p in (root or "").split(os.pathsep) if p]
+    return registry_roots(parts) if parts else [blocks_path()]
+
+
 @_tool
-def list_blocks() -> BlocksResult:
-    """List the blocks: ready-made charts and diagrams that add_block copies into a project."""
-    from .blocks import all_blocks
+def list_blocks(root: str | None = None) -> BlocksResult:
+    """List the blocks: ready-made charts and diagrams that add_block copies into a project.
 
-    return BlocksResult(True, [BlockInfo(b.name, b.description, list(b.tags), b.import_line) for b in all_blocks()])
+    Args:
+        root: A registry folder of your own to read instead of the bundled one, or several joined by the path
+            separator (":" on Linux and macOS, ";" on Windows), the first one winning when a name repeats. Each
+            block says which folder it came from. Only name a folder you trust: its blocks are plain Python.
+    """
+    from .blocks import all_blocks_multi
+
+    return BlocksResult(True, [BlockInfo(b.name, b.description, list(b.tags), b.import_line, str(b.source))
+                               for b in all_blocks_multi(_roots(root))])
 
 
-def _add_blocks(project: str, names: list[str], force: bool, hint: str) -> AddResult:
-    from .blocks import add_block as copy_block
-    from .blocks import get_block
+def _add_blocks(project: str, names: list[str], force: bool, hint: str, roots: list[Path] | None = None) -> AddResult:
+    from .blocks import blocks_path, get_block_multi, install_block
 
-    blocks = [get_block(n) for n in names]  # every name checked before anything is copied
+    blocks = [get_block_multi(n, roots or [blocks_path()]) for n in names]  # every name checked before anything is copied
     pr = _open(project)
     if not force:
         clash = [b.name for b in blocks if (pr.root / "blocks" / f"{b.module}.py").exists()]
         if clash:
             raise ValueError(f"already in this project: {', '.join(clash)} (they may hold your edits); {hint}")
-    return AddResult(True, [AddedBlock(b.name, str(copy_block(pr.root, b.name, force=force)), b.import_line)
+    return AddResult(True, [AddedBlock(b.name, str(install_block(pr.root, b, force)), b.import_line, str(b.source))
                             for b in blocks])
 
 
 @_tool
-def add_block(project: str, names: list[str], force: bool = False) -> AddResult:
+def add_block(project: str, names: list[str], force: bool = False, root: str | None = None) -> AddResult:
     """Copy blocks into the project's blocks/ folder; an episode then imports them with each block's import_line.
 
     Args:
         project: The project folder, or any folder inside it.
         names: Block names from list_blocks, e.g. ["bar-ranking"].
         force: Replace a copy already in the project, losing any edits made to it.
+        root: A registry folder of your own to copy from instead of the bundled one, or several joined by the path
+            separator (":" on Linux and macOS, ";" on Windows), the first one winning when a name repeats; use the
+            same value as for list_blocks. Each result says which folder the block came from. Only name a folder
+            you trust: its blocks are plain Python that runs at render time.
     """
     if not names:
         raise ValueError("name at least one block; list_blocks lists them")
-    return _add_blocks(project, names, force, "call add_block with force=True to replace them")
+    return _add_blocks(project, names, force, "call add_block with force=True to replace them", _roots(root))
 
 
 @_tool
