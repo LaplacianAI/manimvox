@@ -30,6 +30,7 @@ Run `manimvox add --list`. Each line is a block's name, what it draws, and its t
 | `transitions-demo` | the chapter-seam transitions side by side, to see which fits |
 | `labelled-diagram` | boxes joined by arrows with a pointing label for each part |
 | `flow-stream` | dots flowing through stages, dimmed and brightened, with entry and exit markers |
+| `donut` | shares of a whole: up to six slices, labelled outside the ring, total in the centre |
 
 ## Copy it into the project
 
