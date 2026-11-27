@@ -1,0 +1,15 @@
+{
+  "name": "donut",
+  "function": "donut",
+  "helpers": ["grow"],
+  "description": "A donut chart of up to six slices, biggest first, each labelled outside the ring with its share, and the total in the centre.",
+  "tags": ["chart", "share", "donut"],
+  "parameters": [
+    {"name": "parts", "description": "list of 1 to 6 (label, value) pairs, every value above 0"},
+    {"name": "total_label", "description": "text under the total in the centre; default none"},
+    {"name": "radius", "description": "outer radius of the ring in scene units"},
+    {"name": "thickness", "description": "width of the ring in scene units, above 0 and below the radius"},
+    {"name": "size", "description": "font size of the labels"}
+  ],
+  "returns": "VGroup with .slices (each VGroup(sector, leader, label), biggest first), .centre and .centre_point; grow(chart) fades them in"
+}
