@@ -23,6 +23,7 @@ from manimvox.blocks import (
     render_demo,
 )
 from manimvox.cli import main
+from manimvox.kit import ACCENT, BLUE, ORANGE, PINK, TEAL, VIOLET
 from tests.test_skills_lint import BANNED
 
 REG = Path(__file__).resolve().parents[1] / "blocks"
@@ -39,7 +40,7 @@ def test_registry_is_the_starter_set():
     assert {b.name for b in BLOCKS} == {"venn", "bar-ranking", "bug-grid", "line-by-level", "log-scatter",
                                         "token-panel", "request-flow", "sequence-diagram", "code-diff", "surface-plot",
                                         "mesh-model", "kinetic-title", "end-card", "transitions-demo",
-                                        "labelled-diagram", "flow-stream"}
+                                        "labelled-diagram", "flow-stream", "donut"}
 
 
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
@@ -230,6 +231,65 @@ def test_line_by_level_default_ticks_are_quarters(tmp_path, monkeypatch):
 ])
 def test_bar_ranking_rejects_degenerate_input(tmp_path, monkeypatch, call):
     m = _import_block(tmp_path, monkeypatch, "bar-ranking")
+    with pytest.raises(ValueError):
+        call(m)
+
+
+DONUT_SIX = [("Meetings", 9), ("Focused work", 18), ("Code review", 6), ("Planning", 4), ("Support", 2.5),
+             ("Learning", 1.5)]
+
+
+@pytest.mark.parametrize("parts", [[("a", 3), ("b", 1)], DONUT_SIX], ids=["two", "six"])
+def test_donut_builds_ordered_slices_with_clear_labels(tmp_path, monkeypatch, parts):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut(parts, total_label="things")
+    assert len(chart.slices) == len(parts)
+    assert [round(float(s[0].get_fill_opacity())) for s in chart.slices] == [1] * len(parts)
+    # biggest first: the slices' arcs shrink, so each label's percentage falls
+    pct = [int(s[2][1].text.rstrip("%")) for s in chart.slices]
+    assert pct == sorted(pct, reverse=True)
+    kit = [ACCENT, BLUE, TEAL, ORANGE, VIOLET, PINK][:len(parts)]
+    assert [s[0].get_fill_color().to_hex().lower() for s in chart.slices] == [c.lower() for c in kit]
+    boxes = []
+    for s in chart.slices:
+        lab = s[2]
+        corners = [(x, y) for x in (lab.get_left()[0], lab.get_right()[0]) for y in (lab.get_bottom()[1], lab.get_top()[1])]
+        assert min(np.hypot(x, y) for x, y in corners) > 1.5
+        boxes.append((lab.get_left()[0], lab.get_right()[0], lab.get_bottom()[1], lab.get_top()[1]))
+    for i, a in enumerate(boxes):
+        for b in boxes[i + 1:]:
+            assert a[1] <= b[0] or b[1] <= a[0] or a[3] <= b[2] or b[3] <= a[2]
+    assert np.allclose(chart.centre_point.get_center(), 0)
+    assert chart.centre.width < 2 * (1.5 - 0.55)
+
+
+def test_donut_starts_at_twelve_and_goes_clockwise(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut([("a", 3), ("b", 1)])
+    big, small = (s[0] for s in chart.slices)
+    # three quarters clockwise from the top covers the right and the bottom; the last quarter is top left
+    assert small.get_center()[0] < 0 < small.get_center()[1]
+    assert big.get_right()[0] == pytest.approx(1.5, abs=0.05) and big.get_bottom()[1] == pytest.approx(-1.5, abs=0.05)
+    assert big.get_top()[1] == pytest.approx(1.5, abs=0.05)
+
+
+def test_donut_follows_the_chart_when_it_moves(tmp_path, monkeypatch):
+    m = _import_block(tmp_path, monkeypatch, "donut")
+    chart = m.donut(DONUT_SIX)
+    _move_and_scale(chart)
+    assert np.allclose(chart.centre_point.get_center(), chart.centre.get_center(), atol=1e-6)
+
+
+@pytest.mark.parametrize("call", [
+    lambda m: m.donut([]),
+    lambda m: m.donut([(str(i), 1) for i in range(7)]),
+    lambda m: m.donut([("a", 0)]),
+    lambda m: m.donut([("a", 1), ("b", -2)]),
+    lambda m: m.donut([(3, 1)]),
+    lambda m: m.donut([("a", 1)], thickness=2),
+])
+def test_donut_rejects_degenerate_input(tmp_path, monkeypatch, call):
+    m = _import_block(tmp_path, monkeypatch, "donut")
     with pytest.raises(ValueError):
         call(m)
 
