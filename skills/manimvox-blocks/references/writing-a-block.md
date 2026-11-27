@@ -43,9 +43,21 @@ python -m manimvox.blocks docs --root FOLDER
 
 `preview --write` renders a block's demo and saves `preview.png` in the block's folder; `preview --check` renders it and compares with the saved image; `docs` writes `blocks-gallery.md` and copies the previews into the folder given by `--out` (default `docs/`). **Use these only on folders you trust:** `preview` (with `--write` or `--check`) imports and runs the folder's `block.py` and `demo.py`, and nothing is sandboxed. `preview --write` and `docs` also write files, so check where they will write first.
 
-To use a block from the folder, copy its `block.py` into the project's `blocks/` yourself, as "In a project" describes.
+To use a block from the folder, name the folder with `--root` (the command copies the block into the project's `blocks/`, like a bundled one):
 
-Planned, not yet available (tracked in [#72](https://github.com/LaplacianAI/manimvox/issues/72)): `manimvox add --root FOLDER` to copy a block from a shared folder, and a command to check a block (its name is not final). `manimvox add` reads only the bundled registry for now.
+```bash
+manimvox add --list --root FOLDER            # the folder's blocks, each with the folder it came from
+manimvox add NAME [NAME ...] --root FOLDER   # copy blocks from it into the project
+manimvox add NAME --root TEAM --root FOLDER  # repeat --root: the first folder that has a name wins
+```
+
+Where the command reads blocks from, in order: the `--root` folders; else the `MANIMVOX_BLOCKS` environment variable, a list of folders separated like `PATH` (`:` on Linux and macOS, `;` on Windows); else the bundled registry. Setting either replaces the bundled registry, so add its folder (`python -c "from manimvox.blocks import blocks_path; print(blocks_path())"`) as the last `--root` to keep the bundled blocks as well. Every folder must exist, or the command stops and names it. `MANIMVOX_BLOCKS` is read by the `manimvox` command only: the `list_blocks` and `add_block` tools never read it, and take an optional `root` argument instead (one folder, or several joined by the path separator).
+
+If a folder has a block with the same name as a bundled block, or as one in a later folder, the first folder wins and shadows the others. That is allowed on purpose, so a team can replace a block with its own version. `--list` and `add` print the folder each block comes from, so check it. A block copied from a folder other than the bundled one starts with a header comment naming that folder.
+
+Name rule: a block name is checked against the rule above before any path is built, so a name with `..` or a slash is refused and cannot reach outside a registry. **Use only folders you trust:** a copied block is plain Python that runs at render time. Registry folders are opt-in and local; nothing is downloaded.
+
+Planned, not yet available (tracked in [#72](https://github.com/LaplacianAI/manimvox/issues/72)): a command to check a block (its name is not final).
 
 ## Contributing to the bundled registry
 
