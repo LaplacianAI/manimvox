@@ -1065,4 +1065,4 @@ TOOLS = (new_project, brief_questions, write_brief, draft, render, check, contac
 COMMANDS = {"new": "new_project", "brief": "write_brief", "draft": "draft", "render": "render", "check": "check", "sheets": "contact_sheet", "voices": "voices",
             "add": "add_block", "join": "join", "index": "index", "package": "package", "doctor": "doctor",
             "assets": "fetch_asset", "edit": "render_edit"}
-SHELL_ONLY = frozenset({"skills"})  # installs skills into coding agents; a framework agent reads skills_path() instead
+SHELL_ONLY = frozenset({"skills", "blocks"})  # skills installs into coding agents; blocks check runs a folder's code: neither is an agent tool
