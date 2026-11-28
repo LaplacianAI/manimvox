@@ -1,7 +1,5 @@
-import ast
 import itertools
 import json
-import re
 import shutil
 import sys
 from pathlib import Path
@@ -11,8 +9,8 @@ import pytest
 from manim import RIGHT
 from PIL import Image
 
+from manimvox import blockcheck
 from manimvox.blocks import (
-    PREVIEW_SIZE,
     PREVIEW_TOLERANCE,
     add_block,
     all_blocks,
@@ -33,7 +31,6 @@ from tests.test_skills_lint import BANNED
 REG = Path(__file__).resolve().parents[1] / "blocks"
 BLOCKS = all_blocks(REG)
 FIXTURE = Path(__file__).parent / "fixtures" / "hello"
-ALLOWED = set(sys.stdlib_module_names) | {"numpy"}
 
 
 def test_blocks_path_finds_the_repo_blocks_in_a_dev_install():
@@ -48,40 +45,19 @@ def test_registry_is_the_starter_set():
 
 
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
-def test_block_contract(b):
-    files = {p.name for p in b.path.iterdir() if not p.name.startswith((".", "__"))}
-    assert files == {"block.py", "demo.py", "preview.png", "block.json"}
-    assert 1 <= len(b.description) <= 200 and "\n" not in b.description
-    assert 1 <= len(b.tags) <= 6 and all(re.fullmatch(r"[a-z0-9-]+", t) for t in b.tags)
-    tree = ast.parse((b.path / "block.py").read_text(encoding="utf-8"))
-    defs = {n.name: n for n in tree.body if isinstance(n, ast.FunctionDef)}
-    assert b.function in defs and all(h in defs for h in b.helpers)
-    fn = defs[b.function]
-    assert {a.arg for a in fn.args.args + fn.args.kwonlyargs} == {p["name"] for p in b.parameters}
-    assert ast.get_docstring(fn) and ast.get_docstring(tree)
+def test_block_passes_the_shared_static_checks(b):
+    """One source of truth: `manimvox blocks check` runs these same checks on any block folder.
+    They cover the file set, the block.json shape, name and tags, the function and its parameters, the docstrings,
+    the allowed imports, hex colours, the demo's source and the 854x480 PNG preview."""
+    errors = [f.line() for f in blockcheck.check_static(b.path, registry=True) if f.level == blockcheck.ERROR]
+    assert errors == []
 
 
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
-def test_block_imports_only_what_every_project_has(b):
-    tree = ast.parse((b.path / "block.py").read_text(encoding="utf-8"))
-    for node in ast.walk(tree):
-        if isinstance(node, ast.ImportFrom):
-            assert node.module == "manimvox.kit" or node.module.split(".")[0] in ALLOWED, node.module
-        elif isinstance(node, ast.Import):
-            assert all(a.name.split(".")[0] in ALLOWED for a in node.names)
-
-
-@pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
-def test_demo_uses_the_block_as_an_author_would(b):
-    demo = (b.path / "demo.py").read_text(encoding="utf-8")
-    assert f"from blocks.{b.module} import" in demo
-    assert "class Demo(Episode)" in demo or "class Demo(Episode3D)" in demo
-
-
-@pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
-def test_preview_is_a_480p_png(b):
-    with Image.open(b.path / "preview.png") as im:
-        assert im.format == "PNG" and im.size == PREVIEW_SIZE
+def test_block_runs_with_its_defaults(b):
+    """Imports and calls the block; a warning (bad input raising a TypeError) is not an error."""
+    errors = [f.line() for f in blockcheck.check_dynamic(b.path) if f.level == blockcheck.ERROR]
+    assert errors == []
 
 
 @pytest.mark.parametrize("b", BLOCKS, ids=lambda b: b.name)
