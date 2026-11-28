@@ -70,6 +70,8 @@ manimvox blocks check PATH --json      # the report as JSON
 
 The static checks only read and parse files. A block's code is imported and called only after its static checks pass, and nothing is sandboxed, so **check only folders you trust.**
 
+`--render` runs the folder's `demo.py`, which only gets a source-text check, so check trusted folders only.
+
 ## Contributing to the bundled registry
 
 A block in the registry lives in `blocks/<name>/` (the name uses `a-z`, `0-9` and single hyphens) with four files:
