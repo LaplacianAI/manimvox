@@ -15,11 +15,11 @@ from blocks.my_block import my_block
 
 `blocks/__init__.py` is not required: a render runs from the project folder, so `blocks` imports as a plain folder (a namespace package). `manimvox add` writes an `__init__.py` there anyway, and adding an empty one to a hand-made folder is harmless and safer: a regular package named `blocks` elsewhere on the Python path would otherwise win over your folder, and the import would fail.
 
-Nothing else is needed. To check it, render a small scene that uses it (`manimvox draft epNN`) and read the contact sheets, or run `manimvox check layout epNN` where you cannot view images.
+Nothing else is needed. (`manimvox blocks check` takes a block folder with `block.json`, not a single module: see "Checking a block or a registry folder" below.) To check it, render a small scene that uses it (`manimvox draft epNN`) and read the contact sheets, or run `manimvox check layout epNN` where you cannot view images.
 
 ### Rules for the code
 
-These rules are guidance, not a check that runs. Not every bundled block follows each one: `transitions-demo` does not return a `VGroup`, and `bug-grid`, `kinetic-title` and `venn` do not raise `ValueError`. Read a block's docstring for what it really does.
+These rules are guidance. `manimvox blocks check` (below) checks some of them for a block folder, as warnings or errors, but a block in a project's `blocks/` is a single module and is checked by rendering it. Not every bundled block follows each one: `transitions-demo` does not return a `VGroup`, and `bug-grid`, `kinetic-title` and `venn` do not raise `ValueError`. Read a block's docstring for what it really does.
 
 - Start with a module docstring, then `from manimvox.kit import *`. Import nothing else except the Python standard library and `numpy`: a project has nothing more.
 - One main function, plus small helpers if needed. The main function's docstring names every parameter, says what it returns, and which parts to reveal one by one.
@@ -39,6 +39,7 @@ Today the block tools take `--root` to work on such a folder:
 python -m manimvox.blocks preview --write [NAME] --root FOLDER
 python -m manimvox.blocks preview --check [NAME] --root FOLDER
 python -m manimvox.blocks docs --root FOLDER
+manimvox blocks check FOLDER           # read-only checks first; see "Checking a block or a registry folder"
 ```
 
 `preview --write` renders a block's demo and saves `preview.png` in the block's folder; `preview --check` renders it and compares with the saved image; `docs` writes `blocks-gallery.md` and copies the previews into the folder given by `--out` (default `docs/`). **Use these only on folders you trust:** `preview` (with `--write` or `--check`) imports and runs the folder's `block.py` and `demo.py`, and nothing is sandboxed. `preview --write` and `docs` also write files, so check where they will write first.
@@ -57,7 +58,17 @@ If a folder has a block with the same name as a bundled block, or as one in a la
 
 Name rule: a block name is checked against the rule above before any path is built, so a name with `..` or a slash is refused and cannot reach outside a registry. **Use only folders you trust:** a copied block is plain Python that runs at render time. Registry folders are opt-in and local; nothing is downloaded.
 
-Planned, not yet available (tracked in [#72](https://github.com/LaplacianAI/manimvox/issues/72)): a command to check a block (its name is not final).
+### Checking a block or a registry folder
+
+```bash
+manimvox blocks check PATH             # PATH: one block folder, or a registry folder of them
+manimvox blocks check PATH --render    # also render each demo.py (registry folders; slow)
+manimvox blocks check PATH --json      # the report as JSON
+```
+
+`PATH` is a block folder (`block.py` and `block.json`) or a registry folder of block folders. The command checks the `block.json` shape and name, the docstrings, the imports, hex colour literals, the function and its parameters, and in a registry the file set, the demo's source and the preview's size. **Errors exit 1; warnings exit 0.** `--render` is off by default, and a run without it says the demo render was skipped; with it each `demo.py` is rendered and a layout finding or a failed render is an error. `--json` prints the report as JSON.
+
+The static checks only read and parse files. A block's code is imported and called only after its static checks pass, and nothing is sandboxed, so **check only folders you trust.**
 
 ## Contributing to the bundled registry
 
@@ -74,11 +85,12 @@ A block in the registry lives in `blocks/<name>/` (the name uses `a-z`, `0-9` an
   - `returns`.
 - **`preview.png`:** 854x480, written by the preview tool.
 
-Make and check the preview, then run the tests:
+Make and check the preview, check the block, then run the tests:
 
 ```bash
 uv run python -m manimvox.blocks preview --write <name>
 uv run python -m manimvox.blocks preview --check <name>
+uv run manimvox blocks check blocks/<name>
 uv run pytest tests/test_blocks.py
 uv run pytest tests/test_blocks.py -m slow
 ```
