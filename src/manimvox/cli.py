@@ -242,6 +242,20 @@ def _cmd_voices(args) -> int:
     return 0
 
 
+def _cmd_blocks(args) -> int:
+    import json
+
+    from .blockcheck import check_path
+
+    report = check_path(args.path, render=args.render)  # a ValueError for a bad PATH is one line, exit 1
+    if args.json:
+        print(json.dumps(report.to_dict(), indent=2))
+    else:
+        for line in report.lines():
+            print(line)
+    return 0 if report.ok else 1
+
+
 def _cmd_doctor(args) -> int:
     from .tools import doctor
 
@@ -572,6 +586,15 @@ def build_parser() -> argparse.ArgumentParser:
         if ask:
             a.add_argument("-y", "--yes", **yes)
     s.set_defaults(func=_cmd_skills)
+
+    s = p._sub.add_parser("blocks", help="check a block folder or a registry folder of blocks")
+    sub = s.add_subparsers(dest="action", metavar="<action>", required=True)
+    a = sub.add_parser("check", help="check one block folder, or every block in a registry folder; runs block code "
+                       "only after its static checks pass, so check only folders you trust")
+    a.add_argument("path", metavar="PATH", help="a block folder (block.py and block.json) or a folder of them")
+    a.add_argument("--render", action="store_true", help="also render each block's demo.py (registry folders; slow)")
+    a.add_argument("--json", action="store_true", help="print the report as JSON")
+    s.set_defaults(func=_cmd_blocks)
 
     s = p._sub.add_parser("doctor", help="check system libraries, fonts and voice engines")
     s.set_defaults(func=_cmd_doctor)
