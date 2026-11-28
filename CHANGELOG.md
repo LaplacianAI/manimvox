@@ -4,6 +4,8 @@ All notable changes to manimvox are listed here. The format follows [Keep a Chan
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-28
+
 ### Added
 
 - **`manimvox blocks check PATH`** checks one block folder or a registry folder of blocks: the `block.json` shape and name, docstrings, imports, hex colours, the function and its parameters, and for a registry the file set, demo source and preview size. Errors exit 1 and warnings exit 0; `--render` (off by default) also renders each demo, and `--json` prints the report as JSON. Block code runs only after its static checks pass and is not sandboxed, so check only folders you trust. `tests/test_blocks.py` now runs the same checks on the bundled blocks. The blocks skill and its writing guide describe it. Part of [#72](https://github.com/LaplacianAI/manimvox/issues/72).
@@ -172,7 +174,8 @@ The first release.
 - **For agents:** eleven agent skills, the CLI as typed tools, adapters for eight Python agent frameworks, and plugin manifests for Claude Code, Codex, Cursor and Gemini CLI.
 - CI on Linux, macOS and Windows; releases published to PyPI with trusted publishing.
 
-[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.8.5...HEAD
+[Unreleased]: https://github.com/LaplacianAI/manimvox/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/LaplacianAI/manimvox/compare/v0.8.5...v0.9.0
 [0.8.5]: https://github.com/LaplacianAI/manimvox/compare/v0.8.0...v0.8.5
 [0.8.0]: https://github.com/LaplacianAI/manimvox/compare/v0.7.0...v0.8.0
 [0.7.0]: https://github.com/LaplacianAI/manimvox/compare/v0.6.0...v0.7.0

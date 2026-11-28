@@ -445,7 +445,7 @@ Install the `matplotlib` or `plotly` extra for them (see the extras table). Plot
 
 ```json
 {
-  "manimvox": "0.8.5",
+  "manimvox": "0.9.0",
   "series": "Vectors, Explained",
   "tagline": "What a vector really is",
   "voice": "kokoro:af_heart",
