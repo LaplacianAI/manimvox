@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from manimvox import tools
+from manimvox.blocks import blocks_path
 from manimvox.tools import ToolError
 from tests.media import make_mp4
 from tests.test_audio import write_srt
@@ -172,6 +173,67 @@ def test_list_blocks():
     r = tools.list_blocks()
     by = {b.name: b for b in r.blocks}
     assert r.ok and by["bug-grid"].import_line == "from blocks.bug_grid import bug_grid, light"
+
+
+def _registry(tmp_path, name):
+    root = tmp_path / "team"
+    shutil.copytree(blocks_path() / "venn", root / name)
+    data = json.loads((root / name / "block.json").read_text(encoding="utf-8"))
+    (root / name / "block.json").write_text(json.dumps({**data, "name": name}), encoding="utf-8")
+    return root
+
+
+def test_list_blocks_takes_a_root_and_names_the_source(tmp_path):
+    team = _registry(tmp_path, "my-chart")
+    r = tools.list_blocks(str(team))
+    assert [b.name for b in r.blocks] == ["my-chart"] and r.blocks[0].source == str(team.resolve())
+    assert tools.list_blocks().blocks[0].source == str(blocks_path())
+
+
+def test_list_blocks_takes_several_roots_first_one_winning(tmp_path):
+    import os
+
+    team = _registry(tmp_path, "venn")
+    r = tools.list_blocks(f"{team}{os.pathsep}{blocks_path()}")
+    by = {b.name: b for b in r.blocks}
+    assert by["venn"].source == str(team.resolve()) and by["bug-grid"].source == str(blocks_path())
+    assert len([b for b in r.blocks if b.name == "venn"]) == 1
+
+
+def test_add_block_takes_a_root(project, tmp_path):
+    team = _registry(tmp_path, "my-chart")
+    r = tools.add_block(str(project), ["my-chart"], root=str(team))
+    assert r.added[0].source == str(team.resolve()) and (project / "blocks" / "my_chart.py").is_file()
+    with pytest.raises(ToolError, match="force=True"):
+        tools.add_block(str(project), ["my-chart"], root=str(team))
+    assert tools.add_block(str(project), ["my-chart"], force=True, root=str(team)).ok
+
+
+def test_the_tools_name_a_bad_root_and_a_bad_name(project, tmp_path):
+    with pytest.raises(ToolError, match="gone"):
+        tools.list_blocks(str(tmp_path / "gone"))
+    team = _registry(tmp_path, "my-chart")
+    with pytest.raises(ToolError, match="no block named"):
+        tools.add_block(str(project), ["../team/my-chart"], root=str(team))
+    assert not (project / "blocks").exists()
+
+
+def test_the_tools_refuse_a_name_with_a_trailing_newline(project, tmp_path):
+    team = _registry(tmp_path, "my-chart")
+    with pytest.raises(ToolError, match="no block named"):
+        tools.add_block(str(project), ["my-chart\n"], root=str(team))
+    assert not (project / "blocks").exists()
+
+
+def test_the_tools_ignore_the_blocks_environment_variable(project, tmp_path, monkeypatch):
+    team = _registry(tmp_path, "my-chart")
+    monkeypatch.setenv("MANIMVOX_BLOCKS", str(team))
+    assert "venn" in {b.name for b in tools.list_blocks().blocks}
+    assert "my-chart" not in {b.name for b in tools.list_blocks().blocks}
+    with pytest.raises(ToolError, match="no block named"):
+        tools.add_block(str(project), ["my-chart"])
+    monkeypatch.setenv("MANIMVOX_BLOCKS", str(tmp_path / "gone"))
+    assert tools.list_blocks().ok  # a bad variable does not break the tools
 
 
 def test_add_block_copies_and_keeps_edits(project):

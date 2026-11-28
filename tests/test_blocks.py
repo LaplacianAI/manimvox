@@ -16,11 +16,14 @@ from manimvox.blocks import (
     PREVIEW_TOLERANCE,
     add_block,
     all_blocks,
+    all_blocks_multi,
     blocks_path,
     difference,
     get_block,
+    get_block_multi,
     last_frame,
     read_block,
+    registry_roots,
     render_demo,
 )
 from manimvox.cli import main
@@ -168,6 +171,196 @@ def test_add_outside_a_project_fails(tmp_path, monkeypatch, capsys):
     monkeypatch.chdir(tmp_path)
     assert main(["add", "venn"]) == 1
     assert "series.json" in capsys.readouterr().err
+
+
+def _registry(tmp_path, name="team", names=("venn",), description=None):
+    """A registry folder with the standard layout: each block folder copied from the bundled venn."""
+    root = tmp_path / name
+    root.mkdir()
+    for n in names:
+        d = root / n
+        shutil.copytree(REG / "venn", d)
+        data = json.loads((d / "block.json").read_text(encoding="utf-8"))
+        data["name"] = n
+        if description:
+            data["description"] = description
+        (d / "block.json").write_text(json.dumps(data), encoding="utf-8")
+    return root
+
+
+def _project(tmp_path, monkeypatch):
+    d = tmp_path / "p"
+    shutil.copytree(FIXTURE, d)
+    monkeypatch.chdir(d)
+    return d
+
+
+def test_registry_roots_default_is_the_bundled_one(monkeypatch):
+    monkeypatch.delenv("MANIMVOX_BLOCKS", raising=False)
+    assert registry_roots() == [blocks_path()]
+    assert registry_roots([]) == [blocks_path()]
+
+
+def test_registry_roots_flag_beats_env_var_beats_bundled(tmp_path, monkeypatch):
+    a, b = _registry(tmp_path, "a"), _registry(tmp_path, "b")
+    monkeypatch.setenv("MANIMVOX_BLOCKS", str(b))
+    assert registry_roots() == [b.resolve()]
+    assert registry_roots([a]) == [a.resolve()]
+    assert registry_roots([str(a), str(b)]) == [a.resolve(), b.resolve()]
+
+
+def test_registry_roots_splits_the_env_var_on_the_path_separator(tmp_path, monkeypatch):
+    import os
+
+    a, b = _registry(tmp_path, "a"), _registry(tmp_path, "b")
+    monkeypatch.setenv("MANIMVOX_BLOCKS", f"{a}{os.pathsep}{os.pathsep}{b}")
+    assert registry_roots() == [a.resolve(), b.resolve()]
+
+
+def test_registry_roots_names_a_bad_path(tmp_path, monkeypatch):
+    monkeypatch.delenv("MANIMVOX_BLOCKS", raising=False)
+    gone = tmp_path / "gone"
+    with pytest.raises(ValueError, match="gone") as e:
+        registry_roots([gone])
+    assert "does not exist" in str(e.value)
+    f = tmp_path / "file.txt"
+    f.write_text("x", encoding="utf-8")
+    with pytest.raises(ValueError, match="file.txt") as e:
+        registry_roots([f])
+    assert "not a folder" in str(e.value)
+    monkeypatch.setenv("MANIMVOX_BLOCKS", str(gone))
+    with pytest.raises(ValueError, match="gone"):
+        registry_roots()
+
+
+def test_the_first_root_shadows_a_later_one(tmp_path):
+    a = _registry(tmp_path, "a", ("venn", "only-a"), description="from a")
+    b = _registry(tmp_path, "b", ("venn", "only-b"), description="from b")
+    assert get_block_multi("venn", [a, b]).source == a and get_block_multi("venn", [b, a]).source == b
+    assert get_block_multi("only-b", [a, b]).source == b
+    listed = {x.name: x for x in all_blocks_multi([a, b])}
+    assert set(listed) == {"venn", "only-a", "only-b"} and listed["venn"].description == "from a"
+    assert listed["only-b"].source == b
+    with pytest.raises(ValueError, match="no block named"):
+        get_block_multi("nope", [a, b])
+
+
+@pytest.mark.parametrize("name", ["../venn", "../../etc", "a/b", "/etc/passwd", "..", ".", "VENN", "", "venn/"])
+def test_a_name_that_could_leave_the_registry_is_refused(tmp_path, name):
+    outside = _registry(tmp_path, "outside")  # a block folder next to the registry that ../ would reach
+    root = tmp_path / "reg"
+    root.mkdir()
+    shutil.copytree(outside / "venn", tmp_path / "venn")
+    with pytest.raises(ValueError, match="no block named"):
+        get_block_multi(name, [root])
+
+
+def test_add_root_copies_and_says_where_from(tmp_path, monkeypatch, capsys):
+    monkeypatch.delenv("MANIMVOX_BLOCKS", raising=False)
+    team = _registry(tmp_path, "team", ("venn", "my-chart"))
+    d = _project(tmp_path, monkeypatch)
+    assert main(["add", "my-chart", "--root", str(team)]) == 0
+    out = capsys.readouterr().out
+    assert f"(from {team.resolve()})" in out and "from blocks.my_chart import" in out
+    text = (d / "blocks" / "my_chart.py").read_text(encoding="utf-8")
+    assert text.splitlines()[0].startswith("# manimvox block 'my-chart', copied from team (manimvox ")
+    assert str(tmp_path) not in text.splitlines()[0]  # no absolute local path in a file that may be committed
+    assert "def venn" in text
+
+
+def test_the_header_names_a_registry_inside_the_project_by_its_path_from_the_project(tmp_path, monkeypatch):
+    d = _project(tmp_path, monkeypatch)
+    inside = d / "shared" / "blocks"
+    inside.parent.mkdir()
+    shutil.copytree(_registry(tmp_path, "team", ("my-chart",)), inside)
+    assert main(["add", "my-chart", "--root", str(inside)]) == 0
+    first = (d / "blocks" / "my_chart.py").read_text(encoding="utf-8").splitlines()[0]
+    assert first.startswith("# manimvox block 'my-chart', copied from shared/blocks (manimvox ")
+    assert str(tmp_path) not in first
+
+
+def test_add_root_refuses_to_overwrite_without_force(tmp_path, monkeypatch, capsys):
+    team = _registry(tmp_path)
+    d = _project(tmp_path, monkeypatch)
+    assert main(["add", "venn", "--root", str(team)]) == 0
+    dest = d / "blocks" / "venn.py"
+    dest.write_text("# mine\n", encoding="utf-8")
+    assert main(["add", "venn", "--root", str(team)]) == 1
+    assert "--force" in capsys.readouterr().err and dest.read_text(encoding="utf-8") == "# mine\n"
+    assert main(["add", "venn", "--root", str(team), "--force"]) == 0
+    assert "def venn" in dest.read_text(encoding="utf-8")
+
+
+def test_add_list_shows_each_blocks_source_folder(tmp_path, monkeypatch, capsys):
+    monkeypatch.delenv("MANIMVOX_BLOCKS", raising=False)
+    team = _registry(tmp_path, "team", ("my-chart",))
+    monkeypatch.chdir(tmp_path)
+    assert main(["add", "--list", "--root", str(team)]) == 0
+    out = capsys.readouterr().out
+    assert "my-chart" in out and f"(from {team.resolve()})" in out and "bug-grid" not in out
+    assert main(["add", "--list", "--root", str(team), "--root", str(REG)]) == 0
+    out = capsys.readouterr().out
+    assert f"(from {team.resolve()})" in out and f"(from {REG.resolve()})" in out
+
+
+def test_a_custom_block_may_shadow_a_bundled_one_and_says_so(tmp_path, monkeypatch, capsys):
+    monkeypatch.delenv("MANIMVOX_BLOCKS", raising=False)
+    team = _registry(tmp_path, "team", ("venn",), description="the team's venn")
+    d = _project(tmp_path, monkeypatch)
+    assert main(["add", "--list", "--root", str(team), "--root", str(REG)]) == 0
+    lines = [x for x in capsys.readouterr().out.splitlines() if x.startswith("venn ")]
+    assert len(lines) == 1 and "the team's venn" in lines[0] and str(team.resolve()) in lines[0]
+    assert main(["add", "venn", "--root", str(team), "--root", str(REG)]) == 0
+    assert f"(from {team.resolve()})" in capsys.readouterr().out
+    first = (d / "blocks" / "venn.py").read_text(encoding="utf-8").splitlines()[0]
+    assert "copied from team (" in first and str(tmp_path) not in first
+
+
+def test_add_reads_the_env_var_and_the_flag_beats_it(tmp_path, monkeypatch, capsys):
+    env_root = _registry(tmp_path, "envreg", ("from-env",))
+    flag_root = _registry(tmp_path, "flagreg", ("from-flag",))
+    monkeypatch.setenv("MANIMVOX_BLOCKS", str(env_root))
+    d = _project(tmp_path, monkeypatch)
+    assert main(["add", "from-env"]) == 0
+    assert (d / "blocks" / "from_env.py").is_file()
+    capsys.readouterr()
+    assert main(["add", "from-env", "--root", str(flag_root)]) == 1
+    assert "no block named" in capsys.readouterr().err
+    assert main(["add", "from-flag", "--root", str(flag_root)]) == 0
+
+
+def test_add_with_a_bad_root_fails_with_one_line(tmp_path, monkeypatch, capsys):
+    monkeypatch.chdir(tmp_path)
+    assert main(["add", "--list", "--root", str(tmp_path / "gone")]) == 1
+    err = capsys.readouterr().err
+    assert "gone" in err and "Traceback" not in err
+
+
+def test_add_rejects_a_name_that_climbs_out_of_the_registry(tmp_path, monkeypatch, capsys):
+    team = _registry(tmp_path, "team")
+    d = _project(tmp_path, monkeypatch)
+    for name in ("../team/venn", "team/venn", ".."):
+        assert main(["add", name, "--root", str(team)]) == 1
+    assert "no block named" in capsys.readouterr().err
+    assert not (d / "blocks").exists()
+
+
+def test_without_option_or_env_var_the_bundled_registry_and_header_are_unchanged(tmp_path, monkeypatch, capsys):
+    monkeypatch.delenv("MANIMVOX_BLOCKS", raising=False)
+    d = _project(tmp_path, monkeypatch)
+    assert main(["add", "venn"]) == 0
+    out = capsys.readouterr().out
+    assert f"(from {blocks_path()})" in out
+    first = (d / "blocks" / "venn.py").read_text(encoding="utf-8").splitlines()[0]
+    assert first.startswith("# manimvox block 'venn', copied from manimvox ") and first.endswith(".")
+    assert "copied from /" not in first
+
+
+def test_a_registry_with_the_standard_layout_works_as_a_root(tmp_path):
+    team = _registry(tmp_path, "team", ("my-chart",))
+    assert {p.name for p in (team / "my-chart").iterdir()} == {"block.py", "block.json", "demo.py", "preview.png"}
+    assert [b.name for b in all_blocks(team)] == ["my-chart"]
+    assert read_block(team / "my-chart").import_line.startswith("from blocks.my_chart import")
 
 
 @pytest.mark.slow

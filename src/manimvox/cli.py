@@ -174,16 +174,18 @@ def _cmd_join(args) -> int:
 
 
 def _cmd_add(args) -> int:
-    from .tools import _add_blocks, list_blocks
+    from .blocks import all_blocks_multi, registry_roots
+    from .tools import _add_blocks
 
+    roots = registry_roots(args.root)  # --root, else MANIMVOX_BLOCKS, else the bundled registry (the tools skip the variable)
     if args.list or not args.names:
-        for b in list_blocks().blocks:
-            print(f"{b.name:<18} {b.description}  [{', '.join(b.tags)}]")
+        for b in all_blocks_multi(roots):
+            print(f"{b.name:<18} {b.description}  [{', '.join(b.tags)}]  (from {b.source})")
         if not args.list:
             print("add one: manimvox add <block>")
         return 0
-    for b in _add_blocks(str(Path.cwd()), args.names, args.force, "pass --force to replace them").added:
-        print(f"added {b.name}: {b.path}")
+    for b in _add_blocks(str(Path.cwd()), args.names, args.force, "pass --force to replace them", roots).added:
+        print(f"added {b.name}: {b.path} (from {b.source})")
         print(f"  in an episode: {b.import_line}")
     return 0
 
@@ -484,6 +486,9 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("names", nargs="*", metavar="block")
     s.add_argument("--list", action="store_true", help="list the blocks")
     s.add_argument("--force", action="store_true", help="replace a block already in the project")
+    s.add_argument("--root", action="append", metavar="PATH",
+                   help="a registry folder to read instead of the bundled one; repeat it to search several in order "
+                        "(default: MANIMVOX_BLOCKS, else the bundled one). A name in an earlier folder shadows a later one")
     s.set_defaults(func=_cmd_add)
 
     s = p._sub.add_parser("voices", help="voice engines: ready or not, licence, voices")

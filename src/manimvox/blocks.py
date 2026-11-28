@@ -7,9 +7,11 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import sys
 import tempfile
+from collections.abc import Iterable
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -37,6 +39,11 @@ class Block:
         return self.name.replace("-", "_")
 
     @property
+    def source(self) -> Path:
+        """The registry folder this block was read from."""
+        return self.path.parent
+
+    @property
     def import_line(self) -> str:
         return f"from blocks.{self.module} import {', '.join((self.function, *self.helpers))}"
 
@@ -48,6 +55,36 @@ def blocks_path() -> Path:
         if p.is_dir():
             return p
     raise FileNotFoundError("manimvox's blocks are missing from this install; reinstall manimvox")
+
+
+ENV_ROOTS = "MANIMVOX_BLOCKS"  # read by the manimvox command only, never by the agent tools
+
+
+def registry_roots(explicit: Iterable[str | Path] | None = None) -> list[Path]:
+    """The registry folders to read, first one winning: `explicit` (the command's --root flags), else the
+    MANIMVOX_BLOCKS environment variable split on os.pathsep, else the bundled registry.
+    Raises ValueError naming any folder that does not exist or is not a folder."""
+    paths = [str(p) for p in explicit or () if str(p)]
+    if not paths:
+        paths = [p for p in os.environ.get(ENV_ROOTS, "").split(os.pathsep) if p]
+    if not paths:
+        return [blocks_path()]
+    roots = []
+    for p in paths:
+        d = Path(p).expanduser()
+        if not d.exists():
+            raise ValueError(f"registry folder {p} does not exist")
+        if not d.is_dir():
+            raise ValueError(f"registry folder {p} is not a folder")
+        roots.append(d.resolve())
+    return roots
+
+
+def is_bundled(root: Path) -> bool:
+    try:
+        return Path(root).resolve() == blocks_path().resolve()
+    except FileNotFoundError:
+        return False
 
 
 def read_block(d: Path) -> Block:
@@ -67,7 +104,7 @@ def read_block(d: Path) -> Block:
         return v
 
     name = need("name", str)
-    if name != f.parent.name or not NAME.match(name):
+    if name != f.parent.name or not NAME.fullmatch(name):
         raise ValueError(f"{f}: name {name!r} must equal the folder name and use a-z, 0-9 and single hyphens")
     params = need("parameters", list)
     if not all(isinstance(p, dict) and isinstance(p.get("name"), str) and isinstance(p.get("description"), str)
@@ -94,9 +131,45 @@ def get_block(name: str, root: Path | None = None) -> Block:
     raise ValueError(f"no block named {name!r}; `manimvox add --list` shows them")
 
 
+def all_blocks_multi(roots: Iterable[Path]) -> list[Block]:
+    """The blocks of every root, in root order. A name already found in an earlier root shadows the later ones,
+    and a shadowed block.json is not read, so only a block that is listed has to be valid (raises ValueError)."""
+    found: dict[str, Block] = {}
+    for root in roots:
+        for d in sorted(Path(root).iterdir()):
+            if (d / "block.json").is_file() and d.name not in found:
+                b = read_block(d)
+                found[b.name] = b
+    return list(found.values())
+
+
+def get_block_multi(name: str, roots: Iterable[Path]) -> Block:
+    """Block `name` from the first root that has it. The name is checked against the name rule before any path
+    is built, so `..` or a slash cannot reach outside a registry."""
+    if isinstance(name, str) and NAME.fullmatch(name):
+        for root in roots:
+            d = Path(root) / name
+            if (d / "block.json").is_file():
+                return read_block(d)
+    raise ValueError(f"no block named {name!r}; `manimvox add --list` shows them")
+
+
 def add_block(project_root: Path, name: str, force: bool = False, root: Path | None = None) -> Path:
     """Copy block `name` to <project>/blocks/<module>.py. Refuses to replace an existing copy unless `force`."""
-    b = get_block(name, root)
+    return install_block(project_root, get_block(name, root), force)
+
+
+def _where(project_root: Path, source: Path) -> str:
+    """How a copied block's header names its registry folder: the path from the project when the folder lies
+    inside it, else just the folder's name, so no absolute local path lands in a file that may be committed."""
+    src, proj = Path(source).resolve(), Path(project_root).resolve()
+    if src != proj and src.is_relative_to(proj):
+        return src.relative_to(proj).as_posix()
+    return src.name or "a custom registry"
+
+
+def install_block(project_root: Path, b: Block, force: bool = False) -> Path:
+    """Copy the block `b` to <project>/blocks/<module>.py; the header says where it came from if not the bundled registry."""
     d = Path(project_root) / "blocks"
     dest = d / f"{b.module}.py"
     if dest.exists() and not force:
@@ -105,7 +178,11 @@ def add_block(project_root: Path, name: str, force: bool = False, root: Path | N
     if not (d / "__init__.py").exists():
         (d / "__init__.py").write_text(INIT, encoding="utf-8")
     src = (b.path / "block.py").read_text(encoding="utf-8")
-    dest.write_text(f"# manimvox block {b.name!r}, copied from manimvox {__version__}.\n{src}", encoding="utf-8")
+    if is_bundled(b.source):
+        head = f"# manimvox block {b.name!r}, copied from manimvox {__version__}.\n"
+    else:
+        head = f"# manimvox block {b.name!r}, copied from {_where(project_root, b.source)} (manimvox {__version__}).\n"
+    dest.write_text(head + src, encoding="utf-8")
     return dest
 
 
