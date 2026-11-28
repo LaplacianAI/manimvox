@@ -12,7 +12,7 @@ from manimvox.cli import main
 REG = Path(__file__).resolve().parents[1] / "blocks"
 
 GOOD_PY = '''"""A square."""
-from manim import Square, VGroup
+from manimvox.kit import *
 
 
 def {fn}(size=1.0):
@@ -158,13 +158,13 @@ def test_a_missing_function_docstring_is_an_error(tmp_path):
 
 @pytest.mark.parametrize("line", ["import requests", "from requests import get", "import numpy, scipy",
                                   "from . import x", "from .y import z", "from manimvox.other import q",
-                                  "from manimvox import kit"])
+                                  "from manimvox import kit", "import manim", "from manim import *", "from manim import Square"])
 def test_a_disallowed_import_is_an_error(tmp_path, line):
     found = errors(make_block(tmp_path, py=GOOD_PY.format(fn="sq") + f"\n{line}\n"))
     assert len(found) == 1 and "block.py imports" in found[0]
 
 
-@pytest.mark.parametrize("line", ["import json", "import numpy as np", "from manim import *", "import os.path",
+@pytest.mark.parametrize("line", ["import json", "import numpy as np", "import os.path",
                                   "from manimvox.kit import ACCENT", "from collections import abc"])
 def test_an_allowed_import_is_accepted(tmp_path, line):
     assert errors(make_block(tmp_path, py=GOOD_PY.format(fn="sq") + f"\n{line}\n")) == []

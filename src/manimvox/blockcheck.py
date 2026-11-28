@@ -21,7 +21,7 @@ from pathlib import Path
 from .blocks import PREVIEW_SIZE, PREVIEW_TOLERANCE, read_block
 
 BASE_IMPORTS = frozenset(sys.stdlib_module_names) | {"numpy"}  # what every project has
-ALLOWED_IMPORTS = BASE_IMPORTS | {"manim"}  # plus `from manimvox.kit import ...`
+ALLOWED_IMPORTS = BASE_IMPORTS  # plus `from manimvox.kit import ...`
 FILES = frozenset({"block.py", "demo.py", "preview.png", "block.json"})  # a registry block's four files
 HEX = re.compile(r"#(?:[0-9a-fA-F]{8}|[0-9a-fA-F]{6})(?![0-9a-zA-Z_])")
 SHORT_HEX = re.compile(r"#[0-9a-fA-F]{3,4}")  # only a whole string: "#add" inside a sentence is not a colour
@@ -190,7 +190,7 @@ def check_static(d: Path, registry: bool = False) -> list[Finding]:
         if not ast.get_docstring(tree):
             add(ERROR, "block.py has no module docstring")
         for mod in sorted(set(import_problems(tree))):
-            add(ERROR, f"block.py imports {mod}: only the standard library, numpy, manim and manimvox.kit are "
+            add(ERROR, f"block.py imports {mod}: only the standard library, numpy and manimvox.kit are "
                        "available in a project")
         for line, text in hex_colours(tree):
             add(ERROR, f"block.py line {line}: hex colour {text}; use a theme colour (ACCENT, INK, MUTED ...)")
