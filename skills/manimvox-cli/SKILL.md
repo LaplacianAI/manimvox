@@ -1,6 +1,6 @@
 ---
 name: manimvox-cli
-description: "The manimvox command line and how to read its output: doctor, new, brief, draft, render, check brief|theme|layout|audio|edit, voices, add, assets, edit, join, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
+description: "The manimvox command line and how to read its output: doctor, new, brief, draft, render, check brief|theme|layout|audio|edit, voices, add, blocks check, assets, edit, join, index, package and skills. Use when running any manimvox command, choosing flags, or working out why a command or check failed."
 license: MIT
 ---
 
@@ -51,6 +51,7 @@ Ask the user before installing anything: a system package, manimvox itself, or a
 | `manimvox check edit NAME` | none | nothing; prints where each piece of `edits/NAME` lands | 1 on findings (a time past a file's end, a crop or box outside the picture, a hook that does not import) | `check` with `what="edit"` |
 | `manimvox voices [ENGINE]` | `--prepare ENGINE[:VOICE]`, `-y` | model files in the cache | 1 on a voice error | `voices`; `--prepare` is `prepare_voice` |
 | `manimvox add [BLOCK ...]` | `--list`, `--force`, `--root PATH` (repeatable) | `blocks/<block>.py`, `blocks/__init__.py` | 1 on an unknown block or one already in the project without `--force` | `add_block`; `--list` is `list_blocks`; `--root` is their `root` argument; the command also reads `MANIMVOX_BLOCKS`, the tools do not |
+| `manimvox blocks check PATH` | `--render` (also render each registry block's `demo.py`; slow, off by default), `--json` | nothing; prints a report (JSON with `--json`) | 1 on any error, 0 on warnings only | no tool; runs a block's code after its static checks pass, so use only folders you trust |
 | `manimvox assets add URL` | `--licence ID`, `--credit TEXT`, `--name FILE`, `--non-commercial`, `-y` / `--yes` | `research/assets/<file>`, `research/assets.json`, an entry under `## Assets` in `FACTS.md` | 1 on a refused licence, a checksum mismatch, a file already there that differs, or no `--yes` with no terminal | `fetch_asset` (downloads only with `yes=true`; without it the result holds what to ask the user) |
 | `manimvox assets list` | none | nothing | 1 outside a project | `list_assets` |
 | `manimvox edit new NAME FILE...` | none | `edits/NAME.json`: the videos and images in order, joined by cuts | 1 if the edit exists or a file is neither a video nor an image | `new_edit` |
